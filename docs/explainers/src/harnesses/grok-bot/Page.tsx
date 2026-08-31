@@ -1,15 +1,9 @@
+import { MDXProvider } from "@mdx-js/react";
 import { ExplainerShell } from "../../ExplainerShell";
-import { Apex } from "./Apex";
+import { mdxComponents } from "../../mdx-components";
 import { GLOSS } from "./gloss";
-import { S0Map } from "./sections/S0Map";
-import { S1Clone } from "./sections/S1Clone";
-import { S2Process } from "./sections/S2Process";
-import { S3Send } from "./sections/S3Send";
-import { S4Exec } from "./sections/S4Exec";
-import { S5Box } from "./sections/S5Box";
-import { S6Overlay } from "./sections/S6Overlay";
-import { S7Lauren } from "./sections/S7Lauren";
 import srcMap from "./src-map.json";
+import Doc from "./page.mdx";
 
 const TOC = [
   { href: "#s0", n: "0", label: "七塊職責總覽" },
@@ -50,15 +44,9 @@ export function GrokBotPage() {
         </p>
       }
     >
-      <Apex />
-      <S0Map />
-      <S1Clone />
-      <S2Process />
-      <S3Send />
-      <S4Exec />
-      <S5Box />
-      <S6Overlay />
-      <S7Lauren />
+      <MDXProvider components={mdxComponents}>
+        <Doc />
+      </MDXProvider>
     </ExplainerShell>
   );
 }
