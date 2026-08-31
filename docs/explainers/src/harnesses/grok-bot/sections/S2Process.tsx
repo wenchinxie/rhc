@@ -1,0 +1,60 @@
+import { Peek } from "../../../components/Peek";
+import { Term } from "../../../components/Term";
+
+export function S2Process() {
+  return (
+    <>
+      <h2 id="s2">
+        <span className="no">2</span>桌面程式生出控制面，host-main 住在遠端機器
+      </h2>
+      <p>
+        主行程在桌面程式就緒（<code>whenReady</code>
+        ）之後起服務再開窗，自己不跑模型迴圈。
+        <Peek snip="e-main">whenReady</Peek> 帳號就緒後生出控制面，服務名{" "}
+        <code>sand-node-agent-coordinator</code>。<Peek snip="fork">fork</Peek>{" "}
+        子行程收下三條給畫面與主行程說話的通道：控制、畫面資料、主行程資料。
+        <Peek snip="launcher">三埠</Peek>
+      </p>
+      <p>
+        畫面載入前腳本把 <code>desktop</code> 與 <code>coordinatorPort</code>{" "}
+        掛進頁面可呼叫的介面；向主行程要通道後，主行程{" "}
+        <code>postMessage("sand:coordinator-port", …, [port])</code>。
+        <Peek snip="preload-port">preload</Peek>
+      </p>
+      <p>
+        <Term k="sand-host">host-main</Term> 在
+        <Term k="box">沙箱機器</Term>
+        （跟筆電分開、用來跑命令的那台遠端機器）裡依序開機：先搶{" "}
+        <code>host.lock</code>，再起代跑命令的服務 box-exec，再{" "}
+        <code>host.start</code>
+        ，再起給桌面連線的 HTTP 入口，最後寫下 port、pid、token，桌面靠這三個數字找到這台
+        host。
+        <Peek snip="host-main">順序</Peek> box-exec 聽{" "}
+        <code>127.0.0.1:1337</code>
+        ，遠端機器裡的命令交給它。桌面{" "}
+        <Term k="coordinator">coordinator</Term>
+        （桌面程式生出來、畫面把送出交給它的中介行程）連上該入口送出，並收回模型回覆的串流。
+      </p>
+      <p>
+        鎖檔 <code>host.lock</code> 在 sand 根目錄。已有另一個還活著的{" "}
+        <Term k="sand-host">host-main</Term>{" "}
+        握著，就先請它結束，等 3 秒仍活著再強制結束。
+        <span className="stamp">人工選的逾時 3000 ms、最多 5 次</span>
+        改它的成本是重測兩次開機會不會把對方的行程強制結束。
+        <Peek snip="host-lock">鎖</Peek>
+      </p>
+      <p>
+        桌面另有一支脫離的本機命令服務（
+        <code>local-exec-daemon</code>
+        ），由控制面經控制通道請主行程生出來，在使用者電腦上跑本機工具。關程式後最多再等
+        5 秒，逾時就強制結束本機命令服務。
+        <span className="stamp">人工選的 SHUTDOWN_WATCHDOG_MS</span>
+        改它的成本是重測關應用程式會不會留下殘留行程。
+      </p>
+      <p className="src">
+        <code>electron-main/main.ts</code>、<code>coordinator-launcher.ts</code>、
+        <code>host/main.ts</code>、<code>host-lock.ts</code>。
+      </p>
+    </>
+  );
+}

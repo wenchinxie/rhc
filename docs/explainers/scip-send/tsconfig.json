@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "strict": false,
+    "types": ["node"]
+  },
+  "include": [
+    "/mnt/e/grok-bot-0.18-reconstructed/source/host/extensions/transcript/send-pipeline.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/host/extensions/transcript/send-turn-dispatch.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/host/extensions/transcript/turn-runtime.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/host/runner/sand-agent-runner.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/host/runner/turn-agent-composition.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/packages/agent/actions/user-message-action/user-message-action-handler.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts",
+    "/mnt/e/grok-bot-0.18-reconstructed/source/node-agent-coordinator/inference-router.ts"
+  ]
+}

@@ -1,0 +1,6081 @@
+{
+  "model": "faster-whisper/large-v3",
+  "device": "cuda",
+  "compute": "float16",
+  "beam_size": 5,
+  "vad": true,
+  "condition_on_previous_text": false,
+  "duration": 4328.338875,
+  "language": "en",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 15.22,
+      "t": "00:00",
+      "text": "Personally, I think that the best use of AI is really as like a pair, like someone you're pair programming with, and not a tool to just replace the act of writing code, or worse, outsourcing your thinking."
+    },
+    {
+      "start": 16.46,
+      "end": 29.26,
+      "t": "00:16",
+      "text": "And I think there's a tendency, you know, because AI is so exciting, you want to put AI everywhere and be seen as someone who's very, you know, what do you call it, like on the ball, I guess, with AI."
+    },
+    {
+      "start": 30.06,
+      "end": 32.88,
+      "t": "00:30",
+      "text": "that you feel this pressure of like,"
+    },
+    {
+      "start": 32.88,
+      "end": 35.46,
+      "t": "00:32",
+      "text": "I'm just gonna, I gotta increase my productivity,"
+    },
+    {
+      "start": 35.46,
+      "end": 37.54,
+      "t": "00:35",
+      "text": "I gotta ship like 100 PRs this week"
+    },
+    {
+      "start": 37.54,
+      "end": 39.56,
+      "t": "00:37",
+      "text": "and barely understand what I'm doing"
+    },
+    {
+      "start": 39.56,
+      "end": 44.56,
+      "t": "00:39",
+      "text": "and vibe code my way to a million ARR or whatever."
+    },
+    {
+      "start": 46.58,
+      "end": 51.2,
+      "t": "00:46",
+      "text": "But I think one of the things that I've personally seen"
+    },
+    {
+      "start": 51.2,
+      "end": 53.5,
+      "t": "00:51",
+      "text": "is that although when I use AI,"
+    },
+    {
+      "start": 53.5,
+      "end": 56.78,
+      "t": "00:53",
+      "text": "I save some time writing the code,"
+    },
+    {
+      "start": 56.78,
+      "end": 58.84,
+      "t": "00:56",
+      "text": "I actually find myself spending more time"
+    },
+    {
+      "start": 58.84,
+      "end": 60.48,
+      "t": "00:58",
+      "text": "reviewing what the AI did"
+    },
+    {
+      "start": 60.48,
+      "end": 62.16,
+      "t": "01:00",
+      "text": "and correcting it."
+    },
+    {
+      "start": 62.16,
+      "end": 65.36,
+      "t": "01:02",
+      "text": "So I've tried the thing that a lot of people say."
+    },
+    {
+      "start": 66.56,
+      "end": 70.3,
+      "t": "01:06",
+      "text": "Instead of prompting an AI to just build a feature outright,"
+    },
+    {
+      "start": 70.3,
+      "end": 74.06,
+      "t": "01:10",
+      "text": "you sort of get it to build a spec for you first,"
+    },
+    {
+      "start": 74.06,
+      "end": 76.98,
+      "t": "01:14",
+      "text": "then you review that spec, and then you do that whole thing."
+    },
+    {
+      "start": 76.98,
+      "end": 80.28,
+      "t": "01:16",
+      "text": "Then it's such a time-consuming process."
+    },
+    {
+      "start": 80.28,
+      "end": 83.56,
+      "t": "01:20",
+      "text": "And if you don't really understand what the AI is doing,"
+    },
+    {
+      "start": 83.56,
+      "end": 87.36,
+      "t": "01:23",
+      "text": "then I think you're doing yourself a disservice"
+    },
+    {
+      "start": 87.36,
+      "end": 96.56,
+      "t": "01:27",
+      "text": "because it's like the same way that in school you use a calculator or you know you have an open book"
+    },
+    {
+      "start": 96.56,
+      "end": 102.74,
+      "t": "01:36",
+      "text": "exam the the skill of being a developer is really in like the knowledge of using tools and I think"
+    },
+    {
+      "start": 102.74,
+      "end": 109.5,
+      "t": "01:42",
+      "text": "when you just completely outsource that you know thinking I think that's like really dangerous but"
+    },
+    {
+      "start": 109.5,
+      "end": 116.44,
+      "t": "01:49",
+      "text": "I think I don't know I know what other people will say to that so for me I think I'm curious"
+    },
+    {
+      "start": 116.44,
+      "end": 123.32,
+      "t": "01:56",
+      "text": "like i guess Colin, your experience as well but for me i think the most important skill",
+      "was": "like i guess calling your experience as well but for me i think the most important skill",
+      "fixes": [
+        {
+          "pat": "(?i)\\bcalling your experience\\b",
+          "to": "Colin, your experience",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 123.32,
+      "end": 128.74,
+      "t": "02:03",
+      "text": "that you should have in your toolbox when you work with agents is verification"
+    },
+    {
+      "start": 128.74,
+      "end": 137.19,
+      "t": "02:08",
+      "text": "and by verification i mean the ability for an agent to actually run the code or take"
+    },
+    {
+      "start": 137.19,
+      "end": 145.81,
+      "t": "02:17",
+      "text": "cpu traces or heap snapshots or you know open an ios simulator whatever you know however your"
+    },
+    {
+      "start": 145.81,
+      "end": 154.15,
+      "t": "02:25",
+      "text": "application is exposed to your users it can do the same thing and run it for real and actually"
+    },
+    {
+      "start": 154.15,
+      "end": 160.37,
+      "t": "02:34",
+      "text": "test and verify it don't work because that's the thing that really closes the loop it doesn't"
+    },
+    {
+      "start": 160.37,
+      "end": 167.43,
+      "t": "02:40",
+      "text": "guarantee your agent writes good code but it allows them to at least write correct code which"
+    },
+    {
+      "start": 167.43,
+      "end": 175.75,
+      "t": "02:47",
+      "text": "is a big a really big step forward for being able to trust your agents i will i can share one example"
+    },
+    {
+      "start": 175.75,
+      "end": 201.03,
+      "t": "02:55",
+      "text": "that we have uh within cursor uh oops where let me open this there you go uh so for the for cursors"
+    },
+    {
+      "start": 201.03,
+      "end": 207.93,
+      "t": "03:21",
+      "text": "agent window uh so this is actually an interesting story but uh when i joined cursor five months ago"
+    },
+    {
+      "start": 207.93,
+      "end": 213.87,
+      "t": "03:27",
+      "text": "uh they're actually uh well i was supposed to join a different team i was supposed to join like the"
+    },
+    {
+      "start": 213.87,
+      "end": 219.95,
+      "t": "03:33",
+      "text": "cloud agents team uh but then since i have a lot of experience working on react and agents window"
+    },
+    {
+      "start": 219.95,
+      "end": 229.47,
+      "t": "03:39",
+      "text": "is a react application uh i was uh i was asked to basically help out with uh the agent window work"
+    },
+    {
+      "start": 229.47,
+      "end": 238.4,
+      "t": "03:49",
+      "text": "uh but um there wasn't really a lot of like skills to help me so i just found myself that okay uh"
+    },
+    {
+      "start": 238.4,
+      "end": 245.66,
+      "t": "03:58",
+      "text": "agent was going to launch in like a week right we have a really tight deadline and um there was uh"
+    },
+    {
+      "start": 245.66,
+      "end": 249.48,
+      "t": "04:05",
+      "text": "you know i was just sitting there like okay i'm going to open up Performance, the Chrome",
+      "was": "you know i was just sitting there like okay i'm going to open up the performant the the chrome",
+      "fixes": [
+        {
+          "pat": "(?i)\\bthe performant the the chrome\\b",
+          "to": "Performance, the Chrome",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 249.48,
+      "end": 254.52,
+      "t": "04:09",
+      "text": "dev tools and just like take a trace look at it myself and try to make sense of this flame graph"
+    },
+    {
+      "start": 254.52,
+      "end": 259.06,
+      "t": "04:14",
+      "text": "and keep in mind i was just like in my first week so i had no idea what i was looking at"
+    },
+    {
+      "start": 259.06,
+      "end": 264.36,
+      "t": "04:19",
+      "text": "no idea what you know i mean i had some idea but you know the code base was completely fresh to me"
+    },
+    {
+      "start": 264.36,
+      "end": 270.58,
+      "t": "04:24",
+      "text": "and I realized like my agent had no idea either you know like I would take a screenshot of the"
+    },
+    {
+      "start": 270.58,
+      "end": 274.08,
+      "t": "04:30",
+      "text": "trace I would download the trace I would send it to it and it'd be like yeah it kind of looks like",
+      "was": "trade I would download the trade I would send it to it and it'd be like yeah it kind of looks like",
+      "fixes": [
+        {
+          "pat": "(?i)\\bdownload the trade\\b",
+          "to": "download the trace",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 274.08,
+      "end": 279.64,
+      "t": "04:34",
+      "text": "this you know and it would like confidently state like it's this thing and then I'd try to fix that"
+    },
+    {
+      "start": 279.64,
+      "end": 286.11,
+      "t": "04:39",
+      "text": "and turns out that's not the actual thing so this was a very very slow process and if you've ever"
+    },
+    {
+      "start": 286.11,
+      "end": 290.87,
+      "t": "04:46",
+      "text": "done any like performance work yourself or you know just even development with an agent where"
+    },
+    {
+      "start": 290.87,
+      "end": 296.96,
+      "t": "04:50",
+      "text": "you don't have a verification skill you are the verifier all right you you're the bottleneck you"
+    },
+    {
+      "start": 296.96,
+      "end": 301.58,
+      "t": "04:56",
+      "text": "you you tell your agent to do something and then it goes off and write some code then you open up"
+    },
+    {
+      "start": 301.58,
+      "end": 305.68,
+      "t": "05:01",
+      "text": "your you know local dev build and then you start to say oh you know it doesn't work then you have"
+    },
+    {
+      "start": 305.68,
+      "end": 311.76,
+      "t": "05:05",
+      "text": "to copy paste screen uh you know screenshots or console errors or whatever uh and then your agent"
+    },
+    {
+      "start": 311.76,
+      "end": 318.16,
+      "t": "05:11",
+      "text": "like slowly kind of like uh you know works with that and then tries to understand it and um"
+    },
+    {
+      "start": 318.16,
+      "end": 323.54,
+      "t": "05:18",
+      "text": "that fix the thing but then you're constantly just in the loop and and being a bottleneck so"
+    },
+    {
+      "start": 323.54,
+      "end": 327.96,
+      "t": "05:23",
+      "text": "there's really no way to parallelize so the control glass skill is like one of the first"
+    },
+    {
+      "start": 327.96,
+      "end": 334.46,
+      "t": "05:27",
+      "text": "skills i built uh for cursor uh and glass by the way is the code name for agent's window that we"
+    },
+    {
+      "start": 334.46,
+      "end": 343.19,
+      "t": "05:34",
+      "text": "use internally but it's just cursor i guess um and so this skill uh is i guess that the code"
+    },
+    {
+      "start": 343.19,
+      "end": 348.91,
+      "t": "05:43",
+      "text": "itself is not super interesting your agent can very easily make one for you where if if you're"
+    },
+    {
+      "start": 348.91,
+      "end": 356.93,
+      "t": "05:48",
+      "text": "building an electron app or a web app or even ios applications you can teach your agent how to use"
+    },
+    {
+      "start": 356.93,
+      "end": 364.01,
+      "t": "05:56",
+      "text": "like the chrome dev tools protocol or through apple has some utilities as well for running"
+    },
+    {
+      "start": 364.01,
+      "end": 370.97,
+      "t": "06:04",
+      "text": "the simulator and taking traces and controlling programmatic control as well so that's really"
+    },
+    {
+      "start": 370.97,
+      "end": 381.22,
+      "t": "06:10",
+      "text": "useful. But one thing I actually want to talk about is the this thing, where it has to read me."
+    },
+    {
+      "start": 381.22,
+      "end": 389.1,
+      "t": "06:21",
+      "text": "So this skill comes with this very unique feature called, or not feature, a unique file called a"
+    },
+    {
+      "start": 389.1,
+      "end": 395.3,
+      "t": "06:29",
+      "text": "feature map. And so the story then is like, I built this skill. And so now the agent was able"
+    },
+    {
+      "start": 395.3,
+      "end": 404.54,
+      "t": "06:35",
+      "text": "to actually run the agent window and take traces and whatnot. But it had no idea what the agent"
+    },
+    {
+      "start": 404.54,
+      "end": 412.52,
+      "t": "06:44",
+      "text": "window was. So, you know, like someone would say like, oh, the left sidebar is like, laggy or"
+    },
+    {
+      "start": 412.52,
+      "end": 418.08,
+      "t": "06:52",
+      "text": "something like that. Or, you know, the right side, the PR tab is not working. And the agent would"
+    },
+    {
+      "start": 418.08,
+      "end": 421.32,
+      "t": "06:58",
+      "text": "just be like kind of flailing around, it would spend a lot of time trying to like look up the"
+    },
+    {
+      "start": 421.32,
+      "end": 426.5,
+      "t": "07:01",
+      "text": "code and you know where is this feature how do i actually get to it on the ui which made it"
+    },
+    {
+      "start": 426.5,
+      "end": 433.51,
+      "t": "07:06",
+      "text": "basically completely useless uh you know like we would i would run this skill locally and you know"
+    },
+    {
+      "start": 433.51,
+      "end": 440.15,
+      "t": "07:13",
+      "text": "it would spawn a dev build uh but then it just be churning like i just try to click here it wouldn't"
+    },
+    {
+      "start": 440.15,
+      "end": 447.55,
+      "t": "07:20",
+      "text": "know how to get to things um and it was just an awful experience uh so who is putting arrows on"
+    },
+    {
+      "start": 447.55,
+      "end": 456.12,
+      "t": "07:27",
+      "text": "my screen. So yeah, this feature map has been really useful because it teaches the agent how"
+    },
+    {
+      "start": 456.12,
+      "end": 463.62,
+      "t": "07:36",
+      "text": "to get to all of the features that you have. And in Pstack, the plugin that I've made, if you"
+    },
+    {
+      "start": 463.62,
+      "end": 471.26,
+      "t": "07:43",
+      "text": "search for Pstack cursor on Google, you'll find it. But there is a create verification skill in"
+    },
+    {
+      "start": 471.26,
+      "end": 476.84,
+      "t": "07:51",
+      "text": "that plugin where it actually helps you set up something like this for yourself, including the"
+    },
+    {
+      "start": 476.84,
+      "end": 481.82,
+      "t": "07:56",
+      "text": "feature map. So it will actually explore the code and build up this initial feature map that tells"
+    },
+    {
+      "start": 481.82,
+      "end": 487.04,
+      "t": "08:01",
+      "text": "your agent how to get to all of the different features that you have. And this is extremely"
+    },
+    {
+      "start": 487.04,
+      "end": 493.78,
+      "t": "08:07",
+      "text": "powerful because now that you have these user reports that come in, you can actually map even"
+    },
+    {
+      "start": 493.78,
+      "end": 501.45,
+      "t": "08:13",
+      "text": "like a vague report or even a screenshot. So we have this internally at Cursor where we have a"
+    },
+    {
+      "start": 501.45,
+      "end": 507.15,
+      "t": "08:21",
+      "text": "slack channel where you know lots of people giving us feedback on the agents window and Grok Bot and",
+      "was": "slack channel where you know lots of people giving us feedback on the agents window and rock bot and",
+      "fixes": [
+        {
+          "pat": "(?i)\\brock ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 507.15,
+      "end": 513.95,
+      "t": "08:27",
+      "text": "whatnot uh and oftentimes the report is very bad like very low quality like someone just put"
+    },
+    {
+      "start": 513.95,
+      "end": 518.21,
+      "t": "08:33",
+      "text": "very often we get like a screenshot like and then someone just says question mark question"
+    },
+    {
+      "start": 518.21,
+      "end": 523.69,
+      "t": "08:38",
+      "text": "mark question mark like what is this and you know like without this your agents are like i have no"
+    },
+    {
+      "start": 523.69,
+      "end": 531.25,
+      "t": "08:43",
+      "text": "clue right but with a feature map like this it has a lot more context and understanding of how"
+    },
+    {
+      "start": 531.25,
+      "end": 536.77,
+      "t": "08:51",
+      "text": "actually navigate how to get to all the different features uh so like you know example like i guess"
+    },
+    {
+      "start": 536.77,
+      "end": 542.05,
+      "t": "08:56",
+      "text": "like the sidebar like what is the sidebar uh you know like all the different sub features that are"
+    },
+    {
+      "start": 542.05,
+      "end": 548.45,
+      "t": "09:02",
+      "text": "present in it um like from the user point of view which is how to get to it all the different"
+    },
+    {
+      "start": 548.45,
+      "end": 556.07,
+      "t": "09:08",
+      "text": "keyboard shortcuts uh even like the the what do you call it the dom elements or yeah like the"
+    },
+    {
+      "start": 556.07,
+      "end": 563.59,
+      "t": "09:16",
+      "text": "attributes that you use for selecting things through the CDP are all there. So again, yeah,"
+    },
+    {
+      "start": 563.59,
+      "end": 572.07,
+      "t": "09:23",
+      "text": "this is like really, really powerful for agents. And Pstack ships that create verification skill,"
+    },
+    {
+      "start": 572.07,
+      "end": 576.95,
+      "t": "09:32",
+      "text": "but also a maintain verification skill. So you can keep this up to date."
+    },
+    {
+      "start": 577.88,
+      "end": 580.2,
+      "t": "09:37",
+      "text": "Cool. Yeah. I was just going to ask how you created that. So do you mind sharing a little"
+    },
+    {
+      "start": 580.2,
+      "end": 585.4,
+      "t": "09:40",
+      "text": "bit more about that process in the context of Pstack and maybe just what Pstack is for the"
+    },
+    {
+      "start": 585.4,
+      "end": 592.27,
+      "t": "09:45",
+      "text": "folks aren't familiar yeah so Pstack is pretty interesting because uh well first of all the name",
+      "was": "folks aren't familiar yeah so p stack is pretty interesting because uh well first of all the name",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 592.27,
+      "end": 601.45,
+      "t": "09:52",
+      "text": "is kind of goofy like the p the p and Pstack is like potato potato stack because i um so uh",
+      "was": "is kind of goofy like the p the p and p stack is like potato potato stack because i um so uh",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 601.45,
+      "end": 609.77,
+      "t": "10:01",
+      "text": "there is a pretty uh famous person gary tan who is the ceo of y combinator and he's come up with"
+    },
+    {
+      "start": 609.77,
+      "end": 616.61,
+      "t": "10:09",
+      "text": "this plugin called G-Stack, Gary Stack. And funnily enough, we share the last name,"
+    },
+    {
+      "start": 616.71,
+      "end": 621.71,
+      "t": "10:16",
+      "text": "we have no relations. But I thought it'd be funny to kind of, you know, poke fun at Gary"
+    },
+    {
+      "start": 621.71,
+      "end": 630.17,
+      "t": "10:21",
+      "text": "and make Pstack my version of his plugin, but kind of just tailor it to my own set of",
+      "was": "and make P-Stack my version of his plugin, but kind of just tailor it to my own set of",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp-stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 630.17,
+      "end": 635.8,
+      "t": "10:30",
+      "text": "engineering practices. But I honestly actually never set out to build Pstack.",
+      "was": "engineering practices. But I honestly actually never set out to build P-Stack.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp-stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 635.8,
+      "end": 640.64,
+      "t": "10:35",
+      "text": "it just started with a bunch of skills right like i started with that control glass skill"
+    },
+    {
+      "start": 640.64,
+      "end": 647.1,
+      "t": "10:40",
+      "text": "and then i started with another skill like called how which i also noticed through like observing"
+    },
+    {
+      "start": 647.1,
+      "end": 652.78,
+      "t": "10:47",
+      "text": "agents um so like you know in the early days of me you know trying to climb this ladder i was like"
+    },
+    {
+      "start": 652.78,
+      "end": 659.22,
+      "t": "10:52",
+      "text": "super in the loop and i was basically nitpicking my agents to an extreme degree i was like i would"
+    },
+    {
+      "start": 659.22,
+      "end": 665.36,
+      "t": "10:59",
+      "text": "tell it um you know this feature has stopped working here's a bug report like why isn't it"
+    },
+    {
+      "start": 665.36,
+      "end": 672.75,
+      "t": "11:05",
+      "text": "working and very often the agent would just like confidently state like oh it has to be this right"
+    },
+    {
+      "start": 672.75,
+      "end": 678.37,
+      "t": "11:12",
+      "text": "it has to be this thing and i noticed like when i looked at the actual tool calls i noticed it"
+    },
+    {
+      "start": 678.37,
+      "end": 684.49,
+      "t": "11:18",
+      "text": "wasn't actually reading the code that i thought should be affected and that made me just extremely"
+    },
+    {
+      "start": 684.49,
+      "end": 688.67,
+      "t": "11:24",
+      "text": "suspicious and at that point i was like i'm not gonna i can't trust any this agent anymore"
+    },
+    {
+      "start": 688.67,
+      "end": 695.25,
+      "t": "11:28",
+      "text": "because it's just it's just completely hallucinating and i think i think it's very"
+    },
+    {
+      "start": 695.25,
+      "end": 701.23,
+      "t": "11:35",
+      "text": "easy to just you know like build up that distrust and not and kind of feel helpless like you know"
+    },
+    {
+      "start": 701.23,
+      "end": 707.29,
+      "t": "11:41",
+      "text": "you don't know how to help your agents succeed but like again i think the the management analogy"
+    },
+    {
+      "start": 707.29,
+      "end": 712.95,
+      "t": "11:47",
+      "text": "is super helpful because like imagine if you were a manager of an engineering team and you had an"
+    },
+    {
+      "start": 712.95,
+      "end": 717.79,
+      "t": "11:52",
+      "text": "engineer on your team who was a really good coder no business context whatsoever you know they just"
+    },
+    {
+      "start": 717.79,
+      "end": 724.99,
+      "t": "11:57",
+      "text": "you just hired them and they onboarded you know like five seconds ago uh and so how do you actually"
+    },
+    {
+      "start": 724.99,
+      "end": 731.21,
+      "t": "12:04",
+      "text": "teach that person to be effective so how you do that is through a skill a skill being just you"
+    },
+    {
+      "start": 731.21,
+      "end": 736.89,
+      "t": "12:11",
+      "text": "know it's just marked down right but you know encodes a lot of information instructions a lot"
+    },
+    {
+      "start": 736.89,
+      "end": 744.99,
+      "t": "12:16",
+      "text": "of uh you can really draw out a lot of intelligence from an agent by well some people on twitter call"
+    },
+    {
+      "start": 744.99,
+      "end": 749.65,
+      "t": "12:24",
+      "text": "it like you know pull the agent to a different latent space which is kind of like a fancy way"
+    },
+    {
+      "start": 749.65,
+      "end": 756.05,
+      "t": "12:29",
+      "text": "of just saying like since uh you know llms are sort of like they predict the next token uh when"
+    },
+    {
+      "start": 756.05,
+      "end": 761.45,
+      "t": "12:36",
+      "text": "you give it some high quality tokens uh to begin with then you know it it can kind of pattern match"
+    },
+    {
+      "start": 761.45,
+      "end": 769.99,
+      "t": "12:41",
+      "text": "on like a higher space that's you know smarter um so that's like a very interesting model there"
+    },
+    {
+      "start": 769.99,
+      "end": 776.95,
+      "t": "12:49",
+      "text": "but yeah i built Pstack very very incrementally uh so uh started with just really observing how",
+      "was": "but yeah i built p stack very very incrementally uh so uh started with just really observing how",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 776.95,
+      "end": 782.33,
+      "t": "12:56",
+      "text": "agents you know all the fail different failure modes of of that agents were having and every"
+    },
+    {
+      "start": 782.33,
+      "end": 786.75,
+      "t": "13:02",
+      "text": "time i saw that i just okay i'm just gonna make that a skill right like stop hallucinating actually"
+    },
+    {
+      "start": 786.75,
+      "end": 797.69,
+      "t": "13:06",
+      "text": "go and search up look up the code use a lot of sub agents uh and yeah stop guessing yeah that"
+    },
+    {
+      "start": 797.69,
+      "end": 800.97,
+      "t": "13:17",
+      "text": "makes sense one one kind of follow-up question here uh both for myself and from a bunch of people"
+    },
+    {
+      "start": 800.97,
+      "end": 806.27,
+      "t": "13:20",
+      "text": "in the chat so i guess it's two two parts so one is like how do you maintain these skills so like"
+    },
+    {
+      "start": 806.27,
+      "end": 810.03,
+      "t": "13:26",
+      "text": "product changes over time obviously there's a lot of people who are shipping against the code base"
+    },
+    {
+      "start": 810.03,
+      "end": 814.67,
+      "t": "13:30",
+      "text": "so how do these skills get maintained uh and then second to that is like how do you know when your"
+    },
+    {
+      "start": 814.67,
+      "end": 820.59,
+      "t": "13:34",
+      "text": "verification is is good enough uh like in you know you can trust that the verification loops that"
+    },
+    {
+      "start": 820.59,
+      "end": 828.03,
+      "t": "13:40",
+      "text": "you built are gonna i guess you trust that the outputs uh when they're done uh yeah maybe i'll"
+    },
+    {
+      "start": 828.03,
+      "end": 834.11,
+      "t": "13:48",
+      "text": "talk about um i think they're somewhat related maybe i'll start with this one first so like how"
+    },
+    {
+      "start": 834.11,
+      "end": 843.12,
+      "t": "13:54",
+      "text": "do I maintain these skills? So if you're not familiar with this concept, an eval is essentially"
+    },
+    {
+      "start": 843.12,
+      "end": 848.8,
+      "t": "14:03",
+      "text": "like a way to... well I think the mental model I have is like it's like a unit test for an agent"
+    },
+    {
+      "start": 850.24,
+      "end": 856.0,
+      "t": "14:10",
+      "text": "and you can actually make your own evals. You don't need like a special framework for them."
+    },
+    {
+      "start": 856.0,
+      "end": 862.4,
+      "t": "14:16",
+      "text": "You can build one depending on like you know how scientific and how rigorous you want to be."
+    },
+    {
+      "start": 862.4,
+      "end": 870.89,
+      "t": "14:22",
+      "text": "uh my screen is red yeah there's a little button um sorry like disabling the drawing or something"
+    },
+    {
+      "start": 870.89,
+      "end": 875.21,
+      "t": "14:30",
+      "text": "i can't see my screen yeah sorry if you guys could not draw on the screen that'd be great but"
+    },
+    {
+      "start": 875.21,
+      "end": 882.17,
+      "t": "14:35",
+      "text": "um there's a little button in the control yeah the little drop down um how do i clear"
+    },
+    {
+      "start": 882.17,
+      "end": 893.26,
+      "t": "14:42",
+      "text": "yeah okay yeah you got it perfect um yeah so evals are a way to unit test your skills basically"
+    },
+    {
+      "start": 893.26,
+      "end": 895.98,
+      "t": "14:53",
+      "text": "and actually in Pstack we ship",
+      "was": "and actually in P stack we ship",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 895.98,
+      "end": 898.3,
+      "t": "14:55",
+      "text": "under potato mode there's a playbook"
+    },
+    {
+      "start": 898.3,
+      "end": 900.1,
+      "t": "14:58",
+      "text": "if you search for it called eval playbook"
+    },
+    {
+      "start": 900.1,
+      "end": 901.88,
+      "t": "15:00",
+      "text": "and it's"
+    },
+    {
+      "start": 901.88,
+      "end": 904.62,
+      "t": "15:01",
+      "text": "it's like not"
+    },
+    {
+      "start": 904.62,
+      "end": 905.78,
+      "t": "15:04",
+      "text": "it's actually pretty"
+    },
+    {
+      "start": 905.78,
+      "end": 907.7,
+      "t": "15:05",
+      "text": "rigorous the way it's done"
+    },
+    {
+      "start": 907.7,
+      "end": 910.6,
+      "t": "15:07",
+      "text": "but essentially what I do"
+    },
+    {
+      "start": 910.6,
+      "end": 912.44,
+      "t": "15:10",
+      "text": "is I spawn a lot of different sub"
+    },
+    {
+      "start": 912.44,
+      "end": 914.68,
+      "t": "15:12",
+      "text": "agents I have like my main"
+    },
+    {
+      "start": 914.68,
+      "end": 915.78,
+      "t": "15:14",
+      "text": "coordinator agent"
+    },
+    {
+      "start": 915.78,
+      "end": 918.5,
+      "t": "15:15",
+      "text": "come up with a rubric for"
+    },
+    {
+      "start": 918.5,
+      "end": 920.54,
+      "t": "15:18",
+      "text": "what I want"
+    },
+    {
+      "start": 920.54,
+      "end": 921.32,
+      "t": "15:20",
+      "text": "the skill to do"
+    },
+    {
+      "start": 921.32,
+      "end": 928.4,
+      "t": "15:21",
+      "text": "um and then it spawns all these sub-agents and it it creates individual directories for them"
+    },
+    {
+      "start": 928.4,
+      "end": 936.64,
+      "t": "15:28",
+      "text": "which are cleverly named to not let the sub-agent know that it's being evaluated because agents can"
+    },
+    {
+      "start": 936.64,
+      "end": 942.26,
+      "t": "15:36",
+      "text": "actually tell and when they do they change their behavior uh but it does a bunch of stuff like that"
+    },
+    {
+      "start": 942.26,
+      "end": 950.4,
+      "t": "15:42",
+      "text": "to um essentially yeah like test whether or not the skill i'm making or changing is actually doing"
+    },
+    {
+      "start": 950.4,
+      "end": 956.88,
+      "t": "15:50",
+      "text": "what I think it does. And one of the really nice things about Cursor is that we support so many"
+    },
+    {
+      "start": 956.88,
+      "end": 963.7,
+      "t": "15:56",
+      "text": "different models. So you can actually eval your skill across all sorts of different models and"
+    },
+    {
+      "start": 963.7,
+      "end": 970.48,
+      "t": "16:03",
+      "text": "get a sense of how well it performs across that different matrix, especially for the models that"
+    },
+    {
+      "start": 970.48,
+      "end": 978.08,
+      "t": "16:10",
+      "text": "you use. So I do this a lot. Every time I modify a skill, I will run one of these, like the eval"
+    },
+    {
+      "start": 978.08,
+      "end": 984.84,
+      "t": "16:18",
+      "text": "playbook uh and make sure that you know it's actually leading to a result i want uh but i"
+    },
+    {
+      "start": 984.84,
+      "end": 991.05,
+      "t": "16:24",
+      "text": "will say like maintaining skills is actually pretty hard uh it requires i think a lot of"
+    },
+    {
+      "start": 991.05,
+      "end": 997.69,
+      "t": "16:31",
+      "text": "taste and observation so you kind of need to be very good at being a backseat driver"
+    },
+    {
+      "start": 997.69,
+      "end": 1001.75,
+      "t": "16:37",
+      "text": "you know i mean like if you do pair if you've ever done pair programming for example"
+    },
+    {
+      "start": 1001.75,
+      "end": 1006.97,
+      "t": "16:41",
+      "text": "uh and you watch a co-worker code and you're just like you could probably do this better you know"
+    },
+    {
+      "start": 1006.97,
+      "end": 1011.09,
+      "t": "16:46",
+      "text": "you could do, you know, like, why did you not do this, right? You ask a lot of questions to your"
+    },
+    {
+      "start": 1011.09,
+      "end": 1015.67,
+      "t": "16:51",
+      "text": "coworker, and it's kind of a similar thing here, like, you don't want to just be a passive observer"
+    },
+    {
+      "start": 1015.67,
+      "end": 1020.63,
+      "t": "16:55",
+      "text": "of the agent, you want to be very in the driver's seat in the initial stages when you're building up"
+    },
+    {
+      "start": 1020.63,
+      "end": 1025.65,
+      "t": "17:00",
+      "text": "your own set of skills. You know, obviously, you can use something like PSAC, but if you're building"
+    },
+    {
+      "start": 1025.65,
+      "end": 1031.11,
+      "t": "17:05",
+      "text": "your own set of skills, it's very, I think, you know, opening up all the tool calls and, like,"
+    },
+    {
+      "start": 1031.11,
+      "end": 1038.05,
+      "t": "17:11",
+      "text": "reading the code and reading all the agent behavior and their thinking blocks is a really"
+    },
+    {
+      "start": 1038.05,
+      "end": 1044.9,
+      "t": "17:18",
+      "text": "great way to see where they fail, right? Like what, you know, where are they being done? And"
+    },
+    {
+      "start": 1044.9,
+      "end": 1050.11,
+      "t": "17:24",
+      "text": "then you can go and build a skill for that. And then with verification, how you trust it is,"
+    },
+    {
+      "start": 1050.57,
+      "end": 1055.37,
+      "t": "17:30",
+      "text": "it's, I think it's also a very similar iteration loop where, you know, like I actually did the"
+    },
+    {
+      "start": 1055.37,
+      "end": 1063.32,
+      "t": "17:35",
+      "text": "same process for verifying the verification skill where i actually get um so one thing that's"
+    },
+    {
+      "start": 1063.32,
+      "end": 1069.2,
+      "t": "17:43",
+      "text": "interesting about evals is that you can sort of hill climb them meaning that uh your eval can"
+    },
+    {
+      "start": 1069.2,
+      "end": 1076.32,
+      "t": "17:49",
+      "text": "produce a score right a score that you can get your coordinator to produce but also you can have"
+    },
+    {
+      "start": 1076.32,
+      "end": 1083.38,
+      "t": "17:56",
+      "text": "a judge agent of a different model to kind of cross-reference and make sure that the first"
+    },
+    {
+      "start": 1083.38,
+      "end": 1088.0,
+      "t": "18:03",
+      "text": "model is not being biased right the model that's judging all of the sub agents that are running the"
+    },
+    {
+      "start": 1088.0,
+      "end": 1093.5,
+      "t": "18:08",
+      "text": "thing uh but you can also like hill climb so meaning that you can you can use like slash loop"
+    },
+    {
+      "start": 1093.5,
+      "end": 1100.9,
+      "t": "18:13",
+      "text": "in cursor and you can say okay keep looping on this eval right until everything is 10 out of 10"
+    },
+    {
+      "start": 1100.9,
+      "end": 1106.26,
+      "t": "18:20",
+      "text": "as an example uh and i did the same the basically the same approach with the control skill and so i"
+    },
+    {
+      "start": 1106.26,
+      "end": 1112.2,
+      "t": "18:26",
+      "text": "kind of it was very it was very hands-off actually uh so you know i uh i kind of built i built that"
+    },
+    {
+      "start": 1112.2,
+      "end": 1120.1,
+      "t": "18:32",
+      "text": "skill that way like the cli in that skill um and over time it's gotten really good uh but yeah it"
+    },
+    {
+      "start": 1120.1,
+      "end": 1127.1,
+      "t": "18:40",
+      "text": "was definitely not super smooth at the beginning it required a lot of iteration and i think there's"
+    },
+    {
+      "start": 1127.1,
+      "end": 1133.52,
+      "t": "18:47",
+      "text": "an analogy here for me which is um well i make this analogy later in a different slide on my"
+    },
+    {
+      "start": 1133.52,
+      "end": 1141.96,
+      "t": "18:53",
+      "text": "drawing here uh but i think of it like uh you know as a as a engineer now you're sort of more like"
+    },
+    {
+      "start": 1141.96,
+      "end": 1149.72,
+      "t": "19:01",
+      "text": "like maybe a manager or the analogy i like is like you're like a chef in a restaurant uh you're the"
+    },
+    {
+      "start": 1149.72,
+      "end": 1154.7,
+      "t": "19:09",
+      "text": "head chef uh you're not cooking all the food yourself anymore you have a team of cooks right"
+    },
+    {
+      "start": 1154.7,
+      "end": 1161.38,
+      "t": "19:14",
+      "text": "you have line cooks you have a sous chef you know all these different stations um and it's your job"
+    },
+    {
+      "start": 1161.38,
+      "end": 1165.68,
+      "t": "19:21",
+      "text": "to really design the environment you know you you're in charge of setting up the kitchen you're"
+    },
+    {
+      "start": 1165.68,
+      "end": 1173.86,
+      "t": "19:25",
+      "text": "in charge of you know like giving tasks to different people so um yeah it's a very interesting"
+    },
+    {
+      "start": 1173.86,
+      "end": 1181.22,
+      "t": "19:33",
+      "text": "way of working uh but yeah that's that's how i've basically built uh these verification skills"
+    },
+    {
+      "start": 1181.22,
+      "end": 1185.66,
+      "t": "19:41",
+      "text": "yeah just just one ball there i'm like i have to go try to go one layer deeper so"
+    },
+    {
+      "start": 1185.66,
+      "end": 1193.26,
+      "t": "19:45",
+      "text": "are you let's say we wanted to build um an eval or a skill for for something and we wanted to"
+    },
+    {
+      "start": 1193.26,
+      "end": 1198.6,
+      "t": "19:53",
+      "text": "get better on its own, which is what I think you're suggesting. Are you doing that in a work"
+    },
+    {
+      "start": 1198.6,
+      "end": 1203.96,
+      "t": "19:58",
+      "text": "tree, kind of isolated with the sub-agents and then the reviewer agent and all that? Is it"
+    },
+    {
+      "start": 1203.96,
+      "end": 1209.62,
+      "t": "20:03",
+      "text": "happening in some type of cloud-hosted environment? What's the practical steps? If I wanted to go do"
+    },
+    {
+      "start": 1209.62,
+      "end": 1214.12,
+      "t": "20:09",
+      "text": "this and set up a verification system for something, what would I do or where would I start?"
+    },
+    {
+      "start": 1217.28,
+      "end": 1223.6,
+      "t": "20:17",
+      "text": "I think that the best place to start is local because you can observe. You can definitely"
+    },
+    {
+      "start": 1223.6,
+      "end": 1228.28,
+      "t": "20:23",
+      "text": "observe what your agents are doing so uh if you're building a verification skill for yourself"
+    },
+    {
+      "start": 1228.28,
+      "end": 1234.14,
+      "t": "20:28",
+      "text": "uh i would definitely start local and just have your agent bring up the application whether it's"
+    },
+    {
+      "start": 1234.14,
+      "end": 1240.0,
+      "t": "20:34",
+      "text": "like a cli or a desktop app or whatever and so you can actually observe right you can see how"
+    },
+    {
+      "start": 1240.0,
+      "end": 1247.08,
+      "t": "20:40",
+      "text": "the agent is interacting with the the application you can see it you know how it calls like the"
+    },
+    {
+      "start": 1247.08,
+      "end": 1252.24,
+      "t": "20:47",
+      "text": "different APIs that allow it to interact with the the application."
+    },
+    {
+      "start": 1254.38,
+      "end": 1259.42,
+      "t": "20:54",
+      "text": "But for me, personally, I have basically been kind of all in"
+    },
+    {
+      "start": 1259.46,
+      "end": 1262.12,
+      "t": "20:59",
+      "text": "mostly all in on cloud agents, because they're extremely"
+    },
+    {
+      "start": 1262.12,
+      "end": 1266.6,
+      "t": "21:02",
+      "text": "powerful. And the really powerful thing about cursor is"
+    },
+    {
+      "start": 1266.62,
+      "end": 1269.74,
+      "t": "21:06",
+      "text": "the cloud agents, actually, where if you spend a little bit"
+    },
+    {
+      "start": 1269.74,
+      "end": 1273.01,
+      "t": "21:09",
+      "text": "of time setting up the environment, these control"
+    },
+    {
+      "start": 1273.01,
+      "end": 1275.83,
+      "t": "21:13",
+      "text": "skills, these verification skills pay a huge amount of"
+    },
+    {
+      "start": 1275.83,
+      "end": 1282.63,
+      "t": "21:15",
+      "text": "dividends because it's not just something that makes you as a single engineer better it actually"
+    },
+    {
+      "start": 1282.63,
+      "end": 1288.13,
+      "t": "21:22",
+      "text": "levels up your whole team uh and even your whole company because uh you can actually start thinking"
+    },
+    {
+      "start": 1288.13,
+      "end": 1293.75,
+      "t": "21:28",
+      "text": "about cloud agents you can start thinking about automations that automatically do things like"
+    },
+    {
+      "start": 1293.75,
+      "end": 1301.09,
+      "t": "21:33",
+      "text": "uh i'll i get i kind of talk about this a bit later but i'll just kind of get into it uh where"
+    },
+    {
+      "start": 1301.09,
+      "end": 1315.95,
+      "t": "21:41",
+      "text": "For example, I talk a lot about this agent we have called Benny who takes all of the bug reports that we get and it automatically goes off in the cloud, opens up its desktop."
+    },
+    {
+      "start": 1316.43,
+      "end": 1326.83,
+      "t": "21:56",
+      "text": "It runs Cursor in its own computer and it uses the same control skills to interact with the application and try to reproduce the bug or the user report."
+    },
+    {
+      "start": 1326.83,
+      "end": 1333.03,
+      "t": "22:06",
+      "text": "right and this is so so powerful because at once i can immediately i get so much information from"
+    },
+    {
+      "start": 1333.03,
+      "end": 1338.45,
+      "t": "22:13",
+      "text": "this automatically like here in this example you can see that uh the benny actually reproduced the"
+    },
+    {
+      "start": 1338.45,
+      "end": 1345.11,
+      "t": "22:18",
+      "text": "bug uh but it's already fixed on main so it actually confirms that we fixed this problem"
+    },
+    {
+      "start": 1345.11,
+      "end": 1350.75,
+      "t": "22:25",
+      "text": "already and all i need to do is just release another build of of cursor uh so that's like"
+    },
+    {
+      "start": 1350.75,
+      "end": 1355.71,
+      "t": "22:30",
+      "text": "huge information there that i didn't have to go off and sit with an agent you know and spend an"
+    },
+    {
+      "start": 1355.71,
+      "end": 1360.67,
+      "t": "22:35",
+      "text": "hour trying to fit like is this fixed is this not fixed so you you you gain back so much time"
+    },
+    {
+      "start": 1360.67,
+      "end": 1366.01,
+      "t": "22:40",
+      "text": "uh but you know everybody on my team benefits from this everybody in the company benefits from this"
+    },
+    {
+      "start": 1366.01,
+      "end": 1375.13,
+      "t": "22:46",
+      "text": "uh so definitely think that uh you know keeping these using cloud agents is super powerful uh but"
+    },
+    {
+      "start": 1375.13,
+      "end": 1380.57,
+      "t": "22:55",
+      "text": "yeah it's like a journey you have to trust it first right before you you get to this point and"
+    },
+    {
+      "start": 1380.57,
+      "end": 1385.43,
+      "t": "23:00",
+      "text": "that's it goes back to what i was saying here where you know it's very hard it's almost impossible"
+    },
+    {
+      "start": 1385.43,
+      "end": 1402.79,
+      "t": "23:05",
+      "text": "And I would definitely encourage you not to try to jump from, you know, like if you're still in this zone, you don't want to jump to like, I'm going to spawn a hundred or thousands of cloud agents right now because you're just going to waste a lot of tokens and it's going to be extremely expensive."
+    },
+    {
+      "start": 1402.79,
+      "end": 1427.67,
+      "t": "23:22",
+      "text": "Yeah. So just to kind of recap so far, basically the, if we wanted to go on the journey that you've kind of gone on, it would be to start with verification, building some skills and some ways of determining that the agents are producing at least like correct code, whether, like you said, whether it's good code or not is maybe a separate question, but like it's technically solving the problem by looking at, you know, stack traces, looking at, you know, the actual behavior in the app and so on."
+    },
+    {
+      "start": 1427.67,
+      "end": 1432.59,
+      "t": "23:47",
+      "text": "and then once we trust it locally then we can start to think about scaling into the cloud and"
+    },
+    {
+      "start": 1432.59,
+      "end": 1437.11,
+      "t": "23:52",
+      "text": "running more agents that are picking up signals i guess on their own right so whether that's like"
+    },
+    {
+      "start": 1437.11,
+      "end": 1441.67,
+      "t": "23:57",
+      "text": "a bug report that comes in or something they can go and pick it up and solve the problem and give"
+    },
+    {
+      "start": 1441.67,
+      "end": 1447.07,
+      "t": "24:01",
+      "text": "us back a pr and then maybe the last step is like auto merging the prs which uh is where you're at"
+    },
+    {
+      "start": 1447.07,
+      "end": 1452.29,
+      "t": "24:07",
+      "text": "maybe not where everyone yeah yeah um and then reviewing them on main but um is that is that"
+    },
+    {
+      "start": 1452.29,
+      "end": 1457.27,
+      "t": "24:12",
+      "text": "about right yeah exactly i think yeah that's why i drew this this uh this this curve right because"
+    },
+    {
+      "start": 1457.27,
+      "end": 1463.45,
+      "t": "24:17",
+      "text": "that this basically describes my journey of you know when i started barely could use a couple"
+    },
+    {
+      "start": 1463.45,
+      "end": 1467.97,
+      "t": "24:23",
+      "text": "agents and i was just observing every single thing i think there's really no shortcut for"
+    },
+    {
+      "start": 1467.97,
+      "end": 1473.25,
+      "t": "24:27",
+      "text": "going from here to there because this is really about your personal level of trust in agents"
+    },
+    {
+      "start": 1473.25,
+      "end": 1478.29,
+      "t": "24:33",
+      "text": "right um obviously you know as an engineer you don't want to just slop code into production"
+    },
+    {
+      "start": 1478.29,
+      "end": 1485.09,
+      "t": "24:38",
+      "text": "so how do you actually build up that trust takes um a lot of uh i guess taste and judgment"
+    },
+    {
+      "start": 1485.09,
+      "end": 1491.21,
+      "t": "24:45",
+      "text": "um but uh you know like i think plugins like Pstack definitely can help you",
+      "was": "um but uh you know like i think plugins like p-stack definitely can help you",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp-stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1491.21,
+      "end": 1498.87,
+      "t": "24:51",
+      "text": "get up to speed much quicker uh and so i guess it's like if you trust me and you trust Pstack",
+      "was": "get up to speed much quicker uh and so i guess it's like if you trust me and you trust p-stack",
+      "fixes": [
+        {
+          "pat": "(?i)\\bp-stack\\b",
+          "to": "Pstack",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1498.87,
+      "end": 1504.41,
+      "t": "24:58",
+      "text": "then in by extension you can maybe trust your agents but if you don't trust me and i definitely"
+    },
+    {
+      "start": 1504.41,
+      "end": 1511.4,
+      "t": "25:04",
+      "text": "would not encourage people to blindly trust me uh uh you know if you build up your own set of"
+    },
+    {
+      "start": 1511.4,
+      "end": 1516.56,
+      "t": "25:11",
+      "text": "skills that you can obviously you know take a look at pset and kind of fork it make it your own"
+    },
+    {
+      "start": 1516.56,
+      "end": 1522.6,
+      "t": "25:16",
+      "text": "improve the skills definitely encourage that but for me it's really all about it just keeps coming"
+    },
+    {
+      "start": 1522.6,
+      "end": 1527.78,
+      "t": "25:22",
+      "text": "back to trust you know every one of us here in this chat have a different standard for engineering"
+    },
+    {
+      "start": 1527.78,
+      "end": 1535.64,
+      "t": "25:27",
+      "text": "and there are different things that are important for us in our code base and when you are able to"
+    },
+    {
+      "start": 1535.64,
+      "end": 1540.7,
+      "t": "25:35",
+      "text": "encode all of that into skills and you can verify that your agent is actually doing them that allows"
+    },
+    {
+      "start": 1540.7,
+      "end": 1548.17,
+      "t": "25:40",
+      "text": "you to really kind of ascend this curve and um uh you know start automating things uh there's"
+    },
+    {
+      "start": 1548.17,
+      "end": 1553.89,
+      "t": "25:48",
+      "text": "another piece i wanted to talk about um if there's yeah go for it i'll pick up more questions as i go"
+    },
+    {
+      "start": 1553.89,
+      "end": 1558.87,
+      "t": "25:53",
+      "text": "but yeah i think there's a third part to this which i haven't talked about yet which is kind"
+    },
+    {
+      "start": 1558.87,
+      "end": 1564.35,
+      "t": "25:58",
+      "text": "of an interesting one which is like refactoring and rewriting like one of the uh i guess most"
+    },
+    {
+      "start": 1564.35,
+      "end": 1570.03,
+      "t": "26:04",
+      "text": "controversial one of the most controversial topics in the industry i think is like should"
+    },
+    {
+      "start": 1570.03,
+      "end": 1576.63,
+      "t": "26:10",
+      "text": "you rewrite your app or not um because i think engineers are very prone to this where especially"
+    },
+    {
+      "start": 1576.63,
+      "end": 1580.93,
+      "t": "26:16",
+      "text": "when you join a company you come in and you see like the code base and you're like man this is"
+    },
+    {
+      "start": 1580.93,
+      "end": 1585.61,
+      "t": "26:20",
+      "text": "shit like who wrote this code you know it's terrible i want to rewrite the whole thing"
+    },
+    {
+      "start": 1585.61,
+      "end": 1592.53,
+      "t": "26:25",
+      "text": "there is a very common inclination and i think a lot of you know before agents um and i guess"
+    },
+    {
+      "start": 1592.53,
+      "end": 1598.62,
+      "t": "26:32",
+      "text": "arguably even now people will definitely discourage you from rewriting stuff but i'm actually here to"
+    },
+    {
+      "start": 1598.62,
+      "end": 1606.91,
+      "t": "26:38",
+      "text": "make a case for why you might want to consider it um because i think it really depends uh you know"
+    },
+    {
+      "start": 1606.91,
+      "end": 1612.81,
+      "t": "26:46",
+      "text": "brownfield applications i think are actually in a pretty good spot especially if they're set up"
+    },
+    {
+      "start": 1612.81,
+      "end": 1618.61,
+      "t": "26:52",
+      "text": "well already uh and like recently i've been talking to some people but uh you know i was"
+    },
+    {
+      "start": 1618.61,
+      "end": 1627.01,
+      "t": "26:58",
+      "text": "just observing i just noticed this parallel which is that a lot of big tech company problems are now"
+    },
+    {
+      "start": 1627.01,
+      "end": 1632.19,
+      "t": "27:07",
+      "text": "everybody's problems um and the big tech company problem you know like when i was working at meta"
+    },
+    {
+      "start": 1632.19,
+      "end": 1637.51,
+      "t": "27:12",
+      "text": "like we had this giant monorepo we had like i don't know tens of thousands of engineers just"
+    },
+    {
+      "start": 1637.51,
+      "end": 1644.72,
+      "t": "27:17",
+      "text": "you know like banging on their keyboards and shipping code and a lot of really great engineers"
+    },
+    {
+      "start": 1644.72,
+      "end": 1650.88,
+      "t": "27:24",
+      "text": "at meta uh but uh i'll say like you know you'll be surprised that the code quality is actually not"
+    },
+    {
+      "start": 1650.88,
+      "end": 1658.72,
+      "t": "27:30",
+      "text": "that good um and so i often joke that like you know before ai sloth we had human sloth um and so"
+    },
+    {
+      "start": 1658.72,
+      "end": 1664.82,
+      "t": "27:38",
+      "text": "you know i think a lot of big tech infra like uh like what meta has or google you know you know"
+    },
+    {
+      "start": 1664.82,
+      "end": 1670.02,
+      "t": "27:44",
+      "text": "really big tech companies are actually designed for that where you're sort of like you're catering"
+    },
+    {
+      "start": 1670.02,
+      "end": 1675.78,
+      "t": "27:50",
+      "text": "to the the you know like uh this sounds so bad to say but like the the least capable engineer on"
+    },
+    {
+      "start": 1675.78,
+      "end": 1681.16,
+      "t": "27:55",
+      "text": "your team, right? You build frameworks, you build conventions, you build guardrails,"
+    },
+    {
+      "start": 1681.74,
+      "end": 1685.76,
+      "t": "28:01",
+      "text": "you know, you restrict credentials so that, you know, your intern doesn't wipe your production"
+    },
+    {
+      "start": 1685.76,
+      "end": 1694.2,
+      "t": "28:05",
+      "text": "database. There's, you know, if you have that level of infra already, I think your agents can"
+    },
+    {
+      "start": 1694.2,
+      "end": 1699.66,
+      "t": "28:14",
+      "text": "actually already do a very solid job, right? Because they have, the guardrails are already"
+    },
+    {
+      "start": 1699.66,
+      "end": 1707.24,
+      "t": "28:19",
+      "text": "in place for agents to not cause havoc or not cause too much havoc uh in your code base um and"
+    },
+    {
+      "start": 1707.24,
+      "end": 1712.26,
+      "t": "28:27",
+      "text": "you can always add more you know guardrails uh but i think like greenfield applications especially"
+    },
+    {
+      "start": 1712.26,
+      "end": 1718.76,
+      "t": "28:32",
+      "text": "are you know like the brand new applications are like the biggest risk in my opinion uh and also"
+    },
+    {
+      "start": 1718.76,
+      "end": 1725.72,
+      "t": "28:38",
+      "text": "the greatest opportunity because you know if you vibe code a project uh a prototype um like we did"
+    },
+    {
+      "start": 1725.72,
+      "end": 1731.04,
+      "t": "28:45",
+      "text": "for Grok Bot you know Grok Bot was spun up very very very quickly um and if you if you haven't",
+      "was": "for grokbot you know grokbot was spun up very very very quickly um and if you if you haven't",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "start": 1731.04,
+      "end": 1736.48,
+      "t": "28:51",
+      "text": "heard of Grok Bot it's like a new application we just launched yesterday uh it's it's really cool",
+      "was": "heard of grokbot it's like a new application we just launched yesterday uh it's it's really cool",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1736.48,
+      "end": 1742.18,
+      "t": "28:56",
+      "text": "uh lets you orchestrate your create like individual agents that have their own identity"
+    },
+    {
+      "start": 1742.18,
+      "end": 1745.1,
+      "t": "29:02",
+      "text": "and you can kind of orchestrate them it's super cool definitely check it out"
+    },
+    {
+      "start": 1745.1,
+      "end": 1751.3,
+      "t": "29:05",
+      "text": "but yeah that was it's like a very it was a very greenfield application like most prototypes are"
+    },
+    {
+      "start": 1751.3,
+      "end": 1758.84,
+      "t": "29:11",
+      "text": "so it's like vibe coded very quickly humans were not reading the code at all and uh i had this"
+    },
+    {
+      "start": 1758.84,
+      "end": 1768.01,
+      "t": "29:18",
+      "text": "tweet recently uh where i said something about organic architecture um maybe i'll find it uh"
+    },
+    {
+      "start": 1768.01,
+      "end": 1775.21,
+      "t": "29:28",
+      "text": "but the idea is that uh when you have a completely vibe coded application you essentially have no"
+    },
+    {
+      "start": 1775.21,
+      "end": 1782.63,
+      "t": "29:35",
+      "text": "guardrails whatsoever so uh your agents when you give them a task they will just solve it in"
+    },
+    {
+      "start": 1782.63,
+      "end": 1789.93,
+      "t": "29:42",
+      "text": "whatever method is the most convenient and over time you get into this uh situation where you"
+    },
+    {
+      "start": 1789.93,
+      "end": 1795.31,
+      "t": "29:49",
+      "text": "have a code base that is spiraling out of control because you don't understand it uh your agents"
+    },
+    {
+      "start": 1795.31,
+      "end": 1801.07,
+      "t": "29:55",
+      "text": "understand it i guess in a way but like they've built something that is you know optimized for"
+    },
+    {
+      "start": 1801.07,
+      "end": 1808.57,
+      "t": "30:01",
+      "text": "shortcuts. And, you know, you will suffer, you have a lot of issues with that application."
+    },
+    {
+      "start": 1810.52,
+      "end": 1818.7,
+      "t": "30:10",
+      "text": "So I think starting your codebase with, like, very strong constraints is very much needed."
+    },
+    {
+      "start": 1819.58,
+      "end": 1824.16,
+      "t": "30:19",
+      "text": "Because, like, when you have a codebase that you can trust, right, when you have guardrails that"
+    },
+    {
+      "start": 1824.16,
+      "end": 1831.18,
+      "t": "30:24",
+      "text": "actually help you, help your agents write good code, you can get into the, you know, like, into"
+    },
+    {
+      "start": 1831.18,
+      "end": 1837.62,
+      "t": "30:31",
+      "text": "this part of the curve where I said, you know, I woke up today and I had like 20 PRs merged"
+    },
+    {
+      "start": 1837.62,
+      "end": 1846.56,
+      "t": "30:37",
+      "text": "by my agents. And that's because I invested a lot of time, over 600 PRs, I calculated yesterday"
+    },
+    {
+      "start": 1846.56,
+      "end": 1852.28,
+      "t": "30:46",
+      "text": "when I refactored all of Grok Bot to this new architecture that I've been building.",
+      "was": "when I refactored all of Grokbot to this new architecture that I've been building.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1854.7,
+      "end": 1860.3,
+      "t": "30:54",
+      "text": "And yeah, I've gotten to a point where I don't really look, I really don't look at the code"
+    },
+    {
+      "start": 1860.3,
+      "end": 1867.92,
+      "t": "31:00",
+      "text": "anymore and um i say that not just you know to sell you tokens but because i you know it took a"
+    },
+    {
+      "start": 1867.92,
+      "end": 1872.82,
+      "t": "31:07",
+      "text": "lot of work to get to that point i spent a lot of tokens to get the code base to this point where i"
+    },
+    {
+      "start": 1872.82,
+      "end": 1878.74,
+      "t": "31:12",
+      "text": "no longer have to look at it uh but i'm very excited because you know of the potential where"
+    },
+    {
+      "start": 1878.74,
+      "end": 1883.98,
+      "t": "31:18",
+      "text": "you know it's not just this doesn't just benefit me it benefits everyone contributing to growth"
+    },
+    {
+      "start": 1883.98,
+      "end": 1891.02,
+      "t": "31:23",
+      "text": "bot and it also empowers you know designers and product managers and you know people even gtm"
+    },
+    {
+      "start": 1891.02,
+      "end": 1896.26,
+      "t": "31:31",
+      "text": "people to add features to Grok Bot and i don't have to worry you know i don't have to wake up",
+      "was": "people to add features to graph bot and i don't have to worry you know i don't have to wake up",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgraph ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1896.26,
+      "end": 1900.0,
+      "t": "31:36",
+      "text": "at night in in the middle of the night and worry like oh shit someone's just merged a perf"
+    },
+    {
+      "start": 1900.0,
+      "end": 1906.36,
+      "t": "31:40",
+      "text": "regression right i have a ton of constraints and ci is like it's actually very annoying to write"
+    },
+    {
+      "start": 1906.36,
+      "end": 1913.05,
+      "t": "31:46",
+      "text": "code in in Grok Bot but like agents absorb all of that annoyance um but yeah i'm happy to talk",
+      "was": "code in in graph bot but like agents absorb all of that annoyance um but yeah i'm happy to talk",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgraph ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1913.05,
+      "end": 1920.88,
+      "t": "31:53",
+      "text": "about what exactly that is um yeah i think one question um yeah before we get into the this part"
+    },
+    {
+      "start": 1920.88,
+      "end": 1925.88,
+      "t": "32:00",
+      "text": "here is just around that element of like what your your your ci looks like or maybe some of"
+    },
+    {
+      "start": 1925.88,
+      "end": 1929.5,
+      "t": "32:05",
+      "text": "the constraints and then also like the average pr size i saw a question about that earlier"
+    },
+    {
+      "start": 1929.5,
+      "end": 1934.04,
+      "t": "32:09",
+      "text": "just to give people a you know kind of a glance it doesn't have to be like mathematically average"
+    },
+    {
+      "start": 1934.04,
+      "end": 1940.06,
+      "t": "32:14",
+      "text": "but just uh you know like what generally the size of the pr is um if it's only a couple lines of"
+    },
+    {
+      "start": 1940.06,
+      "end": 1950.26,
+      "t": "32:20",
+      "text": "code or you know um yeah um i think it depends on me i'm trying to do this in a way where i'm"
+    },
+    {
+      "start": 1950.26,
+      "end": 1954.72,
+      "t": "32:30",
+      "text": "not gonna like yeah you don't have to share the actual number of you like an actual average just"
+    },
+    {
+      "start": 1954.72,
+      "end": 1962.04,
+      "t": "32:34",
+      "text": "this is fine benchmark but like we have so okay this is not that interesting but uh well fun fact"
+    },
+    {
+      "start": 1962.04,
+      "end": 1969.82,
+      "t": "32:42",
+      "text": "is that virtualization in Grok Bot and in uh cursor is actually powered by uh pretext",
+      "was": "is that virtualization in grokbot and in uh cursor is actually powered by uh pretext",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 1969.82,
+      "end": 1976.6,
+      "t": "32:49",
+      "text": "which is a sort of new library that someone's built um that's really interesting you should"
+    },
+    {
+      "start": 1976.6,
+      "end": 1981.72,
+      "t": "32:56",
+      "text": "you should check it out but that's not really that important uh i think the average pr size"
+    },
+    {
+      "start": 1981.72,
+      "end": 1988.12,
+      "t": "33:01",
+      "text": "i actually don't know i don't know if i want to click on these uh i probably can but i would say"
+    },
+    {
+      "start": 1988.12,
+      "end": 1994.14,
+      "t": "33:08",
+      "text": "like they can range anywhere from a few hundred lines or 50 lines to like a thousand depending"
+    },
+    {
+      "start": 1994.14,
+      "end": 1999.58,
+      "t": "33:14",
+      "text": "on what the thing is doing uh so like here i'm actually like deleting a bunch of files so i"
+    },
+    {
+      "start": 1999.58,
+      "end": 2007.16,
+      "t": "33:19",
+      "text": "expect that it's just like mostly deletion uh but yeah it kind of varies there's no like yeah"
+    },
+    {
+      "start": 2007.16,
+      "end": 2011.76,
+      "t": "33:27",
+      "text": "there's no like hard cap or they're all like 50 line there's definitely no hard cap but i do"
+    },
+    {
+      "start": 2011.76,
+      "end": 2018.66,
+      "t": "33:31",
+      "text": "encourage my agents to split up their work into multiple prs uh i do that mostly because uh"
+    },
+    {
+      "start": 2018.66,
+      "end": 2025.54,
+      "t": "33:38",
+      "text": "i like i like the idea of that i guess maybe this is much harder to do now as in the world of agents"
+    },
+    {
+      "start": 2025.54,
+      "end": 2029.86,
+      "t": "33:45",
+      "text": "and you have like so many commits but i like the idea that you know the git history is very"
+    },
+    {
+      "start": 2029.86,
+      "end": 2037.86,
+      "t": "33:49",
+      "text": "rich source of context uh and i like the i like each pr to sort of atomically describe what that"
+    },
+    {
+      "start": 2037.86,
+      "end": 2043.58,
+      "t": "33:57",
+      "text": "small piece of thing is doing which also makes it easier for me to revert changes and like figure"
+    },
+    {
+      "start": 2043.58,
+      "end": 2049.84,
+      "t": "34:03",
+      "text": "out you know oh i shipped a bug and it's this it's here it's not in this 40,000 line pr where"
+    },
+    {
+      "start": 2049.84,
+      "end": 2059.41,
+      "t": "34:09",
+      "text": "who knows what landed in there uh but i i don't have a hard cap on pr size cool and then um yeah"
+    },
+    {
+      "start": 2059.41,
+      "end": 2063.73,
+      "t": "34:19",
+      "text": "also quick question on like ci so again you don't have to go into like uh the screen share like your"
+    },
+    {
+      "start": 2063.73,
+      "end": 2069.57,
+      "t": "34:23",
+      "text": "ci does but just generally would you describe what the ci kind of looks like uh or how strict it is"
+    },
+    {
+      "start": 2071.17,
+      "end": 2078.34,
+      "t": "34:31",
+      "text": "uh yeah so uh well specifically for Grok Bot so dune is the it's the sort of cheeky code",
+      "was": "uh yeah so uh well specifically for grokbot so dune is the it's the sort of cheeky code",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2078.98,
+      "end": 2086.74,
+      "t": "34:38",
+      "text": "code name for the architecture that we built for Grok Bot um the ci looks pretty annoying",
+      "was": "code name for the architecture that we built for rockbot um the ci looks pretty annoying",
+      "fixes": [
+        {
+          "pat": "(?i)\\brock ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2086.74,
+      "end": 2093.08,
+      "t": "34:46",
+      "text": "because there's checks for everything so like literally i have um uh well if you've written"
+    },
+    {
+      "start": 2093.08,
+      "end": 2097.56,
+      "t": "34:53",
+      "text": "any react for example you know you know that one of the biggest foot guns in react is use effect"
+    },
+    {
+      "start": 2097.56,
+      "end": 2106.65,
+      "t": "34:57",
+      "text": "uh so in uh dune and in Grok Bot we've banned use effect so dune is just the the mental model",
+      "was": "uh so in uh dune and in graphbot we've banned use effect so dune is just the the mental model",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgraph ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2106.65,
+      "end": 2113.39,
+      "t": "35:06",
+      "text": "of what dune is uh you can kind of think of it as like next js for uh electron apps and it's"
+    },
+    {
+      "start": 2113.39,
+      "end": 2119.33,
+      "t": "35:13",
+      "text": "designed for agents to write uh and it's like custom for you know our agent forward applications"
+    },
+    {
+      "start": 2119.33,
+      "end": 2125.45,
+      "t": "35:19",
+      "text": "um so the ci checks are very like specific to that like you know don't use these effect it's it's"
+    },
+    {
+      "start": 2125.45,
+      "end": 2131.89,
+      "t": "35:25",
+      "text": "it's banned like ci will fail uh and yell at you we have like some of the more interesting ones"
+    },
+    {
+      "start": 2131.89,
+      "end": 2137.45,
+      "t": "35:31",
+      "text": "that people might raise eyebrows is like i actually ban code comments as well uh which is"
+    },
+    {
+      "start": 2137.45,
+      "end": 2145.27,
+      "t": "35:37",
+      "text": "very interesting um but i've noticed that 99 of the time agents just write code comments that"
+    },
+    {
+      "start": 2145.27,
+      "end": 2149.69,
+      "t": "35:45",
+      "text": "kind of describe some historical thing that is actually totally irrelevant to the code"
+    },
+    {
+      "start": 2149.69,
+      "end": 2155.27,
+      "t": "35:49",
+      "text": "um like it will often say like you know oh lauren said you should never do this and it's now in the"
+    },
+    {
+      "start": 2155.27,
+      "end": 2160.93,
+      "t": "35:55",
+      "text": "code comment like what like why what that was i didn't say that as like a durable you know global"
+    },
+    {
+      "start": 2160.93,
+      "end": 2168.36,
+      "t": "36:00",
+      "text": "rule i just meant like your this pr sucks and you should change that part agents don't really"
+    },
+    {
+      "start": 2168.36,
+      "end": 2174.14,
+      "t": "36:08",
+      "text": "understand us that well surprisingly uh and or they kind of assume too much and they kind of do"
+    },
+    {
+      "start": 2174.14,
+      "end": 2180.06,
+      "t": "36:14",
+      "text": "things in like very stupid ways so like yeah we just ban everything everything you can imagine"
+    },
+    {
+      "start": 2180.06,
+      "end": 2187.06,
+      "t": "36:20",
+      "text": "like the agents are bad at we ban uh so one example that we actually suffer a lot in the"
+    },
+    {
+      "start": 2187.06,
+      "end": 2192.32,
+      "t": "36:27",
+      "text": "agents window is we have uh you know if you've used agents window you've definitely seen performance"
+    },
+    {
+      "start": 2192.32,
+      "end": 2198.72,
+      "t": "36:32",
+      "text": "issues and you know we're constantly trying to fix them uh but it's like a it's a never-ending"
+    },
+    {
+      "start": 2198.72,
+      "end": 2203.62,
+      "t": "36:38",
+      "text": "struggle because there's so many pull requests that get merged every any one of them could just"
+    },
+    {
+      "start": 2203.62,
+      "end": 2209.12,
+      "t": "36:43",
+      "text": "regress performance or stability or reliability uh you know the agents window doesn't have this"
+    },
+    {
+      "start": 2209.12,
+      "end": 2214.62,
+      "t": "36:49",
+      "text": "architecture yet i plan to do bring this learning back there and kind of refactor everything there"
+    },
+    {
+      "start": 2214.62,
+      "end": 2218.78,
+      "t": "36:54",
+      "text": "but it just regresses super often"
+    },
+    {
+      "start": 2218.78,
+      "end": 2221.12,
+      "t": "36:58",
+      "text": "because there's"
+    },
+    {
+      "start": 2221.12,
+      "end": 2222.56,
+      "t": "37:01",
+      "text": "just one example is like"
+    },
+    {
+      "start": 2222.56,
+      "end": 2223.94,
+      "t": "37:02",
+      "text": "we have very poor"
+    },
+    {
+      "start": 2223.94,
+      "end": 2226.24,
+      "t": "37:03",
+      "text": "isolation between processes"
+    },
+    {
+      "start": 2226.24,
+      "end": 2228.68,
+      "t": "37:06",
+      "text": "so like on Electron"
+    },
+    {
+      "start": 2228.68,
+      "end": 2229.62,
+      "t": "37:08",
+      "text": "you have a renderer thread"
+    },
+    {
+      "start": 2229.62,
+      "end": 2230.8,
+      "t": "37:09",
+      "text": "that renders your UI"
+    },
+    {
+      "start": 2230.8,
+      "end": 2232.64,
+      "t": "37:10",
+      "text": "but you also have like a main thread"
+    },
+    {
+      "start": 2232.64,
+      "end": 2234.12,
+      "t": "37:12",
+      "text": "that you can run other code"
+    },
+    {
+      "start": 2234.12,
+      "end": 2235.4,
+      "t": "37:14",
+      "text": "that you know doesn't need to"
+    },
+    {
+      "start": 2235.4,
+      "end": 2236.72,
+      "t": "37:15",
+      "text": "block the renderer"
+    },
+    {
+      "start": 2236.72,
+      "end": 2239.55,
+      "t": "37:16",
+      "text": "but we do a poor job"
+    },
+    {
+      "start": 2239.55,
+      "end": 2240.77,
+      "t": "37:19",
+      "text": "of separating those things"
+    },
+    {
+      "start": 2240.77,
+      "end": 2242.15,
+      "t": "37:20",
+      "text": "and so oftentimes"
+    },
+    {
+      "start": 2242.15,
+      "end": 2243.05,
+      "t": "37:22",
+      "text": "you just accidentally"
+    },
+    {
+      "start": 2243.05,
+      "end": 2244.77,
+      "t": "37:23",
+      "text": "have code that gets pulled"
+    },
+    {
+      "start": 2244.77,
+      "end": 2250.37,
+      "t": "37:24",
+      "text": "into running on the renderer thread and then all of a sudden you're competing with the renderer"
+    },
+    {
+      "start": 2250.37,
+      "end": 2256.37,
+      "t": "37:30",
+      "text": "that you know that has a very if you want like 60 fps you have to every frame that gets drawn"
+    },
+    {
+      "start": 2256.37,
+      "end": 2262.53,
+      "t": "37:36",
+      "text": "has to be done in 16 milliseconds so very very small you know deadline per frame uh if you want"
+    },
+    {
+      "start": 2262.53,
+      "end": 2267.33,
+      "t": "37:42",
+      "text": "you know a very smooth product uh and when you start building bringing in accidentally bringing"
+    },
+    {
+      "start": 2267.33,
+      "end": 2272.37,
+      "t": "37:47",
+      "text": "in you know things that are like very computationally heavy or they have a lot of io"
+    },
+    {
+      "start": 2272.37,
+      "end": 2278.03,
+      "t": "37:52",
+      "text": "So then you just get into like a lot of jank and your FPS really drops."
+    },
+    {
+      "start": 2278.17,
+      "end": 2280.49,
+      "t": "37:58",
+      "text": "You start, you know, losing frames."
+    },
+    {
+      "start": 2280.61,
+      "end": 2285.83,
+      "t": "38:00",
+      "text": "You get long tasks that take more than 16 milliseconds and you just get this really choppy experience."
+    },
+    {
+      "start": 2286.96,
+      "end": 2294.74,
+      "t": "38:06",
+      "text": "So all of those patterns that we've learned basically building Electron apps, we've encoded into this framework and it becomes like a hard failure."
+    },
+    {
+      "start": 2294.74,
+      "end": 2312.72,
+      "t": "38:14",
+      "text": "So in Grok Bot, we literally have a directory called electron-main, electron-renderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another.",
+      "was": "So in Grogbot, we literally have a directory called ElectronMain, ElectronRenderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrogbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        },
+        {
+          "pat": "(?i)\\belectronmain\\b",
+          "to": "electron-main",
+          "n": 1
+        },
+        {
+          "pat": "(?i)\\belectronrenderer\\b",
+          "to": "electron-renderer",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2313.5,
+      "end": 2324.04,
+      "t": "38:33",
+      "text": "So that's enforced by CI, as well as Bugbot, which is our, which cursors my code review tool that runs on CI.",
+      "was": "So that's enforced by CI, as well as BugBot, which is our, which cursors my code review tool that runs on CI.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bbugbot\\b",
+          "to": "Bugbot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2324.04,
+      "end": 2332.2,
+      "t": "38:44",
+      "text": "uh you know in our agents md it's everywhere like so i i i um i have this thing here where i talk"
+    },
+    {
+      "start": 2332.2,
+      "end": 2338.06,
+      "t": "38:52",
+      "text": "about like um you know like there are multiple layers i think for building a good code base"
+    },
+    {
+      "start": 2338.06,
+      "end": 2344.4,
+      "t": "38:58",
+      "text": "obviously the code base is one where uh if you have an architecture like this where it's extremely"
+    },
+    {
+      "start": 2344.4,
+      "end": 2350.04,
+      "t": "39:04",
+      "text": "strict uh you know the the the way to build features is very conventional that's like the"
+    },
+    {
+      "start": 2350.04,
+      "end": 2356.66,
+      "t": "39:10",
+      "text": "strongest strongest level of enforcement because agents just love to copy existing patterns so"
+    },
+    {
+      "start": 2356.66,
+      "end": 2362.8,
+      "t": "39:16",
+      "text": "one example of this in Grok Bot is like we have this these concepts called like a feature and",
+      "was": "one example of this in rockpot is like we have this these concepts called like a feature and",
+      "fixes": [
+        {
+          "pat": "(?i)\\brockpot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2362.8,
+      "end": 2366.7,
+      "t": "39:22",
+      "text": "we have entry points and transcript cards like oh you know the cards that you see in the chat"
+    },
+    {
+      "start": 2366.7,
+      "end": 2373.64,
+      "t": "39:26",
+      "text": "these are all like like nouns i guess in in the framework and so there's a very conventional way"
+    },
+    {
+      "start": 2373.64,
+      "end": 2380.53,
+      "t": "39:33",
+      "text": "of creating them. And so like a feature is all in a single directory, as an example. And so all of"
+    },
+    {
+      "start": 2380.53,
+      "end": 2385.69,
+      "t": "39:40",
+      "text": "the code that contributes to that feature lives in one directory. So it's all co located in one"
+    },
+    {
+      "start": 2385.69,
+      "end": 2390.59,
+      "t": "39:45",
+      "text": "place, makes it super easy, you know, agents don't have to like, grab around and try to figure out"
+    },
+    {
+      "start": 2390.59,
+      "end": 2395.29,
+      "t": "39:50",
+      "text": "like where all the things are. It just looks at the feature and like, oh, okay, I'm working on"
+    },
+    {
+      "start": 2395.29,
+      "end": 2402.05,
+      "t": "39:55",
+      "text": "the onboarding feature in Grok Bot. I'm just going to work in this directory. And for 80% of the",
+      "was": "the onboarding feature in Grogba. I'm just going to work in this directory. And for 80% of the",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrogba\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2402.05,
+      "end": 2409.87,
+      "t": "40:02",
+      "text": "work it's mostly just very encapsulated there but uh like it's like very it's like design again for"
+    },
+    {
+      "start": 2409.87,
+      "end": 2415.63,
+      "t": "40:09",
+      "text": "you know like the dumbest agent like you don't have to think right the the the one of the key"
+    },
+    {
+      "start": 2415.63,
+      "end": 2421.05,
+      "t": "40:15",
+      "text": "principles i have for this framework is like the shortest the shortest path is the best path"
+    },
+    {
+      "start": 2421.05,
+      "end": 2427.25,
+      "t": "40:21",
+      "text": "so uh because that plays exactly to how agents love to write codes like they like to take"
+    },
+    {
+      "start": 2427.25,
+      "end": 2434.33,
+      "t": "40:27",
+      "text": "shortcuts, really. They'll find the quickest way to solve the problem, so why not make that the"
+    },
+    {
+      "start": 2434.33,
+      "end": 2441.55,
+      "t": "40:34",
+      "text": "best way to solve the problem? So I probably won't get into all the specific details, and"
+    },
+    {
+      "start": 2441.55,
+      "end": 2447.21,
+      "t": "40:41",
+      "text": "this framework's really more of a collection of ideas and principles rather than something that"
+    },
+    {
+      "start": 2447.21,
+      "end": 2453.67,
+      "t": "40:47",
+      "text": "will open source. You can screenshot this, I guess, if you want, and tell your agent to"
+    },
+    {
+      "start": 2453.67,
+      "end": 2456.53,
+      "t": "40:53",
+      "text": "build something like this"
+    },
+    {
+      "start": 2456.53,
+      "end": 2457.07,
+      "t": "40:56",
+      "text": "for you too"
+    },
+    {
+      "start": 2457.07,
+      "end": 2461.09,
+      "t": "40:57",
+      "text": "but it's really all about the layers"
+    },
+    {
+      "start": 2461.09,
+      "end": 2463.01,
+      "t": "41:01",
+      "text": "the code base"
+    },
+    {
+      "start": 2463.01,
+      "end": 2464.45,
+      "t": "41:03",
+      "text": "is one part with features"
+    },
+    {
+      "start": 2464.45,
+      "end": 2467.19,
+      "t": "41:04",
+      "text": "and directories and import"
+    },
+    {
+      "start": 2467.19,
+      "end": 2469.23,
+      "t": "41:07",
+      "text": "blocking import"
+    },
+    {
+      "start": 2469.23,
+      "end": 2471.15,
+      "t": "41:09",
+      "text": "dependencies that shouldn't"
+    },
+    {
+      "start": 2471.15,
+      "end": 2471.71,
+      "t": "41:11",
+      "text": "be imported"
+    },
+    {
+      "start": 2471.71,
+      "end": 2474.43,
+      "t": "41:11",
+      "text": "and it all enforces that"
+    },
+    {
+      "start": 2474.43,
+      "end": 2475.57,
+      "t": "41:14",
+      "text": "and static analysis"
+    },
+    {
+      "start": 2475.57,
+      "end": 2479.13,
+      "t": "41:15",
+      "text": "there's CI checks, we have a lot of"
+    },
+    {
+      "start": 2479.13,
+      "end": 2481.35,
+      "t": "41:19",
+      "text": "lints for bad patterns"
+    },
+    {
+      "start": 2481.35,
+      "end": 2482.13,
+      "t": "41:21",
+      "text": "that we observe"
+    },
+    {
+      "start": 2482.13,
+      "end": 2490.55,
+      "t": "41:22",
+      "text": "compiler diagnostics there's also rules and bug bot which are I think like three four five are"
+    },
+    {
+      "start": 2490.55,
+      "end": 2498.07,
+      "t": "41:30",
+      "text": "more soft right these two actually make make ci rid right so that you know there's a hard"
+    },
+    {
+      "start": 2498.07,
+      "end": 2505.22,
+      "t": "41:38",
+      "text": "constraint where the agent can't just write crappy code for rules and skills and bug bot"
+    },
+    {
+      "start": 2505.22,
+      "end": 2511.97,
+      "t": "41:45",
+      "text": "your agents can still forget right you can still or it may not always consistently apply them"
+    },
+    {
+      "start": 2511.97,
+      "end": 2520.31,
+      "t": "41:51",
+      "text": "so i like to layer them but i don't i don't like to rely on them as the only source of enforcement"
+    },
+    {
+      "start": 2520.31,
+      "end": 2525.35,
+      "t": "42:00",
+      "text": "because it's very very soft right and if you if you only have rules and Bugbot and skills and a",
+      "was": "because it's very very soft right and if you if you only have rules and bugba and skills and a",
+      "fixes": [
+        {
+          "pat": "(?i)\\bbugba\\b",
+          "to": "Bugbot",
+          "n": 1
+        },
+        {
+          "pat": "(?i)\\bbugbot\\b",
+          "to": "Bugbot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2525.35,
+      "end": 2530.61,
+      "t": "42:05",
+      "text": "style guide for your code you will it's only a matter of time before your code base looks like"
+    },
+    {
+      "start": 2530.61,
+      "end": 2536.15,
+      "t": "42:10",
+      "text": "complete trash i'm sorry to say that but uh i definitely recommend yeah like you know investing"
+    },
+    {
+      "start": 2536.15,
+      "end": 2540.47,
+      "t": "42:16",
+      "text": "in, you know, things that can be hard and forced, right?"
+    },
+    {
+      "start": 2540.53,
+      "end": 2544.55,
+      "t": "42:20",
+      "text": "And this is why, you know, maybe the choice of tech stack that you use"
+    },
+    {
+      "start": 2544.55,
+      "end": 2545.45,
+      "t": "42:24",
+      "text": "is also very important."
+    },
+    {
+      "start": 2547.37,
+      "end": 2550.45,
+      "t": "42:27",
+      "text": "Like, I think, for example, Rust is sort of making, you know,"
+    },
+    {
+      "start": 2550.45,
+      "end": 2556.11,
+      "t": "42:30",
+      "text": "it's, like, getting super popular again because the compiler is so strict, right?"
+    },
+    {
+      "start": 2556.15,
+      "end": 2558.49,
+      "t": "42:36",
+      "text": "The compiler enforces so many different things."
+    },
+    {
+      "start": 2558.65,
+      "end": 2560.81,
+      "t": "42:38",
+      "text": "You know, there's a borrow checker that you have to appease."
+    },
+    {
+      "start": 2561.29,
+      "end": 2564.85,
+      "t": "42:41",
+      "text": "And as long as you make sure your agents don't write unsafe code blocks,"
+    },
+    {
+      "start": 2564.85,
+      "end": 2569.67,
+      "t": "42:44",
+      "text": "you can more or less feel somewhat confident that if the code compiles"
+    },
+    {
+      "start": 2569.67,
+      "end": 2573.61,
+      "t": "42:49",
+      "text": "it probably works and it's good. But it gives you that"
+    },
+    {
+      "start": 2573.61,
+      "end": 2577.71,
+      "t": "42:53",
+      "text": "level of trust and confidence that you as a"
+    },
+    {
+      "start": 2577.71,
+      "end": 2581.39,
+      "t": "42:57",
+      "text": "human engineer no longer need to go and check it yourself."
+    },
+    {
+      "start": 2581.39,
+      "end": 2585.41,
+      "t": "43:01",
+      "text": "You rely on code and static"
+    },
+    {
+      "start": 2585.41,
+      "end": 2589.15,
+      "t": "43:05",
+      "text": "analysis to actually make that a lot"
+    },
+    {
+      "start": 2589.15,
+      "end": 2593.47,
+      "t": "43:09",
+      "text": "smoother. And I guess the worst part, the worst"
+    },
+    {
+      "start": 2593.47,
+      "end": 2599.81,
+      "t": "43:13",
+      "text": "place to be in is if you are stuck in code review land where you actually enforce all of the"
+    },
+    {
+      "start": 2599.81,
+      "end": 2606.35,
+      "t": "43:19",
+      "text": "constraints the invariants in your code base by literally the human person saying you know reading",
+      "was": "constraints the invariance in your code base by literally the human person saying you know reading",
+      "fixes": [
+        {
+          "pat": "(?i)\\binvariance\\b",
+          "to": "invariants",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2606.35,
+      "end": 2610.99,
+      "t": "43:26",
+      "text": "the code i'm like okay you should not do this right every time you have to do that you should"
+    },
+    {
+      "start": 2610.99,
+      "end": 2616.65,
+      "t": "43:30",
+      "text": "consider that as a code smell like a anti-pattern and you should say okay instead of me commenting"
+    },
+    {
+      "start": 2616.65,
+      "end": 2623.23,
+      "t": "43:36",
+      "text": "on the pr how do i turn this into a hard rule right how do i turn this into a lint rule how"
+    },
+    {
+      "start": 2623.23,
+      "end": 2629.95,
+      "t": "43:43",
+      "text": "I would turn this into a CI failure? Or how do I even categorically eliminate this problem entirely?"
+    },
+    {
+      "start": 2631.95,
+      "end": 2635.23,
+      "t": "43:51",
+      "text": "I can talk about another migration I've done, but I'll probably pause here."
+    },
+    {
+      "start": 2635.23,
+      "end": 2640.19,
+      "t": "43:55",
+      "text": "Sure. Yeah, I feel like that's where I am, to be honest, is what you're describing right now,"
+    },
+    {
+      "start": 2640.19,
+      "end": 2644.83,
+      "t": "44:00",
+      "text": "which is that I don't have all of these rules. So I have some things to go do after this session."
+    },
+    {
+      "start": 2645.55,
+      "end": 2651.15,
+      "t": "44:05",
+      "text": "In terms of being able to scale my agents, I'm definitely on maybe a couple of parallel ones"
+    },
+    {
+      "start": 2651.15,
+      "end": 2656.99,
+      "t": "44:11",
+      "text": "locally staged like two to three locally and i'm sure most people here are on the same so uh yeah"
+    },
+    {
+      "start": 2656.99,
+      "end": 2660.59,
+      "t": "44:16",
+      "text": "i know we only have a couple minutes left lauren was there anything else that you wanted to to"
+    },
+    {
+      "start": 2660.59,
+      "end": 2664.51,
+      "t": "44:20",
+      "text": "highlight i obviously there's lots of questions so i can grab more but i want to give you a few"
+    },
+    {
+      "start": 2664.51,
+      "end": 2667.55,
+      "t": "44:24",
+      "text": "minutes if there's anything else you want to talk about well i think i've been yapping for quite a"
+    },
+    {
+      "start": 2667.55,
+      "end": 2673.95,
+      "t": "44:27",
+      "text": "lot so maybe let's just do questions okay cool uh one question that had a couple of uh came up"
+    },
+    {
+      "start": 2673.95,
+      "end": 2680.11,
+      "t": "44:33",
+      "text": "a couple times was just around like token usage so the question is like is is what you're describing"
+    },
+    {
+      "start": 2680.11,
+      "end": 2686.91,
+      "t": "44:40",
+      "text": "a realistic thing for people who are on you know uh a normal set of token usage they don't have"
+    },
+    {
+      "start": 2686.91,
+      "end": 2692.81,
+      "t": "44:46",
+      "text": "you know basically unlimited tokens uh to work with i think that's a really good point i mean"
+    },
+    {
+      "start": 2692.81,
+      "end": 2699.77,
+      "t": "44:52",
+      "text": "like obviously you know i work at an ai lab where we have unlimited tokens so uh i definitely cannot"
+    },
+    {
+      "start": 2701.21,
+      "end": 2706.09,
+      "t": "45:01",
+      "text": "say that you know this is something everyone should do in the exact same way that i did it"
+    },
+    {
+      "start": 2706.09,
+      "end": 2709.37,
+      "t": "45:06",
+      "text": "i think it's possible to get to this point without you know breaking the bank"
+    },
+    {
+      "start": 2709.37,
+      "end": 2715.41,
+      "t": "45:09",
+      "text": "but you know if you're like an engineering leader or you know you're you have a startup that you"
+    },
+    {
+      "start": 2715.41,
+      "end": 2725.03,
+      "t": "45:15",
+      "text": "lead um i think to me it's a question of roi um and it's like uh yes you spend a lot of money on"
+    },
+    {
+      "start": 2725.03,
+      "end": 2729.35,
+      "t": "45:25",
+      "text": "tokens in the upfront stage you know like refactoring your code base is going to take a"
+    },
+    {
+      "start": 2729.35,
+      "end": 2735.03,
+      "t": "45:29",
+      "text": "lot of tokens uh adding all these things uh is going to take a bunch of tokens but if we're"
+    },
+    {
+      "start": 2735.03,
+      "end": 2741.61,
+      "t": "45:35",
+      "text": "heading to a world where agents are writing all the code and you know you want to be very lean"
+    },
+    {
+      "start": 2741.61,
+      "end": 2745.37,
+      "t": "45:41",
+      "text": "right you don't want to have to hire you don't want to be you don't want to become like meta"
+    },
+    {
+      "start": 2745.37,
+      "end": 2750.61,
+      "t": "45:45",
+      "text": "right like i mean like in terms of you don't want to become a 10 000 person engineering org because"
+    },
+    {
+      "start": 2750.61,
+      "end": 2756.54,
+      "t": "45:50",
+      "text": "i mean that's a cool problem to have but also you know you have so much overhead there's like"
+    },
+    {
+      "start": 2756.54,
+      "end": 2765.2,
+      "t": "45:56",
+      "text": "planning you know like you it's it's uh personally i i wouldn't uh it's not super fun but um i think"
+    },
+    {
+      "start": 2765.2,
+      "end": 2772.0,
+      "t": "46:05",
+      "text": "you want to stay very nimble. Agents are all about allowing you to do things that you couldn't do"
+    },
+    {
+      "start": 2772.0,
+      "end": 2778.16,
+      "t": "46:12",
+      "text": "before. That's really, to me, the value of agents. It's not just storing tokens on every single"
+    },
+    {
+      "start": 2778.16,
+      "end": 2785.63,
+      "t": "46:18",
+      "text": "little thing. But to me, the thing I couldn't do before is enforce this level of constraints"
+    },
+    {
+      "start": 2785.63,
+      "end": 2793.07,
+      "t": "46:25",
+      "text": "in a code base by myself. I'm just a single person. It would have taken me years to build"
+    },
+    {
+      "start": 2793.07,
+      "end": 2800.64,
+      "t": "46:33",
+      "text": "this framework uh and do all the refactoring and test everything myself and verify you know like"
+    },
+    {
+      "start": 2800.64,
+      "end": 2806.72,
+      "t": "46:40",
+      "text": "run imagine if it was just me right now in in pre-agent era just like running you know it"
+    },
+    {
+      "start": 2806.72,
+      "end": 2813.52,
+      "t": "46:46",
+      "text": "would take me so long right and my salary is pretty high right like so you know the the question"
+    },
+    {
+      "start": 2813.52,
+      "end": 2818.96,
+      "t": "46:53",
+      "text": "i think an engineering leader might have is just then you know like what is there's a trade-off of"
+    },
+    {
+      "start": 2818.96,
+      "end": 2824.64,
+      "t": "46:58",
+      "text": "do you hire someone to do this or do you spend the tokens to set up a code base so that even"
+    },
+    {
+      "start": 2825.28,
+      "end": 2832.08,
+      "t": "47:05",
+      "text": "the the most naive right the dumbest agents can do a good job and when you actually get to this"
+    },
+    {
+      "start": 2832.08,
+      "end": 2837.92,
+      "t": "47:12",
+      "text": "point like even agents that are not you know Claude-size do an excellent job of writing code",
+      "was": "point like even agents that are not you know fable size do an excellent job of writing code",
+      "fixes": [
+        {
+          "pat": "(?i)\\bfable size\\b",
+          "to": "Claude-size",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2838.48,
+      "end": 2844.72,
+      "t": "47:18",
+      "text": "and this pays a lot of dividends as well for me personally where i've empowered not just myself"
+    },
+    {
+      "start": 2844.72,
+      "end": 2853.97,
+      "t": "47:24",
+      "text": "But, again, like, PMs, designers, engineers who are not familiar with Grok Bot to just contribute in a way that is sustainable.",
+      "was": "But, again, like, PMs, designers, engineers who are not familiar with Grokbot to just contribute in a way that is sustainable.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2855.28,
+      "end": 2857.8,
+      "t": "47:35",
+      "text": "So, I think, yeah, it's definitely, like, a trade-off for sure."
+    },
+    {
+      "start": 2858.26,
+      "end": 2860.18,
+      "t": "47:38",
+      "text": "You know, like, nothing is, like, free for sure."
+    },
+    {
+      "start": 2860.66,
+      "end": 2862.26,
+      "t": "47:40",
+      "text": "And tokens are pretty expensive."
+    },
+    {
+      "start": 2862.92,
+      "end": 2869.7,
+      "t": "47:42",
+      "text": "But, oh, actually, I don't know how many of you have seen this, but we actually announced Grok 4.6 today."
+    },
+    {
+      "start": 2870.1,
+      "end": 2871.02,
+      "t": "47:50",
+      "text": "So, very exciting."
+    },
+    {
+      "start": 2871.24,
+      "end": 2871.96,
+      "t": "47:51",
+      "text": "Finally out."
+    },
+    {
+      "start": 2872.62,
+      "end": 2875.16,
+      "t": "47:52",
+      "text": "So, yeah, Grok 4.6 would be, like, a great..."
+    },
+    {
+      "start": 2875.16,
+      "end": 2881.72,
+      "t": "47:55",
+      "text": "is very, very smart. It's really good on the benchmarks. And it's the same, the tokens,"
+    },
+    {
+      "start": 2882.6,
+      "end": 2888.6,
+      "t": "48:02",
+      "text": "well, hopefully I'm not saying this incorrectly, but I believe the cost per token is the same as"
+    },
+    {
+      "start": 2888.6,
+      "end": 2896.2,
+      "t": "48:08",
+      "text": "4.5. So you're actually getting more intelligence for the same cost. I think this is an area that"
+    },
+    {
+      "start": 2896.2,
+      "end": 2903.24,
+      "t": "48:16",
+      "text": "Cursor tries to, Cursor and SpaceX AI, try to really optimize for, like that Pareto frontier"
+    },
+    {
+      "start": 2903.24,
+      "end": 2908.3,
+      "t": "48:23",
+      "text": "of you know cost versus intelligence uh you know we don't necessarily want to build the biggest"
+    },
+    {
+      "start": 2908.3,
+      "end": 2914.06,
+      "t": "48:28",
+      "text": "model ever because that is extremely expensive to run it's really about like how do you find that"
+    },
+    {
+      "start": 2914.06,
+      "end": 2918.42,
+      "t": "48:34",
+      "text": "sweet spot right you don't you don't need a giant model but it's just super smart right and it's not"
+    },
+    {
+      "start": 2918.42,
+      "end": 2926.9,
+      "t": "48:38",
+      "text": "very expensive for inference uh but uh yeah i think to kind of round it up um i think it's like"
+    },
+    {
+      "start": 2926.9,
+      "end": 2933.42,
+      "t": "48:46",
+      "text": "a it's it's there's a if you do your own analysis i feel like it's pretty positive it'll be pretty"
+    },
+    {
+      "start": 2933.42,
+      "end": 2940.64,
+      "t": "48:53",
+      "text": "positive that the roi you get from investing in stuff like this uh just empowers not just yourself"
+    },
+    {
+      "start": 2940.64,
+      "end": 2945.46,
+      "t": "49:00",
+      "text": "but your whole team to be so much more productive right like imagine if you have an army of"
+    },
+    {
+      "start": 2945.46,
+      "end": 2951.76,
+      "t": "49:05",
+      "text": "engineers like me who are shipping so much improvements and and bug fixes uh you know"
+    },
+    {
+      "start": 2951.76,
+      "end": 2958.84,
+      "t": "49:11",
+      "text": "every day right like that is pretty exciting cool uh one last question before we wrap up"
+    },
+    {
+      "start": 2958.84,
+      "end": 2963.98,
+      "t": "49:18",
+      "text": "this one is for the people in product on the call so let's say we do have an army of engineers"
+    },
+    {
+      "start": 2963.98,
+      "end": 2968.96,
+      "t": "49:23",
+      "text": "who are shipping like lauren i'm just curious like how is the product team or other functions"
+    },
+    {
+      "start": 2968.96,
+      "end": 2974.46,
+      "t": "49:28",
+      "text": "of your company keeping up given that like if you're shipping so quickly have are they using"
+    },
+    {
+      "start": 2974.46,
+      "end": 2978.84,
+      "t": "49:34",
+      "text": "ai more to do their jobs like as much as you can speak to that and obviously you know like you're"
+    },
+    {
+      "start": 2978.84,
+      "end": 2984.59,
+      "t": "49:38",
+      "text": "not in that role but just curious about how that works um i think this is where Grok Bot has been",
+      "was": "not in that role but just curious about how that works um i think this is where grokbot has been",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2984.59,
+      "end": 2991.67,
+      "t": "49:44",
+      "text": "actually exceedingly powerful uh where so before Grok Bot like you know uh obviously cursor only",
+      "was": "actually exceedingly powerful uh where so before grokbot like you know uh obviously cursor only",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 2991.67,
+      "end": 2997.71,
+      "t": "49:51",
+      "text": "had cursor like we only had agents window we had a cli we had an ide and these are really like"
+    },
+    {
+      "start": 2997.71,
+      "end": 3003.62,
+      "t": "49:57",
+      "text": "power user tools right they're designed for developers so it's very very developer centric"
+    },
+    {
+      "start": 3003.62,
+      "end": 3008.36,
+      "t": "50:03",
+      "text": "you can do knowledge work in them but it like the ui is not really optimized for that"
+    },
+    {
+      "start": 3008.36,
+      "end": 3015.05,
+      "t": "50:08",
+      "text": "so we actually didn't really have uh well i think like a lot of people like you know gtm product"
+    },
+    {
+      "start": 3015.05,
+      "end": 3020.69,
+      "t": "50:15",
+      "text": "like they might have used cursor uh to do their work but it definitely wasn't like a delightful"
+    },
+    {
+      "start": 3020.69,
+      "end": 3029.18,
+      "t": "50:20",
+      "text": "experience with them um i think now with Grok Bot uh it's become Grok Bot is basically like their",
+      "was": "experience with them um i think now with grokbot uh it's become grokbot is basically like their",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "start": 3029.18,
+      "end": 3035.1,
+      "t": "50:29",
+      "text": "moment for people who are not in tech in my opinion like it's like it's like a very very"
+    },
+    {
+      "start": 3035.1,
+      "end": 3041.04,
+      "t": "50:35",
+      "text": "accessible way to use agents in a very comfortable very familiar interface it looks like imessage"
+    },
+    {
+      "start": 3041.04,
+      "end": 3047.36,
+      "t": "50:41",
+      "text": "um and it's very fun too you know you can give your agent a fun name uh you can have you can"
+    },
+    {
+      "start": 3047.36,
+      "end": 3052.82,
+      "t": "50:47",
+      "text": "kind of do orchestration with in a very like natural way where you can sort of you know each"
+    },
+    {
+      "start": 3052.82,
+      "end": 3056.7,
+      "t": "50:52",
+      "text": "agent is like a person right now you got a team of agents like working on you have one one agent"
+    },
+    {
+      "start": 3056.7,
+      "end": 3061.38,
+      "t": "50:56",
+      "text": "per account that you manage as an example or if you're a pm you have you know you can have an"
+    },
+    {
+      "start": 3061.38,
+      "end": 3065.6,
+      "t": "51:01",
+      "text": "agent that summarizes all the work that lauren did last night and then now you know what i did"
+    },
+    {
+      "start": 3065.6,
+      "end": 3072.44,
+      "t": "51:05",
+      "text": "right so i think our pms are leveraging that a lot and their shipping code too uh so you know"
+    },
+    {
+      "start": 3072.44,
+      "end": 3076.74,
+      "t": "51:12",
+      "text": "oftentimes they will just say oh here's a bug i fixed it can you look at it and then i'll go"
+    },
+    {
+      "start": 3076.74,
+      "end": 3082.84,
+      "t": "51:16",
+      "text": "review it and actually it's just perfect i'm like okay stamp uh so uh that i think that shows that"
+    },
+    {
+      "start": 3082.84,
+      "end": 3088.52,
+      "t": "51:22",
+      "text": "you know the the dune architecture is holding up right the all the the really strict constraints"
+    },
+    {
+      "start": 3088.52,
+      "end": 3094.88,
+      "t": "51:28",
+      "text": "allow people who are not experts in engineering to contribute at a high level uh so i'm i feel"
+    },
+    {
+      "start": 3094.88,
+      "end": 3100.8,
+      "t": "51:34",
+      "text": "like i'm already seeing that pay off a lot where uh you know designers and pms are just able to"
+    },
+    {
+      "start": 3100.8,
+      "end": 3103.44,
+      "t": "51:40",
+      "text": "to ship features directly"
+    },
+    {
+      "start": 3103.44,
+      "end": 3108.7,
+      "t": "51:43",
+      "text": "and that just makes the Grok Bot team super fast, right?",
+      "was": "and that just makes the GrokBot team super fast, right?",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3108.74,
+      "end": 3110.68,
+      "t": "51:48",
+      "text": "Where we can ship so quickly"
+    },
+    {
+      "start": 3110.68,
+      "end": 3113.92,
+      "t": "51:50",
+      "text": "and we have a lot planned."
+    },
+    {
+      "start": 3114.06,
+      "end": 3119.78,
+      "t": "51:54",
+      "text": "So I'm very excited to ship more stuff."
+    },
+    {
+      "start": 3120.28,
+      "end": 3120.94,
+      "t": "52:00",
+      "text": "Yeah, that's awesome."
+    },
+    {
+      "start": 3121.54,
+      "end": 3122.4,
+      "t": "52:01",
+      "text": "We are at time."
+    },
+    {
+      "start": 3122.84,
+      "end": 3125.78,
+      "t": "52:02",
+      "text": "So I guess, Lauren, if folks want to support you,"
+    },
+    {
+      "start": 3125.78,
+      "end": 3128.64,
+      "t": "52:05",
+      "text": "maybe go try Grok Bot, try out 4.6",
+      "was": "maybe go try GrokBot, try out 4.6",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3128.64,
+      "end": 3131.58,
+      "t": "52:08",
+      "text": "and, you know, provide some feedback."
+    },
+    {
+      "start": 3131.76,
+      "end": 3132.48,
+      "t": "52:11",
+      "text": "But yeah, this was awesome."
+    },
+    {
+      "start": 3132.62,
+      "end": 3133.78,
+      "t": "52:12",
+      "text": "Really appreciate you taking the time."
+    },
+    {
+      "start": 3134.24,
+      "end": 3135.6,
+      "t": "52:14",
+      "text": "And yeah, like all the use cases"
+    },
+    {
+      "start": 3135.6,
+      "end": 3136.8,
+      "t": "52:15",
+      "text": "where you can use Grok Bot are,",
+      "was": "where you can use GrokBot are,",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3137.46,
+      "end": 3139.38,
+      "t": "52:17",
+      "text": "I think we've heard a lot of cases"
+    },
+    {
+      "start": 3139.38,
+      "end": 3140.32,
+      "t": "52:19",
+      "text": "where it's like very intuitive."
+    },
+    {
+      "start": 3140.64,
+      "end": 3141.8,
+      "t": "52:20",
+      "text": "You know, it looks like iMessage."
+    },
+    {
+      "start": 3142.4,
+      "end": 3145.7,
+      "t": "52:22",
+      "text": "I've seen a couple of people share Grok Bot with their mom",
+      "was": "I've seen a couple of people share GrokBot with their mom",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3145.7,
+      "end": 3148.06,
+      "t": "52:25",
+      "text": "and their mom's onboarding onto Grok Bot.",
+      "was": "and their mom's onboarding onto GrokBot.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3148.98,
+      "end": 3151.36,
+      "t": "52:28",
+      "text": "So I've been really blown away"
+    },
+    {
+      "start": 3151.36,
+      "end": 3153.28,
+      "t": "52:31",
+      "text": "by how well received Grok Bot is.",
+      "was": "by how well received GrokBot is.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3153.46,
+      "end": 3154.9,
+      "t": "52:33",
+      "text": "There's still a lot more to do, right?"
+    },
+    {
+      "start": 3154.96,
+      "end": 3156.54,
+      "t": "52:34",
+      "text": "Like we have a few bugs here and there"
+    },
+    {
+      "start": 3156.54,
+      "end": 3157.52,
+      "t": "52:36",
+      "text": "that we have to fix."
+    },
+    {
+      "start": 3157.52,
+      "end": 3165.16,
+      "t": "52:37",
+      "text": "but overall it's been very positive um and very excited that we finally get got to launch it"
+    },
+    {
+      "start": 3165.16,
+      "end": 3170.86,
+      "t": "52:45",
+      "text": "and you announced another announcement today so pairing those two together what is now possible"
+    },
+    {
+      "start": 3170.86,
+      "end": 3182.28,
+      "t": "52:50",
+      "text": "um so Grok 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is",
+      "was": "um so graph 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgraph 4\\.6\\b",
+          "to": "Grok 4.6",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3182.28,
+      "end": 3184.38,
+      "t": "53:02",
+      "text": "at the same token cost."
+    },
+    {
+      "start": 3185.48,
+      "end": 3190.3,
+      "t": "53:05",
+      "text": "So I think for coding tasks and the type of work that I do,"
+    },
+    {
+      "start": 3190.34,
+      "end": 3191.78,
+      "t": "53:10",
+      "text": "because I do a lot of engineering work,"
+    },
+    {
+      "start": 3192.44,
+      "end": 3194.88,
+      "t": "53:12",
+      "text": "I use Grok 4.6 a lot for that."
+    },
+    {
+      "start": 3195.4,
+      "end": 3197.24,
+      "t": "53:15",
+      "text": "And it's just way more capable."
+    },
+    {
+      "start": 3197.44,
+      "end": 3198.26,
+      "t": "53:17",
+      "text": "It's really, really fast."
+    },
+    {
+      "start": 3198.92,
+      "end": 3201.9,
+      "t": "53:18",
+      "text": "I still use the other models too, like Claude and Sonnet.",
+      "was": "I still use the other models too, like Fable and Sol.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bfable and sol\\b",
+          "to": "Claude and Sonnet",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3202.28,
+      "end": 3204.9,
+      "t": "53:22",
+      "text": "But Grok is just so fast."
+    },
+    {
+      "start": 3205.18,
+      "end": 3206.08,
+      "t": "53:25",
+      "text": "And it's affordable."
+    },
+    {
+      "start": 3206.34,
+      "end": 3206.7,
+      "t": "53:26",
+      "text": "It's cheap."
+    },
+    {
+      "start": 3206.98,
+      "end": 3208.48,
+      "t": "53:26",
+      "text": "So I really like using it."
+    },
+    {
+      "start": 3208.84,
+      "end": 3210.32,
+      "t": "53:28",
+      "text": "Yeah, I think one thing that we talked about"
+    },
+    {
+      "start": 3210.32,
+      "end": 3213.04,
+      "t": "53:30",
+      "text": "when we launched Grok 4.5 with the SpaceX AI team"
+    },
+    {
+      "start": 3213.04,
+      "end": 3216.22,
+      "t": "53:33",
+      "text": "was sort of this idea that we're going to train models"
+    },
+    {
+      "start": 3216.22,
+      "end": 3217.04,
+      "t": "53:36",
+      "text": "for more than just code."
+    },
+    {
+      "start": 3217.16,
+      "end": 3219.26,
+      "t": "53:37",
+      "text": "And I think what we're continuing to see with Grok 4.6"
+    },
+    {
+      "start": 3219.26,
+      "end": 3220.74,
+      "t": "53:39",
+      "text": "and some of the investments in Grok Bot,",
+      "was": "and some of the investments in GrokBot,",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3220.88,
+      "end": 3222.86,
+      "t": "53:40",
+      "text": "like really, there's a lot more that's possible"
+    },
+    {
+      "start": 3222.86,
+      "end": 3224.46,
+      "t": "53:42",
+      "text": "with these really great models."
+    },
+    {
+      "start": 3224.6,
+      "end": 3226.82,
+      "t": "53:44",
+      "text": "And so, yeah, we're just excited for the models"
+    },
+    {
+      "start": 3226.82,
+      "end": 3229.14,
+      "t": "53:46",
+      "text": "to keep improving, to be part of the discussion"
+    },
+    {
+      "start": 3229.14,
+      "end": 3230.46,
+      "t": "53:49",
+      "text": "on the frontier of models,"
+    },
+    {
+      "start": 3230.64,
+      "end": 3232.9,
+      "t": "53:50",
+      "text": "and yeah, to be able to bring that into the world."
+    },
+    {
+      "start": 3233.12,
+      "end": 3233.3,
+      "t": "53:53",
+      "text": "Yeah."
+    },
+    {
+      "start": 3233.84,
+      "end": 3235.82,
+      "t": "53:53",
+      "text": "I'm really excited what you show here"
+    },
+    {
+      "start": 3235.82,
+      "end": 3237.62,
+      "t": "53:55",
+      "text": "because I know that cursor started off"
+    },
+    {
+      "start": 3237.62,
+      "end": 3239.12,
+      "t": "53:57",
+      "text": "mainly in the agentics coding space."
+    },
+    {
+      "start": 3239.12,
+      "end": 3245.92,
+      "t": "53:59",
+      "text": "I was sharing earlier that Cursor is actually my gateway into starting to use vibe coding"
+    },
+    {
+      "start": 3245.92,
+      "end": 3247.22,
+      "t": "54:05",
+      "text": "tools in general."
+    },
+    {
+      "start": 3247.42,
+      "end": 3248.82,
+      "t": "54:07",
+      "text": "It was the first actual tool I used."
+    },
+    {
+      "start": 3248.92,
+      "end": 3252.02,
+      "t": "54:08",
+      "text": "I used the Cursor models, and then I just kept updating from there."
+    },
+    {
+      "start": 3252.16,
+      "end": 3253.44,
+      "t": "54:12",
+      "text": "And I still, to this day, use it."
+    },
+    {
+      "start": 3253.88,
+      "end": 3257.36,
+      "t": "54:13",
+      "text": "And then I realized before I was actually testing out Grok Bot, I was like, oh, you",
+      "was": "And then I realized before I was actually testing out Crock-Bot, I was like, oh, you",
+      "fixes": [
+        {
+          "pat": "(?i)\\bcrock[- ]?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3257.36,
+      "end": 3260.44,
+      "t": "54:17",
+      "text": "can use this same tool to do research, to do other things."
+    },
+    {
+      "start": 3260.68,
+      "end": 3266.4,
+      "t": "54:20",
+      "text": "And still, even though people say agents are expanding and growing, it's still mainly coding"
+    },
+    {
+      "start": 3266.4,
+      "end": 3271.58,
+      "t": "54:26",
+      "text": "agents because the actual infrastructure in the ux to use agents for everyday things"
+    },
+    {
+      "start": 3271.58,
+      "end": 3276.76,
+      "t": "54:31",
+      "text": "sucks i think OpenClaw was maybe the first mainstream but like you mentioned i don't",
+      "was": "sucks i think open claw was maybe the first mainstream but like you mentioned i don't",
+      "fixes": [
+        {
+          "pat": "(?i)\\bopen claw\\b",
+          "to": "OpenClaw",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3276.76,
+      "end": 3282.96,
+      "t": "54:36",
+      "text": "think my mom would ever be using OpenClaw and um even myself i set up a whole OpenClaw in a",
+      "was": "think my mom would ever be using open claw and um even myself i set up a whole open claw in a",
+      "fixes": [
+        {
+          "pat": "(?i)\\bopen claw\\b",
+          "to": "OpenClaw",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "start": 3282.96,
+      "end": 3287.56,
+      "t": "54:42",
+      "text": "telegram it looks kind of like this in my ui and i have my shopping agent my all that stuff and it"
+    },
+    {
+      "start": 3287.56,
+      "end": 3293.1,
+      "t": "54:47",
+      "text": "breaks all the time and i'm always like like trying to fix it this is awesome and i love the"
+    },
+    {
+      "start": 3293.1,
+      "end": 3299.74,
+      "t": "54:53",
+      "text": "whole ui and structure how did you what was like the design process going through creating this"
+    },
+    {
+      "start": 3299.74,
+      "end": 3305.6,
+      "t": "54:59",
+      "text": "creating Grok Bot yeah i mean the the brief was basically keep it simple uh if i if to be a little",
+      "was": "creating rock bot yeah i mean the the brief was basically keep it simple uh if i if to be a little",
+      "fixes": [
+        {
+          "pat": "(?i)\\brock ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3305.6,
+      "end": 3310.48,
+      "t": "55:05",
+      "text": "cheeky and i think that's actually really real it's like a lot of ai applications have you know"
+    },
+    {
+      "start": 3310.48,
+      "end": 3314.72,
+      "t": "55:10",
+      "text": "a lot of control and power that they give you but sometimes that power is like balanced with"
+    },
+    {
+      "start": 3314.72,
+      "end": 3319.42,
+      "t": "55:14",
+      "text": "complexity and so really our design brief here was like how can we make this really simple first and"
+    },
+    {
+      "start": 3319.42,
+      "end": 3323.24,
+      "t": "55:19",
+      "text": "foremost and so that's kind of where the messaging interface became a little bit inspired from and"
+    },
+    {
+      "start": 3323.24,
+      "end": 3326.62,
+      "t": "55:23",
+      "text": "then of course some of the design touches that we added over time i don't know lauren if you'd add"
+    },
+    {
+      "start": 3326.62,
+      "end": 3332.62,
+      "t": "55:26",
+      "text": "anything kind of having built it all uh i would say i built it all but um i think uh that the team"
+    },
+    {
+      "start": 3332.62,
+      "end": 3337.3,
+      "t": "55:32",
+      "text": "really strove for a very clean simple user interface because like you know if you've used"
+    },
+    {
+      "start": 3337.3,
+      "end": 3342.28,
+      "t": "55:37",
+      "text": "cursor you're probably like a power developer power user it's like very there's like a lot of"
+    },
+    {
+      "start": 3342.28,
+      "end": 3348.72,
+      "t": "55:42",
+      "text": "knobs and whistles and and uh like very it's very tailored focus for coding and with Grok Bot we",
+      "was": "knobs and whistles and and uh like very it's very tailored focus for coding and with grokbot we",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3348.72,
+      "end": 3350.66,
+      "t": "55:48",
+      "text": "really wanted to take a fresh"
+    },
+    {
+      "start": 3350.66,
+      "end": 3352.8,
+      "t": "55:50",
+      "text": "perspective on what would"
+    },
+    {
+      "start": 3352.8,
+      "end": 3354.84,
+      "t": "55:52",
+      "text": "it look like if your agent"
+    },
+    {
+      "start": 3354.84,
+      "end": 3356.34,
+      "t": "55:54",
+      "text": "was really more like a colleague."
+    },
+    {
+      "start": 3357.3,
+      "end": 3358.58,
+      "t": "55:57",
+      "text": "And so you don't"
+    },
+    {
+      "start": 3358.58,
+      "end": 3359.86,
+      "t": "55:58",
+      "text": "necessarily want to"
+    },
+    {
+      "start": 3359.86,
+      "end": 3362.84,
+      "t": "55:59",
+      "text": "micromanage your colleague and say, what tool calls"
+    },
+    {
+      "start": 3362.84,
+      "end": 3364.44,
+      "t": "56:02",
+      "text": "are you using right now?"
+    },
+    {
+      "start": 3364.78,
+      "end": 3366.44,
+      "t": "56:04",
+      "text": "But you want to talk to it like a person."
+    },
+    {
+      "start": 3367.06,
+      "end": 3368.68,
+      "t": "56:07",
+      "text": "You want to see what they're doing on their computer."
+    },
+    {
+      "start": 3370.02,
+      "end": 3372.66,
+      "t": "56:10",
+      "text": "So we've tried to keep the interface"
+    },
+    {
+      "start": 3372.66,
+      "end": 3374.72,
+      "t": "56:12",
+      "text": "really elegant and simple."
+    },
+    {
+      "start": 3375.12,
+      "end": 3376.66,
+      "t": "56:15",
+      "text": "Really cool. I love that"
+    },
+    {
+      "start": 3376.66,
+      "end": 3378.62,
+      "t": "56:16",
+      "text": "I have both of you two on the interview because"
+    },
+    {
+      "start": 3378.62,
+      "end": 3381.42,
+      "t": "56:18",
+      "text": "We have the product side, we have the software engineering side."
+    },
+    {
+      "start": 3381.44,
+      "end": 3382.92,
+      "t": "56:21",
+      "text": "It's a whole team behind the scenes, too."
+    },
+    {
+      "start": 3383.06,
+      "end": 3384.06,
+      "t": "56:23",
+      "text": "There's a lot of work on this."
+    },
+    {
+      "start": 3384.2,
+      "end": 3386.0,
+      "t": "56:24",
+      "text": "Oh, wait, there's more people besides just you two?"
+    },
+    {
+      "start": 3387.38,
+      "end": 3387.9,
+      "t": "56:27",
+      "text": "On it?"
+    },
+    {
+      "start": 3387.94,
+      "end": 3388.56,
+      "t": "56:27",
+      "text": "No, for sure."
+    },
+    {
+      "start": 3388.8,
+      "end": 3393.12,
+      "t": "56:28",
+      "text": "And so having you both here, you get a really comprehensive overview of what it actually"
+    },
+    {
+      "start": 3393.12,
+      "end": 3396.62,
+      "t": "56:33",
+      "text": "takes to create Grok Bot and get this product into the mainstream.",
+      "was": "takes to create Grokbot and get this product into the mainstream.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3397.08,
+      "end": 3402.06,
+      "t": "56:37",
+      "text": "I do know the user might be a little bit different from the typical cursor user."
+    },
+    {
+      "start": 3402.06,
+      "end": 3406.28,
+      "t": "56:42",
+      "text": "Who are you envisioning are going to be the mainstream adopters of Grok Bot?",
+      "was": "Who are you envisioning are going to be the mainstream adopters of Grokbot?",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3406.28,
+      "end": 3409.62,
+      "t": "56:46",
+      "text": "Yeah, I think we really see this being useful for everyone."
+    },
+    {
+      "start": 3410.22,
+      "end": 3418.42,
+      "t": "56:50",
+      "text": "So kind of like what we were saying when we saw this launch internally, I think there's a lot of work out there that's just rife to be made more efficient."
+    },
+    {
+      "start": 3419.32,
+      "end": 3431.24,
+      "t": "56:59",
+      "text": "And I think the motivation for why we built this internally is we actually saw a bunch of folks within Cursor who were building their own agents, kind of like constructing the chats together, building Slack bots."
+    },
+    {
+      "start": 3431.24,
+      "end": 3435.66,
+      "t": "57:11",
+      "text": "Actually, Lauren had a really famous Slack bot that still lives in our Slack instance."
+    },
+    {
+      "start": 3435.66,
+      "end": 3440.84,
+      "t": "57:15",
+      "text": "and it's sort of like that takes a lot of context to put together uh and so the idea was well could"
+    },
+    {
+      "start": 3440.84,
+      "end": 3446.14,
+      "t": "57:20",
+      "text": "we package that up and these bots were for for deployed engineering and for like software"
+    },
+    {
+      "start": 3446.14,
+      "end": 3450.32,
+      "t": "57:26",
+      "text": "engineering for our ops teams and and really just wanting to say like could we productize that in a"
+    },
+    {
+      "start": 3450.32,
+      "end": 3455.52,
+      "t": "57:30",
+      "text": "really in a really fun way so yeah yeah uh so yeah i i talk a lot about this bot that i built"
+    },
+    {
+      "start": 3455.52,
+      "end": 3461.74,
+      "t": "57:35",
+      "text": "called benny he's like this little dog uh that's his avatar but uh the idea i had with benny was"
+    },
+    {
+      "start": 3461.74,
+      "end": 3469.58,
+      "t": "57:41",
+      "text": "really uh you know like i'm a fairly lazy person uh and i wanted to figure out how can i you know"
+    },
+    {
+      "start": 3469.58,
+      "end": 3474.9,
+      "t": "57:49",
+      "text": "we're getting so many bug reports for a cursor right and and i wanted to just fix them all yeah"
+    },
+    {
+      "start": 3474.9,
+      "end": 3479.92,
+      "t": "57:54",
+      "text": "uh and so i started thinking about how would i make it so my agents can just automatically fix"
+    },
+    {
+      "start": 3479.92,
+      "end": 3484.74,
+      "t": "57:59",
+      "text": "bugs for me while i sleep and so that was the inspiration for some of our earlier experiments"
+    },
+    {
+      "start": 3484.74,
+      "end": 3490.96,
+      "t": "58:04",
+      "text": "with you know building like uh like a more like persistent bot uh and so i think there"
+    },
+    {
+      "start": 3490.96,
+      "end": 3495.54,
+      "t": "58:10",
+      "text": "were some ideas that we took from there because i got so many questions like how do you how did"
+    },
+    {
+      "start": 3495.54,
+      "end": 3500.56,
+      "t": "58:15",
+      "text": "you build any how can i build my own i think that inspired uh some of the thinking behind"
+    },
+    {
+      "start": 3500.56,
+      "end": 3505.58,
+      "t": "58:20",
+      "text": "Grok Bot like you know what if everybody could define one of their own uh like bots you know",
+      "was": "grokbot like you know what if everybody could define one of their own uh like bots you know",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3505.58,
+      "end": 3510.78,
+      "t": "58:25",
+      "text": "give it an identity and give it things like its own computer plus routines and automations"
+    },
+    {
+      "start": 3510.78,
+      "end": 3515.6,
+      "t": "58:30",
+      "text": "so like i have like a bot like bots right now that are you know every time someone gives us"
+    },
+    {
+      "start": 3515.6,
+      "end": 3520.5,
+      "t": "58:35",
+      "text": "feedback on Grok Bot my bots are automatically going off and fixing them for me and i just",
+      "was": "feedback on grokbot my bots are automatically going off and fixing them for me and i just",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3520.5,
+      "end": 3527.4,
+      "t": "58:40",
+      "text": "like review their code so what's your job now it's definitely become interesting it's like i'm"
+    },
+    {
+      "start": 3527.4,
+      "end": 3532.36,
+      "t": "58:47",
+      "text": "almost like a manager for my for my digital colleagues yeah so it's pretty interesting"
+    },
+    {
+      "start": 3532.36,
+      "end": 3537.66,
+      "t": "58:52",
+      "text": "it's actually remarkable how much of Grok Bot was built with Grok Bot too yeah that's like it was a",
+      "was": "it's actually remarkable how much of grokbot was built with grokbot too yeah that's like it was a",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "start": 3537.66,
+      "end": 3542.7,
+      "t": "58:57",
+      "text": "it's been a really cool feedback loop where these agents can self-triage issues they can they can"
+    },
+    {
+      "start": 3542.7,
+      "end": 3546.76,
+      "t": "59:02",
+      "text": "write code and so they can connect to cloud agents and i don't know if you have a demo of that lauren"
+    },
+    {
+      "start": 3546.76,
+      "end": 3547.94,
+      "t": "59:06",
+      "text": "that we wanted to share."
+    },
+    {
+      "start": 3547.94,
+      "end": 3548.24,
+      "t": "59:07",
+      "text": "Yeah, I do."
+    },
+    {
+      "start": 3548.44,
+      "end": 3549.78,
+      "t": "59:08",
+      "text": "Ooh, I love these demos."
+    },
+    {
+      "start": 3549.9,
+      "end": 3550.9,
+      "t": "59:09",
+      "text": "This is so fun."
+    },
+    {
+      "start": 3551.34,
+      "end": 3552.86,
+      "t": "59:11",
+      "text": "It's like the best way to experience this"
+    },
+    {
+      "start": 3552.86,
+      "end": 3553.6,
+      "t": "59:12",
+      "text": "is to make it interactive."
+    },
+    {
+      "start": 3553.86,
+      "end": 3554.24,
+      "t": "59:13",
+      "text": "Exactly."
+    },
+    {
+      "start": 3554.44,
+      "end": 3555.62,
+      "t": "59:14",
+      "text": "You explain something and you're like,"
+    },
+    {
+      "start": 3555.68,
+      "end": 3557.6,
+      "t": "59:15",
+      "text": "wow, I do have a demo pulled up."
+    },
+    {
+      "start": 3557.76,
+      "end": 3560.02,
+      "t": "59:17",
+      "text": "Let me just show you now how it actually works."
+    },
+    {
+      "start": 3560.44,
+      "end": 3563.04,
+      "t": "59:20",
+      "text": "We'll continue monitoring right after this message"
+    },
+    {
+      "start": 3563.04,
+      "end": 3563.94,
+      "t": "59:23",
+      "text": "from our sponsors."
+    },
+    {
+      "start": 3564.8,
+      "end": 3567.08,
+      "t": "59:24",
+      "text": "Eleven Labs, AI that communicates at human level"
+    },
+    {
+      "start": 3567.08,
+      "end": 3568.68,
+      "t": "59:27",
+      "text": "across every channel and modality."
+    },
+    {
+      "start": 3569.02,
+      "end": 3570.76,
+      "t": "59:29",
+      "text": "Elevenlabs.io slash MTS."
+    },
+    {
+      "start": 3575.01,
+      "end": 3576.39,
+      "t": "59:35",
+      "text": "Scale your startup on Neon."
+    },
+    {
+      "start": 3576.79,
+      "end": 3578.17,
+      "t": "59:36",
+      "text": "Millions of developers and startups"
+    },
+    {
+      "start": 3578.17,
+      "end": 3580.11,
+      "t": "59:38",
+      "text": "have already chosen Neon for their backend."
+    },
+    {
+      "start": 3580.45,
+      "end": 3581.29,
+      "t": "59:40",
+      "text": "Start on the free plan"
+    },
+    {
+      "start": 3581.29,
+      "end": 3583.97,
+      "t": "59:41",
+      "text": "or get up to $100,000 in credits for your startup"
+    },
+    {
+      "start": 3583.97,
+      "end": 3585.83,
+      "t": "59:43",
+      "text": "at neon.com.mts."
+    },
+    {
+      "start": 3589.73,
+      "end": 3591.55,
+      "t": "59:49",
+      "text": "Special thanks to our sponsor Kong,"
+    },
+    {
+      "start": 3591.67,
+      "end": 3593.01,
+      "t": "59:51",
+      "text": "the AI connectivity platform."
+    },
+    {
+      "start": 3593.37,
+      "end": 3595.55,
+      "t": "59:53",
+      "text": "Connect APIs, LLMs, agents, and systems"
+    },
+    {
+      "start": 3595.55,
+      "end": 3597.13,
+      "t": "59:55",
+      "text": "with serious security and governance."
+    },
+    {
+      "start": 3597.53,
+      "end": 3598.59,
+      "t": "59:57",
+      "text": "konghq.com."
+    },
+    {
+      "start": 3602.32,
+      "end": 3603.36,
+      "t": "60:02",
+      "text": "Yeah, so I kind of,"
+    },
+    {
+      "start": 3603.42,
+      "end": 3605.6,
+      "t": "60:03",
+      "text": "I asked my chief of staff already,"
+    },
+    {
+      "start": 3605.72,
+      "end": 3607.88,
+      "t": "60:05",
+      "text": "like if there's any interesting bugs that we saw today."
+    },
+    {
+      "start": 3608.48,
+      "end": 3609.54,
+      "t": "60:08",
+      "text": "And it's found a few."
+    },
+    {
+      "start": 3609.9,
+      "end": 3612.54,
+      "t": "60:09",
+      "text": "You can also see I have X open on the,"
+    },
+    {
+      "start": 3612.54,
+      "end": 3618.94,
+      "t": "60:12",
+      "text": "on the my bots computer just in case uh but yeah you know i can i can tell it to dispatch uh so"
+    },
+    {
+      "start": 3618.94,
+      "end": 3624.74,
+      "t": "60:18",
+      "text": "like i have a i have a sand team over here i'm sorry a Grok Bot team uh so each of them kind of",
+      "was": "like i have a i have a sand team over here i'm sorry a grokbot team uh so each of them kind of",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3624.74,
+      "end": 3630.2,
+      "t": "60:24",
+      "text": "are responsible for a different feature uh and so now my chief of staff is gonna like send off those"
+    },
+    {
+      "start": 3630.2,
+      "end": 3637.75,
+      "t": "60:30",
+      "text": "tasks to those uh agents uh and in a minute we'll see a bunch of messages that i'll send to the you"
+    },
+    {
+      "start": 3637.75,
+      "end": 3643.93,
+      "t": "60:37",
+      "text": "my different my team members uh and then they'll go off and actually work on those tasks uh and"
+    },
+    {
+      "start": 3643.93,
+      "end": 3647.61,
+      "t": "60:43",
+      "text": "then at the end of it i'll get like a pull request that i can review i'll get videos i'll get a"
+    },
+    {
+      "start": 3647.61,
+      "end": 3656.33,
+      "t": "60:47",
+      "text": "screenshot um and uh yeah so like here's another example where uh this is like one of my engineering"
+    },
+    {
+      "start": 3656.33,
+      "end": 3663.87,
+      "t": "60:56",
+      "text": "team agents and uh i think this is like almost like a feature that's not super obvious but uh"
+    },
+    {
+      "start": 3663.87,
+      "end": 3670.61,
+      "t": "61:03",
+      "text": "If you set up cloud agents on Cursor, your Grok Bot bots can actually kick them off.",
+      "was": "If you set up cloud agents on Cursor, your GrokBot bots can actually kick them off.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3670.91,
+      "end": 3678.49,
+      "t": "61:10",
+      "text": "So here, I have a cloud agent that's running with its own computer that this agent is managing."
+    },
+    {
+      "start": 3679.56,
+      "end": 3682.22,
+      "t": "61:19",
+      "text": "And so it's got a bunch of things in flight already."
+    },
+    {
+      "start": 3682.44,
+      "end": 3684.8,
+      "t": "61:22",
+      "text": "So I have a bunch of PRs to review later."
+    },
+    {
+      "start": 3685.38,
+      "end": 3688.46,
+      "t": "61:25",
+      "text": "I think there's something really exciting about the future of software development here, too,"
+    },
+    {
+      "start": 3688.56,
+      "end": 3693.5,
+      "t": "61:28",
+      "text": "where it's really talking to and working with a bunch of agents that are doing specific tasks"
+    },
+    {
+      "start": 3693.5,
+      "end": 3696.42,
+      "t": "61:33",
+      "text": "And then you kind of just step back and become the manager of them."
+    },
+    {
+      "start": 3696.64,
+      "end": 3699.6,
+      "t": "61:36",
+      "text": "And it sort of feels like that vision is coming true in a really fun way here."
+    },
+    {
+      "start": 3699.9,
+      "end": 3700.96,
+      "t": "61:39",
+      "text": "That's amazing."
+    },
+    {
+      "start": 3701.1,
+      "end": 3703.24,
+      "t": "61:41",
+      "text": "And I see here it's a bunch of cat photos."
+    },
+    {
+      "start": 3703.66,
+      "end": 3704.12,
+      "t": "61:43",
+      "text": "Oh, yeah."
+    },
+    {
+      "start": 3704.42,
+      "end": 3707.38,
+      "t": "61:44",
+      "text": "So all your agents are actual cats."
+    },
+    {
+      "start": 3707.62,
+      "end": 3708.94,
+      "t": "61:47",
+      "text": "Yeah, I just love cats."
+    },
+    {
+      "start": 3709.06,
+      "end": 3714.78,
+      "t": "61:49",
+      "text": "So I decided to give them silly profile pictures just to personalize my Grok Bot a little bit.",
+      "was": "So I decided to give them silly profile pictures just to personalize my Grokbot a little bit.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3715.8,
+      "end": 3718.74,
+      "t": "61:55",
+      "text": "I mean, the default Grok Bot avatars are super cute as well.",
+      "was": "I mean, the default Grokbot avatars are super cute as well.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3719.22,
+      "end": 3721.58,
+      "t": "61:59",
+      "text": "And I added these before we added those."
+    },
+    {
+      "start": 3721.58,
+      "end": 3723.7,
+      "t": "62:01",
+      "text": "But it's just having a bit of fun, you know?"
+    },
+    {
+      "start": 3724.38,
+      "end": 3724.52,
+      "t": "62:04",
+      "text": "Yeah."
+    },
+    {
+      "start": 3724.8,
+      "end": 3729.18,
+      "t": "62:04",
+      "text": "Roshan, you hinted towards something that is a trend that, of course, is happening with"
+    },
+    {
+      "start": 3729.18,
+      "end": 3730.1,
+      "t": "62:09",
+      "text": "the future of agentic coding.",
+      "was": "the future of agent decoding.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bagent decoding\\b",
+          "to": "agentic coding",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3730.26,
+      "end": 3733.82,
+      "t": "62:10",
+      "text": "And Cursor has been at the front and center of seeing all of this happen."
+    },
+    {
+      "start": 3734.2,
+      "end": 3737.62,
+      "t": "62:14",
+      "text": "More and more code is getting automated and is done by these agents."
+    },
+    {
+      "start": 3737.76,
+      "end": 3742.9,
+      "t": "62:17",
+      "text": "And so as a human, you become this puppeteer of agents who are handling all these tasks"
+    },
+    {
+      "start": 3742.9,
+      "end": 3743.28,
+      "t": "62:22",
+      "text": "for you."
+    },
+    {
+      "start": 3743.32,
+      "end": 3746.06,
+      "t": "62:23",
+      "text": "I know that's a world that you are particularly excited about."
+    },
+    {
+      "start": 3746.5,
+      "end": 3747.62,
+      "t": "62:26",
+      "text": "Can you share a little bit more?"
+    },
+    {
+      "start": 3747.74,
+      "end": 3748.74,
+      "t": "62:27",
+      "text": "Why are you excited about that?"
+    },
+    {
+      "start": 3748.74,
+      "end": 3754.8,
+      "t": "62:28",
+      "text": "What does that actually unlock at maybe the human level that people in the mainstream audience might not realize?"
+    },
+    {
+      "start": 3755.04,
+      "end": 3755.52,
+      "t": "62:35",
+      "text": "Yeah, totally."
+    },
+    {
+      "start": 3755.72,
+      "end": 3758.76,
+      "t": "62:35",
+      "text": "I think that, like, if I had to pick one word, it would be efficiency."
+    },
+    {
+      "start": 3759.0,
+      "end": 3763.34,
+      "t": "62:39",
+      "text": "I think there's so many ideas in people's heads, regardless of role, again."
+    },
+    {
+      "start": 3763.5,
+      "end": 3765.82,
+      "t": "62:43",
+      "text": "Like, I have so many product ideas I want to build into Cursor."
+    },
+    {
+      "start": 3766.82,
+      "end": 3768.98,
+      "t": "62:46",
+      "text": "And it's the limiting factor."
+    },
+    {
+      "start": 3769.26,
+      "end": 3772.68,
+      "t": "62:49",
+      "text": "Like, there's always some bottleneck in that, like, idea to existence pipeline."
+    },
+    {
+      "start": 3772.68,
+      "end": 3784.78,
+      "t": "62:52",
+      "text": "And so I think the promise of being able to throw fleets of agents at these problems and then have them produce things that are really high quality and sort of aligned with the taste that I would myself put into a product, that's the vision, right?"
+    },
+    {
+      "start": 3784.82,
+      "end": 3785.64,
+      "t": "63:04",
+      "text": "That's sort of the dream."
+    },
+    {
+      "start": 3785.8,
+      "end": 3788.1,
+      "t": "63:05",
+      "text": "It's like being able to go from thought to existence."
+    },
+    {
+      "start": 3788.1,
+      "end": 3802.84,
+      "t": "63:08",
+      "text": "So to me, that's the thing to work towards is can we build these things in a way where whether I'm managing a bunch of agents or asking agents to manage other agents or working with Lauren's agents or whatever that looks like, we're able to really shorten, compress, compress, compress that cycle more and more."
+    },
+    {
+      "start": 3802.92,
+      "end": 3813.48,
+      "t": "63:22",
+      "text": "And I think if you kind of like look at the evolution of Cursor as a company, that's sort of how we've built in a lot of ways, built ourselves towards that future is by, you know, continuing to introduce more and more sort of like agent tools and complexity there."
+    },
+    {
+      "start": 3813.6,
+      "end": 3816.08,
+      "t": "63:33",
+      "text": "So, yeah, I think that's the vision and we're excited for it."
+    },
+    {
+      "start": 3816.08,
+      "end": 3819.14,
+      "t": "63:36",
+      "text": "And then how has it changed on the software engineering team?"
+    },
+    {
+      "start": 3819.14,
+      "end": 3823.46,
+      "t": "63:39",
+      "text": "What differences from when you started working at Cursor to how it is now?"
+    },
+    {
+      "start": 3824.6,
+      "end": 3831.68,
+      "t": "63:44",
+      "text": "I think it's like the way I see engineers roles evolve in the agent world is, you know,"
+    },
+    {
+      "start": 3831.72,
+      "end": 3835.1,
+      "t": "63:51",
+      "text": "like I mentioned, you're sort of like an engineering manager for your agents."
+    },
+    {
+      "start": 3835.64,
+      "end": 3841.58,
+      "t": "63:55",
+      "text": "But I think a big part of our responsibility now as engineers is also to like, you know,"
+    },
+    {
+      "start": 3841.58,
+      "end": 3848.4,
+      "t": "64:01",
+      "text": "keep the code base in in a condition where you know product managers designers can contribute"
+    },
+    {
+      "start": 3848.4,
+      "end": 3853.14,
+      "t": "64:08",
+      "text": "like high quality code and that's something i talk a lot about on twitter as well which is you"
+    },
+    {
+      "start": 3853.14,
+      "end": 3859.64,
+      "t": "64:13",
+      "text": "know like investing in refactoring rewriting even rewriting your code base so that agents can really"
+    },
+    {
+      "start": 3859.64,
+      "end": 3864.4,
+      "t": "64:19",
+      "text": "thrive even if you're not like or they don't you know they're not very smart agents sometimes"
+    },
+    {
+      "start": 3864.4,
+      "end": 3872.0,
+      "t": "64:24",
+      "text": "uh you know like things like encoding your rules and your style guides into actual uh like lint"
+    },
+    {
+      "start": 3872.0,
+      "end": 3879.64,
+      "t": "64:32",
+      "text": "rules or hard constraints that uh you know fail ci so that again like the the i think the big unlock"
+    },
+    {
+      "start": 3879.64,
+      "end": 3885.72,
+      "t": "64:39",
+      "text": "is uh as an engineer i can empower like so many other people to do things that they couldn't do"
+    },
+    {
+      "start": 3885.72,
+      "end": 3890.4,
+      "t": "64:45",
+      "text": "before and i can do things that i couldn't do before as well because like you know i've done"
+    },
+    {
+      "start": 3890.4,
+      "end": 3897.4,
+      "t": "64:50",
+      "text": "a lot of big refactors and migrations uh at cursor and i did them like mostly by myself wow like with"
+    },
+    {
+      "start": 3897.4,
+      "end": 3902.24,
+      "t": "64:57",
+      "text": "one of all the cat agents yeah all the cat agents were just going wild and like you know i converted"
+    },
+    {
+      "start": 3902.24,
+      "end": 3908.42,
+      "t": "65:02",
+      "text": "you know a bunch of stuff uh you know which would have taken me or a team of engineers months or"
+    },
+    {
+      "start": 3908.42,
+      "end": 3914.32,
+      "t": "65:08",
+      "text": "even years to finish wow that's incredible and as an outsider's perspective you might think okay"
+    },
+    {
+      "start": 3914.32,
+      "end": 3919.58,
+      "t": "65:14",
+      "text": "now that agents can do all this coding what's the role of a software engineer and if you actually"
+    },
+    {
+      "start": 3919.58,
+      "end": 3925.52,
+      "t": "65:19",
+      "text": "look at what's happening on the ground, there's more demand than ever for more and more of these"
+    },
+    {
+      "start": 3925.52,
+      "end": 3930.18,
+      "t": "65:25",
+      "text": "engineers. And it's probably towards something that you hinted. Now that you can build software"
+    },
+    {
+      "start": 3930.18,
+      "end": 3937.02,
+      "t": "65:30",
+      "text": "with the thought to execution timeline is getting so condensed. We just now get something like"
+    },
+    {
+      "start": 3937.02,
+      "end": 3940.32,
+      "t": "65:37",
+      "text": "Grok Bot that started off as that's something you guys are building. And then you could use",
+      "was": "Grokbot that started off as that's something you guys are building. And then you could use",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3940.32,
+      "end": 3945.24,
+      "t": "65:40",
+      "text": "Grok Bot to now build Grok Bot and put it out into commercial production. Is that also what you're",
+      "was": "Grokbot to now build Grokbot and put it out into commercial production. Is that also what you're",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "start": 3945.24,
+      "end": 3950.66,
+      "t": "65:45",
+      "text": "seeing just as a trend happen more and more? Yeah. I mean, I think the time to prototype ideas"
+    },
+    {
+      "start": 3950.66,
+      "end": 3954.92,
+      "t": "65:50",
+      "text": "has gone down a bunch. And so it's really quick to test things. I think we've been able, like the"
+    },
+    {
+      "start": 3954.92,
+      "end": 3958.8,
+      "t": "65:54",
+      "text": "team behind Grok Bot has been able to move incredibly quickly just because of these tools",
+      "was": "team behind Grokbot has been able to move incredibly quickly just because of these tools",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3958.8,
+      "end": 3962.44,
+      "t": "65:58",
+      "text": "getting better. And obviously the model is getting better as a huge component of that. And so,"
+    },
+    {
+      "start": 3962.92,
+      "end": 3966.84,
+      "t": "66:02",
+      "text": "yeah, I think that like to bring it to the Grok Bot side of things, the motivation there",
+      "was": "yeah, I think that like to bring it to the Grokbot side of things, the motivation there",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 3966.84,
+      "end": 3970.34,
+      "t": "66:06",
+      "text": "is really around how can we make this product more and more helpful for folks. As far as the"
+    },
+    {
+      "start": 3970.34,
+      "end": 3974.74,
+      "t": "66:10",
+      "text": "trend, I think like this is going to get easier. I think there's still a really strong role for"
+    },
+    {
+      "start": 3974.74,
+      "end": 3979.62,
+      "t": "66:14",
+      "text": "people to play and all that too right whether it's the taste argument or some other combination"
+    },
+    {
+      "start": 3979.62,
+      "end": 3985.72,
+      "t": "66:19",
+      "text": "like that but yeah i think it's just um ideas are you know abound and it's just going to be"
+    },
+    {
+      "start": 3985.72,
+      "end": 3990.34,
+      "t": "66:25",
+      "text": "exciting to see more and more of them come to reality wow yeah the the sort of analogy or"
+    },
+    {
+      "start": 3990.34,
+      "end": 3996.59,
+      "t": "66:30",
+      "text": "metaphor that i that i personally like a lot is this idea that uh so i like food yeah i'm a big"
+    },
+    {
+      "start": 3996.59,
+      "end": 4003.73,
+      "t": "66:36",
+      "text": "lover of food and uh i kind of think of my agents as sort of like uh like a kitchen a michelin"
+    },
+    {
+      "start": 4003.73,
+      "end": 4009.39,
+      "t": "66:43",
+      "text": "kitchen is what i call it and so like maybe my role has sort of changed in that maybe i'm not"
+    },
+    {
+      "start": 4009.39,
+      "end": 4015.51,
+      "t": "66:49",
+      "text": "you know cooking all the food myself anymore uh but i have a team of bots and agents that are"
+    },
+    {
+      "start": 4015.51,
+      "end": 4022.55,
+      "t": "66:55",
+      "text": "that i've sort of hired right and i've trained through skills or uh like refactoring to do good"
+    },
+    {
+      "start": 4022.55,
+      "end": 4026.17,
+      "t": "67:02",
+      "text": "code the way that i would have done it and so my role is becoming more like you know like a head"
+    },
+    {
+      "start": 4026.17,
+      "end": 4033.07,
+      "t": "67:06",
+      "text": "chef right like i i maybe assemble a plate to the food i you know i i own the quality control"
+    },
+    {
+      "start": 4033.07,
+      "end": 4041.95,
+      "t": "67:13",
+      "text": "but you know if you invest a lot in in having like early capable team of agents you can just do"
+    },
+    {
+      "start": 4041.95,
+      "end": 4047.71,
+      "t": "67:21",
+      "text": "so much more and now think about that like with every engineer in your team can have one of these"
+    },
+    {
+      "start": 4047.71,
+      "end": 4053.47,
+      "t": "67:27",
+      "text": "teams behind them uh you can really you can solve a lot more problems you know you can build more"
+    },
+    {
+      "start": 4053.47,
+      "end": 4059.77,
+      "t": "67:33",
+      "text": "features not all of them should be built but you know you you have much more productivity and"
+    },
+    {
+      "start": 4059.77,
+      "end": 4066.09,
+      "t": "67:39",
+      "text": "velocity yeah i do like what you hinted about the internal culture of you actually build things you"
+    },
+    {
+      "start": 4066.09,
+      "end": 4071.23,
+      "t": "67:46",
+      "text": "test it out and that the employees themselves at cursor have a certain taste for what other"
+    },
+    {
+      "start": 4071.23,
+      "end": 4075.95,
+      "t": "67:51",
+      "text": "engineers what other product people what other consumers i guess in general would want to see"
+    },
+    {
+      "start": 4075.95,
+      "end": 4082.19,
+      "t": "67:55",
+      "text": "exist do you have any hints that you can maybe share okay if you don't but of what might be"
+    },
+    {
+      "start": 4082.19,
+      "end": 4086.05,
+      "t": "68:02",
+      "text": "coming up or even something that people are working on internally yeah i mean we definitely"
+    },
+    {
+      "start": 4086.05,
+      "end": 4090.79,
+      "t": "68:06",
+      "text": "want to make Grok Bot better. We launched this as a beta yesterday. And so tons of feedback coming in",
+      "was": "want to make Rockbot better. We launched this as a beta yesterday. And so tons of feedback coming in",
+      "fixes": [
+        {
+          "pat": "(?i)\\brock ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4090.79,
+      "end": 4095.25,
+      "t": "68:10",
+      "text": "of all shapes and sizes. Our goal there is just to make this as helpful, these assistants, these"
+    },
+    {
+      "start": 4095.25,
+      "end": 4099.05,
+      "t": "68:15",
+      "text": "bots as helpful as we can. And so definitely going to continue investing there. Obviously,"
+    },
+    {
+      "start": 4099.11,
+      "end": 4102.39,
+      "t": "68:19",
+      "text": "really excited about the models getting better too, and excited to be a part of that conversation"
+    },
+    {
+      "start": 4102.39,
+      "end": 4107.31,
+      "t": "68:22",
+      "text": "and to have frontier models now. And so I think we're going to continue to just invest a bunch"
+    },
+    {
+      "start": 4107.31,
+      "end": 4112.33,
+      "t": "68:27",
+      "text": "in that space and then some more fun stuff to come to. But I think overall, just very bullish"
+    },
+    {
+      "start": 4112.33,
+      "end": 4114.41,
+      "t": "68:32",
+      "text": "on the future and the future of both"
+    },
+    {
+      "start": 4114.41,
+      "end": 4116.27,
+      "t": "68:34",
+      "text": "coding agents but also general purpose agents"
+    },
+    {
+      "start": 4116.27,
+      "end": 4117.43,
+      "t": "68:36",
+      "text": "and I think it's going to be a really fun time."
+    },
+    {
+      "start": 4119.05,
+      "end": 4120.39,
+      "t": "68:39",
+      "text": "I'm personally really excited"
+    },
+    {
+      "start": 4120.39,
+      "end": 4121.95,
+      "t": "68:40",
+      "text": "to see more"
+    },
+    {
+      "start": 4121.95,
+      "end": 4124.65,
+      "t": "68:41",
+      "text": "performance and reliability"
+    },
+    {
+      "start": 4124.65,
+      "end": 4126.27,
+      "t": "68:44",
+      "text": "as an engineer and that's something"
+    },
+    {
+      "start": 4126.27,
+      "end": 4127.37,
+      "t": "68:46",
+      "text": "I care about a lot."
+    },
+    {
+      "start": 4128.03,
+      "end": 4130.47,
+      "t": "68:48",
+      "text": "We have some really interesting features that we're debating."
+    },
+    {
+      "start": 4131.21,
+      "end": 4132.41,
+      "t": "68:51",
+      "text": "Actually, one thing"
+    },
+    {
+      "start": 4132.41,
+      "end": 4134.29,
+      "t": "68:52",
+      "text": "that I hacked"
+    },
+    {
+      "start": 4134.29,
+      "end": 4136.51,
+      "t": "68:54",
+      "text": "into Grok Bot in the early days",
+      "was": "into GraphBot in the early days",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgraph ?bot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4136.51,
+      "end": 4138.81,
+      "t": "68:56",
+      "text": "was support for iMessage"
+    },
+    {
+      "start": 4138.81,
+      "end": 4140.57,
+      "t": "68:58",
+      "text": "so you can actually text your"
+    },
+    {
+      "start": 4140.57,
+      "end": 4145.37,
+      "t": "69:00",
+      "text": "bots i don't know if we'll add it for for Grok but i know it's like a common ask so we're",
+      "was": "bots i don't know if we'll add it for for graph but i know it's like a common ask so we're",
+      "fixes": [
+        {
+          "pat": "(?i)\\bfor graph\\b",
+          "to": "for Grok",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4145.37,
+      "end": 4149.71,
+      "t": "69:05",
+      "text": "definitely like you know thinking about things like this where again it's like the mental model"
+    },
+    {
+      "start": 4149.71,
+      "end": 4154.67,
+      "t": "69:09",
+      "text": "is these are colleagues right you know so like how do you like your your colleague is accessible"
+    },
+    {
+      "start": 4154.67,
+      "end": 4159.87,
+      "t": "69:14",
+      "text": "not just through slack right that you can text them you can call them uh so it's interesting"
+    },
+    {
+      "start": 4159.87,
+      "end": 4165.11,
+      "t": "69:19",
+      "text": "to kind of imagine a world where you have these always on colleagues that you can talk to at"
+    },
+    {
+      "start": 4165.11,
+      "end": 4170.39,
+      "t": "69:25",
+      "text": "anytime from anywhere uh and they're just off doing good work for you oh my gosh i can't wait"
+    },
+    {
+      "start": 4170.39,
+      "end": 4172.67,
+      "t": "69:30",
+      "text": "to be able to text them or call them."
+    },
+    {
+      "start": 4173.01,
+      "end": 4174.23,
+      "t": "69:33",
+      "text": "I saw this meme where it's like,"
+    },
+    {
+      "start": 4174.25,
+      "end": 4176.17,
+      "t": "69:34",
+      "text": "my agents were talking to each other in their standup"
+    },
+    {
+      "start": 4176.17,
+      "end": 4178.49,
+      "t": "69:36",
+      "text": "and they're like, sorry, I was off like all weekend."
+    },
+    {
+      "start": 4178.65,
+      "end": 4179.57,
+      "t": "69:38",
+      "text": "It's like, you're an agent."
+    },
+    {
+      "start": 4179.77,
+      "end": 4181.81,
+      "t": "69:39",
+      "text": "I don't know exactly what that means."
+    },
+    {
+      "start": 4181.91,
+      "end": 4183.19,
+      "t": "69:41",
+      "text": "Yeah, maybe we need agent PTO."
+    },
+    {
+      "start": 4183.41,
+      "end": 4186.41,
+      "t": "69:43",
+      "text": "Yeah, agent PTO, turn your computer off."
+    },
+    {
+      "start": 4187.17,
+      "end": 4187.81,
+      "t": "69:47",
+      "text": "Let's do it."
+    },
+    {
+      "start": 4188.09,
+      "end": 4189.57,
+      "t": "69:48",
+      "text": "One last thing I did want to bring up"
+    },
+    {
+      "start": 4189.57,
+      "end": 4190.53,
+      "t": "69:49",
+      "text": "because this is really impressive"
+    },
+    {
+      "start": 4190.53,
+      "end": 4192.11,
+      "t": "69:50",
+      "text": "is you guys, of course,"
+    },
+    {
+      "start": 4192.23,
+      "end": 4193.31,
+      "t": "69:52",
+      "text": "we're not just working on Grok Bot,",
+      "was": "we're not just working on Grokbot,",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrokbot\\b",
+          "to": "Grok Bot",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4193.35,
+      "end": 4194.67,
+      "t": "69:53",
+      "text": "not just working on the application layer,"
+    },
+    {
+      "start": 4194.67,
+      "end": 4196.29,
+      "t": "69:54",
+      "text": "but also on the model layer."
+    },
+    {
+      "start": 4197.01,
+      "end": 4200.27,
+      "t": "69:57",
+      "text": "And Grok 4.6, the benchmarks came out on CursorBench."
+    },
+    {
+      "start": 4200.27,
+      "end": 4206.29,
+      "t": "70:00",
+      "text": "3.2 and were really impressive. And I wanted to address them here on air while we still have time."
+    },
+    {
+      "start": 4206.87,
+      "end": 4215.27,
+      "t": "70:06",
+      "text": "You had Grok 4.6 extra high scored 70.8% at an average cost of 2.81 per task. For context,"
+    },
+    {
+      "start": 4215.27,
+      "end": 4226.67,
+      "t": "70:15",
+      "text": "Fable 5 Max scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change",
+      "was": "Fable 5 Max scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change",
+      "fixes": [
+        {
+          "pat": "(?i)\\bfable 5 max\\b",
+          "to": "Claude Opus (ASR: Fable 5 Max)",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4226.67,
+      "end": 4234.13,
+      "t": "70:26",
+      "text": "how the everyday consumer actually interacts with agents with ai as a whole yeah go ahead uh so yeah"
+    },
+    {
+      "start": 4234.13,
+      "end": 4238.03,
+      "t": "70:34",
+      "text": "this is definitely like very top of mind for me because uh you know i think about this a lot"
+    },
+    {
+      "start": 4238.03,
+      "end": 4243.41,
+      "t": "70:38",
+      "text": "because i i work at cursor i have unlimited tokens and so i can just you know you know go crazy with"
+    },
+    {
+      "start": 4243.41,
+      "end": 4248.45,
+      "t": "70:43",
+      "text": "token maxing but obviously a lot of our customers and our users are you know are more cost conscious"
+    },
+    {
+      "start": 4248.45,
+      "end": 4254.96,
+      "t": "70:48",
+      "text": "so personally what i'm most excited about is this idea that you have a very efficient model"
+    },
+    {
+      "start": 4254.96,
+      "end": 4259.48,
+      "t": "70:54",
+      "text": "that is as good as some of the other big models,"
+    },
+    {
+      "start": 4260.22,
+      "end": 4261.98,
+      "t": "71:00",
+      "text": "but at a fraction of the cost."
+    },
+    {
+      "start": 4262.56,
+      "end": 4265.78,
+      "t": "71:02",
+      "text": "And I feel like that's a very important topic"
+    },
+    {
+      "start": 4265.78,
+      "end": 4269.3,
+      "t": "71:05",
+      "text": "that a lot of leaders and engineers are having right now,"
+    },
+    {
+      "start": 4269.52,
+      "end": 4273.1,
+      "t": "71:09",
+      "text": "which is the rising cost of using AI."
+    },
+    {
+      "start": 4273.1,
+      "end": 4283.1,
+      "t": "71:13",
+      "text": "So I think Grok 4.6 is a really interesting choice in that discussion.",
+      "was": "So I think Grot 4.6 is a really interesting choice in that discussion.",
+      "fixes": [
+        {
+          "pat": "(?i)\\bgrot 4\\.6\\b",
+          "to": "Grok 4.6",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "start": 4283.1,
+      "end": 4289.18,
+      "t": "71:23",
+      "text": "you know like every every company is going to have their own requirements for the type of model mix"
+    },
+    {
+      "start": 4289.18,
+      "end": 4295.64,
+      "t": "71:29",
+      "text": "that they use so i think grok 4.6 makes a very compelling you know a very compelling option"
+    },
+    {
+      "start": 4295.64,
+      "end": 4300.34,
+      "t": "71:35",
+      "text": "right if you're considering between like some of the the bigger models which are also extremely"
+    },
+    {
+      "start": 4300.34,
+      "end": 4306.72,
+      "t": "71:40",
+      "text": "capable but you want something like a little bit more you know cheaper grok is like an excellent"
+    },
+    {
+      "start": 4306.72,
+      "end": 4311.36,
+      "t": "71:46",
+      "text": "choice yeah it's like if you have a budget of 20 bucks to do all of your ai tasks and the cost per"
+    },
+    {
+      "start": 4311.36,
+      "end": 4316.14,
+      "t": "71:51",
+      "text": "task goes down it's like you can just do more tasks so i think the efficiency game is just such"
+    },
+    {
+      "start": 4316.14,
+      "end": 4320.18,
+      "t": "71:56",
+      "text": "a fun one to play because it feels like you just can do more like you can have more bots or write"
+    },
+    {
+      "start": 4320.18,
+      "end": 4323.7,
+      "t": "72:00",
+      "text": "more code and so yeah just like this idea and i think this is happening across the industry which"
+    },
+    {
+      "start": 4323.7,
+      "end": 4328.26,
+      "t": "72:03",
+      "text": "is very exciting but just like being able to do more things with the tokens are just like"
+    }
+  ],
+  "corrections": {
+    "n": 66,
+    "note": "Proper-noun and known slip patches on faster-whisper large-v3. Fable/Sol treated as Claude/Sonnet from Cursor-model slang + the 70.8 vs 70.5 bench pair.",
+    "rows": [
+      {
+        "t": "01:56",
+        "start": 116.44,
+        "was": "like i guess calling your experience as well but for me i think the most important skill",
+        "now": "like i guess Colin, your experience as well but for me i think the most important skill"
+      },
+      {
+        "t": "04:05",
+        "start": 245.66,
+        "was": "you know i was just sitting there like okay i'm going to open up the performant the the chrome",
+        "now": "you know i was just sitting there like okay i'm going to open up Performance, the Chrome"
+      },
+      {
+        "t": "04:30",
+        "start": 270.58,
+        "was": "trade I would download the trade I would send it to it and it'd be like yeah it kind of looks like",
+        "now": "trade I would download the trace I would send it to it and it'd be like yeah it kind of looks like"
+      },
+      {
+        "t": "08:21",
+        "start": 501.45,
+        "was": "slack channel where you know lots of people giving us feedback on the agents window and rock bot and",
+        "now": "slack channel where you know lots of people giving us feedback on the agents window and Grok Bot and"
+      },
+      {
+        "t": "09:45",
+        "start": 585.4,
+        "was": "folks aren't familiar yeah so p stack is pretty interesting because uh well first of all the name",
+        "now": "folks aren't familiar yeah so Pstack is pretty interesting because uh well first of all the name"
+      },
+      {
+        "t": "09:52",
+        "start": 592.27,
+        "was": "is kind of goofy like the p the p and p stack is like potato potato stack because i um so uh",
+        "now": "is kind of goofy like the p the p and Pstack is like potato potato stack because i um so uh"
+      },
+      {
+        "t": "10:21",
+        "start": 621.71,
+        "was": "and make P-Stack my version of his plugin, but kind of just tailor it to my own set of",
+        "now": "and make Pstack my version of his plugin, but kind of just tailor it to my own set of"
+      },
+      {
+        "t": "10:30",
+        "start": 630.17,
+        "was": "engineering practices. But I honestly actually never set out to build P-Stack.",
+        "now": "engineering practices. But I honestly actually never set out to build Pstack."
+      },
+      {
+        "t": "12:49",
+        "start": 769.99,
+        "was": "but yeah i built p stack very very incrementally uh so uh started with just really observing how",
+        "now": "but yeah i built Pstack very very incrementally uh so uh started with just really observing how"
+      },
+      {
+        "t": "14:53",
+        "start": 893.26,
+        "was": "and actually in P stack we ship",
+        "now": "and actually in Pstack we ship"
+      },
+      {
+        "t": "24:45",
+        "start": 1485.09,
+        "was": "um but uh you know like i think plugins like p-stack definitely can help you",
+        "now": "um but uh you know like i think plugins like Pstack definitely can help you"
+      },
+      {
+        "t": "24:51",
+        "start": 1491.21,
+        "was": "get up to speed much quicker uh and so i guess it's like if you trust me and you trust p-stack",
+        "now": "get up to speed much quicker uh and so i guess it's like if you trust me and you trust Pstack"
+      },
+      {
+        "t": "28:45",
+        "start": 1725.72,
+        "was": "for grokbot you know grokbot was spun up very very very quickly um and if you if you haven't",
+        "now": "for Grok Bot you know Grok Bot was spun up very very very quickly um and if you if you haven't"
+      },
+      {
+        "t": "28:51",
+        "start": 1731.04,
+        "was": "heard of grokbot it's like a new application we just launched yesterday uh it's it's really cool",
+        "now": "heard of Grok Bot it's like a new application we just launched yesterday uh it's it's really cool"
+      },
+      {
+        "t": "30:46",
+        "start": 1846.56,
+        "was": "when I refactored all of Grokbot to this new architecture that I've been building.",
+        "now": "when I refactored all of Grok Bot to this new architecture that I've been building."
+      },
+      {
+        "t": "31:31",
+        "start": 1891.02,
+        "was": "people to add features to graph bot and i don't have to worry you know i don't have to wake up",
+        "now": "people to add features to Grok Bot and i don't have to worry you know i don't have to wake up"
+      },
+      {
+        "t": "31:46",
+        "start": 1906.36,
+        "was": "code in in graph bot but like agents absorb all of that annoyance um but yeah i'm happy to talk",
+        "now": "code in in Grok Bot but like agents absorb all of that annoyance um but yeah i'm happy to talk"
+      },
+      {
+        "t": "32:42",
+        "start": 1962.04,
+        "was": "is that virtualization in grokbot and in uh cursor is actually powered by uh pretext",
+        "now": "is that virtualization in Grok Bot and in uh cursor is actually powered by uh pretext"
+      },
+      {
+        "t": "34:31",
+        "start": 2071.17,
+        "was": "uh yeah so uh well specifically for grokbot so dune is the it's the sort of cheeky code",
+        "now": "uh yeah so uh well specifically for Grok Bot so dune is the it's the sort of cheeky code"
+      },
+      {
+        "t": "34:38",
+        "start": 2078.98,
+        "was": "code name for the architecture that we built for rockbot um the ci looks pretty annoying",
+        "now": "code name for the architecture that we built for Grok Bot um the ci looks pretty annoying"
+      },
+      {
+        "t": "34:57",
+        "start": 2097.56,
+        "was": "uh so in uh dune and in graphbot we've banned use effect so dune is just the the mental model",
+        "now": "uh so in uh dune and in Grok Bot we've banned use effect so dune is just the the mental model"
+      },
+      {
+        "t": "38:14",
+        "start": 2294.74,
+        "was": "So in Grogbot, we literally have a directory called ElectronMain, ElectronRenderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another.",
+        "now": "So in Grok Bot, we literally have a directory called electron-main, electron-renderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another."
+      },
+      {
+        "t": "38:33",
+        "start": 2313.5,
+        "was": "So that's enforced by CI, as well as BugBot, which is our, which cursors my code review tool that runs on CI.",
+        "now": "So that's enforced by CI, as well as Bugbot, which is our, which cursors my code review tool that runs on CI."
+      },
+      {
+        "t": "39:16",
+        "start": 2356.66,
+        "was": "one example of this in rockpot is like we have this these concepts called like a feature and",
+        "now": "one example of this in Grok Bot is like we have this these concepts called like a feature and"
+      },
+      {
+        "t": "39:55",
+        "start": 2395.29,
+        "was": "the onboarding feature in Grogba. I'm just going to work in this directory. And for 80% of the",
+        "now": "the onboarding feature in Grok Bot. I'm just going to work in this directory. And for 80% of the"
+      },
+      {
+        "t": "42:00",
+        "start": 2520.31,
+        "was": "because it's very very soft right and if you if you only have rules and bugba and skills and a",
+        "now": "because it's very very soft right and if you if you only have rules and Bugbot and skills and a"
+      },
+      {
+        "t": "43:19",
+        "start": 2599.81,
+        "was": "constraints the invariance in your code base by literally the human person saying you know reading",
+        "now": "constraints the invariants in your code base by literally the human person saying you know reading"
+      },
+      {
+        "t": "47:12",
+        "start": 2832.08,
+        "was": "point like even agents that are not you know fable size do an excellent job of writing code",
+        "now": "point like even agents that are not you know Claude-size do an excellent job of writing code"
+      },
+      {
+        "t": "47:24",
+        "start": 2844.72,
+        "was": "But, again, like, PMs, designers, engineers who are not familiar with Grokbot to just contribute in a way that is sustainable.",
+        "now": "But, again, like, PMs, designers, engineers who are not familiar with Grok Bot to just contribute in a way that is sustainable."
+      },
+      {
+        "t": "49:38",
+        "start": 2978.84,
+        "was": "not in that role but just curious about how that works um i think this is where grokbot has been",
+        "now": "not in that role but just curious about how that works um i think this is where Grok Bot has been"
+      },
+      {
+        "t": "49:44",
+        "start": 2984.59,
+        "was": "actually exceedingly powerful uh where so before grokbot like you know uh obviously cursor only",
+        "now": "actually exceedingly powerful uh where so before Grok Bot like you know uh obviously cursor only"
+      },
+      {
+        "t": "50:20",
+        "start": 3020.69,
+        "was": "experience with them um i think now with grokbot uh it's become grokbot is basically like their",
+        "now": "experience with them um i think now with Grok Bot uh it's become Grok Bot is basically like their"
+      },
+      {
+        "t": "51:43",
+        "start": 3103.44,
+        "was": "and that just makes the GrokBot team super fast, right?",
+        "now": "and that just makes the Grok Bot team super fast, right?"
+      },
+      {
+        "t": "52:05",
+        "start": 3125.78,
+        "was": "maybe go try GrokBot, try out 4.6",
+        "now": "maybe go try Grok Bot, try out 4.6"
+      },
+      {
+        "t": "52:15",
+        "start": 3135.6,
+        "was": "where you can use GrokBot are,",
+        "now": "where you can use Grok Bot are,"
+      },
+      {
+        "t": "52:22",
+        "start": 3142.4,
+        "was": "I've seen a couple of people share GrokBot with their mom",
+        "now": "I've seen a couple of people share Grok Bot with their mom"
+      },
+      {
+        "t": "52:25",
+        "start": 3145.7,
+        "was": "and their mom's onboarding onto GrokBot.",
+        "now": "and their mom's onboarding onto Grok Bot."
+      },
+      {
+        "t": "52:31",
+        "start": 3151.36,
+        "was": "by how well received GrokBot is.",
+        "now": "by how well received Grok Bot is."
+      },
+      {
+        "t": "52:50",
+        "start": 3170.86,
+        "was": "um so graph 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is",
+        "now": "um so Grok 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is"
+      },
+      {
+        "t": "53:18",
+        "start": 3198.92,
+        "was": "I still use the other models too, like Fable and Sol.",
+        "now": "I still use the other models too, like Claude and Sonnet."
+      },
+      {
+        "t": "53:39",
+        "start": 3219.26,
+        "was": "and some of the investments in GrokBot,",
+        "now": "and some of the investments in Grok Bot,"
+      },
+      {
+        "t": "54:13",
+        "start": 3253.88,
+        "was": "And then I realized before I was actually testing out Crock-Bot, I was like, oh, you",
+        "now": "And then I realized before I was actually testing out Grok Bot, I was like, oh, you"
+      },
+      {
+        "t": "54:31",
+        "start": 3271.58,
+        "was": "sucks i think open claw was maybe the first mainstream but like you mentioned i don't",
+        "now": "sucks i think OpenClaw was maybe the first mainstream but like you mentioned i don't"
+      },
+      {
+        "t": "54:36",
+        "start": 3276.76,
+        "was": "think my mom would ever be using open claw and um even myself i set up a whole open claw in a",
+        "now": "think my mom would ever be using OpenClaw and um even myself i set up a whole OpenClaw in a"
+      },
+      {
+        "t": "54:59",
+        "start": 3299.74,
+        "was": "creating rock bot yeah i mean the the brief was basically keep it simple uh if i if to be a little",
+        "now": "creating Grok Bot yeah i mean the the brief was basically keep it simple uh if i if to be a little"
+      },
+      {
+        "t": "55:42",
+        "start": 3342.28,
+        "was": "knobs and whistles and and uh like very it's very tailored focus for coding and with grokbot we",
+        "now": "knobs and whistles and and uh like very it's very tailored focus for coding and with Grok Bot we"
+      },
+      {
+        "t": "56:33",
+        "start": 3393.12,
+        "was": "takes to create Grokbot and get this product into the mainstream.",
+        "now": "takes to create Grok Bot and get this product into the mainstream."
+      },
+      {
+        "t": "56:42",
+        "start": 3402.06,
+        "was": "Who are you envisioning are going to be the mainstream adopters of Grokbot?",
+        "now": "Who are you envisioning are going to be the mainstream adopters of Grok Bot?"
+      },
+      {
+        "t": "58:20",
+        "start": 3500.56,
+        "was": "grokbot like you know what if everybody could define one of their own uh like bots you know",
+        "now": "Grok Bot like you know what if everybody could define one of their own uh like bots you know"
+      },
+      {
+        "t": "58:35",
+        "start": 3515.6,
+        "was": "feedback on grokbot my bots are automatically going off and fixing them for me and i just",
+        "now": "feedback on Grok Bot my bots are automatically going off and fixing them for me and i just"
+      },
+      {
+        "t": "58:52",
+        "start": 3532.36,
+        "was": "it's actually remarkable how much of grokbot was built with grokbot too yeah that's like it was a",
+        "now": "it's actually remarkable how much of Grok Bot was built with Grok Bot too yeah that's like it was a"
+      },
+      {
+        "t": "60:18",
+        "start": 3618.94,
+        "was": "like i have a i have a sand team over here i'm sorry a grokbot team uh so each of them kind of",
+        "now": "like i have a i have a sand team over here i'm sorry a Grok Bot team uh so each of them kind of"
+      },
+      {
+        "t": "61:03",
+        "start": 3663.87,
+        "was": "If you set up cloud agents on Cursor, your GrokBot bots can actually kick them off.",
+        "now": "If you set up cloud agents on Cursor, your Grok Bot bots can actually kick them off."
+      },
+      {
+        "t": "61:49",
+        "start": 3709.06,
+        "was": "So I decided to give them silly profile pictures just to personalize my Grokbot a little bit.",
+        "now": "So I decided to give them silly profile pictures just to personalize my Grok Bot a little bit."
+      },
+      {
+        "t": "61:55",
+        "start": 3715.8,
+        "was": "I mean, the default Grokbot avatars are super cute as well.",
+        "now": "I mean, the default Grok Bot avatars are super cute as well."
+      },
+      {
+        "t": "62:09",
+        "start": 3729.18,
+        "was": "the future of agent decoding.",
+        "now": "the future of agentic coding."
+      },
+      {
+        "t": "65:37",
+        "start": 3937.02,
+        "was": "Grokbot that started off as that's something you guys are building. And then you could use",
+        "now": "Grok Bot that started off as that's something you guys are building. And then you could use"
+      },
+      {
+        "t": "65:40",
+        "start": 3940.32,
+        "was": "Grokbot to now build Grokbot and put it out into commercial production. Is that also what you're",
+        "now": "Grok Bot to now build Grok Bot and put it out into commercial production. Is that also what you're"
+      },
+      {
+        "t": "65:54",
+        "start": 3954.92,
+        "was": "team behind Grokbot has been able to move incredibly quickly just because of these tools",
+        "now": "team behind Grok Bot has been able to move incredibly quickly just because of these tools"
+      },
+      {
+        "t": "66:02",
+        "start": 3962.92,
+        "was": "yeah, I think that like to bring it to the Grokbot side of things, the motivation there",
+        "now": "yeah, I think that like to bring it to the Grok Bot side of things, the motivation there"
+      },
+      {
+        "t": "68:06",
+        "start": 4086.05,
+        "was": "want to make Rockbot better. We launched this as a beta yesterday. And so tons of feedback coming in",
+        "now": "want to make Grok Bot better. We launched this as a beta yesterday. And so tons of feedback coming in"
+      },
+      {
+        "t": "68:54",
+        "start": 4134.29,
+        "was": "into GraphBot in the early days",
+        "now": "into Grok Bot in the early days"
+      },
+      {
+        "t": "69:00",
+        "start": 4140.57,
+        "was": "bots i don't know if we'll add it for for graph but i know it's like a common ask so we're",
+        "now": "bots i don't know if we'll add it for for Grok but i know it's like a common ask so we're"
+      },
+      {
+        "t": "69:52",
+        "start": 4192.23,
+        "was": "we're not just working on Grokbot,",
+        "now": "we're not just working on Grok Bot,"
+      },
+      {
+        "t": "70:15",
+        "start": 4215.27,
+        "was": "Fable 5 Max scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change",
+        "now": "Claude Opus (ASR: Fable 5 Max) scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change"
+      },
+      {
+        "t": "71:13",
+        "start": 4273.1,
+        "was": "So I think Grot 4.6 is a really interesting choice in that discussion.",
+        "now": "So I think Grok 4.6 is a really interesting choice in that discussion."
+      }
+    ]
+  }
+}

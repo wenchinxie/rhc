@@ -1,0 +1,175 @@
+import { Peek } from "../../components/Peek";
+import { Term } from "../../components/Term";
+
+export function Apex() {
+  return (
+    <section className="apex wide">
+      <p>
+        磁碟上有一份 Grok Bot 的原始碼複製：
+        <code>/mnt/e/grok-bot-0.18-reconstructed</code>，commit <code>a9f633e</code>
+        。產品是 Anysphere 的桌面程式 0.18.0，應用程式識別{" "}
+        <code>com.anysphere.sand</code>
+        ，安裝包從 <code>downloads.cursor.com/grokbot</code> 下來。
+        <span className="stamp">PROVENANCE.md</span>
+        。<code>rhc</code> 是全新空倉庫，不是這份樹的分支。
+      </p>
+      <p>
+        若把每個資料夾當成各自獨立的產品來讀，使用者按一次送出會被拆成三條互不相干的故事。這樣讀有三個問題。
+      </p>
+      <ol className="enum">
+        <li>
+          <span className="n">第一</span>
+          <strong>
+            把接下送出、並一步步呼叫模型與工具直到這則送出結束的那個行程（
+            <Term k="sand-host">host-main</Term>
+            ）當成桌面旁邊第三個桌面程式行程。
+          </strong>
+          <span className="d">
+            它住在跟筆電分開、用來跑命令的那台遠端機器裡：開機先寫入鎖檔，再起代跑命令的服務，再起給桌面連線的 HTTP 入口。
+            <Peek snip="host-main">host/main</Peek> 見{" "}
+            <a className="xref" href="#s2">
+              §2
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">第二</span>
+          <strong>
+            把 <code>frontend/</code> 資料夾當成出廠畫面的源碼。
+          </strong>
+          <span className="d">
+            裝進應用程式的是出廠已經編好的畫面；
+            <code>frontend/</code> 只是可讀工作區，不取代那份畫面。見{" "}
+            <a className="xref" href="#s1">
+              §1
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">第三</span>
+          <strong>把可選別家模型的推論路由器當成出廠預設。</strong>
+          <span className="d">
+            設定沒改時，模型來源是 <code>cursor</code>。Claude Code／Codex／OpenRouter
+            屬於
+            <Term k="reconstruction">重建疊層</Term>
+            ：這份複製樹加在出廠行為上面的東西。
+            <Peek snip="router-cursor">cursor 不處理</Peek> 見{" "}
+            <a className="xref" href="#s3">
+              §3
+            </a>
+            、
+            <a className="xref" href="#s6">
+              §6
+            </a>
+            。
+          </span>
+        </li>
+      </ol>
+      <p>
+        <strong>
+          讀這份原始碼複製時，沿一則使用者送出的時間順序走，才不會被資料夾名拆成互不相干的三條故事。
+        </strong>
+        桌面程式（Electron）只開窗，並生出中介行程（控制面）；畫面把送出交給這個行程。接下送出、並一步步呼叫模型與工具直到這則送出結束的那個行程（
+        <Term k="sand-host">host-main</Term>
+        ）住在跟筆電分開、用來跑命令的那台遠端機器（
+        <Term k="box">沙箱機器</Term>
+        ）裡。裝進應用程式的畫面是出廠已經編好的那份，外加一條窄的模型來源設定補丁；
+        <code>frontend/</code> 只是可讀工作區，不取代出廠畫面。設定沒改時模型來源是{" "}
+        <code>cursor</code>
+        ；Claude Code／Codex／OpenRouter 與改連這台電腦上另開的隔離環境（容器），才是這份複製樹加在出廠行為上面的
+        <Term k="reconstruction">重建疊層</Term>。
+      </p>
+      <ol className="enum">
+        <li>
+          <span className="n">一</span>
+          <strong>
+            這份複製樹是出廠 0.18.0 的重建稿，不是官方一次交付的整包原始碼庫。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s1">
+              §1
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">二</span>
+          <strong>
+            桌面程式生出控制面；
+            <Term k="sand-host">host-main</Term> 與代跑命令的服務住在
+            <Term k="box">沙箱機器</Term>
+            ，本機另有一支在使用者電腦跑命令的服務。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s2">
+              §2
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">三</span>
+          <strong>
+            出廠送出的模型來源是 Cursor：控制面把請求交給遠端的 host-main，由
+            <Term k="send-pipeline">SendPipeline</Term>
+            （合併重複送出、寫下使用者那行文字、再排隊跑一回合）接。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s3">
+              §3
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">四</span>
+          <strong>
+            遠端機器上的命令走遠端代跑命令的服務（box-exec）；使用者電腦上的命令走使用者電腦上的命令服務（local-exec），權限預設先問再跑。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s4">
+              §4
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">五</span>
+          <strong>
+            出廠預設連 Cursor 配的遠端
+            <Term k="box">沙箱機器</Term>
+            ；改連這台電腦上另開的隔離環境（容器）是疊層開關。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s5">
+              §5
+            </a>
+            。
+          </span>
+        </li>
+        <li>
+          <span className="n">六</span>
+          <strong>
+            路由器與本機容器標成
+            <Term k="reconstruction">重建疊層</Term>
+            ；設定沒改時仍走 Cursor 與遠端機器。
+          </strong>
+          <span className="d">
+            見{" "}
+            <a className="xref" href="#s6">
+              §6
+            </a>
+            。
+          </span>
+        </li>
+      </ol>
+    </section>
+  );
+}
