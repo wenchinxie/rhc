@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Explainer frontend activate (venv-shaped).
+#   source ./activate    # cd here, bun on PATH, bun install if needed
+#   ./activate           # same, then bun run dev
+#
+# Copy this file to the app root as `activate` (no .sh). Do not source it
+# from the skill tree; the app is the working directory.
+
+_ab_src="${BASH_SOURCE[0]:-$0}"
+_ab_root="$(cd "$(dirname "$_ab_src")" && pwd)"
+_ab_sourced=0
+if [[ "${BASH_SOURCE[0]:-}" != "$0" ]]; then
+  _ab_sourced=1
+fi
+
+cd "$_ab_root" || {
+  echo "activate: cannot cd to $_ab_root" >&2
+  if [[ "$_ab_sourced" -eq 1 ]]; then return 1; else exit 1; fi
+}
+
+if [[ -z "${BUN_INSTALL:-}" ]]; then
+  export BUN_INSTALL="${HOME}/.bun"
+fi
+case ":$PATH:" in
+  *":${BUN_INSTALL}/bin:"*) ;;
+  *) export PATH="${BUN_INSTALL}/bin:$PATH" ;;
+esac
+
+if ! command -v bun >/dev/null 2>&1; then
+  echo "activate: bun not on PATH (${BUN_INSTALL}/bin)" >&2
+  if [[ "$_ab_sourced" -eq 1 ]]; then return 1; else exit 1; fi
+fi
+
+if [[ ! -f package.json ]]; then
+  echo "activate: no package.json in $_ab_root" >&2
+  if [[ "$_ab_sourced" -eq 1 ]]; then return 1; else exit 1; fi
+fi
+
+if [[ ! -d node_modules ]]; then
+  bun install
+fi
+
+unset _ab_src
+if [[ "$_ab_sourced" -eq 1 ]]; then
+  unset _ab_root _ab_sourced
+  return 0
+fi
+unset _ab_root _ab_sourced
+exec bun run dev

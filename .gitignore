@@ -1,0 +1,9 @@
+node_modules/
+docs/explainers/dist/
+docs/explainers/.bun-out/
+docs/explainers/scip-send/node_modules/
+docs/explainers/scip-send/index.scip
+*.tgz
+.DS_Store
+.env
+.env.*
