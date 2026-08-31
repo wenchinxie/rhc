@@ -1,0 +1,932 @@
+{
+  "product": {
+    "type": "code",
+    "kind": "產品名",
+    "title": "顯示名稱是 Grok Bot，內部仍叫 Sand",
+    "meta": "source/shared/product-name.ts:1-2",
+    "why": "出廠產品名寫在這；行程與路徑仍帶 sand- 前綴。",
+    "start": 1,
+    "hi": [
+      1
+    ],
+    "lines": [
+      "export const SAND_PRODUCT_DISPLAY_NAME = \"Grok Bot\";",
+      "export const SAND_PRODUCT_HTTP_TOKEN = SAND_PRODUCT_DISPLAY_NAME.replaceAll(/\\s+/g, \"\");"
+    ]
+  },
+  "e-main": {
+    "type": "code",
+    "kind": "開機",
+    "title": "Electron whenReady 之後才起服務與主視窗",
+    "meta": "source/electron-main/main.ts:373-414",
+    "why": "主行程管視窗與服務，自己不跑 agent 迴圈。",
+    "start": 373,
+    "hi": [
+      374,
+      387,
+      412
+    ],
+    "lines": [
+      "  void deps.app",
+      "    .whenReady()",
+      "    .then(async () => {",
+      "      if (!isPrimaryInstance) {",
+      "        deps.startup.cancel();",
+      "        return;",
+      "      }",
+      "      deps.startup.markPhase(\"move_check\");",
+      "      const moveDisposition = await deps.startup.runMoveCheck({",
+      "        hasPendingActivation: deps.deepLinks.hasPendingActivation,",
+      "      });",
+      "      if (moveDisposition === \"stop-bootstrap\") return;",
+      "      deps.startup.armStuckWatchdog();",
+      "      deps.startup.markPhase(\"services\");",
+      "      services = await deps.initializeServices({ routeHostInput: hostChords.routeHostInput });",
+      "",
+      "      const membership = createDevToolsMembershipResolver({",
+      "        getStatus: services.getDevToolsMembershipStatus,",
+      "        setMembership: devToolsGate.setMembership,",
+      "        onError: (error) => reportDesktopEdgeFailure(\"cursor-auth\", \"anysphere-membership\", error),",
+      "      });",
+      "      services.subscribeDevToolsMembership(() => void membership.refresh());",
+      "      void membership.refresh();",
+      "",
+      "      const installMenu = (): void =>",
+      "        installApplicationMenu(",
+      "          {",
+      "            applyWindowShortcut: hostChords.applyWindowShortcut,",
+      "            canUseDevTools: devToolsGate.isAllowed,",
+      "            emitOpenAbout: () => services?.mainEdge.emit(\"open-about\", {}),",
+      "            emitOpenFeedback: () => services?.mainEdge.emit(\"open-feedback\", {}),",
+      "            platform,",
+      "          },",
+      "          deps.menu,",
+      "        );",
+      "      installMenu();",
+      "      services.registerImageContextMenu?.();",
+      "      devToolsGate.subscribe(installMenu);",
+      "",
+      "      deps.startup.markPhase(\"window\");",
+      "      isMainWindowCreationReady = true;",
+      "      await createWindow();"
+    ]
+  },
+  "fork": {
+    "type": "code",
+    "kind": "控制面",
+    "title": "帳號就緒後 utilityProcess.fork coordinator",
+    "meta": "source/electron-main/coordinator/production-provider.ts:428-431",
+    "why": "控制面是獨立 Node 行程，不是 renderer 裡的函式。",
+    "start": 428,
+    "hi": [
+      430
+    ],
+    "lines": [
+      "      const createRuntime = () =>",
+      "        createCoordinatorRuntime({",
+      "          fork: (path, options) =>",
+      "            ports.utilityProcess.fork(path, [], { serviceName: options.serviceName }),"
+    ]
+  },
+  "launcher": {
+    "type": "code",
+    "kind": "控制面",
+    "title": "fork 時交出三條 MessagePort",
+    "meta": "source/electron-main/coordinator/coordinator-launcher.ts:46-70",
+    "why": "控制埠、畫面資料埠、主行程資料埠一次交給子行程。",
+    "start": 46,
+    "hi": [
+      49,
+      68
+    ],
+    "lines": [
+      "export function launchCoordinator(",
+      "  dependencies: LaunchCoordinatorDependencies,",
+      "): CoordinatorLaunchHandle {",
+      "  const child = dependencies.fork(dependencies.artifactPath, {",
+      "    serviceName: COORDINATOR_SERVICE_NAME,",
+      "  });",
+      "  const controlChannel = dependencies.createChannel();",
+      "  const dataChannel = dependencies.createChannel();",
+      "  const mainDataChannel = dependencies.createChannel();",
+      "  const server = createCoordinatorControlServer({",
+      "    post: (frame) => controlChannel.port2.postMessage(frame),",
+      "    executors: dependencies.executors,",
+      "    onEvent: dependencies.onEvent,",
+      "    onProblem: dependencies.onProblem,",
+      "    ...(dependencies.reportFailure === undefined",
+      "      ? {}",
+      "      : { reportFailure: dependencies.reportFailure }),",
+      "  });",
+      "",
+      "  controlChannel.port2.on(\"message\", (event) => server.handleMessage(event.data));",
+      "  controlChannel.port2.on(\"close\", () => server.handlePortClosed());",
+      "  controlChannel.port2.start();",
+      "  child.postMessage(",
+      "    { bootstrap: { processConfig: dependencies.processConfig } },",
+      "    [controlChannel.port1, dataChannel.port1, mainDataChannel.port1],"
+    ]
+  },
+  "preload-port": {
+    "type": "code",
+    "kind": "畫面",
+    "title": "preload 把 coordinator MessagePort 交進畫面",
+    "meta": "source/electron-preload/preload.ts:309-316",
+    "why": "畫面經 sand:coordinator-port-request 向主行程要埠。",
+    "start": 309,
+    "hi": [
+      311,
+      313
+    ],
+    "lines": [
+      "  const broker = options.coordinatorBroker ?? createCoordinatorPortBroker<any>({ invokeRequest: () => { void options.ipc.invoke(\"sand:coordinator-port-request\"); } });",
+      "  const desktop = createDesktopPreloadBridge({ ...options, env, devRestartEnabled, initialState });",
+      "  options.contextBridge.exposeInMainWorld(\"desktop\", desktop);",
+      "  options.contextBridge.exposeInMainWorld(\"coordinatorPort\", broker.bridge);",
+      "  options.ipc.on(\"sand:coordinator-port\", (event: { readonly ports: readonly any[] }) => {",
+      "    const port = event.ports[0];",
+      "    if (port != null) broker.deliver(wrapTransferredCoordinatorPort(port));",
+      "  });"
+    ]
+  },
+  "host-main": {
+    "type": "code",
+    "kind": "host",
+    "title": "box 裡先搶鎖、再起 box-exec、再起 gateway",
+    "meta": "source/host/main.ts:206-255",
+    "why": "host 不是桌面旁邊的第三個 Electron 行程。",
+    "start": 206,
+    "hi": [
+      208,
+      222,
+      246
+    ],
+    "lines": [
+      "  const crashGuards = deps.installProcessCrashGuards({ scope: \"sand-host\" });",
+      "  const lockResult = await deps.acquireHostLock();",
+      "  reportLockOutcome(lockResult, deps.getSandRootDir(), log);",
+      "",
+      "  const hostLock = lockResult.lock;",
+      "  let boxExecDaemon: OwnedBoxExecDaemon | undefined;",
+      "  const host = deps.createHost();",
+      "  crashGuards.setReporter((error, kind) => {",
+      "    host.reportProcessCrash(error, kind);",
+      "  });",
+      "  deps.installInvariantReporter(report => host.reportInvariantViolation(report));",
+      "  deps.pinHostDiagnosticsReporter(diagnostic => {",
+      "    host.reportHostDiagnostic(diagnostic);",
+      "  });",
+      "",
+      "  try {",
+      "    boxExecDaemon = await deps.startBoxExecDaemon?.();",
+      "    await host.start();",
+      "    const gatewayConfig = deps.resolveGatewayServerConfig();",
+      "    const scheme = deps.gatewayScheme(gatewayConfig);",
+      "    const gateway = await deps.startGatewayServer({",
+      "      api: host.getApi(),",
+      "      subscribe: listener => host.subscribe(listener),",
+      "      getHealth: () => host.getHealth(),",
+      "      onEventStreamClosed: () => host.noteEventStreamClosed(),",
+      "      onDesktopContact: () => host.noteDesktopContact(),",
+      "      prepareForUpgrade: () => host.prepareForUpgrade(),",
+      "      startedAt: host.startedAt,",
+      "      host: gatewayConfig.host,",
+      "      ...(gatewayConfig.port === undefined ? {} : { port: gatewayConfig.port }),",
+      "      ...(gatewayConfig.authToken === undefined",
+      "        ? {}",
+      "        : { authToken: gatewayConfig.authToken }),",
+      "      ...(gatewayConfig.tls === undefined ? {} : { tls: gatewayConfig.tls }),",
+      "      localExec: host.getLocalExecBridge(),",
+      "      webauthn: host.getWebAuthnBridge(),",
+      "      onCommandError: report => host.reportGatewayCommandError(report),",
+      "      onCommandComplete: report => host.reportGatewayCommandSuccess(report)",
+      "    });",
+      "",
+      "    await deps.writeGatewayDiscovery({",
+      "      port: gateway.port,",
+      "      pid: processControl.pid,",
+      "      startedAt: host.startedAt,",
+      "      scheme,",
+      "      host: gatewayConfig.host,",
+      "      ...(gatewayConfig.authToken === undefined",
+      "        ? {}",
+      "        : { token: gatewayConfig.authToken })",
+      "    });"
+    ]
+  },
+  "host-lock": {
+    "type": "code",
+    "kind": "host",
+    "title": "同一台機器只允許一個 host-main 握鎖",
+    "meta": "source/host/host-lock.ts:6-9",
+    "why": "活人握鎖會被 SIGTERM 再 SIGKILL 接手。3 秒與 5 次是人工選的。",
+    "start": 6,
+    "hi": [
+      6,
+      9
+    ],
+    "lines": [
+      "export const DEFAULT_TAKEOVER_TIMEOUT_MS = 3_000; export const DEFAULT_POLL_INTERVAL_MS = 100; export const MAX_ACQUIRE_ATTEMPTS = 5;",
+      "export function defaultIsProcessAlive(pid: number): boolean { try { process.kill(pid, 0); return true; } catch { return false; } }",
+      "export function readProcessCommand(pid: number): string | null { try { const value = readFileSync(`/proc/${pid}/cmdline`, \"utf8\"); if (value.length > 0) return value.replace(/\\0/g, \" \").trim(); } catch {} try { return execFileSync(\"ps\", [\"-p\", String(pid), \"-o\", \"command=\"], { encoding: \"utf8\", timeout: 2_000 }).trim(); } catch { return null; } }",
+      "export function isSandHostProcess(pid: number): boolean { return readProcessCommand(pid)?.includes(\"host-main\") === true; }"
+    ]
+  },
+  "remote-box": {
+    "type": "code",
+    "kind": "box",
+    "title": "預設向 Cursor 後端 ensureSandBox 要遠端沙箱",
+    "meta": "source/electron-main/box/box-host-connector.ts:81-99",
+    "why": "broker 回 gateway URL 與 VNC；空 URL 直接失敗。",
+    "start": 81,
+    "hi": [
+      81,
+      84
+    ],
+    "lines": [
+      "  async connect(): Promise<GatewayConnection> {",
+      "    if (this.blocked != null && Date.now() < this.blocked.untilMs) throw blockedError(this.blocked.info);",
+      "    let box: BrokerBox;",
+      "    try { box = await this.client.ensureSandBox({}); }",
+      "    catch (error) {",
+      "      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === CLOUD_AGENT_STORAGE_DISABLED) throw new ConnectError(GATEWAY_NO_STORAGE_MESSAGE_MARKER, error.code, error.metadata, undefined, error);",
+      "      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === SAND_BOX_BLOCKED) {",
+      "        const info = readBlockedInfoOrEmpty(error);",
+      "        this.blocked = { info, untilMs: Date.now() + (parseRetryAfterMs(error.metadata.get(\"retry-after\")) ?? BOX_BLOCKED_FALLBACK_HOLD_MS) };",
+      "        throw blockedError(info, error);",
+      "      }",
+      "      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === SAND_UPDATE_REQUIRED_HINT) this.updateSink?.noteBackendUpdateRequirement(true);",
+      "      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) == null && (error.code === Code.Unauthenticated || error.code === Code.PermissionDenied)) throw new ConnectError(GATEWAY_ACCESS_DENIED_MESSAGE_MARKER, error.code, error.metadata, undefined, error);",
+      "      throw error;",
+      "    }",
+      "    this.blocked = undefined;",
+      "    this.updateSink?.noteBackendUpdateRequirement(false);",
+      "    if (box.gatewayUrl.length === 0) throw new SandBoxHostConnectError(\"Broker did not expose the in-box Sand gateway (gateway_url empty); the backend stamps it on every box — check the backend version/logs.\");",
+      "    return buildConnection(box.gatewayUrl, box.gatewayToken, box.networkToken, { primaryUrl: box.vncUrl, forkBaseUrl: box.forkVncBaseUrl });"
+    ]
+  },
+  "docker": {
+    "type": "code",
+    "kind": "box",
+    "title": "設定 boxRuntime=local-docker 才改連本機容器",
+    "meta": "source/electron-main/box/local-docker-host-connector.ts:230-246",
+    "why": "讀到 local-docker 才改連本機容器；出廠預設仍打遠端 broker。",
+    "start": 230,
+    "hi": [
+      245
+    ],
+    "lines": [
+      "export function createSettingsRoutedHostConnector(",
+      "  remote: SandRemoteHostConnector,",
+      "  settings: SandSettingsStore,",
+      "): SandRemoteHostConnector {",
+      "  const localConnect = (): Promise<GatewayConnection> => {",
+      "    if (ensureInFlight == null) ensureInFlight = (async () => {",
+      "      const issued = remote.issueInferenceCredential == null ? undefined : await Promise.race([",
+      "        remote.issueInferenceCredential(),",
+      "        new Promise<undefined>((resolve) => setTimeout(resolve, OPTIONAL_CREDENTIAL_TIMEOUT_MS)),",
+      "      ]);",
+      "      return await ensureLocalDockerBox(settings.settingsPath, issued);",
+      "    })().finally(() => { ensureInFlight = undefined; });",
+      "    return ensureInFlight;",
+      "  };",
+      "  return {",
+      "    connect: async () => settings.getBoxRuntime() === \"local-docker\" ? await localConnect() : await remote.connect(),",
+      "    ...(remote.issueLocalExecDaemonCredential == null ? {} : { issueLocalExecDaemonCredential: remote.issueLocalExecDaemonCredential.bind(remote) }),"
+    ]
+  },
+  "docker-port": {
+    "type": "code",
+    "kind": "box",
+    "title": "本機容器閘道固定 127.0.0.1:1340",
+    "meta": "source/electron-main/box/local-docker-host-connector.ts:13-18",
+    "why": "映像名、容器名、迴路埠 1340 都寫死；改了要重測控制面對接。",
+    "start": 13,
+    "hi": [
+      14,
+      15
+    ],
+    "lines": [
+      "export const LOCAL_DOCKER_BOX_IMAGE = \"public.ecr.aws/k0i0n2g5/cursorenvironments/universal:sand-box-latest\";",
+      "export const LOCAL_DOCKER_BOX_CONTAINER = \"grok-bot-local-vm\";",
+      "export const LOCAL_DOCKER_GATEWAY_URL = \"http://127.0.0.1:1340\";",
+      "export const LOCAL_DOCKER_OWNER_LABEL = \"com.grok-bot.local-vm=1\";",
+      "export const LOCAL_DOCKER_SCHEMA_VERSION = \"6\";",
+      "const READY_TIMEOUT_MS = 180_000;"
+    ]
+  },
+  "router-cursor": {
+    "type": "code",
+    "kind": "送出",
+    "title": "provider 是 cursor 時路由器放手，走 host",
+    "meta": "source/node-agent-coordinator/inference-router.ts:212-228",
+    "why": "非 cursor 才在控制面本地處理並回 accepted。",
+    "start": 212,
+    "hi": [
+      212,
+      228
+    ],
+    "lines": [
+      "      if (method !== \"sendPrompt\" || provider === \"cursor\") return { handled: false };",
+      "      const record = asRecord(args) ?? {};",
+      "      const agentId = typeof record.agentId === \"string\" ? record.agentId : \"\";",
+      "      const previous = queues.get(agentId) ?? Promise.resolve();",
+      "      const next = previous.catch(() => undefined).then(() => execute(provider, record)).catch(async (error) => {",
+      "        const timestampMs = now();",
+      "        const content = `Router error: ${error instanceof Error ? error.message : String(error)}`;",
+      "        if (agentId.length > 0) {",
+      "          const id = `t${Date.now()}s0`;",
+      "          await append(agentId, [{ provider, role: \"assistant\", content, id, timestampMs }]);",
+      "          emitTranscript(agentId, \"appended\", { kind: \"send-message\", id, message: { type: \"text\", content }, timestampMs });",
+      "        }",
+      "      });",
+      "      const queued = next.finally(() => { if (queues.get(agentId) === queued) queues.delete(agentId); });",
+      "      queues.set(agentId, queued);",
+      "      void queued;",
+      "      return { handled: true, value: { accepted: true, clientNonce: record.clientNonce, provider } };"
+    ]
+  },
+  "send-prompt": {
+    "type": "code",
+    "kind": "送出",
+    "title": "SendPipeline 用 clientNonce 合併重複送出",
+    "meta": "source/host/extensions/transcript/send-pipeline.ts:100-110",
+    "why": "沒有 nonce 就直接送一次；有就去重。",
+    "start": 100,
+    "hi": [
+      100,
+      103
+    ],
+    "lines": [
+      "  async sendPrompt(prompt: string, options: SendPromptOptions): Promise<void> {",
+      "    const nonce = options.clientNonce?.length ? options.clientNonce : undefined;",
+      "    if (nonce == null) return this.sendPromptOnce(prompt, options);",
+      "    const inFlight = this.inFlightSends.get(nonce);",
+      "    if (inFlight != null) {",
+      "      console.log(",
+      "        \"[sand] duplicate send (nonce still in flight) — coalescing onto the running attempt\",",
+      "      );",
+      "      return inFlight;",
+      "    }",
+      "    const digest = sendInputDigest({"
+    ]
+  },
+  "max-steps": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "一輪 agent 最多 5000 步",
+    "meta": "source/host/runner/turn-agent-composition.ts:142",
+    "why": "5000 是程式常數 SAND_AGENT_MAX_STEPS，碼裡沒寫是誰定的。",
+    "start": 142,
+    "hi": [
+      142
+    ],
+    "lines": [
+      "export const SAND_AGENT_MAX_STEPS = 5_000;"
+    ]
+  },
+  "perm": {
+    "type": "code",
+    "kind": "權限",
+    "title": "本機工具權限只有 always、ask、never，預設 ask",
+    "meta": "source/shared/local-tool-permission.ts:1-5",
+    "why": "五種動作：跑命令、送輸入、讀檔、列目錄、寫檔。",
+    "start": 1,
+    "hi": [
+      1,
+      3,
+      4
+    ],
+    "lines": [
+      "export const SAND_LOCAL_TOOL_PERMISSIONS = [\"always\", \"ask\", \"never\"] as const;",
+      "export type SandLocalToolPermission = (typeof SAND_LOCAL_TOOL_PERMISSIONS)[number];",
+      "export const SAND_DEFAULT_LOCAL_TOOL_PERMISSION: SandLocalToolPermission = \"ask\";",
+      "export const SAND_LOCAL_TOOL_ACTIONS = [\"run-command\", \"send-input\", \"read-file\", \"list-directory\", \"write-file\"] as const;",
+      "export type SandLocalToolAction = (typeof SAND_LOCAL_TOOL_ACTIONS)[number];"
+    ]
+  },
+  "box-exec": {
+    "type": "code",
+    "kind": "執行",
+    "title": "box 內執行 daemon 聽 127.0.0.1:1337",
+    "meta": "source/box-exec-daemon/server.ts:76-83",
+    "why": "沙箱裡的命令走這支 daemon，不是桌面 local-exec。",
+    "start": 76,
+    "hi": [
+      80,
+      81
+    ],
+    "lines": [
+      "  typeName: ExecService.typeName,",
+      "  methods: { exec: { ...ExecService.methods.exec, kind: MethodKind.ServerStreaming } },",
+      "} as const satisfies ServiceType;",
+      "",
+      "export const BOX_EXEC_DAEMON_HOST = \"127.0.0.1\";",
+      "export const BOX_EXEC_DAEMON_PORT = 1337;",
+      "export const BOX_EXEC_DAEMON_AUTH_TOKEN = \"local\";",
+      "export const BOX_TERMINAL_VIRTUAL_PREFIX = \"/root/.cursor/projects/workspace/terminals/\";"
+    ]
+  },
+  "arch": {
+    "type": "code",
+    "kind": "邊界",
+    "title": "source/ 是 runtime 重建，frontend/ 是畫面工作區",
+    "meta": "docs/ARCHITECTURE.md:1-12",
+    "why": "出廠畫面用 checksum 釘住的 renderer，bootstrap 才抽出。",
+    "start": 1,
+    "hi": [
+      3,
+      9
+    ],
+    "lines": [
+      "# Architecture",
+      "",
+      "The repository keeps two editable source roots:",
+      "",
+      "- `source/` contains the Electron main, host, coordinator, local-exec, shared,",
+      "  and protocol reconstruction.",
+      "- `frontend/` contains the React renderer reconstruction.",
+      "",
+      "The upstream 0.18.0 application is an external, checksum-pinned build input.",
+      "`npm run bootstrap` extracts its `dist` tree to ignored `src/app/dist`. Build",
+      "scripts stage that baseline, compile reviewed source runtimes, overlay eligible",
+      "clean outputs, apply the reconstructed updater guard, and pack a new ASAR."
+    ]
+  },
+  "tape-pair": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "AI 是配對寫程式的人，不是外包思考",
+    "meta": "00:00–00:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "開場：配對，不是取代寫碼，更不是把思考外包。",
+    "rows": [
+      [
+        "時間",
+        "00:00"
+      ],
+      [
+        "檔",
+        "lauren-talk.txt"
+      ]
+    ],
+    "quote": "Personally, I think that the best use of AI is really like someone you're pair programming with and not someone that is not a tool to just replace the act of writing code or worse outsourcing your thinking.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-verify": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "最要緊的技能是 verification",
+    "meta": "02:01–02:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "驗證＝agent 用使用者看到的同一面把應用跑真的：CPU 追蹤、heap snapshot、iOS 模擬器。",
+    "rows": [
+      [
+        "時間",
+        "02:01"
+      ]
+    ],
+    "quote": "the most important skill that you should have in your toolbox when you work with agents is verification. By verification, I mean the ability for an agent to actually run the code or take CPU traces or heap snapshots or open an iOS simulator. However your application is exposed to your users, it can do the same thing and run it for real ... It doesn't guarantee your agent writes good code, but it allows them to at least write correct code",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-bottleneck": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "沒有驗證技能，人就是瓶頸",
+    "meta": "04:47–05:23 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "人當驗收員就無法平行。",
+    "rows": [
+      [
+        "時間",
+        "04:47"
+      ]
+    ],
+    "quote": "if you've ever done any performance work yourself or just even development with an agent where you don't have a verification skill, you are the verifier. You're the bottleneck. ... there's really no way to parallelize.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-glass": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "進 Cursor 五個月，第一個技能是 control glass",
+    "meta": "03:18–05:36 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "Glass＝Agent Window 內部代號。本要進 cloud agents 組，因 React 被拉去趕一週後上線。",
+    "rows": [
+      [
+        "時間",
+        "03:18"
+      ]
+    ],
+    "quote": "when I joined cursor five months ago ... I was supposed to join the cloud agents team, but then since I have a lot of experience working on React and agents window is a React application, I was asked to basically help out ... The control glass skill is one of the first skills I built for cursor. Glass, by the way, is the codename for agent's window",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-featmap": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "功能地圖：側欄、捷徑、CDP 選擇器",
+    "meta": "06:23–09:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "Slack 常只丟一張圖加問號。有功能地圖才找得到畫面。",
+    "rows": [
+      [
+        "時間",
+        "06:23"
+      ]
+    ],
+    "quote": "This skill comes with this very unique ... file called a feature map. ... it teaches the agent how to get to all of the features that you have. ... from the user point of view, shows how to get to it, all the different keyboard shortcuts, even like ... the DOM elements or the attributes that you use for selecting things through the CDP are all there.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-pstack": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Pstack＝potato stack，對 Gary Tan 的 G-stack 開玩笑",
+    "meta": "07:39–10:33 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "外掛有 create／maintain verification skill。她沒打算做產品，技能堆出來的。",
+    "rows": [
+      [
+        "時間",
+        "07:39"
+      ]
+    ],
+    "quote": "in PStack, the plugin that I've made ... there is a create verification skill ... but also a maintain verification skill. ... the P in P-stack is like potato ... Gary Tan ... G-stack ... poke fun at Gary",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-how": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "how 技能：看 tool call，禁止猜",
+    "meta": "10:41–13:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "agent 自信下結論卻沒讀該讀的碼。技能：去搜、讀碼、用子代理、別猜。",
+    "rows": [
+      [
+        "時間",
+        "10:41"
+      ]
+    ],
+    "quote": "I started with another skill like called how, which I also noticed through like observing agents. ... when I look at the actual tool calls, I noticed it wasn't actually reading the code that I thought should be affected. ... every time I saw that, I just, okay, I'm just gonna make that a skill ... stop hallucinating, actually go and search up, look up the code, use a lot of sub-agents and yeah, stop guessing.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-eval": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "評測是技能的單元測試；目錄名藏起「正在被評」",
+    "meta": "13:53–18:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "協調者出評分表，跨模型，另一個模型當法官。/loop 爬到 10/10。",
+    "rows": [
+      [
+        "時間",
+        "13:53"
+      ]
+    ],
+    "quote": "an eval is essentially like ... a unit test for an agent. ... My main coordinator agent come up with a rubric ... creates individual directories for them, which are cleverly named to not let the subagent know that it's being evaluated, because agents can actually tell and when they do, they change their behavior. ... you can also like hill climb ... use like slash loop in cursor ... until everything is 10 out of 10",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-benny": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Benny 在雲端桌面重現錯誤回報",
+    "meta": "20:17–22:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "先本機觀察，再把同一套驗證技能交給雲端。",
+    "rows": [
+      [
+        "時間",
+        "21:40"
+      ]
+    ],
+    "quote": "this agent we have called Benny ... takes all of the bug reports that we get, and it automatically goes off in the cloud, opens up a cloud ... desktop, it runs cursor in its own computer. And it uses the same control skills to interact with the application and try to reproduce the bug",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-trust": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "不要一次生 100／1000 個雲端 agent",
+    "meta": "23:10–25:43 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "信任曲線沒有捷徑。可 fork Pstack，不要盲信她。",
+    "rows": [
+      [
+        "時間",
+        "23:10"
+      ]
+    ],
+    "quote": "you don't want to jump to like, I'm going to spawn 100 or 1000s of cloud agents right now, because you're just gonna waste a lot of tokens. ... I think there's really no shortcut for going from here to there, because this is really about your personal level of trust in agents. ... I definitely would not encourage people to blindly trust me.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-20": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "當天醒來約 20 則合併請求已被 agent 合進去",
+    "meta": "30:30 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "帶子數字。不是推文的 1000／月。",
+    "rows": [
+      [
+        "時間",
+        "30:30"
+      ]
+    ],
+    "quote": "I woke up today and I had like 20 PRs merged by my agents.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-600": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "重構 Grok Bot 到新架構算過 600 多則",
+    "meta": "30:39–30:48 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "帶子數字。投入在重構，之後才敢不看碼。",
+    "rows": [
+      [
+        "時間",
+        "30:39"
+      ]
+    ],
+    "quote": "that's because I invested a lot of time, over 600 PRs I calculated yesterday, when I refactored all of Grokbot to this new architecture that I've been building.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-green": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Grok Bot 是綠地 vibe code，人當時不讀碼",
+    "meta": "28:40–30:03 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "沒護欄時 agent 走最方便的捷徑，程式庫失控。",
+    "rows": [
+      [
+        "時間",
+        "28:40"
+      ]
+    ],
+    "quote": "if you vibe code a project, a prototype, like we did for Grokbot ... it was a very greenfield application ... vibe coded very quickly, humans were not reading the code at all. ... when you have a completely vibe coded application, you essentially have no guardrails whatsoever. So your agents ... will just solve it in whatever method is the most convenient.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-dune": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Dune＝給 Electron 用的 Next.js",
+    "meta": "34:35–35:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "內部代號。為 agent 寫的應用而做。",
+    "rows": [
+      [
+        "時間",
+        "34:35"
+      ]
+    ],
+    "quote": "Dune is the sort of cheeky code, codename for the architecture that we built for Grokbot. ... You kind of think of it as like Next.js for Electron apps and it's designed for agents to write",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-useeffect": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "CI 禁止 useEffect",
+    "meta": "34:49–35:25 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "React 最大腳槍寫進硬失敗。",
+    "rows": [
+      [
+        "時間",
+        "34:54"
+      ]
+    ],
+    "quote": "one of the biggest foot guns in React is use effect. So in Dune and in Grokbot, we've banned use effect. ... don't use use effect. It's banned, like CI will fail and yell at you.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-comment": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "禁止註解：agent 會把一次性抱怨寫成全域規則",
+    "meta": "35:29–36:19 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "「Lauren 說永遠不要這樣」被寫進註解。",
+    "rows": [
+      [
+        "時間",
+        "35:33"
+      ]
+    ],
+    "quote": "I actually banned code comments as well ... 99% of the time agents just write code comments that kind of describe some historical thing that is actually totally irrelevant ... it will often say like, you know, oh, Lauren said you should never do this and it's now in a code comment.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-import": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "electron-main／electron-renderer 依賴圖由 CI 擋",
+    "meta": "38:07–38:37 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "主行程與畫面行程混 import 會搶 16ms 一幀。",
+    "rows": [
+      [
+        "時間",
+        "38:15"
+      ]
+    ],
+    "quote": "in Grokbot, we literally have a directory called Electron main, Electron renderer, and we have import CI ... we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another. So that's enforced by CI.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-shortest": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "最短路徑就是最好路徑",
+    "meta": "40:16–40:32 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "agent 愛走捷徑，所以把捷徑做成對的做法。功能放同一個目錄。",
+    "rows": [
+      [
+        "時間",
+        "40:16"
+      ]
+    ],
+    "quote": "one of the key principles I have for this framework is like, the shortest, the shortest path is the best path. So because that plays exactly to how agents love to rank, is that they like to take shortcuts, really. They'll find the quickest way to solve the problem. So why not make that the best way to solve the problem.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-layers": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "硬約束在持續整合；規則／技能／Bugbot 是軟的",
+    "meta": "41:25–43:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "人在程式審查裡重複講的，應變成 lint 或 CI 失敗。",
+    "rows": [
+      [
+        "時間",
+        "41:25"
+      ]
+    ],
+    "quote": "There's also rules and bug bot, which are, I think, like 345 are more soft ... For rules and skills and bug bot, your agents can still forget ... if you only have rules and bug bot and skills and a style guide ... it's only a matter of time before your code base looks like complete trash. ... Every time you have to [comment on the PR], you should consider that as a code smell ... how do I turn this into a CI failure?",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-prsize": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "PR 約 50 到 1000 行，無硬上限，要可原子還原",
+    "meta": "32:59–34:11 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "git 歷史當上下文。不要 40,000 行一包。",
+    "rows": [
+      [
+        "時間",
+        "32:59"
+      ]
+    ],
+    "quote": "they can range anywhere from a few hundred lines or 50 lines to like 1000 ... There's definitely no hard cap. But I do encourage my agents to split up their work into multiple PRs. ... I like each PR to sort of atomically describe what that small piece of thing is doing ... it's not in this 40,000 line PR",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-tokens": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "實驗室代幣不限額；前期重構很貴，對的是聘人成本",
+    "meta": "44:36–47:38 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "她說不要照抄她的用量。",
+    "rows": [
+      [
+        "時間",
+        "44:52"
+      ]
+    ],
+    "quote": "I work at an AI lab where we have unlimited tokens. So I definitely cannot say that, you know, this is something everyone should do in the exact same way that I did it. ... refactoring a code base is going to take a lot of tokens. ... the question I think an engineering leader might have is ... do you hire someone to do this or do you spend the tokens",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-46": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Grok 4.6 每 token 價她相信與 4.5 相同",
+    "meta": "47:48–48:09 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "她加了「希望我沒講錯」。",
+    "rows": [
+      [
+        "時間",
+        "47:48"
+      ]
+    ],
+    "quote": "we actually announced grok 4.6 today. ... I believe the cost per token is the same as 4.5. So you're actually getting more intelligence for the same cost.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-colleague": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "設計 brief：同事，不要微觀管理 tool call",
+    "meta": "55:00–56:08 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "畫面像 iMessage。Cursor 是給開發者的旋鈕。",
+    "rows": [
+      [
+        "時間",
+        "55:47"
+      ]
+    ],
+    "quote": "with Grokbot, we really wanted to take a fresh perspective on what would it look like if your agent was really more like a colleague. And so you don't necessarily want to micromanage your colleague and say, what tool calls are you using right now? But you want to talk to it like a person. You want to see what they're doing on their computer.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-dispatch": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "幕僚長把當天錯誤分給 sand／group 工程機器人",
+    "meta": "60:02–60:46 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "結尾會拿到合併請求、影片、截圖。",
+    "rows": [
+      [
+        "時間",
+        "60:02"
+      ]
+    ],
+    "quote": "I asked my chief of staff already, like if there's any interesting bugs that we saw today ... I have a sand team over here. I'm sorry, a group team. So each of them kind of are responsible for a different feature. And so now my chief of staff is going to send off those tasks to those agents. ... at the end of it, I'll get like a full request that I can review. I'll get videos. I'll get a screenshot.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-cloud": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "Grok Bot 的機器人可以踢出 Cursor 雲端 agent",
+    "meta": "61:03–61:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "外層迴圈在 Grok Bot，寫碼工廠在雲端 agent。",
+    "rows": [
+      [
+        "時間",
+        "61:03"
+      ]
+    ],
+    "quote": "if you set up cloud agents on cursor, your Grokbot bots can actually kick them off. So like here ... I have a cloud agent that's running with its own computer that this agent is managing.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-chef": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "主廚：組盤與品管，不是每道菜自己炒",
+    "meta": "19:09 與 66:35–67:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "同一比喻講兩次。",
+    "rows": [
+      [
+        "時間",
+        "66:35"
+      ]
+    ],
+    "quote": "I kind of think of my agents as sort of like a kitchen, a Michelin kitchen ... maybe I'm not cooking all the food myself anymore. ... my role is becoming more like a head chef. ... I maybe assemble a plate to the food. I own the quality control.",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tape-imessage": {
+    "type": "ref",
+    "kind": "逐字稿",
+    "title": "早期她把 iMessage 接到 Grok Bot：同事要能傳訊、打電話",
+    "meta": "68:45–69:28 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
+    "why": "產品是否上線她說還在想。",
+    "rows": [
+      [
+        "時間",
+        "68:45"
+      ]
+    ],
+    "quote": "one thing that I try to hack, I hacked in into [Grok Bot] like when in the early days was support for like iMessage. We can actually text your bots. ... the mental model is these are colleagues. ... you can text them. You can call them. ... always on colleagues that you can talk to at any time from anywhere",
+    "url": "https://x.com/0xCodez/status/2093013117156331552",
+    "linktext": "x.com/0xCodez/status/2093013117156331552"
+  },
+  "tweet-july": {
+    "type": "ref",
+    "kind": "推文",
+    "title": "2026-07-29：這個月用 Cursor 幾乎送出 1000 則 PR",
+    "meta": "2026-07-29 · @poteto",
+    "why": "帶子沒講這句。是推文。",
+    "rows": [
+      [
+        "日期",
+        "2026-07-29"
+      ],
+      [
+        "帳號",
+        "@poteto"
+      ]
+    ],
+    "quote": "shipped almost 1000 PRs this month with cursor",
+    "url": "https://x.com/poteto/status/2082371906309849354",
+    "linktext": "x.com/poteto/status/2082371906309849354"
+  },
+  "tweet-aug": {
+    "type": "ref",
+    "kind": "推文",
+    "title": "2026-08-19：上個月 1000 則，這個月朝加倍；Grok Bot 是外層迴圈",
+    "meta": "2026-08-19 · @poteto",
+    "why": "同一則推文寫 pstack、/lauren-mode＝/poteto-mode、routines、/goal /loop /swarm、雲端 agent 24/7。",
+    "rows": [
+      [
+        "日期",
+        "2026-08-19"
+      ],
+      [
+        "帳號",
+        "@poteto"
+      ]
+    ],
+    "quote": "i shipped 1000 PRs last month and am on track to doubling that this month, all thanks to cloud agents. you can also launch cloud agents with Grok @Bot btw! ... i use Grok @Bot routines to farm context for me ... Grok Bot feeds my \"outer loop\", where i think about what to point my factory at next. ... everything runs on cloud agents, so my bots work 24/7 even when i'm asleep or my laptop is offline.",
+    "url": "https://x.com/poteto/status/2090141955695198633",
+    "linktext": "x.com/poteto/status/2090141955695198633"
+  }
+}

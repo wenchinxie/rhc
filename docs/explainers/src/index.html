@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grok Bot 0.18 設計邏輯</title>
+    <script type="module" src="./frontend.tsx" async></script>
+  </head>
+  <body>
+    <script type="application/json" id="SRC_MAP">{"product":{"type":"code","kind":"產品名","title":"顯示名稱是 Grok Bot，內部仍叫 Sand","meta":"source/shared/product-name.ts:1-2","why":"出廠產品名寫在這；行程與路徑仍帶 sand- 前綴。","start":1,"hi":[1],"lines":["export const SAND_PRODUCT_DISPLAY_NAME = \"Grok Bot\";","export const SAND_PRODUCT_HTTP_TOKEN = SAND_PRODUCT_DISPLAY_NAME.replaceAll(/\\s+/g, \"\");"]},"e-main":{"type":"code","kind":"開機","title":"Electron whenReady 之後才起服務與主視窗","meta":"source/electron-main/main.ts:373-414","why":"主行程管視窗與服務，自己不跑 agent 迴圈。","start":373,"hi":[374,387,412],"lines":["  void deps.app","    .whenReady()","    .then(async () => {","      if (!isPrimaryInstance) {","        deps.startup.cancel();","        return;","      }","      deps.startup.markPhase(\"move_check\");","      const moveDisposition = await deps.startup.runMoveCheck({","        hasPendingActivation: deps.deepLinks.hasPendingActivation,","      });","      if (moveDisposition === \"stop-bootstrap\") return;","      deps.startup.armStuckWatchdog();","      deps.startup.markPhase(\"services\");","      services = await deps.initializeServices({ routeHostInput: hostChords.routeHostInput });","","      const membership = createDevToolsMembershipResolver({","        getStatus: services.getDevToolsMembershipStatus,","        setMembership: devToolsGate.setMembership,","        onError: (error) => reportDesktopEdgeFailure(\"cursor-auth\", \"anysphere-membership\", error),","      });","      services.subscribeDevToolsMembership(() => void membership.refresh());","      void membership.refresh();","","      const installMenu = (): void =>","        installApplicationMenu(","          {","            applyWindowShortcut: hostChords.applyWindowShortcut,","            canUseDevTools: devToolsGate.isAllowed,","            emitOpenAbout: () => services?.mainEdge.emit(\"open-about\", {}),","            emitOpenFeedback: () => services?.mainEdge.emit(\"open-feedback\", {}),","            platform,","          },","          deps.menu,","        );","      installMenu();","      services.registerImageContextMenu?.();","      devToolsGate.subscribe(installMenu);","","      deps.startup.markPhase(\"window\");","      isMainWindowCreationReady = true;","      await createWindow();"]},"fork":{"type":"code","kind":"控制面","title":"帳號就緒後 utilityProcess.fork coordinator","meta":"source/electron-main/coordinator/production-provider.ts:428-431","why":"控制面是獨立 Node 行程，不是 renderer 裡的函式。","start":428,"hi":[430],"lines":["      const createRuntime = () =>","        createCoordinatorRuntime({","          fork: (path, options) =>","            ports.utilityProcess.fork(path, [], { serviceName: options.serviceName }),"]},"launcher":{"type":"code","kind":"控制面","title":"fork 時交出三條 MessagePort","meta":"source/electron-main/coordinator/coordinator-launcher.ts:46-70","why":"控制埠、畫面資料埠、主行程資料埠一次交給子行程。","start":46,"hi":[49,68],"lines":["export function launchCoordinator(","  dependencies: LaunchCoordinatorDependencies,","): CoordinatorLaunchHandle {","  const child = dependencies.fork(dependencies.artifactPath, {","    serviceName: COORDINATOR_SERVICE_NAME,","  });","  const controlChannel = dependencies.createChannel();","  const dataChannel = dependencies.createChannel();","  const mainDataChannel = dependencies.createChannel();","  const server = createCoordinatorControlServer({","    post: (frame) => controlChannel.port2.postMessage(frame),","    executors: dependencies.executors,","    onEvent: dependencies.onEvent,","    onProblem: dependencies.onProblem,","    ...(dependencies.reportFailure === undefined","      ? {}","      : { reportFailure: dependencies.reportFailure }),","  });","","  controlChannel.port2.on(\"message\", (event) => server.handleMessage(event.data));","  controlChannel.port2.on(\"close\", () => server.handlePortClosed());","  controlChannel.port2.start();","  child.postMessage(","    { bootstrap: { processConfig: dependencies.processConfig } },","    [controlChannel.port1, dataChannel.port1, mainDataChannel.port1],"]},"preload-port":{"type":"code","kind":"畫面","title":"preload 把 coordinator MessagePort 交進畫面","meta":"source/electron-preload/preload.ts:309-316","why":"畫面經 sand:coordinator-port-request 向主行程要埠。","start":309,"hi":[311,313],"lines":["  const broker = options.coordinatorBroker ?? createCoordinatorPortBroker\u003cany>({ invokeRequest: () => { void options.ipc.invoke(\"sand:coordinator-port-request\"); } });","  const desktop = createDesktopPreloadBridge({ ...options, env, devRestartEnabled, initialState });","  options.contextBridge.exposeInMainWorld(\"desktop\", desktop);","  options.contextBridge.exposeInMainWorld(\"coordinatorPort\", broker.bridge);","  options.ipc.on(\"sand:coordinator-port\", (event: { readonly ports: readonly any[] }) => {","    const port = event.ports[0];","    if (port != null) broker.deliver(wrapTransferredCoordinatorPort(port));","  });"]},"host-main":{"type":"code","kind":"host","title":"box 裡先搶鎖、再起 box-exec、再起 gateway","meta":"source/host/main.ts:206-255","why":"host 不是桌面旁邊的第三個 Electron 行程。","start":206,"hi":[208,222,246],"lines":["  const crashGuards = deps.installProcessCrashGuards({ scope: \"sand-host\" });","  const lockResult = await deps.acquireHostLock();","  reportLockOutcome(lockResult, deps.getSandRootDir(), log);","","  const hostLock = lockResult.lock;","  let boxExecDaemon: OwnedBoxExecDaemon | undefined;","  const host = deps.createHost();","  crashGuards.setReporter((error, kind) => {","    host.reportProcessCrash(error, kind);","  });","  deps.installInvariantReporter(report => host.reportInvariantViolation(report));","  deps.pinHostDiagnosticsReporter(diagnostic => {","    host.reportHostDiagnostic(diagnostic);","  });","","  try {","    boxExecDaemon = await deps.startBoxExecDaemon?.();","    await host.start();","    const gatewayConfig = deps.resolveGatewayServerConfig();","    const scheme = deps.gatewayScheme(gatewayConfig);","    const gateway = await deps.startGatewayServer({","      api: host.getApi(),","      subscribe: listener => host.subscribe(listener),","      getHealth: () => host.getHealth(),","      onEventStreamClosed: () => host.noteEventStreamClosed(),","      onDesktopContact: () => host.noteDesktopContact(),","      prepareForUpgrade: () => host.prepareForUpgrade(),","      startedAt: host.startedAt,","      host: gatewayConfig.host,","      ...(gatewayConfig.port === undefined ? {} : { port: gatewayConfig.port }),","      ...(gatewayConfig.authToken === undefined","        ? {}","        : { authToken: gatewayConfig.authToken }),","      ...(gatewayConfig.tls === undefined ? {} : { tls: gatewayConfig.tls }),","      localExec: host.getLocalExecBridge(),","      webauthn: host.getWebAuthnBridge(),","      onCommandError: report => host.reportGatewayCommandError(report),","      onCommandComplete: report => host.reportGatewayCommandSuccess(report)","    });","","    await deps.writeGatewayDiscovery({","      port: gateway.port,","      pid: processControl.pid,","      startedAt: host.startedAt,","      scheme,","      host: gatewayConfig.host,","      ...(gatewayConfig.authToken === undefined","        ? {}","        : { token: gatewayConfig.authToken })","    });"]},"host-lock":{"type":"code","kind":"host","title":"同一台機器只允許一個 host-main 握鎖","meta":"source/host/host-lock.ts:6-9","why":"活人握鎖會被 SIGTERM 再 SIGKILL 接手。3 秒與 5 次是人工選的。","start":6,"hi":[6,9],"lines":["export const DEFAULT_TAKEOVER_TIMEOUT_MS = 3_000; export const DEFAULT_POLL_INTERVAL_MS = 100; export const MAX_ACQUIRE_ATTEMPTS = 5;","export function defaultIsProcessAlive(pid: number): boolean { try { process.kill(pid, 0); return true; } catch { return false; } }","export function readProcessCommand(pid: number): string | null { try { const value = readFileSync(`/proc/${pid}/cmdline`, \"utf8\"); if (value.length > 0) return value.replace(/\\0/g, \" \").trim(); } catch {} try { return execFileSync(\"ps\", [\"-p\", String(pid), \"-o\", \"command=\"], { encoding: \"utf8\", timeout: 2_000 }).trim(); } catch { return null; } }","export function isSandHostProcess(pid: number): boolean { return readProcessCommand(pid)?.includes(\"host-main\") === true; }"]},"remote-box":{"type":"code","kind":"box","title":"預設向 Cursor 後端 ensureSandBox 要遠端沙箱","meta":"source/electron-main/box/box-host-connector.ts:81-99","why":"broker 回 gateway URL 與 VNC；空 URL 直接失敗。","start":81,"hi":[81,84],"lines":["  async connect(): Promise\u003cGatewayConnection> {","    if (this.blocked != null && Date.now() \u003c this.blocked.untilMs) throw blockedError(this.blocked.info);","    let box: BrokerBox;","    try { box = await this.client.ensureSandBox({}); }","    catch (error) {","      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === CLOUD_AGENT_STORAGE_DISABLED) throw new ConnectError(GATEWAY_NO_STORAGE_MESSAGE_MARKER, error.code, error.metadata, undefined, error);","      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === SAND_BOX_BLOCKED) {","        const info = readBlockedInfoOrEmpty(error);","        this.blocked = { info, untilMs: Date.now() + (parseRetryAfterMs(error.metadata.get(\"retry-after\")) ?? BOX_BLOCKED_FALLBACK_HOLD_MS) };","        throw blockedError(info, error);","      }","      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) === SAND_UPDATE_REQUIRED_HINT) this.updateSink?.noteBackendUpdateRequirement(true);","      if (error instanceof ConnectError && error.metadata.get(AUTOMATION_FAILURE_HINT_HEADER) == null && (error.code === Code.Unauthenticated || error.code === Code.PermissionDenied)) throw new ConnectError(GATEWAY_ACCESS_DENIED_MESSAGE_MARKER, error.code, error.metadata, undefined, error);","      throw error;","    }","    this.blocked = undefined;","    this.updateSink?.noteBackendUpdateRequirement(false);","    if (box.gatewayUrl.length === 0) throw new SandBoxHostConnectError(\"Broker did not expose the in-box Sand gateway (gateway_url empty); the backend stamps it on every box — check the backend version/logs.\");","    return buildConnection(box.gatewayUrl, box.gatewayToken, box.networkToken, { primaryUrl: box.vncUrl, forkBaseUrl: box.forkVncBaseUrl });"]},"docker":{"type":"code","kind":"box","title":"設定 boxRuntime=local-docker 才改連本機容器","meta":"source/electron-main/box/local-docker-host-connector.ts:230-246","why":"讀到 local-docker 才改連本機容器；出廠預設仍打遠端 broker。","start":230,"hi":[245],"lines":["export function createSettingsRoutedHostConnector(","  remote: SandRemoteHostConnector,","  settings: SandSettingsStore,","): SandRemoteHostConnector {","  const localConnect = (): Promise\u003cGatewayConnection> => {","    if (ensureInFlight == null) ensureInFlight = (async () => {","      const issued = remote.issueInferenceCredential == null ? undefined : await Promise.race([","        remote.issueInferenceCredential(),","        new Promise\u003cundefined>((resolve) => setTimeout(resolve, OPTIONAL_CREDENTIAL_TIMEOUT_MS)),","      ]);","      return await ensureLocalDockerBox(settings.settingsPath, issued);","    })().finally(() => { ensureInFlight = undefined; });","    return ensureInFlight;","  };","  return {","    connect: async () => settings.getBoxRuntime() === \"local-docker\" ? await localConnect() : await remote.connect(),","    ...(remote.issueLocalExecDaemonCredential == null ? {} : { issueLocalExecDaemonCredential: remote.issueLocalExecDaemonCredential.bind(remote) }),"]},"docker-port":{"type":"code","kind":"box","title":"本機容器閘道固定 127.0.0.1:1340","meta":"source/electron-main/box/local-docker-host-connector.ts:13-18","why":"映像名、容器名、迴路埠 1340 都寫死；改了要重測控制面對接。","start":13,"hi":[14,15],"lines":["export const LOCAL_DOCKER_BOX_IMAGE = \"public.ecr.aws/k0i0n2g5/cursorenvironments/universal:sand-box-latest\";","export const LOCAL_DOCKER_BOX_CONTAINER = \"grok-bot-local-vm\";","export const LOCAL_DOCKER_GATEWAY_URL = \"http://127.0.0.1:1340\";","export const LOCAL_DOCKER_OWNER_LABEL = \"com.grok-bot.local-vm=1\";","export const LOCAL_DOCKER_SCHEMA_VERSION = \"6\";","const READY_TIMEOUT_MS = 180_000;"]},"router-cursor":{"type":"code","kind":"送出","title":"provider 是 cursor 時路由器放手，走 host","meta":"source/node-agent-coordinator/inference-router.ts:212-228","why":"非 cursor 才在控制面本地處理並回 accepted。","start":212,"hi":[212,228],"lines":["      if (method !== \"sendPrompt\" || provider === \"cursor\") return { handled: false };","      const record = asRecord(args) ?? {};","      const agentId = typeof record.agentId === \"string\" ? record.agentId : \"\";","      const previous = queues.get(agentId) ?? Promise.resolve();","      const next = previous.catch(() => undefined).then(() => execute(provider, record)).catch(async (error) => {","        const timestampMs = now();","        const content = `Router error: ${error instanceof Error ? error.message : String(error)}`;","        if (agentId.length > 0) {","          const id = `t${Date.now()}s0`;","          await append(agentId, [{ provider, role: \"assistant\", content, id, timestampMs }]);","          emitTranscript(agentId, \"appended\", { kind: \"send-message\", id, message: { type: \"text\", content }, timestampMs });","        }","      });","      const queued = next.finally(() => { if (queues.get(agentId) === queued) queues.delete(agentId); });","      queues.set(agentId, queued);","      void queued;","      return { handled: true, value: { accepted: true, clientNonce: record.clientNonce, provider } };"]},"send-prompt":{"type":"code","kind":"送出","title":"SendPipeline 用 clientNonce 合併重複送出","meta":"source/host/extensions/transcript/send-pipeline.ts:100-110","why":"沒有 nonce 就直接送一次；有就去重。","start":100,"hi":[100,103],"lines":["  async sendPrompt(prompt: string, options: SendPromptOptions): Promise\u003cvoid> {","    const nonce = options.clientNonce?.length ? options.clientNonce : undefined;","    if (nonce == null) return this.sendPromptOnce(prompt, options);","    const inFlight = this.inFlightSends.get(nonce);","    if (inFlight != null) {","      console.log(","        \"[sand] duplicate send (nonce still in flight) — coalescing onto the running attempt\",","      );","      return inFlight;","    }","    const digest = sendInputDigest({"]},"max-steps":{"type":"code","kind":"迴圈","title":"一輪 agent 最多 5000 步","meta":"source/host/runner/turn-agent-composition.ts:142","why":"5000 是程式常數 SAND_AGENT_MAX_STEPS，碼裡沒寫是誰定的。","start":142,"hi":[142],"lines":["export const SAND_AGENT_MAX_STEPS = 5_000;"]},"perm":{"type":"code","kind":"權限","title":"本機工具權限只有 always、ask、never，預設 ask","meta":"source/shared/local-tool-permission.ts:1-5","why":"五種動作：跑命令、送輸入、讀檔、列目錄、寫檔。","start":1,"hi":[1,3,4],"lines":["export const SAND_LOCAL_TOOL_PERMISSIONS = [\"always\", \"ask\", \"never\"] as const;","export type SandLocalToolPermission = (typeof SAND_LOCAL_TOOL_PERMISSIONS)[number];","export const SAND_DEFAULT_LOCAL_TOOL_PERMISSION: SandLocalToolPermission = \"ask\";","export const SAND_LOCAL_TOOL_ACTIONS = [\"run-command\", \"send-input\", \"read-file\", \"list-directory\", \"write-file\"] as const;","export type SandLocalToolAction = (typeof SAND_LOCAL_TOOL_ACTIONS)[number];"]},"box-exec":{"type":"code","kind":"執行","title":"box 內執行 daemon 聽 127.0.0.1:1337","meta":"source/box-exec-daemon/server.ts:76-83","why":"沙箱裡的命令走這支 daemon，不是桌面 local-exec。","start":76,"hi":[80,81],"lines":["  typeName: ExecService.typeName,","  methods: { exec: { ...ExecService.methods.exec, kind: MethodKind.ServerStreaming } },","} as const satisfies ServiceType;","","export const BOX_EXEC_DAEMON_HOST = \"127.0.0.1\";","export const BOX_EXEC_DAEMON_PORT = 1337;","export const BOX_EXEC_DAEMON_AUTH_TOKEN = \"local\";","export const BOX_TERMINAL_VIRTUAL_PREFIX = \"/root/.cursor/projects/workspace/terminals/\";"]},"arch":{"type":"code","kind":"邊界","title":"source/ 是 runtime 重建，frontend/ 是畫面工作區","meta":"docs/ARCHITECTURE.md:1-12","why":"出廠畫面用 checksum 釘住的 renderer，bootstrap 才抽出。","start":1,"hi":[3,9],"lines":["# Architecture","","The repository keeps two editable source roots:","","- `source/` contains the Electron main, host, coordinator, local-exec, shared,","  and protocol reconstruction.","- `frontend/` contains the React renderer reconstruction.","","The upstream 0.18.0 application is an external, checksum-pinned build input.","`npm run bootstrap` extracts its `dist` tree to ignored `src/app/dist`. Build","scripts stage that baseline, compile reviewed source runtimes, overlay eligible","clean outputs, apply the reconstructed updater guard, and pack a new ASAR."]}}</script>
+    <script>/* Classic script: design-explainer glossary gate looks for `var GLOSS = {…};`. */
+var GLOSS = {
+  coordinator: {
+    t: "coordinator",
+    d: "桌面程式生出來的中介行程（服務名 sand-node-agent-coordinator）。視窗把使用者的送出交給它；它再連到跟筆電分開、用來跑命令的那台遠端機器，把送出轉給那裡負責接送出的行程。",
+    avoid: ["控制面行程"],
+  },
+  "sand-host": {
+    t: "host-main",
+    d: "在跟筆電分開、用來跑命令的那台遠端機器裡，負責接下使用者送出、一步步呼叫模型與工具直到這則送出結束的那個行程。開機時先搶鎖檔 host.lock，再起代跑命令的服務，再起給桌面連線用的 HTTP 入口。程式檔是 host/main.ts。",
+    avoid: ["sand-host"],
+  },
+  box: {
+    t: "沙箱機器",
+    d: "出廠預設由 Cursor 後端配給的一台遠端電腦，用來跑命令與放檔案，跟使用者自己的筆電分開。程式裡叫 box；這份原始碼複製也可改連使用者筆電上另開的隔離環境（容器）。",
+    avoid: [],
+  },
+  "send-pipeline": {
+    t: "SendPipeline",
+    d: "遠端機器上那個接送出的行程，接受「送出」請求時走的路：先給這則送出一個編號，同一個編號若還在處理就併進那次；寫下使用者剛送出的那行文字，再排隊讓模型再答一回合。",
+    avoid: [],
+  },
+  reconstruction: {
+    t: "重建疊層",
+    d: "這份原始碼複製加在出廠行為上面的東西：可改走 Claude Code／Codex／OpenRouter，以及改連使用者筆電上另開的隔離環境（容器）。出廠沒改設定時，模型來源仍是 Cursor，機器仍是遠端那台。",
+    avoid: ["重建稿疊層"],
+  },
+};
+window.GLOSS = GLOSS;
+</script>
+    <script>/* design-explainer rail / spy / gloss / srcpane. Call initExplainerShell()
+   after React paints. Safe to call twice only if you reload the page. */
+window.initExplainerShell = window.initExplainerShell || function initExplainerShell() {
+  if (window.__explainerShellOn) return;
+  window.__explainerShellOn = true;
+(function () {
+  var toc = document.querySelector("nav.toc");
+  var doc = document.querySelector(".doc");
+  if (!toc || !doc) return;
+  function tokenPx(name, fallback) {
+    var probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;left:-9999px;top:0;height:0;padding:0;border:0;margin:0;width:var(" + name + ")";
+    document.documentElement.appendChild(probe);
+    var w = probe.getBoundingClientRect().width;
+    document.documentElement.removeChild(probe);
+    return w || fallback;
+  }
+  function fit() {
+    /* 要放得下的是文件的真實寬度(--prose + --side-w + --side-gap)加上左欄與
+       間距。用 --prose 算會在放不下時就開左欄,整頁被推出橫向捲軸;而
+       `|| vw >= 720` 那個後門等於「一定開」,是同一個 bug 的另一半。 */
+    var vw = document.documentElement.clientWidth;
+    var need = tokenPx("--prose", 720) + tokenPx("--side-w", 304)
+             + tokenPx("--side-gap", 56) + tokenPx("--rail-w", 240)
+             + tokenPx("--rail-gap", 48) + 24;
+    document.body.classList.toggle("rail-on", vw >= need);
+  }
+  var timer;
+  function schedule() { clearTimeout(timer); timer = setTimeout(fit, 40); }
+  window.addEventListener("resize", schedule);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", schedule);
+  fit();
+
+  /* 放不下左欄時的第二種呈現:同一個 nav 拉出來。連結一點就關,因為它蓋著正文。 */
+  var tocBtn = document.getElementById("tocbtn");
+  var tocScrim = document.getElementById("tocscrim");
+  var tocClose = document.getElementById("tocclose");
+  if (tocBtn) {
+    toc.setAttribute("tabindex", "-1");
+    var setToc = function (open) {
+      document.body.classList.toggle("toc-open", open);
+      tocBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) { toc.focus(); } else { tocBtn.focus(); }
+    };
+    tocBtn.addEventListener("click", function () {
+      setToc(!document.body.classList.contains("toc-open"));
+    });
+    if (tocScrim) { tocScrim.addEventListener("click", function () { setToc(false); }); }
+    if (tocClose) { tocClose.addEventListener("click", function () { setToc(false); }); }
+    toc.addEventListener("click", function (ev) {
+      if (ev.target.closest("a")) { setToc(false); }
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && document.body.classList.contains("toc-open")) { setToc(false); }
+    });
+  }
+})();
+
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  if (!links.length || !window.IntersectionObserver) return;
+  var order = [], byId = {};
+  links.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (document.getElementById(id)) { order.push(id); byId[id] = a; }
+  });
+  var visible = {};
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+    var current = null;
+    for (var i = 0; i < order.length; i++) { if (visible[order[i]]) { current = order[i]; break; } }
+    links.forEach(function (a) { a.removeAttribute('aria-current'); });
+    if (current) byId[current].setAttribute('aria-current', 'true');
+  }, { rootMargin: '0px 0px -72% 0px' });
+  order.forEach(function (id) { io.observe(document.getElementById(id)); });
+})();
+
+(function () {
+  // One entry per concept this document owns. `avoid` lists the near-misses
+  // this document has actually seen, i.e. the residue of picking a canonical
+  // term; it is not a general denylist of bad words.
+  var GLOSS = window.GLOSS || {
+    "replace-key": {
+      t: "REPLACE 詞卡標題",
+      d: "REPLACE 一句話定義,讀者第一次看到這個名字時需要的全部。",
+      avoid: ["REPLACE 這個概念的別名"]
+    }
+  };
+  var card = document.getElementById("gloss-card");
+  var backdrop = document.getElementById("gloss-backdrop");
+  var titleEl = document.getElementById("gloss-card-title");
+  var textEl = document.getElementById("gloss-card-text");
+  if (!card || !backdrop || !titleEl || !textEl) return;
+
+  function placeNear(el) {
+    var r = el.getBoundingClientRect();
+    var top = r.bottom + window.scrollY + 6;
+    var left = Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - card.offsetWidth - 12);
+    card.style.top = top + "px";
+    card.style.left = Math.max(window.scrollX + 12, left) + "px";
+  }
+  function openGloss(el) {
+    var e = GLOSS[el.getAttribute("data-gloss")];
+    if (!e) return;
+    titleEl.textContent = e.t;
+    textEl.textContent = e.d;
+    card.style.display = "block";
+    backdrop.style.display = "block";
+    placeNear(el);
+  }
+  function closeGloss() {
+    card.style.display = "none";
+    backdrop.style.display = "none";
+  }
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button.term");
+    if (btn) { ev.preventDefault(); openGloss(btn); return; }
+    if (!ev.target.closest("#gloss-card")) closeGloss();
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeGloss(); });
+  window.addEventListener("resize", closeGloss);
+})();
+
+/* 原文對照面板。點圖上帶小圓點的節點，或句子裡的 .peek 小標籤，右側滑出原文。
+   停用 JS 時面板不會出現，出處仍在每一節末尾的引文行，所以資訊不會消失。 */
+(function () {
+  var MAP = JSON.parse(document.getElementById("SRC_MAP").textContent);
+  var pane = document.getElementById("srcpane");
+  var scrim = document.getElementById("srcscrim");
+  var last = null;
+
+  function codeBlock(d) {
+    var pre = document.createElement("pre");
+    var codeEl = document.createElement("code");
+    d.lines.forEach(function (line, i) {
+      var n = d.start + i;
+      var row = document.createElement("span");
+      row.className = d.hi.indexOf(n) >= 0 ? "l hi" : "l";
+      var num = document.createElement("span");
+      num.className = "ln";
+      num.textContent = String(n);
+      row.appendChild(num);
+      row.appendChild(document.createTextNode(line));
+      codeEl.appendChild(row);
+    });
+    pre.appendChild(codeEl);
+    return pre;
+  }
+
+  function refBlock(d) {
+    var frag = document.createDocumentFragment();
+    var ul = document.createElement("ul");
+    ul.className = "refmeta";
+    d.rows.forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML = "<b>" + r[0] + "</b>：" + r[1];
+      ul.appendChild(li);
+    });
+    frag.appendChild(ul);
+    var q = document.createElement("blockquote");
+    q.innerHTML = d.quote;
+    frag.appendChild(q);
+    if (d.url) {
+      var p = document.createElement("p");
+      p.className = "dlink";
+      p.innerHTML = '<a class="xref" href="' + d.url + '">' + d.linktext + "</a>";
+      frag.appendChild(p);
+    }
+    return frag;
+  }
+
+  function open(id, trigger) {
+    var d = MAP[id];
+    if (!d) return;
+    last = trigger || null;
+    document.getElementById("src-kind").textContent = d.kind || "";
+    document.getElementById("src-title").textContent = d.title || "";
+    document.getElementById("src-meta").textContent = d.meta || "";
+    document.getElementById("src-why").innerHTML = d.why || "";
+    var body = document.getElementById("src-body");
+    body.textContent = "";
+    body.appendChild(d.type === "code" ? codeBlock(d) : refBlock(d));
+    pane.classList.add("on");
+    scrim.classList.add("on");
+    pane.setAttribute("aria-hidden", "false");
+    pane.scrollTop = 0;
+    pane.focus();
+  }
+
+  function close() {
+    pane.classList.remove("on");
+    scrim.classList.remove("on");
+    pane.setAttribute("aria-hidden", "true");
+    if (last && last.focus) last.focus();
+  }
+
+  document.addEventListener("click", function (ev) {
+    var t = ev.target.closest ? ev.target.closest("[data-snip]") : null;
+    if (t) { open(t.getAttribute("data-snip"), t); return; }
+    if (ev.target.id === "srcclose" || ev.target.id === "srcscrim") close();
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { close(); return; }
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    var t = ev.target.closest ? ev.target.closest("[data-snip]") : null;
+    if (t) { ev.preventDefault(); open(t.getAttribute("data-snip"), t); }
+  });
+})();
+
+};
+if (document.querySelector("nav.toc")) window.initExplainerShell();
+</script>
+    <div id="root"></div>
+    <div id="gloss-backdrop"></div>
+    <div id="gloss-card" role="dialog" aria-modal="false">
+      <div id="gloss-card-title"></div>
+      <div id="gloss-card-text"></div>
+    </div>
+    <div id="srcscrim" aria-hidden="true"></div>
+    <aside id="srcpane" tabindex="-1" aria-label="原文對照" aria-hidden="true">
+      <button id="srcclose" type="button" aria-label="關閉對照面板">×</button>
+      <p id="src-kind"></p>
+      <h2 id="src-title"></h2>
+      <p id="src-meta"></p>
+      <div id="src-why"></div>
+      <div id="src-body"></div>
+    </aside>
+    <div hidden id="snip-index" aria-hidden="true">
+    <button type="button" class="peek" data-snip="product">product</button>
+    <button type="button" class="peek" data-snip="e-main">e-main</button>
+    <button type="button" class="peek" data-snip="fork">fork</button>
+    <button type="button" class="peek" data-snip="launcher">launcher</button>
+    <button type="button" class="peek" data-snip="preload-port">preload-port</button>
+    <button type="button" class="peek" data-snip="host-main">host-main</button>
+    <button type="button" class="peek" data-snip="host-lock">host-lock</button>
+    <button type="button" class="peek" data-snip="remote-box">remote-box</button>
+    <button type="button" class="peek" data-snip="docker">docker</button>
+    <button type="button" class="peek" data-snip="docker-port">docker-port</button>
+    <button type="button" class="peek" data-snip="router-cursor">router-cursor</button>
+    <button type="button" class="peek" data-snip="send-prompt">send-prompt</button>
+    <button type="button" class="peek" data-snip="max-steps">max-steps</button>
+    <button type="button" class="peek" data-snip="perm">perm</button>
+    <button type="button" class="peek" data-snip="box-exec">box-exec</button>
+    <button type="button" class="peek" data-snip="arch">arch</button>
+    </div>
+  </body>
+</html>

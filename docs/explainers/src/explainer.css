@@ -1,0 +1,593 @@
+/* 色票取自 Anthropic 官方 stylesheet 的 --swatch--* 原生值,hex 轉 OKLCH:
+     ivory-light #faf9f5 / ivory-medium #f0eee6 / ivory-dark #e8e6dc /
+     cloud-light #d1cfc5 / cloud-medium #b0aea5 / cloud-dark #87867f /
+     slate-dark #141413 / slate-medium #3d3d3a / slate-light #5e5d59 /
+     clay #d97757。兩處偏離官方,各有量到的理由:
+     (1) 暗色 --line 在 slate-dark 與 slate-medium 之間插一階,官方只有兩階,
+         --paper-2 會與 --line 撞色、表頭邊界消失;
+     (2) --pen-ink 壓到 L 0.560,官方 #c6613f 是 hover 底色,當小字只有 3.85:1。
+     clay 本身只出現在邊框、底色與 tint:它對 ivory 是 2.97:1,當文字不合格,
+     所以節號、目錄目前位置、管線箭頭都走 --pen-ink。對比度由
+     design-explainer/scripts/check_contrast.py 把關,不靠眼睛。 */
+  :root {
+    --paper: oklch(0.982 0.005 95.1);
+    --paper-2: oklch(0.948 0.011 95.2);
+    --ink: oklch(0.191 0.002 106.6);
+    --ink-2: oklch(0.359 0.005 106.7);
+    --ink-3: oklch(0.478 0.006 95.2);
+    --line: oklch(0.924 0.014 97.5);
+    --line-strong: oklch(0.853 0.014 97.5);
+    --pen: oklch(0.672 0.131 38.8);
+    --pen-ink: oklch(0.560 0.145 39.0);
+    --pen-tint: oklch(0.672 0.131 38.8 / 0.09);
+    --pen-line: oklch(0.672 0.131 38.8 / 0.36);
+    /* 決策樹的寫回迴圈，與 --pen 的紅色重試迴圈分開語意。
+       出處：17media/data-pipeline realtime_fifo 的 --lp-* teal。 */
+    --loop: oklch(0.55 0.10 200);
+    --rail-w: 15rem; --rail-gap: 3rem;
+    /* 正文 78ch ≈ 39 個中文字一行。中文一字佔 2ch,72ch 只有 36 字,
+       在寬螢幕上把版面憋窄卻換不到可讀性 */
+    --prose: 78ch;
+    /* 字級一律 clamp,跟著視窗連續變化:同一份文件在 13 吋筆電與 27 吋螢幕上
+       字級不同、行寬相同。下限是窄視窗還讀得動的最小值,上限是寬視窗不致鬆散
+       的最大值,中間的 vw 項讓它連續走,不跳階 —— 所以不需要為字級開 @media。
+       元件不要自己寫死 rem:寫死的那幾個在 13 吋上偏大、在 27 吋上偏小,而且
+       改一次要改幾十處(量到 2026-08-26:表格、左欄、面板共 20 餘處寫死)。 */
+    --fs-body: clamp(1.15rem, 1.08rem + 0.30vw, 1.28rem);
+    --fs-h1:   clamp(2.70rem, 2.10rem + 2.20vw, 4.00rem);
+    --fs-h2:   clamp(1.95rem, 1.70rem + 0.80vw, 2.25rem);
+    --fs-h3:   clamp(1.50rem, 1.35rem + 0.50vw, 1.70rem);
+    --fs-sm:   clamp(1.00rem, 0.96rem + 0.20vw, 1.10rem);
+    --fs-xs:   clamp(0.86rem, 0.83rem + 0.14vw, 0.97rem);
+    --fs-2xs:  clamp(0.74rem, 0.72rem + 0.09vw, 0.84rem);
+    --fs-rail: clamp(0.88rem, 0.70rem + 0.42vw, 1.12rem);
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: oklch(0.191 0.002 106.6);
+      --paper-2: oklch(0.359 0.005 106.7);
+      --ink: oklch(0.982 0.005 95.1);
+      --ink-2: oklch(0.853 0.014 97.5);
+      --ink-3: oklch(0.750 0.013 96.5);
+      --line: oklch(0.300 0.004 106.6);
+      --line-strong: oklch(0.478 0.006 95.2);
+      --pen: oklch(0.672 0.131 38.8);
+      --pen-ink: oklch(0.712 0.126 39.5);
+      --pen-tint: oklch(0.672 0.131 38.8 / 0.13);
+      --pen-line: oklch(0.672 0.131 38.8 / 0.42);
+      --loop: oklch(0.70 0.10 200);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); overflow-x: hidden; overflow-x: clip; }
+  body {
+    margin: 0; color: var(--ink); font-family: var(--sans);
+    max-width: 100%;
+    /* 18.4px 起跳、寬螢幕 20.5px。中文的筆畫密度比拉丁字高,同一 px 值讀起來更小 */
+    font-size: var(--fs-body); line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── 一個寬度:開場、正文、表格、流程圖全部同寬。--side-w + --side-gap 這一段
+     原本是讓出來給右側浮動批註的,而 .mn 元件已經移除(見 head 註解),沒有東西
+     用那條溝,只造成正文比 .wide 區塊窄一截、讀者一路上換兩次行寬(量到
+     2026-08-26)。所以 .doc 的內容框直接吃掉那一段,.wide/.full 退成 100%。
+     要重開浮動批註層,得把 padding-right 與 .wide 的 calc 一起還原。 ── */
+  .doc {
+    --side-w: 19rem; --side-gap: 3.5rem;
+    max-width: var(--prose); margin-inline: auto;
+    padding: clamp(1.2rem, 4vw, 3rem) 1.2rem 6rem;
+  }
+  @media (min-width: 1120px) {
+    .doc {
+      max-width: calc(var(--prose) + var(--side-w) + var(--side-gap));
+      padding-right: 1.2rem;
+      position: relative;
+    }
+      .wide, .full { width: 100%; }
+  }
+  .apex { margin-bottom: 1rem; }
+  /* 開場的列舉:序號懸掛在文字欄外,結論粗體先給,證據跟在同一項裡。
+     讀者要能數得出來有幾條,而不必在長句裡自己找第一第二。 */
+  .apex ol.enum { list-style: none; margin: .9rem 0 1rem; padding: 0; }
+  .apex ol.enum > li {
+    position: relative; padding-left: 3.4em; margin: .8rem 0;
+  }
+  .apex ol.enum > li + li {
+    padding-top: .8rem; border-top: 1px solid var(--line);
+  }
+  .apex ol.enum > li > strong { display: block; }
+  .apex ol.enum > li > .d {
+    display: block; margin-top: .45rem; padding-left: 1.15em;
+    color: var(--ink-2);
+  }
+  .apex ol.enum > li > .n {
+    position: absolute; left: 0;
+    font-family: var(--mono); font-size: .84em; color: var(--pen-ink);
+    letter-spacing: .04em;
+  }
+  .apex ol.enum > li + li > .n { top: .8rem; }
+
+  /* 第二層列舉:第一層某一項自己數了幾樣(「要重推的只有四樣」)時就展開,一項一列,
+     結論粗體先給。兩層是上限,更深的內容改放 body 加 §ref;序號用 ink-2 讀作從屬。 */
+  .apex ol.enum .sub { list-style: none; margin: .6rem 0 0; padding: 0; }
+  .apex ol.enum .sub > li {
+    position: relative; padding-left: 2.1em; margin: .5rem 0;
+  }
+  .apex ol.enum .sub > li + li {
+    padding-top: .5rem; border-top: 1px solid var(--line);
+  }
+  .apex ol.enum .sub > li > b { display: block; }
+  .apex ol.enum .sub > li > .e {
+    display: block; margin-top: .3rem; color: var(--ink-2);
+  }
+  .apex ol.enum .sub > li > .n2 {
+    position: absolute; left: 0; top: 0;
+    font-family: var(--mono); font-size: .8em; color: var(--ink-2);
+    letter-spacing: .02em;
+  }
+
+  .stamp {
+    display: inline-block; font-family: var(--mono); font-size: var(--fs-xs);
+    letter-spacing: .04em; color: var(--pen-ink);
+    border: 1px solid var(--pen-line); border-radius: 2px;
+    padding: 0 .45em; margin-right: .4em; white-space: nowrap;
+    vertical-align: .08em;
+  }
+
+  /* ── 標題與節奏 ── */
+  header.masthead { margin-bottom: 3.2rem; }
+  .doc-id {
+    font-family: var(--mono); font-size: var(--fs-xs); letter-spacing: .08em;
+    color: var(--ink-3); text-transform: uppercase; margin-bottom: 1.4rem;
+  }
+  /* 標題吃掉版面上緣:第二行降到 500 字重當副題,對比在字重不在字級 */
+  h1 {
+    font-size: var(--fs-h1); line-height: 1.1;
+    font-weight: 850; letter-spacing: -.018em; margin: 0 0 1.4rem;
+  }
+  h1 span {
+    display: block; font-weight: 500; letter-spacing: -.005em;
+    color: var(--ink-2); font-size: .58em; line-height: 1.25; margin-top: .35rem;
+  }
+  .mast-note {
+    margin: 0; border-block: 1px solid var(--line-strong); padding: .7rem 0;
+    font-size: var(--fs-xs); color: var(--ink-3);
+  }
+
+  h2 {
+    font-size: var(--fs-h2); font-weight: 800; line-height: 1.28;
+    margin: 5rem 0 1.1rem;
+    padding-top: 1.2rem; border-top: 2px solid var(--ink); clear: both;
+    position: relative; scroll-margin-top: 2rem;
+  }
+  h2 .no {
+    font-family: var(--mono); font-weight: 400; font-size: .8em;
+    color: var(--pen-ink); margin-right: .7em;
+  }
+  /* 三級與 body 同步流動,相鄰級距在整個視窗範圍都維持 ≥1.25 */
+  h3 { font-size: var(--fs-h3); font-weight: 750;
+       line-height: 1.36; margin: 2.8rem 0 .7rem; scroll-margin-top: 2rem; }
+  a.xref {
+    color: var(--pen-ink); text-decoration: none;
+    border-bottom: 1px dotted var(--pen-line);
+    font-family: var(--mono); font-size: .88em;
+    white-space: nowrap;
+  }
+  a.xref:hover { border-bottom-style: solid; background: var(--pen-tint); }
+  :target { animation: xflash 1.4s cubic-bezier(.22, 1, .36, 1); }
+  @keyframes xflash { from { background: var(--pen-tint); } to { background: transparent; } }
+
+  /* ── 詞卡:文件自己擁有的概念，每個都有 var GLOSS 條目與正文按鈕 ── */
+  button.term {
+    font: inherit; color: inherit; cursor: pointer;
+    background: var(--pen-tint); border: 0; border-bottom: 1px solid var(--pen-line);
+    padding: 0 .12em; border-radius: 2px;
+  }
+  button.term:hover { background: var(--pen-line); }
+  .term-q {
+    font-family: var(--mono); font-size: .72em; color: var(--pen-ink);
+    vertical-align: super; margin-left: .12em;
+  }
+  #gloss-backdrop {
+    position: fixed; inset: 0; background: transparent; display: none; z-index: 40;
+  }
+  #gloss-card {
+    position: absolute; display: none; z-index: 41; max-width: 22rem;
+    background: var(--paper); border: 1px solid var(--line);
+    box-shadow: 0 6px 24px oklch(0 0 0 / 0.14);
+    padding: .8rem .95rem; border-radius: 3px;
+  }
+  #gloss-card-title { font-weight: 700; font-size: var(--fs-sm); margin-bottom: .3rem; }
+  #gloss-card-text { font-size: var(--fs-xs); line-height: 1.7; color: var(--ink-2); }
+  h3 .no { font-family: var(--mono); font-weight: 400; color: var(--ink-3); margin-right: .5em; font-size: .88em; }
+  p { margin: .8rem 0; }
+  strong { font-weight: 700; }
+  em { font-style: normal; font-weight: 700; color: var(--pen-ink); }
+  /* <dfn>:編號或名稱的定義實例(HTML 自己的元素)。正文提到一個編號時,
+     check_wording 會要求同一份文件裡有它的 <dfn>;CJK 斜體不好讀,只加粗 */
+  dfn { font-style: normal; font-weight: 700; }
+
+  /* ── 表格 ── */
+  .overflow { overflow-x: auto; margin: 1.1rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); line-height: 1.62; }
+  th, td { border: 1px solid var(--line); padding: .6rem .8rem; text-align: left; vertical-align: top; }
+  th { background: var(--paper-2); font-size: var(--fs-sm); font-weight: 750; letter-spacing: .02em; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-size: var(--fs-sm); }
+  code {
+    font-family: var(--mono); font-size: .85em;
+    background: var(--paper-2); padding: .08rem .34rem; border-radius: 3px;
+  }
+  .formula {
+    background: var(--paper-2); border: 1px solid var(--line);
+    padding: .7rem 1.1rem; margin: 1rem 0;
+    font-family: var(--mono); font-size: var(--fs-sm); overflow-x: auto;
+    border-radius: 2px;
+  }
+  .penblock {
+    background: var(--pen-tint); border: 1px solid var(--pen-line);
+    border-radius: 2px; padding: .8rem 1.1rem; margin: 1.2rem 0;
+  }
+  .penblock > :first-child { margin-top: 0; } .penblock > :last-child { margin-bottom: 0; }
+  .src { font-size: var(--fs-sm); color: var(--ink-3); line-height: 1.78; }
+
+  /* 工作坊逐字稿。時間戳用既有 .stamp；左線與 #srcpane blockquote 同一套 token。 */
+  p.tape {
+    margin: .7rem 0;
+    padding: .4rem 0 .4rem .9rem;
+    border-left: 2px solid var(--line-strong);
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  p.tape .stamp { margin-right: .45em; }
+
+  /* 工作坊全稿：時間軸清單。分類表連到 #t-<秒>。 */
+  ol.catmap { list-style: none; margin: 1rem 0 0; padding: 0; }
+  ol.catmap > li {
+    display: grid; grid-template-columns: 7.2rem 1fr;
+    gap: .4rem 1rem; padding: .55rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-xs); line-height: 1.55;
+  }
+  ol.catmap .when { font-family: var(--mono); color: var(--ink-3); }
+  ol.catmap b { font-weight: 700; display: block; }
+  ol.talk {
+    list-style: none; margin: 1rem 0 0; padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  ol.talk > li {
+    display: grid; grid-template-columns: 4.4rem 1fr;
+    gap: .35rem .8rem; padding: .4rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-xs); line-height: 1.62;
+    scroll-margin-top: 2.4rem;
+  }
+  ol.talk > li:target { background: var(--pen-tint); }
+  ol.talk .ts {
+    font-family: var(--mono); color: var(--ink-3);
+    text-decoration: none; border: 0;
+  }
+  ol.talk .ts:hover { color: var(--pen-ink); }
+  ol.talk .fix {
+    font-family: var(--mono); font-size: var(--fs-2xs);
+    color: var(--pen-ink); margin-left: .4em;
+  }
+
+  /* ── §0 管線圖 ── */
+  .pipe { display: grid; gap: .9rem; margin: 1.4rem 0 .6rem;
+          grid-template-columns: 1fr; counter-reset: phase; }
+  @media (min-width: 1120px) { .pipe { grid-template-columns: repeat(5, 1fr); gap: 0; } }
+  .phase { border: 1px solid var(--line-strong); background: var(--paper-2); padding: .8rem .9rem 1rem; position: relative; }
+  @media (min-width: 1120px) {
+    .phase { border-right-width: 0; }
+    .phase:last-child { border-right-width: 1px; }
+    .phase::after {
+      content: "→"; position: absolute; right: -.62rem; top: .55rem; z-index: 1;
+      color: var(--pen-ink); background: var(--paper); font-weight: 700;
+      line-height: 1; padding: .1rem .05rem;
+    }
+    .phase:last-child::after { content: none; }
+  }
+  .phase h4 {
+    margin: 0 0 .55rem; font-size: var(--fs-xs); letter-spacing: .03em;
+    color: var(--pen-ink); font-weight: 800;
+  }
+  .phase h4::before {
+    counter-increment: phase; content: counter(phase, upper-alpha);
+    font-family: var(--mono); font-weight: 400; color: var(--ink-3);
+    margin-right: .5em;
+  }
+  .phase ul { margin: 0; padding-left: 1.05rem; font-size: var(--fs-xs); line-height: 1.72; color: var(--ink-2); }
+  .phase li { margin: .18rem 0; }
+  .phase li b { color: var(--ink); font-weight: 700; }
+  .loopnote { font-size: var(--fs-xs); color: var(--pen-ink); font-family: var(--mono); margin: .5rem 0 0; }
+
+  /* ── 左欄:sticky 目錄 + 外掛節號（body.rail-on，JS 量視窗） ──
+     不用 min-width 猜：CSS px 已被 Windows 縮放除過（1920@150% = 1280），
+     1400 門檻把目錄藏掉。 */
+  nav.toc { display: none; }
+  nav.toc a {
+    color: var(--ink-2); text-decoration: none;
+    display: grid; grid-template-columns: 1.45em 1fr; column-gap: .5em;
+    padding: .34rem 0 .34rem .85rem;
+    border-left: 2px solid transparent;
+    font-size: var(--fs-rail); line-height: 1.45;
+    transition: color .2s cubic-bezier(.22, 1, .36, 1);
+  }
+  nav.toc a i {
+    font-family: var(--mono); font-style: normal; font-size: .84em;
+    color: var(--ink-3); text-align: right; line-height: inherit;
+  }
+  nav.toc a:hover { color: var(--pen-ink); border-left-color: var(--pen-line); }
+  nav.toc a:hover i { color: var(--pen-ink); }
+  nav.toc a[aria-current] { color: var(--pen-ink); border-left-color: var(--pen); font-weight: 700; }
+  nav.toc a[aria-current] i { color: var(--pen-ink); }
+  nav.toc .t { font-family: var(--mono); font-size: var(--fs-2xs); letter-spacing: .1em;
+               color: var(--ink-3); margin-bottom: .8rem; padding-left: .85rem; }
+  nav.toc .rail-note { margin: 1.6rem 0 0; padding: .8rem 0 0 .85rem;
+                       border-top: 1px solid var(--line);
+                       font-size: var(--fs-xs); line-height: 1.65; color: var(--ink-3); }
+  nav.toc .rail-note b { color: var(--ink-2); font-weight: 700; }
+  nav.toc .toc-sub { display: flex; flex-direction: column; margin: 0; padding: 0; }
+  nav.toc .toc-sub a { padding-left: 1.55rem; }
+  /* 左欄開著時不擠正文:文件只有一個寬度,擠窄就破了那個承諾。放不下就不開
+     左欄(下面的探針量),索引改走目錄鈕。 */
+  body.rail-on {
+    display: grid; justify-content: center; align-items: start;
+    grid-template-columns: var(--rail-w) auto; column-gap: var(--rail-gap);
+  }
+  body.rail-on nav.toc {
+    display: block; position: sticky; top: 3.4rem;
+    min-width: 0;
+    margin-top: clamp(1.2rem, 4vw, 3rem);
+    border-top: 3px solid var(--ink); padding-top: 1rem;
+    font-size: var(--fs-rail); line-height: 1.45;
+  }
+  body.rail-on .doc { margin-inline: 0; }
+  /* 節號離開行內、掛進左側間隙,是這份文件唯一的大字。細字重對上 h2 的 800,
+     所以捲動時先看到的是位置,不是又一行標題 */
+  body.rail-on h2 .no {
+    position: absolute; right: 100%; margin-right: 0; padding-right: .85rem;
+    font-size: 1.8em; font-weight: 300; line-height: 1; top: 1.35rem;
+    color: var(--pen-ink); font-variant-numeric: tabular-nums;
+  }
+  /* ── 目錄的第二種呈現。同一個 <nav class="toc">,不複製連結:放得下時是左欄,
+     放不下時(窄視窗、手機,以及文件發成 artifact 之後那個窄面板)改由左下角的
+     目錄鈕拉出。索引必須在每一個寬度都拿得到:長文件的全局結構只有這一個入口,
+     而 rail-on 關掉時 nav 的 display 是 none(量到 2026-08-26:索引整個消失)。
+     check_render 的版面半段會在左欄沒出現時,要求有一個 aria-controls 指到它的
+     可見控制項,而且按下去 nav 真的出現。 ── */
+  #tocbtn { position: fixed; left: 1.1rem; bottom: 1.1rem; z-index: 42;
+    font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2);
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: 999px; padding: .5em 1.05em; cursor: pointer;
+    box-shadow: 0 4px 14px oklch(0.25 0.01 95 / 0.14); }
+  #tocbtn:hover { color: var(--pen-ink); border-color: var(--pen-line); }
+  body.rail-on #tocbtn { display: none; }
+  #tocscrim { position: fixed; inset: 0; z-index: 43; display: none;
+    background: oklch(0.25 0.01 95 / 0.30); }
+  body.toc-open #tocscrim { display: block; }
+  body.toc-open nav.toc {
+    display: block; position: fixed; left: 0; top: 0; z-index: 44;
+    width: min(21rem, 86vw); height: 100dvh; overflow-y: auto;
+    overscroll-behavior: contain; margin: 0;
+    padding: 3rem 1.4rem 2rem 1.6rem; background: var(--paper);
+    border-top: 0; border-right: 1px solid var(--line-strong);
+    box-shadow: 14px 0 34px oklch(0.25 0.01 95 / 0.14);
+    font-size: var(--fs-rail); line-height: 1.5; }
+  #tocclose { display: none; position: fixed; left: min(21rem, 86vw); top: .6rem;
+    z-index: 45; transform: translateX(-2.9rem); cursor: pointer;
+    font: inherit; font-size: var(--fs-sm); line-height: 1; color: var(--ink-3);
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: 4px; padding: .18em .45em; }
+  #tocclose:hover { color: var(--ink); border-color: var(--ink-3); }
+  body.toc-open #tocclose { display: block; }
+
+  /* 正文寬度已達可讀上限,多出來的螢幕給兩側:左邊導覽、右邊跨欄與對照面板 */
+  /* 正文寬度已達可讀上限,多出來的螢幕只給左欄。--side-w／--side-gap 不隨螢幕
+     長:它們現在是正文寬度的一部分,加寬等於拉長行長。字級的成長由 --fs-* 的
+     clamp 負責,不需要在這裡開斷點。 */
+  @media (min-width: 1700px) { :root { --rail-w: 17rem; --rail-gap: 5rem; } }
+  @media (min-width: 2100px) { :root { --rail-w: 19rem; } }
+  a { color: var(--pen-ink); }
+  @media print {
+    body { display: block; }
+    nav.toc { display: none; }
+    .doc { max-width: none; width: auto; padding-right: 1.2rem; }
+    h2 .no { position: static; padding-right: 0; margin-right: .7em; }
+  }
+  /* ── tabs：無 JS，radio + :checked 選同層 panel ── */
+  .tabs { margin: 1.4rem 0 0; }
+  .tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+  .tablist { display: flex; flex-wrap: wrap; gap: .4rem; border-bottom: 1px solid var(--line-strong);
+             padding-bottom: 0; }
+  .tablist label { display: inline-block; padding: .45rem .9rem; cursor: pointer;
+                   font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2);
+                   border: 1px solid var(--line); border-bottom: none;
+                   border-radius: 6px 6px 0 0; background: var(--paper-2);
+                   position: relative; top: 1px; }
+  .tablist label:hover { color: var(--ink); }
+  .tabs > .panel { display: none; padding-top: 1.4rem; }
+  #t-codex:checked ~ .tablist label[for="t-codex"],
+  #t-ds:checked ~ .tablist label[for="t-ds"],
+  #t-grok:checked ~ .tablist label[for="t-grok"],
+  #t-cc:checked ~ .tablist label[for="t-cc"] {
+    background: var(--paper); color: var(--ink); border-color: var(--line-strong);
+    border-bottom: 1px solid var(--paper); font-weight: 700; }
+  #t-codex:checked ~ #p-codex,
+  #t-ds:checked ~ #p-ds,
+  #t-grok:checked ~ #p-grok,
+  #t-cc:checked ~ #p-cc { display: block; }
+
+  /* ── codeblock：本文裡的提案程式碼（不是引用，來源面板才是引用） ── */
+  .codeblock { background: var(--paper-2); border: 1px solid var(--line);
+    border-left: 3px solid var(--pen-line); border-radius: 4px;
+    padding: 0.9rem 1.1rem; margin: 1.1rem 0; overflow-x: auto; }
+  .codeblock pre { margin: 0; font-family: var(--mono); font-size: var(--fs-sm);
+    line-height: 1.7; color: var(--ink); white-space: pre; }
+  .codeblock .cbcap { display: block; margin: 0 0 0.6rem; font-size: var(--fs-xs);
+    color: var(--ink-3); font-family: inherit; }
+
+  /* ── DAG：色相只有 pen 一種，所以 kernel 與應用層用線寬區分，不發明新色 ── */
+  /* 圖的字級由 viewBox 寬度決定，不由 font-size 決定：width:100% 會算繪成容器寬，
+     所以 scale ＝ 容器寬 ÷ viewBox 寬，viewBox 越窄、同一個 user unit 就越大。
+     實測 2026-08-19：viewBox 1200 配 max-width:1200px 等於 scale 鎖在 1.0，
+     12.5px 的標籤就真的只有 12.5px，是正文 20.48px 的 0.61 倍，讀者說太小。
+     viewBox 1000 且上限放寬後是 15.3px（1227px 容器）到 16.9px（1352px 容器）。
+     代價付在字數：同樣的實體寬度，字大 36% 就是每框少 25% 的字。
+     1600px 上限只是防呆，避免超寬螢幕把圖拉得比一頁還高。 */
+  .dagbox { max-width: 100%; }
+  .dag { width: 100%; height: auto; display: block; font-family: var(--sans);
+         min-width: 40rem; max-width: 1600px; margin-inline: auto; }
+  .dag line, .dag path { stroke: var(--ink-3); stroke-width: 1.4; fill: none; }
+  .dag .split { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 4 4; }
+  .dag .broken { stroke: var(--pen); stroke-dasharray: 5 4; stroke-width: 1.6; }
+  .dag rect { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1; }
+  .dag .app rect { fill: var(--paper-2); }
+  .dag .kern rect { stroke: var(--ink); stroke-width: 2; }
+  .dag .none rect { fill: var(--pen-tint); stroke: var(--pen-line); stroke-width: 1.4; }
+  .dag text { fill: var(--ink); font-size: 13.5px; font-weight: 600; }
+  .dag .sub { fill: var(--ink-2); font-size: 11.5px; font-weight: 400; }
+  .dag .phase { fill: var(--ink-3); font-size: 12.5px; font-weight: 700; letter-spacing: .04em; }
+  .dag .note { fill: var(--pen-ink); font-size: 12px; font-weight: 600; }
+  /* 決策樹（tree_grammar.py）。CSS_NOTE 給前三行；.lay 是層別泳道標籤，
+     字級比 .sub 再小一級，讀成 chrome 而不是內容（模組用 FS_L=10.5 量寬）。 */
+  .dag .loop { stroke: var(--loop); stroke-dasharray: 7 4; stroke-width: 1.8; }
+  .dag .dec polygon { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1.2; }
+  .dag a:hover rect, .dag a:hover polygon { stroke: var(--pen); }
+  .dag .lay { fill: var(--ink-3); font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
+  .dagcap { font-size: var(--fs-xs); color: var(--ink-2); margin: .5rem 0 0; line-height: 1.55; }
+  .daglegend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .6rem 0 0;
+               font-size: var(--fs-xs); color: var(--ink-2); }
+  .daglegend span { display: inline-flex; align-items: center; gap: .4rem; }
+  .daglegend i { width: 1.5rem; height: 0; border-top: 2px solid var(--ink); display: inline-block; }
+  .daglegend i.thin { border-top: 1px solid var(--line-strong); }
+  .daglegend i.br { border-top: 2px dashed var(--pen); }
+  /* 圖例要指的是「框的底色」而不是一條線時用 i.fill:.none 那一格的填色與框線,
+     legend 只有線條樣式時,讀者會把底色的意義當成沒有標示。 */
+  .daglegend i.fill { height: .8rem; border: 1px solid var(--pen-line);
+                      background: var(--pen-tint); border-top-width: 1px; }
+
+  /* ── 決策流程：guard clause 逐條，序號掛在外面 ── */
+  ol.dflow { list-style: none; margin: 1rem 0 0; padding: 0; counter-reset: df; }
+  ol.dflow > li { position: relative; padding: 0 0 .75rem 2.6rem; counter-increment: df;
+                  font-size: var(--fs-xs); line-height: 1.6; }
+  ol.dflow > li::before { content: counter(df); position: absolute; left: 0; top: .1rem;
+    width: 1.75rem; text-align: right; font-family: var(--mono); font-size: var(--fs-2xs);
+    color: var(--ink-3); }
+  ol.dflow > li b { color: var(--ink); }
+  ol.dflow > li.stop { border-left: 2px solid var(--pen-line); margin-left: -.2rem;
+                       padding-left: 2.8rem; }
+  /* ---- 對照面板 .peek / #srcpane ----------------------------------------
+     圖上的節點與句中的小 tab 都可以點，右側滑出它依據的原文，讀者不用離開這頁
+     就能核對。形狀取自 17media/data-pipeline 的 realtime_fifo/architecture.html
+     的 snippet pane：一個面板重複使用，資料放在一份 JSON 裡按需載入，不是每個
+     主張各自一個藏起來的區塊。兩種內容型別：code 放原始碼（行號與內容由腳本從
+     source 直接讀出），ref 放論文、規格或外部連結。
+     那份原檔從 CDN 載 Prism 上色；這裡不引外部資源，所以是純等寬加行號。 */
+  .peek { display: inline-flex; align-items: baseline; gap: .28em; cursor: pointer;
+          font: inherit; background: none; font-size: var(--fs-2xs); font-weight: 600;
+          color: var(--ink-2);
+          border: 1px solid var(--line-strong); border-radius: 999px;
+          padding: .06em .5em .1em; margin-inline: .25em; white-space: nowrap; }
+  .peek::after { content: "\203a"; font-weight: 700; color: var(--ink-3); }
+  .peek:hover, .peek:focus-visible { color: var(--ink); border-color: var(--ink-3);
+          background: var(--paper-2); outline: none; }
+
+  /* 可點的圖節點。只加游標與 hover 描邊，不改配色，否則會跟「粗框＝kernel」
+     這條圖例打架。 */
+  /* §0 地圖的框包在 a.xref 裡（href 跳節）；不要繼承正文 xref 的點線與等寬。 */
+  .dag a.xref {
+    color: inherit; font: inherit; white-space: normal;
+    border-bottom: none; background: none; cursor: pointer;
+  }
+  .dag a.xref:hover, .dag a.xref:focus-visible {
+    border-bottom: none; background: none;
+  }
+  .dag a.xref:hover rect, .dag a.xref:focus-visible rect {
+    stroke: var(--ink);
+  }
+  .dag g.src { cursor: pointer; }
+  .dag g.src:hover rect, .dag g.src:focus-visible rect { stroke: var(--ink); stroke-width: 2; }
+  .dag g.src:focus-visible { outline: none; }
+  .dag .srcdot { fill: var(--ink-3); }
+  .dag g.src:hover .srcdot { fill: var(--ink); }
+  .dag .srcfold { fill: var(--pen-line); stroke: none; }
+  .dag g.src:hover .srcfold, .dag g.src:focus-visible .srcfold { fill: var(--pen-ink); }
+  .dag .elab { fill: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+
+  #srcscrim { position: fixed; inset: 0; z-index: 40; opacity: 0; pointer-events: none;
+              background: oklch(0.25 0.01 95 / 0.32); transition: opacity .18s ease; }
+  #srcscrim.on { opacity: 1; pointer-events: auto; }
+  #srcpane { position: fixed; top: 0; right: 0; z-index: 41;
+             width: min(46rem, 94vw); height: 100dvh; overflow-y: auto;
+             overscroll-behavior: contain;
+             padding: 1.5rem 1.7rem 3rem; background: var(--paper);
+             border-left: 1px solid var(--line-strong);
+             box-shadow: -14px 0 34px oklch(0.25 0.01 95 / 0.14);
+             transform: translateX(101%); transition: transform .22s ease; }
+  #srcpane.on { transform: none; }
+  @media (prefers-reduced-motion: reduce) { #srcscrim, #srcpane { transition: none; } }
+
+  #srcclose { position: absolute; top: .8rem; right: 1rem; cursor: pointer;
+              font: inherit; font-size: var(--fs-sm); line-height: 1; color: var(--ink-3);
+              background: var(--paper); border: 1px solid var(--line-strong);
+              border-radius: 4px; padding: .18em .45em; }
+  #srcclose:hover { color: var(--ink); border-color: var(--ink-3); }
+  #srcpane .eyebrow { font-family: var(--mono); font-size: var(--fs-2xs); letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--ink-3); margin: 0 0 .2rem; }
+  #srcpane h5 { font-size: var(--fs-sm); margin: 0 2.6rem .2rem 0; }
+  #srcpane .dmeta { font-family: var(--mono); font-size: var(--fs-2xs); color: var(--ink-2);
+                    margin: 0 0 .85rem; word-break: break-all; }
+  #srcpane .why { font-size: var(--fs-xs); line-height: 1.72; color: var(--ink-2); margin: 0 0 1rem; }
+  #srcpane .why b { color: var(--ink); }
+  #srcpane pre { background: var(--paper-2); border: 1px solid var(--line);
+                 border-radius: 5px; padding: .7rem 0; margin: 0 0 .9rem;
+                 overflow-x: auto; font-size: var(--fs-xs); line-height: 1.62; }
+  #srcpane pre code { display: block; font-family: var(--mono); }
+  #srcpane .l { display: block; white-space: pre; padding-inline: .55rem .8rem; }
+  #srcpane .l.hi { background: var(--pen-tint); }
+  #srcpane .ln { display: inline-block; width: 3.4em; text-align: right;
+                 margin-right: .9em; color: var(--ink-3); user-select: none; }
+  #srcpane .refmeta { list-style: none; margin: 0 0 .9rem; padding: 0;
+                      font-size: var(--fs-xs); color: var(--ink-2); }
+  #srcpane .refmeta li { padding: .12rem 0; }
+  #srcpane .refmeta b { color: var(--ink); font-weight: 600; }
+  #srcpane blockquote { margin: 0 0 .9rem; padding: .45rem 0 .45rem .9rem;
+                        border-left: 2px solid var(--line-strong);
+                        font-size: var(--fs-xs); line-height: 1.7; color: var(--ink); }
+  #srcpane .empty { font-size: var(--fs-xs); line-height: 1.75; color: var(--ink-2); }
+  /* ── 轉移引用：機制／前提／適配／不抄（transfer-cite.md）
+     2026-08-23 從 cryo/frontend/store-and-index.html 寫回：template 原本沒有
+     .xfer，轉移引用只能落成裸 ul，gate 讀不到四欄。色票全用既有 token。 */
+  .xfer-stack { margin: 1.2rem 0 1.4rem; }
+  article.xfer {
+    background: var(--paper-2);
+    border: 1px solid var(--line-strong);
+    padding: .9rem 1rem 1rem;
+    border-radius: 2px;
+  }
+  .xfer-head { display: flex; justify-content: space-between; gap: .8rem; align-items: baseline; }
+  .xfer-head .name { margin: 0; font-size: var(--fs-sm); font-weight: 750; }
+  .xfer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .7rem .9rem;
+    margin-top: .8rem;
+  }
+  .xfer-cell .lab {
+    font-size: var(--fs-2xs);
+    letter-spacing: .08em;
+    color: var(--ink-3);
+    margin: 0 0 .2rem;
+    font-family: var(--mono);
+  }
+  .xfer-cell p { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
+  .xfer-cell.break { grid-column: 1 / -1; }
+  @media (max-width: 1119.9px) {
+    .xfer-grid { grid-template-columns: 1fr; }
+    .xfer-cell.break { grid-column: auto; }
+  }

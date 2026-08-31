@@ -1,0 +1,38 @@
+@import "../styles/globals.css";
+@import "./explainer.css";
+
+/* Map shadcn tokens onto the explainer ivory sheet. */
+:root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --muted: var(--paper-2);
+  --muted-foreground: var(--ink-3);
+  --border: var(--line);
+  --primary: var(--pen);
+  --primary-foreground: var(--paper);
+}
+
+body {
+  display: block;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body::before {
+  content: none;
+}
+
+/* shell.css grids body.rail-on assuming nav.toc is a body child.
+   React mounts nav inside #root; display:contents promotes those children. */
+body.rail-on #root {
+  display: contents;
+}
+body.rail-on nav.toc {
+  align-self: start;
+  max-height: calc(100vh - 4.5rem);
+}

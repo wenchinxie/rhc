@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grok Build 設計邏輯</title>
+<!--
+  design-explainer template. LIVING FILE: shell improvements made while
+  producing any document get written back here (see SKILL.md step 5).
+  Origin: stt-feedback-analysis sampling-design.html, frozen 2026-08-11;
+  type ladder, width layers and palette rewritten 2026-08-17 from the same
+  document's impeccable pass. .tabs / .dag / ol.dflow added 2026-08-18 from
+  the four-harness bash-sandbox explainer; .dag stays hue-free on purpose so
+  no document has to invent a green the palette cannot source.
+
+  Component inventory (all demonstrated in the body below):
+    nav.toc      the index, in TWO presentations off ONE element (never two
+                 copies of the links): a left rail when it fits, and a pull-out
+                 sheet (#tocbtn / #tocscrim / #tocclose, body.toc-open) when it
+                 does not — a narrow window, a phone, and the panel an artifact
+                 is read in, where rail-on is off and the nav's display is none.
+                 The render gate fails a document whose rail is absent with no
+                 visible aria-controls trigger that actually opens it.
+                 Left rail. Hidden until the inline rail-fit script toggles
+                 body.rail-on: viewport clientWidth must hold --prose +
+                 --rail-w + --rail-gap. Not a min-width guess (Windows 1920
+                 at 150% is 1280 CSS px; a 1400 floor hid the index).
+                 Sticky + hanging h2 .no when on. Rail type is 1rem on
+                 nav.toc a so it cannot inherit body 1.15–1.28rem. Below
+                 ~1100px CSS it clamps down. Optional .toc-sub indents
+                 children. Spy marks the first visible heading. Optional
+                 .rail-note.
+    .stamp       small mono chip in body prose or .penblock: date + decision;
+                 a dated caveat or provenance is a SENTENCE beside the claim
+                 it qualifies, in the paragraph, never a floating margin note
+                 (the .mn component is removed: an unclosed aside swallowed
+                 every following table into the gutter, and load-bearing
+                 decided-against reasoning kept landing in gutter type),
+                 e.g. <span class="stamp">2026-08-11 修訂</span>
+    h1 > span    masthead subtitle: same size step down plus weight 500, so the
+                 contrast is weight, not a second display line
+    .mast-note   one line under the title for the document's own pointer. It
+                 replaced a 3-cell metadata grid, which invited status/review
+                 sediment that duplicated the rail note and a body section.
+    .penblock    inline red-tinted block for load-bearing decisions that must
+                 not live in the margin (too long / too central)
+    .formula     mono block for formulas
+    .pipe.full   full-width N-phase sequence that is NOT the page map.
+                 §0 map is a workflow DAG (shell-layout.md), not this.
+    .wide        table wrapper spanning main column + right gutter
+    .overflow    horizontal-scroll wrapper, REQUIRED around every table
+    h2 > .no     section number, h3 > .no subsection number
+    .src         small sources paragraph
+    td.num       right-aligned mono numeric cells
+    ol.sub       second level inside one ol.enum li, when that item counts its
+                 own contents (「要重推的只有四樣」). Ordinal in span.n2, the
+                 member's conclusion in b, its evidence in span.e. Two levels
+                 is the ceiling; deeper content goes to the body with a §ref.
+                 The li holding it uses div.d, not span.d: an ol inside a span
+                 is invalid and the browser lifts it out.
+    ol.enum      apex only: the N problems C carries, one li each. Ordinal in
+                 span.n hangs outside the text column, the item's conclusion is
+                 a bold sentence on its own line, its evidence goes in span.d
+                 indented below. Bold quota in the apex: the A-line once plus
+                 one conclusion per item.
+    a.xref       clickable §ref; every numbered heading carries id="s<N>"
+                 or id="s<N>-<M>" so it resolves
+    .tabs        no-JS tab group: radio inputs first, then .tablist labels,
+                 then one .panel per tab. Selection is `#t-KEY:checked ~ #p-KEY`,
+                 so the ids are the contract: rename a tab and update both the
+                 label's `for` and the panel id. The CSS lists those ids TWICE,
+                 once for the active-label style and once for `display: block`,
+                 and both lists ship carrying the PREVIOUS document's keys, so a
+                 new document must rewrite them. Miss it and the unmatched panels
+                 stay display:none with every gate green except a render-gate line
+                 reading `svg 0x0 ... 圖 FIT`, which looks like a pass
+                 (2026-08-24: three of four panels were invisible that way). Use when N options share one
+                 question and the reader compares them one at a time; a matrix
+                 is still better when they must be seen side by side.
+    .dag         inline-SVG flow diagram, .app / .kern / .none on the <g>.
+                 Deliberately hue-free apart from the pen tint: app-level vs
+                 kernel is carried by stroke WEIGHT, so the diagram needs no
+                 token the palette cannot justify. Pair it with p.daglegend.
+                 §0 map boxes wrap in a.xref (href to h2); .dag a.xref drops
+                 the prose dotted underline.
+    .daglegend   line swatches for a .dag; i.fill instead of i when the legend
+                 entry points at a box FILL (the .none tint), not an edge style.
+    .dag (tree)  decision-tree shape from scripts/tree_grammar.py: one spine,
+                 diamonds for criteria, right-hand outcome boxes, lane labels
+                 in the left gutter. Its CSS_NOTE rules plus .dag .lay ship in
+                 the .dag block above, and --loop is in both roots (2026-08-24).
+                 Pair it with .dagbox wide. Pick it over the 3-row DAG when the
+                 content is a ladder of gates with an example per exit.
+    ol.dflow     guard-clause decision order, read off the code. Ordinal hangs
+                 outside the text column; li.stop marks an early return, which
+                 is where the behaviour is actually decided.
+    article.xfer transfer-cite card: 機制／前提／適配／不抄 in .xfer-grid.
+                 Added 2026-08-23 from cryo/frontend/store-and-index.html.
+    .peek        inline source tab: <button type="button" class="peek"
+                 data-snip="KEY">label</button>. On a .dag node put the same
+                 data-snip on the <g> plus class="src", which draws a small dot
+                 so the reader can tell the node opens something.
+    #srcpane     the ONE reusable right-hand pane every data-snip opens, with
+                 #srcscrim behind it. Content comes from
+                 script[type=application/json]#SRC_MAP, keyed by data-snip:
+                 type "code" needs kind/title/meta/why/start/lines (+hi line
+                 numbers), type "ref" needs kind/title/why plus rows and/or
+                 quote (+url/linktext). Do NOT give each claim its own hidden
+                 block; one pane and a data map is the shape, taken from
+                 17media/data-pipeline realtime_fifo/architecture.html. That
+                 page loads Prism from a CDN and this one deliberately does
+                 not: an explainer that needs the network to render its own
+                 evidence stops working the day it is read offline.
+                 Emit the JSON with `</` escaped as `<\/` or a quoted tag
+                 closes the script early. The ids src-kind / src-title /
+                 src-meta / src-why / src-body and #srcclose are the contract
+                 check_render.py reads.
+                 The pane answers 「這句的依據在哪」; button.term answers
+                 「我不認識這個字」. Same claim may carry both; neither
+                 substitutes for the other.
+    button.term  glossary term + visible ?; its data-gloss key must exist in
+                 var GLOSS at the foot of the page. The ids gloss-backdrop /
+                 gloss-card / gloss-card-title / gloss-card-text and the
+                 function names openGloss / placeNear / closeGloss are a fixed
+                 contract that check_design_doc_html.py reads: rename one and
+                 the popup and the gate break together.
+  ONE width: every block — apex, prose, table, diagram — spans
+  --prose + --side-w + --side-gap. .wide and .full are 100% of it and exist
+  only as the wrapper names the gates look for. 78ch, not 72: a CJK character
+  occupies 2ch, so 72ch is 36 characters a line, which narrows the page
+  without buying readability. Extra viewport width goes to the LEFT rail, never
+  to the reading line and no longer to a right gutter: .mn was removed, nothing
+  used that space, and reserving it left prose narrower than every .wide block
+  so the reader changed line width twice on the way down (2026-08-26). To
+  re-open a floating annotation layer, restore .doc's padding-right AND .wide's
+  calc together — one without the other silently overlaps.
+  Type: every reader-facing size is a --fs-* token, all clamp(), so type scales
+  with the viewport and NO breakpoint sets a font size. The steps are
+  body / h1 / h2 / h3 / sm (tables, code, panes) / xs (captions, chips, notes) /
+  2xs (mono labels) / rail (left rail and the index sheet, which share one
+  step). Measured 2026-08-26 at 600 -> 2560px: body 19.1 -> 20.5, h3 24.6 ->
+  27.2, table 16.6 -> 17.6, rail 14.1 -> 17.9, each capped at its clamp
+  ceiling. Elements must not write their own rem: the ones that did read too
+  large on a 13-inch screen and too small on a 27-inch one, and changing the
+  ladder meant editing 20-odd places (the .dag px sizes are the one exception —
+  they are viewBox-driven and check_svg_fit.py models them from the CSS).
+  Two gutters, two jobs: LEFT is navigation and standing facts (never prose,
+  it is sticky and would fight the reading line); RIGHT is the red-pen
+  annotation layer that belongs beside the sentence it qualifies.
+  Theme: Anthropic's own --swatch--* values (ivory / slate / cloud / clay),
+  hex converted to OKLCH, light + dark via prefers-color-scheme. The :root
+  comment records every deviation from the official value and why; keep that
+  habit, a palette with no provenance is one nobody can check.
+  clay (--pen) is a background and border colour: 2.97:1 on ivory. Text that
+  wants the pen colour uses --pen-ink, which is measured against AA.
+  Wording: human-writing GLOSSARY.md (no em dash; scan before delivery).
+  Body region: the per-document part runs from <body> to the </div> that
+  closes .doc; the two gloss divs and the three scripts after it are shell.
+  Splicing by line number, confirm you stopped at .doc's </div> and not at
+  the one closing #gloss-card, which also sits alone on its line further
+  down (2026-08-24: doing that deleted the whole popup DOM and the glossary
+  gate reported four missing ids rather than a wrong splice).
+  Gates: check_design_doc_html.py + check_wording.py (human-writing skill) and
+  scripts/check_contrast.py here. The contrast gate exists because --ink-3 sat
+  at 3.47:1 through four design passes and six palettes without being noticed.
+-->
+<style>
+  /* 色票取自 Anthropic 官方 stylesheet 的 --swatch--* 原生值,hex 轉 OKLCH:
+     ivory-light #faf9f5 / ivory-medium #f0eee6 / ivory-dark #e8e6dc /
+     cloud-light #d1cfc5 / cloud-medium #b0aea5 / cloud-dark #87867f /
+     slate-dark #141413 / slate-medium #3d3d3a / slate-light #5e5d59 /
+     clay #d97757。兩處偏離官方,各有量到的理由:
+     (1) 暗色 --line 在 slate-dark 與 slate-medium 之間插一階,官方只有兩階,
+         --paper-2 會與 --line 撞色、表頭邊界消失;
+     (2) --pen-ink 壓到 L 0.560,官方 #c6613f 是 hover 底色,當小字只有 3.85:1。
+     clay 本身只出現在邊框、底色與 tint:它對 ivory 是 2.97:1,當文字不合格,
+     所以節號、目錄目前位置、管線箭頭都走 --pen-ink。對比度由
+     design-explainer/scripts/check_contrast.py 把關,不靠眼睛。 */
+  :root {
+    --paper: oklch(0.982 0.005 95.1);
+    --paper-2: oklch(0.948 0.011 95.2);
+    --ink: oklch(0.191 0.002 106.6);
+    --ink-2: oklch(0.359 0.005 106.7);
+    --ink-3: oklch(0.478 0.006 95.2);
+    --line: oklch(0.924 0.014 97.5);
+    --line-strong: oklch(0.853 0.014 97.5);
+    --pen: oklch(0.672 0.131 38.8);
+    --pen-ink: oklch(0.560 0.145 39.0);
+    --pen-tint: oklch(0.672 0.131 38.8 / 0.09);
+    --pen-line: oklch(0.672 0.131 38.8 / 0.36);
+    /* 決策樹的寫回迴圈，與 --pen 的紅色重試迴圈分開語意。
+       出處：17media/data-pipeline realtime_fifo 的 --lp-* teal。 */
+    --loop: oklch(0.55 0.10 200);
+    --rail-w: 15rem; --rail-gap: 3rem;
+    /* 正文 78ch ≈ 39 個中文字一行。中文一字佔 2ch,72ch 只有 36 字,
+       在寬螢幕上把版面憋窄卻換不到可讀性 */
+    --prose: 78ch;
+    /* 字級一律 clamp,跟著視窗連續變化:同一份文件在 13 吋筆電與 27 吋螢幕上
+       字級不同、行寬相同。下限是窄視窗還讀得動的最小值,上限是寬視窗不致鬆散
+       的最大值,中間的 vw 項讓它連續走,不跳階 —— 所以不需要為字級開 @media。
+       元件不要自己寫死 rem:寫死的那幾個在 13 吋上偏大、在 27 吋上偏小,而且
+       改一次要改幾十處(量到 2026-08-26:表格、左欄、面板共 20 餘處寫死)。 */
+    --fs-body: clamp(1.15rem, 1.08rem + 0.30vw, 1.28rem);
+    --fs-h1:   clamp(2.70rem, 2.10rem + 2.20vw, 4.00rem);
+    --fs-h2:   clamp(1.95rem, 1.70rem + 0.80vw, 2.25rem);
+    --fs-h3:   clamp(1.50rem, 1.35rem + 0.50vw, 1.70rem);
+    --fs-sm:   clamp(1.00rem, 0.96rem + 0.20vw, 1.10rem);
+    --fs-xs:   clamp(0.86rem, 0.83rem + 0.14vw, 0.97rem);
+    --fs-2xs:  clamp(0.74rem, 0.72rem + 0.09vw, 0.84rem);
+    --fs-rail: clamp(0.88rem, 0.70rem + 0.42vw, 1.12rem);
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: oklch(0.191 0.002 106.6);
+      --paper-2: oklch(0.359 0.005 106.7);
+      --ink: oklch(0.982 0.005 95.1);
+      --ink-2: oklch(0.853 0.014 97.5);
+      --ink-3: oklch(0.750 0.013 96.5);
+      --line: oklch(0.300 0.004 106.6);
+      --line-strong: oklch(0.478 0.006 95.2);
+      --pen: oklch(0.672 0.131 38.8);
+      --pen-ink: oklch(0.712 0.126 39.5);
+      --pen-tint: oklch(0.672 0.131 38.8 / 0.13);
+      --pen-line: oklch(0.672 0.131 38.8 / 0.42);
+      --loop: oklch(0.70 0.10 200);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); overflow-x: hidden; overflow-x: clip; }
+  body {
+    margin: 0; color: var(--ink); font-family: var(--sans);
+    max-width: 100%;
+    /* 18.4px 起跳、寬螢幕 20.5px。中文的筆畫密度比拉丁字高,同一 px 值讀起來更小 */
+    font-size: var(--fs-body); line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── 一個寬度:開場、正文、表格、流程圖全部同寬。--side-w + --side-gap 這一段
+     原本是讓出來給右側浮動批註的,而 .mn 元件已經移除(見 head 註解),沒有東西
+     用那條溝,只造成正文比 .wide 區塊窄一截、讀者一路上換兩次行寬(量到
+     2026-08-26)。所以 .doc 的內容框直接吃掉那一段,.wide/.full 退成 100%。
+     要重開浮動批註層,得把 padding-right 與 .wide 的 calc 一起還原。 ── */
+  .doc {
+    --side-w: 19rem; --side-gap: 3.5rem;
+    max-width: var(--prose); margin-inline: auto;
+    padding: clamp(1.2rem, 4vw, 3rem) 1.2rem 6rem;
+  }
+  @media (min-width: 1120px) {
+    .doc {
+      max-width: calc(var(--prose) + var(--side-w) + var(--side-gap));
+      padding-right: 1.2rem;
+      position: relative;
+    }
+      .wide, .full { width: 100%; }
+  }
+  .apex { margin-bottom: 1rem; }
+  /* 開場的列舉:序號懸掛在文字欄外,結論粗體先給,證據跟在同一項裡。
+     讀者要能數得出來有幾條,而不必在長句裡自己找第一第二。 */
+  .apex ol.enum { list-style: none; margin: .9rem 0 1rem; padding: 0; }
+  .apex ol.enum > li {
+    position: relative; padding-left: 3.4em; margin: .8rem 0;
+  }
+  .apex ol.enum > li + li {
+    padding-top: .8rem; border-top: 1px solid var(--line);
+  }
+  .apex ol.enum > li > strong { display: block; }
+  .apex ol.enum > li > .d {
+    display: block; margin-top: .45rem; padding-left: 1.15em;
+    color: var(--ink-2);
+  }
+  .apex ol.enum > li > .n {
+    position: absolute; left: 0;
+    font-family: var(--mono); font-size: .84em; color: var(--pen-ink);
+    letter-spacing: .04em;
+  }
+  .apex ol.enum > li + li > .n { top: .8rem; }
+
+  /* 第二層列舉:第一層某一項自己數了幾樣(「要重推的只有四樣」)時就展開,一項一列,
+     結論粗體先給。兩層是上限,更深的內容改放 body 加 §ref;序號用 ink-2 讀作從屬。 */
+  .apex ol.enum .sub { list-style: none; margin: .6rem 0 0; padding: 0; }
+  .apex ol.enum .sub > li {
+    position: relative; padding-left: 2.1em; margin: .5rem 0;
+  }
+  .apex ol.enum .sub > li + li {
+    padding-top: .5rem; border-top: 1px solid var(--line);
+  }
+  .apex ol.enum .sub > li > b { display: block; }
+  .apex ol.enum .sub > li > .e {
+    display: block; margin-top: .3rem; color: var(--ink-2);
+  }
+  .apex ol.enum .sub > li > .n2 {
+    position: absolute; left: 0; top: 0;
+    font-family: var(--mono); font-size: .8em; color: var(--ink-2);
+    letter-spacing: .02em;
+  }
+
+  .stamp {
+    display: inline-block; font-family: var(--mono); font-size: var(--fs-xs);
+    letter-spacing: .04em; color: var(--pen-ink);
+    border: 1px solid var(--pen-line); border-radius: 2px;
+    padding: 0 .45em; margin-right: .4em; white-space: nowrap;
+    vertical-align: .08em;
+  }
+
+  /* ── 標題與節奏 ── */
+  header.masthead { margin-bottom: 3.2rem; }
+  .doc-id {
+    font-family: var(--mono); font-size: var(--fs-xs); letter-spacing: .08em;
+    color: var(--ink-3); text-transform: uppercase; margin-bottom: 1.4rem;
+  }
+  /* 標題吃掉版面上緣:第二行降到 500 字重當副題,對比在字重不在字級 */
+  h1 {
+    font-size: var(--fs-h1); line-height: 1.1;
+    font-weight: 850; letter-spacing: -.018em; margin: 0 0 1.4rem;
+  }
+  h1 span {
+    display: block; font-weight: 500; letter-spacing: -.005em;
+    color: var(--ink-2); font-size: .58em; line-height: 1.25; margin-top: .35rem;
+  }
+  .mast-note {
+    margin: 0; border-block: 1px solid var(--line-strong); padding: .7rem 0;
+    font-size: var(--fs-xs); color: var(--ink-3);
+  }
+
+  h2 {
+    font-size: var(--fs-h2); font-weight: 800; line-height: 1.28;
+    margin: 5rem 0 1.1rem;
+    padding-top: 1.2rem; border-top: 2px solid var(--ink); clear: both;
+    position: relative; scroll-margin-top: 2rem;
+  }
+  h2 .no {
+    font-family: var(--mono); font-weight: 400; font-size: .8em;
+    color: var(--pen-ink); margin-right: .7em;
+  }
+  /* 三級與 body 同步流動,相鄰級距在整個視窗範圍都維持 ≥1.25 */
+  h3 { font-size: var(--fs-h3); font-weight: 750;
+       line-height: 1.36; margin: 2.8rem 0 .7rem; scroll-margin-top: 2rem; }
+  a.xref {
+    color: var(--pen-ink); text-decoration: none;
+    border-bottom: 1px dotted var(--pen-line);
+    font-family: var(--mono); font-size: .88em;
+    white-space: nowrap;
+  }
+  a.xref:hover { border-bottom-style: solid; background: var(--pen-tint); }
+  :target { animation: xflash 1.4s cubic-bezier(.22, 1, .36, 1); }
+  @keyframes xflash { from { background: var(--pen-tint); } to { background: transparent; } }
+
+  /* ── 詞卡:文件自己擁有的概念，每個都有 var GLOSS 條目與正文按鈕 ── */
+  button.term {
+    font: inherit; color: inherit; cursor: pointer;
+    background: var(--pen-tint); border: 0; border-bottom: 1px solid var(--pen-line);
+    padding: 0 .12em; border-radius: 2px;
+  }
+  button.term:hover { background: var(--pen-line); }
+  .term-q {
+    font-family: var(--mono); font-size: .72em; color: var(--pen-ink);
+    vertical-align: super; margin-left: .12em;
+  }
+  #gloss-backdrop {
+    position: fixed; inset: 0; background: transparent; display: none; z-index: 40;
+  }
+  #gloss-card {
+    position: absolute; display: none; z-index: 41; max-width: 22rem;
+    background: var(--paper); border: 1px solid var(--line);
+    box-shadow: 0 6px 24px oklch(0 0 0 / 0.14);
+    padding: .8rem .95rem; border-radius: 3px;
+  }
+  #gloss-card-title { font-weight: 700; font-size: var(--fs-sm); margin-bottom: .3rem; }
+  #gloss-card-text { font-size: var(--fs-xs); line-height: 1.7; color: var(--ink-2); }
+  h3 .no { font-family: var(--mono); font-weight: 400; color: var(--ink-3); margin-right: .5em; font-size: .88em; }
+  p { margin: .8rem 0; }
+  strong { font-weight: 700; }
+  em { font-style: normal; font-weight: 700; color: var(--pen-ink); }
+  /* <dfn>:編號或名稱的定義實例(HTML 自己的元素)。正文提到一個編號時,
+     check_wording 會要求同一份文件裡有它的 <dfn>;CJK 斜體不好讀,只加粗 */
+  dfn { font-style: normal; font-weight: 700; }
+
+  /* ── 表格 ── */
+  .overflow { overflow-x: auto; margin: 1.1rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); line-height: 1.62; }
+  th, td { border: 1px solid var(--line); padding: .6rem .8rem; text-align: left; vertical-align: top; }
+  th { background: var(--paper-2); font-size: var(--fs-sm); font-weight: 750; letter-spacing: .02em; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-size: var(--fs-sm); }
+  code {
+    font-family: var(--mono); font-size: .85em;
+    background: var(--paper-2); padding: .08rem .34rem; border-radius: 3px;
+  }
+  .formula {
+    background: var(--paper-2); border: 1px solid var(--line);
+    padding: .7rem 1.1rem; margin: 1rem 0;
+    font-family: var(--mono); font-size: var(--fs-sm); overflow-x: auto;
+    border-radius: 2px;
+  }
+  .penblock {
+    background: var(--pen-tint); border: 1px solid var(--pen-line);
+    border-radius: 2px; padding: .8rem 1.1rem; margin: 1.2rem 0;
+  }
+  .penblock > :first-child { margin-top: 0; } .penblock > :last-child { margin-bottom: 0; }
+  .src { font-size: var(--fs-sm); color: var(--ink-3); line-height: 1.78; }
+
+  /* ── §0 管線圖 ── */
+  .pipe { display: grid; gap: .9rem; margin: 1.4rem 0 .6rem;
+          grid-template-columns: 1fr; counter-reset: phase; }
+  @media (min-width: 1120px) { .pipe { grid-template-columns: repeat(5, 1fr); gap: 0; } }
+  .phase { border: 1px solid var(--line-strong); background: var(--paper-2); padding: .8rem .9rem 1rem; position: relative; }
+  @media (min-width: 1120px) {
+    .phase { border-right-width: 0; }
+    .phase:last-child { border-right-width: 1px; }
+    .phase::after {
+      content: "→"; position: absolute; right: -.62rem; top: .55rem; z-index: 1;
+      color: var(--pen-ink); background: var(--paper); font-weight: 700;
+      line-height: 1; padding: .1rem .05rem;
+    }
+    .phase:last-child::after { content: none; }
+  }
+  .phase h4 {
+    margin: 0 0 .55rem; font-size: var(--fs-xs); letter-spacing: .03em;
+    color: var(--pen-ink); font-weight: 800;
+  }
+  .phase h4::before {
+    counter-increment: phase; content: counter(phase, upper-alpha);
+    font-family: var(--mono); font-weight: 400; color: var(--ink-3);
+    margin-right: .5em;
+  }
+  .phase ul { margin: 0; padding-left: 1.05rem; font-size: var(--fs-xs); line-height: 1.72; color: var(--ink-2); }
+  .phase li { margin: .18rem 0; }
+  .phase li b { color: var(--ink); font-weight: 700; }
+  .loopnote { font-size: var(--fs-xs); color: var(--pen-ink); font-family: var(--mono); margin: .5rem 0 0; }
+
+  /* ── 左欄:sticky 目錄 + 外掛節號（body.rail-on，JS 量視窗） ──
+     不用 min-width 猜：CSS px 已被 Windows 縮放除過（1920@150% = 1280），
+     1400 門檻把目錄藏掉。 */
+  nav.toc { display: none; }
+  nav.toc a {
+    color: var(--ink-2); text-decoration: none;
+    display: grid; grid-template-columns: 1.45em 1fr; column-gap: .5em;
+    padding: .34rem 0 .34rem .85rem;
+    border-left: 2px solid transparent;
+    font-size: var(--fs-rail); line-height: 1.45;
+    transition: color .2s cubic-bezier(.22, 1, .36, 1);
+  }
+  nav.toc a i {
+    font-family: var(--mono); font-style: normal; font-size: .84em;
+    color: var(--ink-3); text-align: right; line-height: inherit;
+  }
+  nav.toc a:hover { color: var(--pen-ink); border-left-color: var(--pen-line); }
+  nav.toc a:hover i { color: var(--pen-ink); }
+  nav.toc a[aria-current] { color: var(--pen-ink); border-left-color: var(--pen); font-weight: 700; }
+  nav.toc a[aria-current] i { color: var(--pen-ink); }
+  nav.toc .t { font-family: var(--mono); font-size: var(--fs-2xs); letter-spacing: .1em;
+               color: var(--ink-3); margin-bottom: .8rem; padding-left: .85rem; }
+  nav.toc .rail-note { margin: 1.6rem 0 0; padding: .8rem 0 0 .85rem;
+                       border-top: 1px solid var(--line);
+                       font-size: var(--fs-xs); line-height: 1.65; color: var(--ink-3); }
+  nav.toc .rail-note b { color: var(--ink-2); font-weight: 700; }
+  nav.toc .toc-sub { display: flex; flex-direction: column; margin: 0; padding: 0; }
+  nav.toc .toc-sub a { padding-left: 1.55rem; }
+  /* 左欄開著時不擠正文:文件只有一個寬度,擠窄就破了那個承諾。放不下就不開
+     左欄(下面的探針量),索引改走目錄鈕。 */
+  body.rail-on {
+    display: grid; justify-content: center; align-items: start;
+    grid-template-columns: var(--rail-w) auto; column-gap: var(--rail-gap);
+  }
+  body.rail-on nav.toc {
+    display: block; position: sticky; top: 3.4rem;
+    min-width: 0;
+    margin-top: clamp(1.2rem, 4vw, 3rem);
+    border-top: 3px solid var(--ink); padding-top: 1rem;
+    font-size: var(--fs-rail); line-height: 1.45;
+  }
+  body.rail-on .doc { margin-inline: 0; }
+  /* 節號離開行內、掛進左側間隙,是這份文件唯一的大字。細字重對上 h2 的 800,
+     所以捲動時先看到的是位置,不是又一行標題 */
+  body.rail-on h2 .no {
+    position: absolute; right: 100%; margin-right: 0; padding-right: .85rem;
+    font-size: 1.8em; font-weight: 300; line-height: 1; top: 1.35rem;
+    color: var(--pen-ink); font-variant-numeric: tabular-nums;
+  }
+  /* ── 目錄的第二種呈現。同一個 <nav class="toc">,不複製連結:放得下時是左欄,
+     放不下時(窄視窗、手機,以及文件發成 artifact 之後那個窄面板)改由左下角的
+     目錄鈕拉出。索引必須在每一個寬度都拿得到:長文件的全局結構只有這一個入口,
+     而 rail-on 關掉時 nav 的 display 是 none(量到 2026-08-26:索引整個消失)。
+     check_render 的版面半段會在左欄沒出現時,要求有一個 aria-controls 指到它的
+     可見控制項,而且按下去 nav 真的出現。 ── */
+  #tocbtn { position: fixed; left: 1.1rem; bottom: 1.1rem; z-index: 42;
+    font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2);
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: 999px; padding: .5em 1.05em; cursor: pointer;
+    box-shadow: 0 4px 14px oklch(0.25 0.01 95 / 0.14); }
+  #tocbtn:hover { color: var(--pen-ink); border-color: var(--pen-line); }
+  body.rail-on #tocbtn { display: none; }
+  #tocscrim { position: fixed; inset: 0; z-index: 43; display: none;
+    background: oklch(0.25 0.01 95 / 0.30); }
+  body.toc-open #tocscrim { display: block; }
+  body.toc-open nav.toc {
+    display: block; position: fixed; left: 0; top: 0; z-index: 44;
+    width: min(21rem, 86vw); height: 100dvh; overflow-y: auto;
+    overscroll-behavior: contain; margin: 0;
+    padding: 3rem 1.4rem 2rem 1.6rem; background: var(--paper);
+    border-top: 0; border-right: 1px solid var(--line-strong);
+    box-shadow: 14px 0 34px oklch(0.25 0.01 95 / 0.14);
+    font-size: var(--fs-rail); line-height: 1.5; }
+  #tocclose { display: none; position: fixed; left: min(21rem, 86vw); top: .6rem;
+    z-index: 45; transform: translateX(-2.9rem); cursor: pointer;
+    font: inherit; font-size: var(--fs-sm); line-height: 1; color: var(--ink-3);
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: 4px; padding: .18em .45em; }
+  #tocclose:hover { color: var(--ink); border-color: var(--ink-3); }
+  body.toc-open #tocclose { display: block; }
+
+  /* 正文寬度已達可讀上限,多出來的螢幕給兩側:左邊導覽、右邊跨欄與對照面板 */
+  /* 正文寬度已達可讀上限,多出來的螢幕只給左欄。--side-w／--side-gap 不隨螢幕
+     長:它們現在是正文寬度的一部分,加寬等於拉長行長。字級的成長由 --fs-* 的
+     clamp 負責,不需要在這裡開斷點。 */
+  @media (min-width: 1700px) { :root { --rail-w: 17rem; --rail-gap: 5rem; } }
+  @media (min-width: 2100px) { :root { --rail-w: 19rem; } }
+  a { color: var(--pen-ink); }
+  @media print {
+    body { display: block; }
+    nav.toc { display: none; }
+    .doc { max-width: none; width: auto; padding-right: 1.2rem; }
+    h2 .no { position: static; padding-right: 0; margin-right: .7em; }
+  }
+  /* ── tabs：無 JS，radio + :checked 選同層 panel ── */
+  .tabs { margin: 1.4rem 0 0; }
+  .tabs > input { position: absolute; opacity: 0; pointer-events: none; }
+  .tablist { display: flex; flex-wrap: wrap; gap: .4rem; border-bottom: 1px solid var(--line-strong);
+             padding-bottom: 0; }
+  .tablist label { display: inline-block; padding: .45rem .9rem; cursor: pointer;
+                   font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2);
+                   border: 1px solid var(--line); border-bottom: none;
+                   border-radius: 6px 6px 0 0; background: var(--paper-2);
+                   position: relative; top: 1px; }
+  .tablist label:hover { color: var(--ink); }
+  .tabs > .panel { display: none; padding-top: 1.4rem; }
+  #t-codex:checked ~ .tablist label[for="t-codex"],
+  #t-ds:checked ~ .tablist label[for="t-ds"],
+  #t-grok:checked ~ .tablist label[for="t-grok"],
+  #t-cc:checked ~ .tablist label[for="t-cc"] {
+    background: var(--paper); color: var(--ink); border-color: var(--line-strong);
+    border-bottom: 1px solid var(--paper); font-weight: 700; }
+  #t-codex:checked ~ #p-codex,
+  #t-ds:checked ~ #p-ds,
+  #t-grok:checked ~ #p-grok,
+  #t-cc:checked ~ #p-cc { display: block; }
+
+  /* ── codeblock：本文裡的提案程式碼（不是引用，來源面板才是引用） ── */
+  .codeblock { background: var(--paper-2); border: 1px solid var(--line);
+    border-left: 3px solid var(--pen-line); border-radius: 4px;
+    padding: 0.9rem 1.1rem; margin: 1.1rem 0; overflow-x: auto; }
+  .codeblock pre { margin: 0; font-family: var(--mono); font-size: var(--fs-sm);
+    line-height: 1.7; color: var(--ink); white-space: pre; }
+  .codeblock .cbcap { display: block; margin: 0 0 0.6rem; font-size: var(--fs-xs);
+    color: var(--ink-3); font-family: inherit; }
+
+  /* ── DAG：色相只有 pen 一種，所以 kernel 與應用層用線寬區分，不發明新色 ── */
+  /* 圖的字級由 viewBox 寬度決定，不由 font-size 決定：width:100% 會算繪成容器寬，
+     所以 scale ＝ 容器寬 ÷ viewBox 寬，viewBox 越窄、同一個 user unit 就越大。
+     實測 2026-08-19：viewBox 1200 配 max-width:1200px 等於 scale 鎖在 1.0，
+     12.5px 的標籤就真的只有 12.5px，是正文 20.48px 的 0.61 倍，讀者說太小。
+     viewBox 1000 且上限放寬後是 15.3px（1227px 容器）到 16.9px（1352px 容器）。
+     代價付在字數：同樣的實體寬度，字大 36% 就是每框少 25% 的字。
+     1600px 上限只是防呆，避免超寬螢幕把圖拉得比一頁還高。 */
+  .dagbox { max-width: 100%; }
+  .dag { width: 100%; height: auto; display: block; font-family: var(--sans);
+         min-width: 40rem; max-width: 1600px; margin-inline: auto; }
+  .dag line, .dag path { stroke: var(--ink-3); stroke-width: 1.4; fill: none; }
+  .dag .split { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 4 4; }
+  .dag .broken { stroke: var(--pen); stroke-dasharray: 5 4; stroke-width: 1.6; }
+  .dag rect { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1; }
+  .dag .app rect { fill: var(--paper-2); }
+  .dag .kern rect { stroke: var(--ink); stroke-width: 2; }
+  .dag .none rect { fill: var(--pen-tint); stroke: var(--pen-line); stroke-width: 1.4; }
+  .dag text { fill: var(--ink); font-size: 13.5px; font-weight: 600; }
+  .dag .sub { fill: var(--ink-2); font-size: 11.5px; font-weight: 400; }
+  .dag .phase { fill: var(--ink-3); font-size: 12.5px; font-weight: 700; letter-spacing: .04em; }
+  .dag .note { fill: var(--pen-ink); font-size: 12px; font-weight: 600; }
+  /* 決策樹（tree_grammar.py）。CSS_NOTE 給前三行；.lay 是層別泳道標籤，
+     字級比 .sub 再小一級，讀成 chrome 而不是內容（模組用 FS_L=10.5 量寬）。 */
+  .dag .loop { stroke: var(--loop); stroke-dasharray: 7 4; stroke-width: 1.8; }
+  .dag .dec polygon { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1.2; }
+  .dag a:hover rect, .dag a:hover polygon { stroke: var(--pen); }
+  .dag .lay { fill: var(--ink-3); font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
+  .dagcap { font-size: var(--fs-xs); color: var(--ink-2); margin: .5rem 0 0; line-height: 1.55; }
+  .daglegend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .6rem 0 0;
+               font-size: var(--fs-xs); color: var(--ink-2); }
+  .daglegend span { display: inline-flex; align-items: center; gap: .4rem; }
+  .daglegend i { width: 1.5rem; height: 0; border-top: 2px solid var(--ink); display: inline-block; }
+  .daglegend i.thin { border-top: 1px solid var(--line-strong); }
+  .daglegend i.br { border-top: 2px dashed var(--pen); }
+  /* 圖例要指的是「框的底色」而不是一條線時用 i.fill:.none 那一格的填色與框線,
+     legend 只有線條樣式時,讀者會把底色的意義當成沒有標示。 */
+  .daglegend i.fill { height: .8rem; border: 1px solid var(--pen-line);
+                      background: var(--pen-tint); border-top-width: 1px; }
+
+  /* ── 決策流程：guard clause 逐條，序號掛在外面 ── */
+  ol.dflow { list-style: none; margin: 1rem 0 0; padding: 0; counter-reset: df; }
+  ol.dflow > li { position: relative; padding: 0 0 .75rem 2.6rem; counter-increment: df;
+                  font-size: var(--fs-xs); line-height: 1.6; }
+  ol.dflow > li::before { content: counter(df); position: absolute; left: 0; top: .1rem;
+    width: 1.75rem; text-align: right; font-family: var(--mono); font-size: var(--fs-2xs);
+    color: var(--ink-3); }
+  ol.dflow > li b { color: var(--ink); }
+  ol.dflow > li.stop { border-left: 2px solid var(--pen-line); margin-left: -.2rem;
+                       padding-left: 2.8rem; }
+  /* ---- 對照面板 .peek / #srcpane ----------------------------------------
+     圖上的節點與句中的小 tab 都可以點，右側滑出它依據的原文，讀者不用離開這頁
+     就能核對。形狀取自 17media/data-pipeline 的 realtime_fifo/architecture.html
+     的 snippet pane：一個面板重複使用，資料放在一份 JSON 裡按需載入，不是每個
+     主張各自一個藏起來的區塊。兩種內容型別：code 放原始碼（行號與內容由腳本從
+     source 直接讀出），ref 放論文、規格或外部連結。
+     那份原檔從 CDN 載 Prism 上色；這裡不引外部資源，所以是純等寬加行號。 */
+  .peek { display: inline-flex; align-items: baseline; gap: .28em; cursor: pointer;
+          font: inherit; background: none; font-size: var(--fs-2xs); font-weight: 600;
+          color: var(--ink-2);
+          border: 1px solid var(--line-strong); border-radius: 999px;
+          padding: .06em .5em .1em; margin-inline: .25em; white-space: nowrap; }
+  .peek::after { content: "\203a"; font-weight: 700; color: var(--ink-3); }
+  .peek:hover, .peek:focus-visible { color: var(--ink); border-color: var(--ink-3);
+          background: var(--paper-2); outline: none; }
+
+  /* 可點的圖節點。只加游標與 hover 描邊，不改配色，否則會跟「粗框＝kernel」
+     這條圖例打架。 */
+  /* §0 地圖的框包在 a.xref 裡（href 跳節）；不要繼承正文 xref 的點線與等寬。 */
+  .dag a.xref {
+    color: inherit; font: inherit; white-space: normal;
+    border-bottom: none; background: none; cursor: pointer;
+  }
+  .dag a.xref:hover, .dag a.xref:focus-visible {
+    border-bottom: none; background: none;
+  }
+  .dag a.xref:hover rect, .dag a.xref:focus-visible rect {
+    stroke: var(--ink);
+  }
+  .dag g.src { cursor: pointer; }
+  .dag g.src:hover rect, .dag g.src:focus-visible rect { stroke: var(--ink); stroke-width: 2; }
+  .dag g.src:focus-visible { outline: none; }
+  .dag .srcdot { fill: var(--ink-3); }
+  .dag g.src:hover .srcdot { fill: var(--ink); }
+  .dag .srcfold { fill: var(--pen-line); stroke: none; }
+  .dag g.src:hover .srcfold, .dag g.src:focus-visible .srcfold { fill: var(--pen-ink); }
+  .dag .elab { fill: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+
+  #srcscrim { position: fixed; inset: 0; z-index: 40; opacity: 0; pointer-events: none;
+              background: oklch(0.25 0.01 95 / 0.32); transition: opacity .18s ease; }
+  #srcscrim.on { opacity: 1; pointer-events: auto; }
+  #srcpane { position: fixed; top: 0; right: 0; z-index: 41;
+             width: min(46rem, 94vw); height: 100dvh; overflow-y: auto;
+             overscroll-behavior: contain;
+             padding: 1.5rem 1.7rem 3rem; background: var(--paper);
+             border-left: 1px solid var(--line-strong);
+             box-shadow: -14px 0 34px oklch(0.25 0.01 95 / 0.14);
+             transform: translateX(101%); transition: transform .22s ease; }
+  #srcpane.on { transform: none; }
+  @media (prefers-reduced-motion: reduce) { #srcscrim, #srcpane { transition: none; } }
+
+  #srcclose { position: absolute; top: .8rem; right: 1rem; cursor: pointer;
+              font: inherit; font-size: var(--fs-sm); line-height: 1; color: var(--ink-3);
+              background: var(--paper); border: 1px solid var(--line-strong);
+              border-radius: 4px; padding: .18em .45em; }
+  #srcclose:hover { color: var(--ink); border-color: var(--ink-3); }
+  #srcpane .eyebrow { font-family: var(--mono); font-size: var(--fs-2xs); letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--ink-3); margin: 0 0 .2rem; }
+  #srcpane h5 { font-size: var(--fs-sm); margin: 0 2.6rem .2rem 0; }
+  #srcpane .dmeta { font-family: var(--mono); font-size: var(--fs-2xs); color: var(--ink-2);
+                    margin: 0 0 .85rem; word-break: break-all; }
+  #srcpane .why { font-size: var(--fs-xs); line-height: 1.72; color: var(--ink-2); margin: 0 0 1rem; }
+  #srcpane .why b { color: var(--ink); }
+  #srcpane pre { background: var(--paper-2); border: 1px solid var(--line);
+                 border-radius: 5px; padding: .7rem 0; margin: 0 0 .9rem;
+                 overflow-x: auto; font-size: var(--fs-xs); line-height: 1.62; }
+  #srcpane pre code { display: block; font-family: var(--mono); }
+  #srcpane .l { display: block; white-space: pre; padding-inline: .55rem .8rem; }
+  #srcpane .l.hi { background: var(--pen-tint); }
+  #srcpane .ln { display: inline-block; width: 3.4em; text-align: right;
+                 margin-right: .9em; color: var(--ink-3); user-select: none; }
+  #srcpane .refmeta { list-style: none; margin: 0 0 .9rem; padding: 0;
+                      font-size: var(--fs-xs); color: var(--ink-2); }
+  #srcpane .refmeta li { padding: .12rem 0; }
+  #srcpane .refmeta b { color: var(--ink); font-weight: 600; }
+  #srcpane blockquote { margin: 0 0 .9rem; padding: .45rem 0 .45rem .9rem;
+                        border-left: 2px solid var(--line-strong);
+                        font-size: var(--fs-xs); line-height: 1.7; color: var(--ink); }
+  #srcpane .empty { font-size: var(--fs-xs); line-height: 1.75; color: var(--ink-2); }
+  /* ── 轉移引用：機制／前提／適配／不抄（transfer-cite.md）
+     2026-08-23 從 cryo/frontend/store-and-index.html 寫回：template 原本沒有
+     .xfer，轉移引用只能落成裸 ul，gate 讀不到四欄。色票全用既有 token。 */
+  .xfer-stack { margin: 1.2rem 0 1.4rem; }
+  article.xfer {
+    background: var(--paper-2);
+    border: 1px solid var(--line-strong);
+    padding: .9rem 1rem 1rem;
+    border-radius: 2px;
+  }
+  .xfer-head { display: flex; justify-content: space-between; gap: .8rem; align-items: baseline; }
+  .xfer-head .name { margin: 0; font-size: var(--fs-sm); font-weight: 750; }
+  .xfer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .7rem .9rem;
+    margin-top: .8rem;
+  }
+  .xfer-cell .lab {
+    font-size: var(--fs-2xs);
+    letter-spacing: .08em;
+    color: var(--ink-3);
+    margin: 0 0 .2rem;
+    font-family: var(--mono);
+  }
+  .xfer-cell p { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
+  .xfer-cell.break { grid-column: 1 / -1; }
+  @media (max-width: 1119.9px) {
+    .xfer-grid { grid-template-columns: 1fr; }
+    .xfer-cell.break { grid-column: auto; }
+  }
+</style>
+</head>
+<body>
+
+<button id="tocbtn" type="button" aria-controls="toc" aria-expanded="false">☰ 目錄</button>
+<div id="tocscrim" aria-hidden="true"></div>
+<button id="tocclose" type="button" aria-label="關閉目錄">×</button>
+<nav class="toc" id="toc" aria-label="目錄">
+  <div class="t">grok-build</div>
+  <a href="#s0"><i>0</i>一則訊息怎麼走完</a>
+  <a href="#s1"><i>1</i>三種入口接到同一個 MvpAgent</a>
+  <a href="#s2"><i>2</i>Agent 進迴圈前組好</a>
+  <a href="#s3"><i>3</i>兩層迴圈跑完一則訊息</a>
+  <a href="#s4"><i>4</i>模型工具清單固定</a>
+  <a href="#s5"><i>5</i>壓縮梯子最後一階非空</a>
+  <a href="#s6"><i>6</i>子代理有預算，Ask 要人點頭</a>
+  <p class="rail-note"><b>clone</b> <code>/home/hanson/src/grok-build</code> @ d6a22a1<br>SOURCE_REV 7140ec21 · 讀碼日 2026-08-29</p>
+</nav>
+
+<div class="doc">
+
+<header class="masthead">
+  <div class="doc-id">docs/grok-build-design.html</div>
+  <h1>Grok Build 設計邏輯<span>一則使用者訊息怎麼被跑完</span></h1>
+  <p class="mast-note">原始碼 <code>/home/hanson/src/grok-build</code>（xai-org/grok-build @ d6a22a1）</p>
+</header>
+
+<div class="apex wide">
+<p>本機已 clone Grok Build（本機跑的 grok 程式）在 <code>/home/hanson/src/grok-build</code>。遠端是 <code>xai-org/grok-build</code>，commit <code>d6a22a1</code>。根目錄檔案 <code>SOURCE_REV</code> 記上游那次同步，內容是 <code>7140ec21</code>。根 README 把倉庫寫成三塊：pager 管螢幕，shell 管執行期，tools 管工具實作。<span class="stamp">2026-08-29 數根目錄 Cargo.toml</span>工作區 members 有 92 個套件。</p>
+<p>按套件名各讀各的，會把同一條執行路徑拆成獨立產品。這樣讀有三個問題。</p>
+<ol class="enum">
+<li><span class="n">第一</span><strong>螢幕程式被當成自己在跑模型。</strong><span class="d">組出 grok 執行檔的套件 pager-bin，其 <code>main</code> 把全螢幕終端、一問一答、標準輸入輸出接到 shell 的啟動函式。真正實作 ACP（編輯器與螢幕跟 agent 說話的那條遠端呼叫）的是 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>；每個對話是一個 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button>。<button type="button" class="peek" data-snip="pager-main">入口</button> 見 <a class="xref" href="#s1">§1</a>。</span></li>
+<li><span class="n">第二</span><strong>以為掛上的外部工具伺服器會出現在<button type="button" class="term" data-gloss="kv-list" aria-haspopup="dialog" aria-expanded="false">模型工具清單<span class="term-q" aria-hidden="true">?</span></button>。</strong><span class="d">每輪清單走 <code>tool_definitions_builtins_only</code>。外部工具靠 <code>search_tool</code> 找、<code>use_tool</code> 打，為了讓工具名跨輪固定。<button type="button" class="peek" data-snip="use-tool-kv">原文</button> 見 <a class="xref" href="#s4">§4</a>。</span></li>
+<li><span class="n">第三</span><strong>以為壓縮是模型回「上下文太長」才做。</strong><span class="d"><code>check_auto_compact_needed</code> 在每輪送給模型之前。預設門檻是上下文的 85%。<span class="stamp">人工預設</span>沒有環境變數、設定檔或遠端覆寫時才用這個數，與 Grok 網頁聊天共用；改它的成本是重測何時開始把舊對話收成摘要。<button type="button" class="peek" data-snip="turn-compact">取樣前</button> 見 <a class="xref" href="#s3">§3</a>、<a class="xref" href="#s5">§5</a>。</span></li>
+</ol>
+<p><strong>讀這份原始碼時以 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button> 的兩層迴圈為軸：<button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button>每輪先壓再取樣再跑工具，外層<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>同一則訊息最多再推 8 次。</strong>8 是程式常數 <code>MAX_STOP_HOOK_CONTINUATIONS_PER_TURN</code>，碼裡沒寫是誰定的；改它的成本是重測<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>會跑的回合結束腳本，見 <a class="xref" href="#s3">§3</a>。三種入口只換 ACP 怎麼打到同一個 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>。外部工具伺服器用兩支固定名字的工具（<code>search_tool</code> 與 <code>use_tool</code>）保持<button type="button" class="term" data-gloss="kv-list" aria-haspopup="dialog" aria-expanded="false">模型工具清單<span class="term-q" aria-hidden="true">?</span></button>穩定。規則命中、要人點頭的那次（Ask）不讓模型放行。</p>
+<ol class="enum">
+<li><span class="n">一</span><strong>全螢幕終端、一問一答、標準輸入輸出只換 ACP 怎麼打進同一個 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>。</strong><span class="d">對話本身都是 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button>。見 <a class="xref" href="#s1">§1</a>。</span></li>
+<li><span class="n">二</span><strong>Agent 在進迴圈前一次組好提示、工具與權限。</strong><span class="d">組好後綁在該次對話；專案說明檔 AGENTS.md 走使用者前綴，系統提示仍用底座模板。見 <a class="xref" href="#s2">§2</a>。</span></li>
+<li><span class="n">三</span><strong>一則訊息用兩層迴圈跑完。</strong><span class="d"><button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button>負責壓縮、取樣、工具；外層<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>決定停或再推。見 <a class="xref" href="#s3">§3</a>。</span></li>
+<li><span class="n">四</span><strong><button type="button" class="term" data-gloss="kv-list" aria-haspopup="dialog" aria-expanded="false">模型工具清單<span class="term-q" aria-hidden="true">?</span></button>只含內建工具加上 <code>search_tool</code> 與 <code>use_tool</code>。</strong><span class="d">外部伺服器工具先找再打。見 <a class="xref" href="#s4">§4</a>。</span></li>
+<li><span class="n">五</span><strong><button type="button" class="term" data-gloss="compact-ladder" aria-haspopup="dialog" aria-expanded="false">壓縮梯子<span class="term-q" aria-hidden="true">?</span></button>最後一階必須交出非空結果。</strong><span class="d">後一階只在前一階仍超標時才跑。見 <a class="xref" href="#s5">§5</a>。</span></li>
+<li><span class="n">六</span><strong>子代理與批次腳本有呼叫次數上限；規則命中的 Ask 維持要人點頭。</strong><span class="d">子代理呼叫次數預設 128、同時 32。見 <a class="xref" href="#s6">§6</a>。</span></li>
+</ol>
+</div>
+
+<h2 id="s0"><span class="no">0</span>一則訊息怎麼走完</h2>
+<p>使用者一則訊息進 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button> 的 <code>handle_prompt</code> 之後，走的是下面這張圖。<span class="stamp">2026-08-29 讀碼</span></p>
+<figure id="map">
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 808 228" role="img" aria-label="一則使用者訊息在 SessionActor 裡怎麼走完" aria-describedby="dagcap-map">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+  </defs>
+  <path d="M442.0,60 L442.0,72.0"/>
+  <path d="M190.0,72.0 L694.0,72.0"/>
+  <path d="M190.0,72.0 L190.0,84" marker-end="url(#ar)"/>
+  <path d="M442.0,72.0 L442.0,84" marker-end="url(#ar)"/>
+  <path d="M694.0,72.0 L694.0,84" marker-end="url(#ar)"/>
+  <path class="broken" d="M76,112.0 L52,112.0 L52,40.0 L76,40.0" marker-end="url(#br)"/>
+  <path d="M442.0,140 L442.0,152.0"/>
+  <path d="M694.0,140 L694.0,152.0"/>
+  <path d="M442.0,152.0 L694.0,152.0"/>
+  <path d="M442.0,152.0 L442.0,164" marker-end="url(#ar)"/>
+  <text class="phase" x="10" y="44.0">開輪</text>
+  <text class="phase" x="10" y="116.0">取樣</text>
+  <text class="phase" x="10" y="188.0">停閘</text>
+  <a class="xref" href="#s3">
+  <g class="kern src" data-snip="turn-compact" tabindex="0" role="button" aria-label="每輪取樣前必要時先壓縮再送給模型，開啟原文">
+    <rect x="76" y="20" width="732" height="40" rx="3"/>
+    <text x="86" y="45">每輪取樣前必要時先壓縮再送給模型</text>
+    <path class="srcfold" d="M800,60 L808,60 L808,52 z"/>
+  </g>
+  </a>
+  <a class="xref" href="#s4">
+  <g class="app src" data-snip="turn-tools" tabindex="0" role="button" aria-label="呼叫工具，結果寫回再取樣，開啟原文">
+    <rect x="76" y="84" width="228" height="56" rx="3"/>
+    <text x="86" y="117">呼叫工具，結果寫回再取樣</text>
+    <path class="srcfold" d="M296,140 L304,140 L304,132 z"/>
+  </g>
+  </a>
+  <a class="xref" href="#s3">
+  <g class="app src" data-snip="turn-complete" tabindex="0" role="button" aria-label="只回文字，內層結束，開啟原文">
+    <rect x="328" y="84" width="228" height="56" rx="3"/>
+    <text x="338" y="117">只回文字，內層結束</text>
+    <path class="srcfold" d="M548,140 L556,140 L556,132 z"/>
+  </g>
+  </a>
+  <a class="xref" href="#s3">
+  <g class="app src" data-snip="turn-stat" tabindex="0" role="button" aria-label="同一工具連打就停本輪，開啟原文">
+    <rect x="580" y="84" width="228" height="56" rx="3"/>
+    <text x="590" y="117">同一工具連打就停本輪</text>
+    <path class="srcfold" d="M800,140 L808,140 L808,132 z"/>
+  </g>
+  </a>
+  <a class="xref" href="#s3">
+  <g class="kern src" data-snip="stop-gate" tabindex="0" role="button" aria-label="外層續跑滿八次就停，開啟原文">
+    <rect x="76" y="164" width="732" height="40" rx="3"/>
+    <text x="86" y="189">外層續跑滿八次就停</text>
+    <path class="srcfold" d="M800,204 L808,204 L808,196 z"/>
+  </g>
+  </a>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-map">粗框是<button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button>每輪必做的壓縮與組請求。細框是取樣後三條路：左欄有工具就寫回再取樣（左側回頭邊）、中欄無工具就結束內層、右欄同一工具連打就停。底框是外層<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>。點框跳章節，折角開原文。</p>
+</figure>
+<p class="daglegend"><i class="kern"></i>壓縮與<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>（粗筆）　<i class="app"></i>取樣後三路　左側回頭邊是還有工具、再進<button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button></p>
+<ol class="dflow">
+<li><b>入口。</b><span class="e"><code>handle_prompt</code> 把使用者訊息寫進 transcript，再開外層迴圈。<button type="button" class="peek" data-snip="handle-prompt">handle_prompt</button></span></li>
+<li><b>每輪取樣前。</b><span class="e">必要時先壓縮，再組<button type="button" class="term" data-gloss="kv-list" aria-haspopup="dialog" aria-expanded="false">模型工具清單<span class="term-q" aria-hidden="true">?</span></button>送給模型。預設 85% 觸發，見 <a class="xref" href="#s5">§5</a>。</span></li>
+<li><b>取樣後三路。</b><span class="e">無工具：內層收工。有工具：執行、寫回、回頭再取樣。同一工具連打：本輪硬停。</span></li>
+<li class="stop"><b>外層<button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>。</b><span class="e">Stop hook 可再推；滿 8 次就停，不再問 hook。<button type="button" class="peek" data-snip="stop-gate-cap">滿 8 次</button></span></li>
+</ol>
+<p class="src">圖由 <code>dag_grammar.py</code> 排出。迴圈順序讀自 <code>turn.rs</code> <code>handle_prompt</code> 與 <code>process_conversation_turn</code>，2026-08-29。</p>
+
+<h2 id="s1"><span class="no">1</span>三種入口接到同一個 MvpAgent</h2>
+<p>全螢幕終端、<code>grok -p</code> 一問一答、<code>grok agent stdio</code> 只換 ACP 位元組怎麼送到同一個 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>；每個對話仍是 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button>。<span class="stamp">2026-08-29</span> 組裝根是 <code>xai-grok-pager-bin</code> 的 <code>main</code>：它起非同步 runtime、更新策略、再分派，自己不跑取樣迴圈。<button type="button" class="peek" data-snip="pager-main">run_*</button></p>
+<div class="overflow wide"><table>
+<tr><th>入口</th><th>誰在說話</th><th>接到哪</th></tr>
+<tr><td>互動全螢幕 <code>grok</code></td><td>pager 當 ACP 用戶端</td><td>行程內 <code>spawn_grok_shell</code>，或 Unix 插座連獨立 leader（失敗則退回行程內）</td></tr>
+<tr><td>一問一答 <code>grok -p</code></td><td>pager <code>headless.rs</code></td><td>一律行程內 <code>spawn_grok_shell</code>，不走 leader</td></tr>
+<tr><td><code>grok agent stdio</code> / <code>leader</code> / <code>serve</code></td><td>shell <code>agent/app.rs</code></td><td>本地 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>，或當 leader 的 JSON / WebSocket 橋</td></tr>
+</table></div>
+<p>Leader 是長駐行程（檔案鎖加 <code>~/.grok/</code> 下的插座），讓多個全螢幕終端共用一個 <button type="button" class="term" data-gloss="mvp-agent" aria-haspopup="dialog" aria-expanded="false">MvpAgent<span class="term-q" aria-hidden="true">?</span></button>。workspace 套件管檔案系統、權限、checkpoint，給 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button> 用，不是第三種入口。</p>
+<p>第一次取樣之前要齊的是：有效設定、認證（瀏覽器登入或 API key）、組織下發的設定閘、模型目錄、ACP <code>initialize</code>、再開 <code>new_session</code> 生 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button>。</p>
+<p class="src">README Repository layout；<code>pager-bin/src/main.rs</code>；shell <code>agent/app.rs</code>。</p>
+
+<h2 id="s2"><span class="no">2</span>Agent 進迴圈前一次組好提示、工具與權限</h2>
+<p>進迴圈前，AgentBuilder 一次組好 system prompt、<button type="button" class="term" data-gloss="tool-bridge" aria-haspopup="dialog" aria-expanded="false">ToolBridge<span class="term-q" aria-hidden="true">?</span></button>、權限模式。crate README 寫這個物件可攜；結構註解寫它綁在該次對話。以結構為準：組好後帶已渲染 system prompt、<button type="button" class="term" data-gloss="tool-bridge" aria-haspopup="dialog" aria-expanded="false">ToolBridge<span class="term-q" aria-hidden="true">?</span></button>、reminder 與 compaction 政策。<button type="button" class="peek" data-snip="agent-tied">NOT portable</button></p>
+<p>預設 <code>promptMode</code> 是 Extend：底座模板（主代理 <code>prompt.md</code>，子代理 <code>subagent_prompt.md</code>）再接定義 body。Full 才把 body 當整份 system prompt。<button type="button" class="peek" data-snip="prompt-extend">Extend / Full</button></p>
+<p>AGENTS.md 變成使用者前綴裡的 <code>&lt;system-reminder&gt;</code>，系統提示仍用底座模板。發現到的檔案列在 <code>agents_md_files</code>。檔案開頭的 YAML 點名的 skills 前置進 <code>prompt_body</code>；其餘 skill 清單進對話上下文給執行期發現。</p>
+<div class="penblock">
+<p><span class="stamp">抽出套件時的決定</span>Agent 從 <code>xai-grok-shell</code> 抽成一等型別，讓全螢幕終端以外的入口也能組同一份物件。抽完仍經 <button type="button" class="term" data-gloss="tool-bridge" aria-haspopup="dialog" aria-expanded="false">ToolBridge<span class="term-q" aria-hidden="true">?</span></button> 綁對話，所以不能序列化到另一個行程當「同一份 Agent」用。</p>
+</div>
+<p class="src"><code>xai-grok-agent/src/agent.rs</code>、<code>builder.rs</code>、<code>prompt/context.rs</code>；crate README。</p>
+
+<h2 id="s3"><span class="no">3</span>兩層迴圈跑完一則訊息</h2>
+<p>一則使用者訊息在 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button> 裡有兩層迴圈，外面還有 actor 收命令。<span class="stamp">2026-08-29</span> <button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button>是 <code>process_conversation_turn</code>；外層在 <code>handle_prompt</code> 裡呼叫它，再跑 <button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>。</p>
+<div class="overflow wide"><table>
+<tr><th>層</th><th>函式</th><th>何時停</th></tr>
+<tr><td>actor</td><td><code>run_session</code></td><td>Shutdown、頻道關</td></tr>
+<tr><td>外層</td><td><code>handle_prompt</code> 的 loop</td><td>內層不是 Completed，或 <button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button> 回 AllowStop</td></tr>
+<tr><td>內層</td><td><code>process_conversation_turn</code></td><td>模型沒叫工具、同一工具連打硬停、或 max_turns</td></tr>
+</table></div>
+<p>外層每次先跑 <code>process_conversation_turn_with_recovery</code>。若 goal 仍要 Continue，注入指令再進內層。否則 <code>run_stop_gate</code>：AllowStop 結束；KeepWorking 把 hook 回饋推進 transcript，續跑計數加一。<button type="button" class="peek" data-snip="outer-loop">外層 loop</button></p>
+<p>續跑上限 8 次，常數 <code>MAX_STOP_HOOK_CONTINUATIONS_PER_TURN</code>。碼裡沒寫是誰定的。<span class="stamp">人工選的常數</span>改它要重測回合結束腳本：滿 8 次時連腳本都不叫，直接 AllowStop。<button type="button" class="peek" data-snip="stop-gate-cap">強制停</button> 行程結束腳本另有 5 秒預算。<span class="stamp">人工選的逾時</span>改它的成本是重測關行程會不會被這段腳本卡住；逾時就放行。</p>
+<p><button type="button" class="term" data-gloss="inner-loop" aria-haspopup="dialog" aria-expanded="false">內層迴圈<span class="term-q" aria-hidden="true">?</span></button>每一圈：注入 reminder 與記憶、必要時壓縮、組請求、<button type="button" class="term" data-gloss="kv-list" aria-haspopup="dialog" aria-expanded="false">模型工具清單<span class="term-q" aria-hidden="true">?</span></button>、送給模型。模型若回「先壓縮再重送」，這一圈 <code>continue</code>。沒有 tool calls 才收工；有則 <code>execute_tool_calls</code>，結果寫回再取樣。<button type="button" class="peek" data-snip="turn-compact">取樣前壓縮</button> <button type="button" class="peek" data-snip="turn-tools">工具 continue</button> <button type="button" class="peek" data-snip="turn-complete">無工具</button> <button type="button" class="peek" data-snip="turn-stat">連打硬停</button></p>
+<p>同一工具連打走硬停，不經 <button type="button" class="term" data-gloss="stop-gate" aria-haspopup="dialog" aria-expanded="false">停閘<span class="term-q" aria-hidden="true">?</span></button>。權限拒絕則本輪標成取消。</p>
+<p class="src"><code>turn.rs</code> <code>handle_prompt</code> / <code>process_conversation_turn</code>；<code>stop_gate.rs</code>。</p>
+
+<h2 id="s4"><span class="no">4</span>模型工具清單固定，外部工具用兩支名字</h2>
+<p>每輪送給模型的是 <button type="button" class="term" data-gloss="tool-bridge" aria-haspopup="dialog" aria-expanded="false">ToolBridge<span class="term-q" aria-hidden="true">?</span></button> 的 <code>tool_definitions_builtins_only()</code>，再加計畫模式過濾。名稱帶 <code>__</code> 的外部伺服器工具走 <code>search_tool</code>，留在 builtins_only 之外。<button type="button" class="peek" data-snip="builtins-only">builtins_only</button></p>
+<p><code>search_tool</code> 用關鍵字檢索在 ToolIndex 上找外部伺服器工具並回 schema。<code>use_tool</code> 依 <code>server__tool</code> 名字派發。<button type="button" class="peek" data-snip="search-tool">search_tool</button> <button type="button" class="peek" data-snip="use-tool-kv">use_tool</button></p>
+<article class="xfer">
+<div class="xfer-h">search_tool / use_tool 分成兩支</div>
+<div class="xfer-grid">
+<div class="xfer-cell"><div class="lab">機制</div><p>模型永遠看到同一組內建工具加上這兩支固定名字的工具。要呼叫外部伺服器時先 search 再 use。use_tool 走內部派發，避開外層 <button type="button" class="term" data-gloss="tool-bridge" aria-haspopup="dialog" aria-expanded="false">ToolBridge<span class="term-q" aria-hidden="true">?</span></button> 鎖。</p></div>
+<div class="xfer-cell"><div class="lab">前提</div><p>模型對固定前綴做快取；工具名一變，快取失效。外部伺服器會在對話中途增減。</p></div>
+<div class="xfer-cell"><div class="lab">適配</div><p>Grok 的外部伺服器可在對話中掛上。註解寫明：工具清單跨輪穩定，新工具被發現時不改模型看到的工具名。</p></div>
+<div class="xfer-cell"><div class="lab">不抄</div><p>外部工具只經 <code>search_tool</code> 與 <code>use_tool</code> 進模型。若把本機工具名誤打進 use_tool，預設回「直接呼叫」的糾正錯誤；離線評估可關掉這條糾正。</p></div>
+</div>
+</article>
+<p>內建實作在 <code>implementations/grok_build/</code>。另有 openai/codex 與 sst/opencode 的埠，NOTICE 寫在 tools 套件。分類表只給 kind 與標籤；哪一支進清單由 Agent preset 決定。</p>
+<p class="src"><code>sampler_turn.rs:214-219</code>；<code>search_tool/mod.rs</code>；<code>use_tool/mod.rs:80-82</code>；<code>xai-grok-tools/THIRD_PARTY_NOTICES.md</code>。</p>
+
+<h2 id="s5"><span class="no">5</span>壓縮在取樣前觸發，梯子最後一階非空</h2>
+<p>壓縮在取樣前觸發，<button type="button" class="term" data-gloss="compact-ladder" aria-haspopup="dialog" aria-expanded="false">壓縮梯子<span class="term-q" aria-hidden="true">?</span></button>最後一階必須交出非空結果。計量是估計 token（上次模型回報的 total_tokens，加上之後位元組差除以 4）。門檻預設 85%：<code>used * 100 &gt;= window * pct</code>。85 在沒有 env、使用者設定、遠端覆寫時才用，與 Grok 網頁聊天共用。<span class="stamp">人工預設</span>改它的成本是重測何時開始把舊對話收成摘要。<button type="button" class="peek" data-snip="compact-85">85%</button></p>
+<p><button type="button" class="term" data-gloss="compact-ladder" aria-haspopup="dialog" aria-expanded="false">壓縮梯子<span class="term-q" aria-hidden="true">?</span></button>寫在 <code>fit.rs</code> 檔頭，順序不可重排。後一階只在前面跑完仍超標時才跑。<button type="button" class="peek" data-snip="fit-ladder">梯子</button></p>
+<div class="overflow wide"><table>
+<tr><th>階</th><th>做什麼</th><th>何時跑</th></tr>
+<tr><td>0 Verbatim</td><td>history 加 steps 已在預算內</td><td>永遠先量</td></tr>
+<tr><td>1 HistoryTurnSelected</td><td>丟最舊的歷史輪，盡量留 steps</td><td>0 仍超</td></tr>
+<tr><td>2 ToolTruncated</td><td>截過長工具結果；預算位元組 = token × 4，不做二分搜</td><td>1 仍超</td></tr>
+<tr><td>3 StepTurnsSelected</td><td>丟最舊的 step 輪</td><td>2 仍超</td></tr>
+<tr><td>4 Emergency</td><td>硬縮最新一則</td><td>3 仍超；這一階必須非空</td></tr>
+</table></div>
+<p>token × 4 來自 <code>xai-token-estimation::BYTES_PER_TOKEN = 4</code>，是位元組近似，不是再 tokenize 迴圈。跨 session 的記憶寫在 <code>~/.grok/memory/</code>；壓縮前會先 flush。transcript 追加到該 session 目錄的 <code>chat_history.jsonl</code>，壓縮時整份替換。</p>
+<article class="xfer">
+<div class="xfer-h">固定梯子，最後一階總產出</div>
+<div class="xfer-grid">
+<div class="xfer-cell"><div class="lab">機制</div><p>五階依序；後階只在仍超標時跑。Emergency 測試要求最新一則留下，計畫不得為空。</p></div>
+<div class="xfer-cell"><div class="lab">前提</div><p>steps 比舊聊天歷史更值得留。一次位元組近似對下游夠用。</p></div>
+<div class="xfer-cell"><div class="lab">適配</div><p>空的最後一階計畫曾中止「上下文太長」之後的恢復，所以最後一階必須交出非空。觸發接在取樣前，與 Grok 網頁聊天共用同一份 core 套件。</p></div>
+<div class="xfer-cell"><div class="lab">不抄</div><p>截斷用一次位元組近似，梯子順序固定。下游若硬拒超標，這一階近似就要改成精確計數。</p></div>
+</div>
+</article>
+<p class="src"><code>turn.rs:2131-2133</code>；<code>code_compaction/config.rs:13</code>；<code>intra_compaction/fit.rs</code>；<code>chat_persistence.rs</code>。</p>
+
+<h2 id="s6"><span class="no">6</span>子代理與批次腳本有預算，規則命中的 Ask 要人點頭</h2>
+<p>子代理與批次腳本有呼叫次數上限；規則命中的 Ask 維持要人點頭。子代理由父 <button type="button" class="term" data-gloss="session-actor" aria-haspopup="dialog" aria-expanded="false">SessionActor<span class="term-q" aria-hidden="true">?</span></button> 用 <code>parent_session_id</code> 登記；再往下生的會接到根。隔離預設 <code>none</code>；<code>worktree</code> 才走 <code>xai_fast_worktree::WorktreeBuilder</code>。同一對話同時跑的子代理預設 32，到上限預設排隊。<span class="stamp">人工預設 DEFAULT_MAX_CONCURRENT</span>改它的成本是重測同對話排隊延遲。<button type="button" class="peek" data-snip="admit-32">32</button></p>
+<p>workflow 用 Rhai 腳本引擎。journal 重放要序號、種類、請求雜湊全中，否則當失敗。child-agent 預算預設 128、上限 1024；現場同時跑的子代預設 32。<span class="stamp">人工預算</span>改 128 或 1024 的成本是重測 workflow 會不會在半路 Pause。<button type="button" class="peek" data-snip="agent-budget">128 / 1024</button></p>
+<p>goal 分類器每輪上限預設 10，註解寫這是 runaway 後門；主停是連續 2 次相同缺口指紋。<span class="stamp">人工選的次數</span>改 10 或 2 的成本是重測 goal 何時被強制停、會不會誤停。<button type="button" class="peek" data-snip="stall-2">stall = 2</button></p>
+<article class="xfer">
+<div class="xfer-h">規則命中的 Ask 不讓模型放行</div>
+<div class="xfer-grid">
+<div class="xfer-cell"><div class="lab">機制</div><p>gate_preflight 分開 rule-match Ask 與 fail-closed Ask。只有後者、且在 auto mode、且不是 rule-match 時，才 <code>defers_gate_ask</code> 給分類器。<button type="button" class="peek" data-snip="gate-ask">原文</button></p></div>
+<div class="xfer-cell"><div class="lab">前提</div><p>政策規則比模型判斷穩定。拆不開的命令才需要分類器。</p></div>
+<div class="xfer-cell"><div class="lab">適配</div><p>註解原文：rule-match Ask stays a prompt，never waived by a model。測試寫 model verdict must never waive a matched policy rule。</p></div>
+<div class="xfer-cell"><div class="lab">不抄</div><p>真實政策命中維持要人點頭。規則太吵該改規則，不該讓模型放行。</p></div>
+</div>
+</article>
+<p>沙箱用 <button type="button" class="term" data-gloss="Landlock" aria-haspopup="dialog" aria-expanded="false">Landlock<span class="term-q" aria-hidden="true">?</span></button> / <button type="button" class="term" data-gloss="Seatbelt" aria-haspopup="dialog" aria-expanded="false">Seatbelt<span class="term-q" aria-hidden="true">?</span></button>（feature <code>enforce</code>）。行程級網路維持開著，因為要打模型 API；Linux 子行程斷網走 <button type="button" class="term" data-gloss="seccomp" aria-haspopup="dialog" aria-expanded="false">seccomp<span class="term-q" aria-hidden="true">?</span></button>，且要 applied、configured、Linux 三條件同時成立。<button type="button" class="peek" data-snip="child-net">AND</button> 看的是請求的非 off 設定檔，不是 <code>is_active()</code>。<button type="button" class="peek" data-snip="sandbox-req">requested</button> Linux 上必要保護沒套上且不在 <button type="button" class="term" data-gloss="bwrap" aria-haspopup="dialog" aria-expanded="false">bwrap<span class="term-q" aria-hidden="true">?</span></button> 裡，shell 拒開。</p>
+<p class="src"><code>gate_preflight.rs:50-52</code>；<code>xai-grok-sandbox/src/lib.rs</code>；<code>xai-workflow/src/lib.rs</code>；<code>goal_tracker.rs:20</code>；<code>admission.rs:6</code>。</p>
+
+</div>
+<script>
+(function () {
+  var toc = document.querySelector("nav.toc");
+  var doc = document.querySelector(".doc");
+  if (!toc || !doc) return;
+  function tokenPx(name, fallback) {
+    var probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;left:-9999px;top:0;height:0;padding:0;border:0;margin:0;width:var(" + name + ")";
+    document.documentElement.appendChild(probe);
+    var w = probe.getBoundingClientRect().width;
+    document.documentElement.removeChild(probe);
+    return w || fallback;
+  }
+  function fit() {
+    /* 要放得下的是文件的真實寬度(--prose + --side-w + --side-gap)加上左欄與
+       間距。用 --prose 算會在放不下時就開左欄,整頁被推出橫向捲軸;而
+       `|| vw >= 720` 那個後門等於「一定開」,是同一個 bug 的另一半。 */
+    var vw = document.documentElement.clientWidth;
+    var need = tokenPx("--prose", 720) + tokenPx("--side-w", 304)
+             + tokenPx("--side-gap", 56) + tokenPx("--rail-w", 240)
+             + tokenPx("--rail-gap", 48) + 24;
+    document.body.classList.toggle("rail-on", vw >= need);
+  }
+  var timer;
+  function schedule() { clearTimeout(timer); timer = setTimeout(fit, 40); }
+  window.addEventListener("resize", schedule);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", schedule);
+  fit();
+
+  /* 放不下左欄時的第二種呈現:同一個 nav 拉出來。連結一點就關,因為它蓋著正文。 */
+  var tocBtn = document.getElementById("tocbtn");
+  var tocScrim = document.getElementById("tocscrim");
+  var tocClose = document.getElementById("tocclose");
+  if (tocBtn) {
+    toc.setAttribute("tabindex", "-1");
+    var setToc = function (open) {
+      document.body.classList.toggle("toc-open", open);
+      tocBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) { toc.focus(); } else { tocBtn.focus(); }
+    };
+    tocBtn.addEventListener("click", function () {
+      setToc(!document.body.classList.contains("toc-open"));
+    });
+    if (tocScrim) { tocScrim.addEventListener("click", function () { setToc(false); }); }
+    if (tocClose) { tocClose.addEventListener("click", function () { setToc(false); }); }
+    toc.addEventListener("click", function (ev) {
+      if (ev.target.closest("a")) { setToc(false); }
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && document.body.classList.contains("toc-open")) { setToc(false); }
+    });
+  }
+})();
+</script>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  if (!links.length || !window.IntersectionObserver) return;
+  var order = [], byId = {};
+  links.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (document.getElementById(id)) { order.push(id); byId[id] = a; }
+  });
+  var visible = {};
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+    var current = null;
+    for (var i = 0; i < order.length; i++) { if (visible[order[i]]) { current = order[i]; break; } }
+    links.forEach(function (a) { a.removeAttribute('aria-current'); });
+    if (current) byId[current].setAttribute('aria-current', 'true');
+  }, { rootMargin: '0px 0px -72% 0px' });
+  order.forEach(function (id) { io.observe(document.getElementById(id)); });
+})();
+</script>
+
+<div id="gloss-backdrop"></div>
+<div id="gloss-card" role="dialog" aria-modal="false">
+  <div id="gloss-card-title"></div>
+  <div id="gloss-card-text"></div>
+</div>
+<script>
+(function () {
+  // One entry per concept this document owns. `avoid` lists the near-misses
+  // this document has actually seen, i.e. the residue of picking a canonical
+  // term; it is not a general denylist of bad words.
+  var GLOSS = {
+  "mvp-agent": {
+    "t": "MvpAgent",
+    "d": "一個行程裡接「編輯器跟 agent 說話」那條協定的物件（MvpAgent）。全螢幕終端、一問一答、標準輸入輸出，都把協定打到它，由它為每個對話生一個 SessionActor（一個對話的執行緒內物件）。",
+    "avoid": [
+      "ACP agent 本體"
+    ]
+  },
+  "session-actor": {
+    "t": "SessionActor",
+    "d": "一個對話的執行緒內物件（SessionActor）。使用者一則訊息由它的 handle_prompt 跑完：反覆壓縮、送給模型、跑工具，直到模型不再叫工具；然後再問一次要不要停。",
+    "avoid": [
+      "session actor"
+    ]
+  },
+  "inner-loop": {
+    "t": "內層迴圈",
+    "d": "同一則使用者訊息裡，反覆「必要時壓縮、送給模型、若有工具就執行並寫回」直到模型不再叫工具、或同一工具連打被硬停。程式函式名是 process_conversation_turn。",
+    "avoid": [
+      "agentic loop",
+      "內圈"
+    ]
+  },
+  "stop-gate": {
+    "t": "停閘",
+    "d": "壓縮、取樣、跑工具那圈結束後再跑的那一關（run_stop_gate）。若回合結束腳本回 KeepWorking（還要繼續），就把回饋當新的使用者訊息再進那圈。同一則訊息最多續 8 次；8 是常數 MAX_STOP_HOOK_CONTINUATIONS_PER_TURN，碼裡沒寫是誰定的。",
+    "avoid": [
+      "stop gate",
+      "Stop 閘"
+    ]
+  },
+  "compact-ladder": {
+    "t": "壓縮梯子",
+    "d": "上下文超預算時固定的降級順序：先原樣、再丟最舊歷史、再截過長工具結果、再丟最舊步驟、最後硬縮最新一則。後一階只在前一階仍超標時才跑。最後一階必須交出非空結果。",
+    "avoid": [
+      "fit ladder",
+      "降級鏈"
+    ]
+  },
+  "tool-bridge": {
+    "t": "ToolBridge",
+    "d": "組好的助手物件持有的工具橋（ToolBridge）。工具註冊、外部伺服器掛載、重試設定走它內部的鎖；助手物件組好後本身不再改這些欄位。",
+    "avoid": [
+      "工具橋"
+    ]
+  },
+  "kv-list": {
+    "t": "模型工具清單",
+    "d": "每輪真正送給模型的那份工具定義。本機內建工具，加上兩支名叫 search_tool 與 use_tool 的工具。外部伺服器增減時這份名單的名稱不變，以免打斷模型對固定前綴的快取（同一串字再送一次時可沿用上次計算）。",
+    "avoid": [
+      "KV 清單",
+      "tool set"
+    ]
+  },
+  "Landlock": {
+    "t": "Landlock",
+    "d": "Linux kernel 讓未特權行程自己套用的檔案存取控制（Landlock）。",
+    "avoid": []
+  },
+  "seccomp": {
+    "t": "seccomp",
+    "d": "Kernel 系統呼叫過濾（seccomp）。子行程斷網常用這條。",
+    "avoid": [
+      "seccomp-bpf"
+    ]
+  },
+  "Seatbelt": {
+    "t": "Seatbelt",
+    "d": "macOS 用系統指令 sandbox-exec 套上的沙箱（Seatbelt）。",
+    "avoid": []
+  },
+  "bwrap": {
+    "t": "bwrap",
+    "d": "bubblewrap：換掉這個行程看到的檔案樹，讓同一路徑在裡面指向另一處（bwrap）。",
+    "avoid": [
+      "bubblewrap"
+    ]
+  }
+};
+
+  var card = document.getElementById("gloss-card");
+  var backdrop = document.getElementById("gloss-backdrop");
+  var titleEl = document.getElementById("gloss-card-title");
+  var textEl = document.getElementById("gloss-card-text");
+  if (!card || !backdrop || !titleEl || !textEl) return;
+
+  function placeNear(el) {
+    var r = el.getBoundingClientRect();
+    var top = r.bottom + window.scrollY + 6;
+    var left = Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - card.offsetWidth - 12);
+    card.style.top = top + "px";
+    card.style.left = Math.max(window.scrollX + 12, left) + "px";
+  }
+  function openGloss(el) {
+    var e = GLOSS[el.getAttribute("data-gloss")];
+    if (!e) return;
+    titleEl.textContent = e.t;
+    textEl.textContent = e.d;
+    card.style.display = "block";
+    backdrop.style.display = "block";
+    placeNear(el);
+  }
+  function closeGloss() {
+    card.style.display = "none";
+    backdrop.style.display = "none";
+  }
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button.term");
+    if (btn) { ev.preventDefault(); openGloss(btn); return; }
+    if (!ev.target.closest("#gloss-card")) closeGloss();
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeGloss(); });
+  window.addEventListener("resize", closeGloss);
+})();
+</script>
+
+<div id="srcscrim" aria-hidden="true"></div>
+<aside id="srcpane" tabindex="-1" aria-label="原文對照" aria-hidden="true">
+  <button id="srcclose" type="button" aria-label="關閉對照面板">×</button>
+  <p class="eyebrow" id="src-kind"></p>
+  <h5 id="src-title">原文對照</h5>
+  <p class="dmeta" id="src-meta"></p>
+  <p class="why" id="src-why"></p>
+  <div id="src-body"></div>
+</aside>
+<script type="application/json" id="SRC_MAP">{"pager-main": {"type": "code", "kind": "入口", "title": "pager-bin 把 headless / stdio / leader 接到 shell", "meta": "xai-grok-pager-bin/src/main.rs:40-42", "why": "組裝根只做分派，agent 迴圈不在這個 crate。", "start": 40, "hi": [40], "lines": ["use xai_grok_shell::agent::app::{run_headless, run_leader, run_stdio_agent};", "use xai_grok_shell::agent::config::Config as AgentConfig;", "use xai_grok_shell::leader::{"]}, "agent-tied": {"type": "code", "kind": "Agent", "title": "組好的 Agent 綁在該次 session，不能當獨立物件帶走", "meta": "xai-grok-agent/src/agent.rs:14-24", "why": "README 寫 portable；結構註解寫 NOT portable。以這段為準。", "start": 14, "hi": [16, 17], "lines": ["/// A fully built agent: definition + session context.", "///", "/// NOT portable — tied to a specific session via its ToolBridge,", "/// rendered system prompt, and session-level policies.", "///", "/// Created by AgentBuilder from an AgentDefinition + session context.", "///", "/// The Agent is effectively immutable after construction. It holds", "/// Arc\u003cToolBridge> — mutations to tool state (MCP registration,", "/// completion tracking, retry config) go through ToolBridge's", "/// internal locks."]}, "prompt-extend": {"type": "code", "kind": "提示", "title": "預設 Extend：底座模板再接 body", "meta": "xai-grok-agent/src/prompt/context.rs:281-306", "why": "Full 才把 body 當整份 system prompt。子代理換 subagent 模板。", "start": 281, "hi": [281, 291, 305], "lines": ["        let prompt = match self.prompt_mode {", "            PromptMode::Extend => {", "                let decrypted;", "                let base = match &self.system_prompt {", "                    TemplateOverride::Custom(template) => template.as_str(),", "                    TemplateOverride::Codex => {", "                        decrypted = apply_patch_template();", "                        &decrypted", "                    }", "                    TemplateOverride::None => {", "                        decrypted = if self.audience == PromptAudience::Subagent {", "                            subagent_template()", "                        } else {", "                            base_template()", "                        };", "                        &decrypted", "                    }", "                };", "                let mut prompt = render(base)?;", "                if let Some(body) = &self.prompt_body {", "                    prompt.push_str(\"\\n\\n\");", "                    prompt.push_str(&render(body).unwrap_or_else(|| body.clone()));", "                }", "                prompt", "            }", "            PromptMode::Full => render(self.prompt_body.as_deref().unwrap_or(\"\"))?,"]}, "handle-prompt": {"type": "code", "kind": "迴圈", "title": "handle_prompt 是一則使用者訊息的入口", "meta": "xai-grok-shell/.../turn.rs:255-270", "why": "slash、bash、workflow 都在這之前被攔截；進到這裡才開兩層迴圈。", "start": 255, "hi": [255], "lines": ["    pub(super) async fn handle_prompt(", "        self: &Arc\u003cSelf>,", "        prompt_id: &str,", "        prompt_blocks: Vec\u003cacp::ContentBlock>,", "        prompt_mode: PromptMode,", "        trace_gcs_config: Option\u003ccrate::session::repo_changes::TraceExportConfig>,", "        artifact_tracker: Option\u003ccrate::upload::manifest::ArtifactTracker>,", "        prompt_client_identifier: Option\u003cString>,", "        prompt_screen_mode: Option\u003cString>,", "        verbatim: bool,", "        send_now: bool,", "        json_schema: Option\u003cserde_json::Value>,", "        persist_ack: Option\u003coneshot::Sender\u003c()>>,", "        parsed_prompt_tx: Option\u003coneshot::Sender\u003cParsedPromptInfo>>,", "    ) -> PromptTurnResult {", "        let handle_prompt_start = std::time::Instant::now();"]}, "outer-loop": {"type": "code", "kind": "迴圈", "title": "外層：內層 Completed 之後跑 goal 或停閘", "meta": "xai-grok-shell/.../turn.rs:869-930", "why": "KeepWorking 把 hook 回饋推進 transcript，再進內層。", "start": 869, "hi": [873, 920, 925], "lines": ["        let mut result = {", "            let mut round_trace = trace_gcs_config;", "            let mut round_artifact = artifact_tracker;", "            let mut stop_continuations_this_turn: u32 = 0;", "            loop {", "                if self.goal_harness_enabled() {", "                    let goal_loop_active = self.goal_tracker.lock().status()", "                        == Some(crate::session::goal_tracker::GoalStatus::Active);", "                    self.set_goal_loop_active_resource(goal_loop_active).await;", "                }", "                let round = self", "                    .process_conversation_turn_with_recovery(", "                        prompt_id,", "                        round_trace.take(),", "                        round_artifact.take(),", "                        json_schema.clone(),", "                    )", "                    .await;", "                if !matches!(round, Ok(TurnOutcome::Completed { .. })) {", "                    break round;", "                }", "                if matches!(", "                    round,", "                    Ok(TurnOutcome::Completed {", "                        refusal: Some(_),", "                        ..", "                    })", "                ) {", "                    self.auto_pause_goal_if_active_with_message(", "                        crate::session::goal_tracker::GoalPauseReason::Infra,", "                        \"The model provider refused this goal round. Use /goal resume to retry.\"", "                            .to_string(),", "                    )", "                    .await;", "                    break round;", "                }", "                let goal_active = laziness_injection_active(", "                    self.goal_harness_enabled(),", "                    self.goal_tracker.lock().status(),", "                );", "                if goal_active {", "                    let decision = if self.goal_runs_on_workflow_engine() {", "                        self.run_goal_round_end().await", "                    } else {", "                        self.run_goal_round_end_legacy().await", "                    };", "                    if let GoalRoundDecision::Continue(directive) = decision {", "                        self.inject_goal_continuation_message(directive).await;", "                        continue;", "                    }", "                }", "                match self", "                    .run_stop_gate(prompt_id, stop_continuations_this_turn)", "                    .await", "                {", "                    StopGateDecision::AllowStop => break round,", "                    StopGateDecision::KeepWorking { feedback } => {", "                        stop_continuations_this_turn += 1;", "                        self.chat_state_handle", "                            .push_user_message(ConversationItem::stop_hook_feedback(feedback));", "                    }", "                }"]}, "turn-compact": {"type": "code", "kind": "壓縮", "title": "每輪取樣前先問要不要壓縮", "meta": "xai-grok-shell/.../turn.rs:2128-2138", "why": "壓縮失敗只記 log；只有認證失敗才中止本輪取樣。", "start": 2128, "hi": [2131, 2132], "lines": ["            if self.tool_context.task_output_token_budget.is_none() {", "                self.refresh_token_if_expired().await;", "            }", "            if self.tool_context.task_output_token_budget.is_none()", "                && let Some(trigger_info) = self.check_auto_compact_needed().await", "                && let Err(e) = self.run_compact_only(trigger_info).await", "            {", "                tracing::error!(error = %e, \"Pre-sampling auto-compaction failed\");", "                if Self::is_auth_compact_error(&e) {", "                    return Err(self.surface_compact_auth_failure(e).await);", "                }"]}, "turn-complete": {"type": "code", "kind": "迴圈", "title": "模型沒叫工具才走內層收工", "meta": "xai-grok-shell/.../turn.rs:2522-2534", "why": "空工具清單還可能被 TodoGate 再推一次。", "start": 2522, "hi": [2523], "lines": ["            self.send_buffered_xai_update(response_completed).await;", "            if tool_calls.is_empty() {", "                if !schema_ok", "                    && !turn_refused", "                    && let Some(gate_cfg) = self.todo_gate_policy()", "                {", "                    let collected = self.collect_todo_gate_input(req_id).await;", "                    let input = collected.as_input();", "                    if let TodoGateDecision::Nudge { reminder, reason } = evaluate_todo_gate(&input)", "                    {", "                        if todo_gate_fires \u003c gate_cfg.max_fires_per_prompt {", "                            todo_gate_fires += 1;", "                            tracing::info!("]}, "turn-stat": {"type": "code", "kind": "迴圈", "title": "同一工具連打達到硬停就結束本輪", "meta": "xai-grok-shell/.../turn.rs:2028-2040", "why": "這條路不經停閘，直接 StationarityEnded。", "start": 2028, "hi": [2031], "lines": ["        loop {", "            self.emit_event(crate::session::events::Event::LoopStarted { loop_index });", "            loop_index += 1;", "            if identical_tool_calls.run_len >= identical_tool_calls.hard_stop_threshold() {", "                let run_len = identical_tool_calls.run_len;", "                let tool_name = identical_tool_calls.tool_name.clone();", "                let true_noop = identical_tool_calls.is_true_noop_run;", "                tracing::warn!(", "                    session_id = %self.session_info.id,", "                    tool_name = %tool_name,", "                    run_len,", "                    true_noop,", "                    \"action stationarity: ending turn after repeated identical tool calls\""]}, "turn-tools": {"type": "code", "kind": "工具", "title": "有工具就 execute_tool_calls，結果寫回再 continue", "meta": "xai-grok-shell/.../turn.rs:2692-2718", "why": "權限拒絕會 Cancelled；FollowupMessage 當新的 user 再取樣。", "start": 2692, "hi": [2692, 2714], "lines": ["            let execute_tool_calls_result = self.execute_tool_calls(tool_call_responses).await;", "            match execute_tool_calls_result {", "                Ok(ToolLoop::PermissionReject { tool_name, reason }) => {", "                    return Ok(TurnOutcome::Cancelled {", "                        category: Some(", "                            crate::session::events::CancellationCategory::PermissionRejected,", "                        ),", "                        context: Some(serde_json::json!({", "                            \"tool_name\": tool_name,", "                            \"reason\": reason,", "                        })),", "                    });", "                }", "                Ok(ToolLoop::HookDenied { .. }) => {}", "                Ok(ToolLoop::Cancelled) => {", "                    return Ok(TurnOutcome::Cancelled {", "                        category: Some(", "                            crate::session::events::CancellationCategory::PermissionCancelled,", "                        ),", "                        context: None,", "                    });", "                }", "                Ok(ToolLoop::FollowupMessage(followup_message)) => {", "                    self.add_followup_message_as_user_turn(&followup_message)", "                        .await;", "                    continue;", "                }"]}, "stop-gate": {"type": "code", "kind": "停閘", "title": "續跑次數滿 8 就不再問 hook，直接停", "meta": "xai-grok-shell/.../stop_gate.rs:9,278-289", "why": "8 是程式常數 MAX_STOP_HOOK_CONTINUATIONS_PER_TURN，碼裡沒寫是誰定的。", "start": 9, "hi": [9], "lines": ["pub const MAX_STOP_HOOK_CONTINUATIONS_PER_TURN: u32 = 8;", "", "const SESSION_END_STOP_BUDGET: std::time::Duration = std::time::Duration::from_secs(5);"]}, "stop-gate-cap": {"type": "code", "kind": "停閘", "title": "滿 8 次的強制停路徑", "meta": "xai-grok-shell/.../stop_gate.rs:278-289", "why": "續跑次數到上限時連 Stop hook 都不叫，直接 AllowStop。", "start": 278, "hi": [280, 289], "lines": ["        // At the cap no hook is consulted or notified for this forced stop,", "        // unlike the force-stop path below which still notifies observers.", "        if continuations_this_turn >= MAX_STOP_HOOK_CONTINUATIONS_PER_TURN {", "            tracing::warn!(", "                continuations_this_turn,", "                \"stop hook continuation limit reached; ending the turn\"", "            );", "            self.send_hook_annotation(&format!(", "                \"\\u{26a0} Stop hooks kept the agent working {MAX_STOP_HOOK_CONTINUATIONS_PER_TURN} times this turn: limit reached, ending the turn\"", "            ))", "            .await;", "            return StopGateDecision::AllowStop;"]}, "builtins-only": {"type": "code", "kind": "工具清單", "title": "送給模型的是 builtins_only，不含名稱帶 __ 的外部伺服器工具", "meta": "xai-grok-shell/.../sampler_turn.rs:214-219", "why": "外部伺服器走 search_tool / use_tool，不進這份清單。", "start": 214, "hi": [216], "lines": ["    pub(super) async fn prepare_tool_definitions_inner(&self) -> Vec\u003cToolDefinition> {", "        let bridge = self.agent.borrow().tool_bridge().clone();", "        let defs = bridge.tool_definitions_builtins_only().await;", "        let plan_active = self.plan_mode.lock().is_active();", "        filter_cursor_tools_by_plan_mode(defs, plan_active)", "    }"]}, "search-tool": {"type": "code", "kind": "外部工具", "title": "search_tool 用關鍵字檢索在 ToolIndex 裡找外部伺服器工具", "meta": "xai-grok-tools/.../search_tool/mod.rs:1-14", "why": "search_tool 只負責發現外部伺服器工具與回 schema，自己不執行。", "start": 1, "hi": [1, 14], "lines": ["//! `search_tool` — discover MCP tools via BM25 keyword search.", "", "pub mod types;", "", "pub use types::SearchToolInput;", "", "use crate::types::output::{SearchToolOutput, ToolOutput};", "use crate::types::tool::{ToolKind, ToolNamespace};", "use crate::types::tool_index::ToolIndex;", "", "/// Wire name of the MCP discovery tool (see [`USE_TOOL_NAME`]).", "///", "/// [`USE_TOOL_NAME`]: crate::implementations::use_tool::USE_TOOL_NAME", "pub const SEARCH_TOOL_NAME: &str = \"search_tool\";"]}, "use-tool-kv": {"type": "code", "kind": "外部工具", "title": "use_tool 存在是為了讓模型工具清單跨輪固定", "meta": "xai-grok-tools/.../use_tool/mod.rs:68-82", "why": "新的外部伺服器工具被發現時不改模型看到的工具名，以免打斷前綴快取。", "start": 68, "hi": [80, 81, 82], "lines": ["/// Meta tool that dispatches calls to MCP tools discovered via `search_tool`.", "///", "/// `run()` reads [`InnerDispatch`] from `ToolCallContext::extensions` — set", "/// by `FinalizedToolset::call()` on every call — and dispatches to the target", "/// tool via the runtime `ToolDispatch` trait → `FinalizedToolset::call_raw()`.", "/// This bypasses the outer `ToolBridge` mutex and avoids deadlock.", "/// `call_raw()` skips reminders/persistence so post-processing", "/// runs exactly once (via the outer `call(\"use_tool\")`).", "///", "/// If `InnerDispatch` is absent, dispatch fails with a clear error (should", "/// never happen in production — `FinalizedToolset::call()` always sets it).", "///", "/// The tool exists so its definition appears in the model's tool list —", "/// keeping the tool set stable across turns (no KV cache breaks when new", "/// MCP tools are discovered)."]}, "fit-ladder": {"type": "code", "kind": "壓縮", "title": "降級梯子順序寫死，後一階只在仍超標時才跑", "meta": "xai-grok-compaction/.../fit.rs:1-19", "why": "最後一階 Emergency 必須交出非空。", "start": 1, "hi": [3, 18], "lines": ["//! Fit FullReplace summarizer input to a **token** budget.", "//!", "//! # Ordered ladder (strict sequence — do not reorder)", "//!", "//! Stages run **in order**. A later stage is attempted **only if** earlier", "//! stages still leave `history ++ steps` over budget. Effects accumulate", "//! (e.g. `ToolTruncated` may already have dropped history).", "//!", "//! ```text", "//! 0. Verbatim              history ++ steps already ≤ budget", "//! 1. HistoryTurnSelected   drop oldest **history** turns first", "//!                          (prefer keeping all steps)", "//! 2. ToolTruncated         only if still over: prefix-clip tool results", "//!                          that alone exceed budget (grok-build style:", "//!                          max_bytes = max_tokens * 4, no binary search)", "//! 3. StepTurnsSelected     only if still over: drop oldest **step** turns", "//!                          (keep remaining history)", "//! 4. Emergency             only if still over: hard-shrink newest item", "//! ```"]}, "compact-85": {"type": "code", "kind": "壓縮", "title": "沒有 env / 設定 / 遠端覆寫時，預設 85% 觸發", "meta": "xai-grok-compaction/.../config.rs:10-13", "why": "這個 85% 與 Grok chat 共用，沒有 env 或遠端覆寫時才用。", "start": 10, "hi": [13], "lines": ["/// Default auto-compact threshold (% of context window) when no other source", "/// (env var, user config, remote per-model/global flags) sets it. Shared by", "/// grok-build and Grok chat (~85% trigger on both sides).", "pub const DEFAULT_AUTO_COMPACT_THRESHOLD_PERCENT: u8 = 85;"]}, "gate-ask": {"type": "code", "kind": "權限", "title": "規則命中的 Ask 不讓模型放行", "meta": "xai-grok-workspace/.../gate_preflight.rs:46-53", "why": "只有拆不開命令的 fail-closed Ask 才可交給分類器。", "start": 46, "hi": [50, 51, 52], "lines": ["            || matches!(bash_command, Some(GateDecision::AskRuleMatch))", "            || matches!(shell_file, Some(GateDecision::AskRuleMatch));", "        let fail_closed_ask = matches!(bash_command, Some(GateDecision::AskFailClosed))", "            || matches!(shell_file, Some(GateDecision::AskFailClosed));", "        // WHY: a fail-closed Ask means analysis could not decompose the command", "        // to check rules, so the classifier arbitrates it; a rule-match Ask is", "        // an actual policy match that stays a prompt (never waived by a model).", "        let defers_gate_ask = auto_mode && fail_closed_ask && !rule_match_ask;"]}, "sandbox-req": {"type": "code", "kind": "沙箱", "title": "看的是請求了哪個設定檔，不是套用成功", "meta": "xai-grok-sandbox/src/lib.rs:110-117", "why": "請求了非 off profile 卻沒套上，仍然當受困來警告，不看 is_active。", "start": 110, "hi": [112, 115], "lines": ["/// The non-`off` sandbox profile this process was **requested** with, if any.", "///", "/// This is the configured request, not a report that enforcement succeeded —", "/// `is_active()` can be false while the process is still confined (e.g. some", "/// Linux bwrap paths), and a requested-but-unapplied profile already warns the", "/// user. Keying on the request is the fail-closed choice.", "pub fn requested_confinement_profile() -> Option\u003c&'static str> {", "    configured_profile_name().filter(|name| profile_confines(name))"]}, "child-net": {"type": "code", "kind": "沙箱", "title": "子行程斷網要 applied 且 configured 且 Linux 同時成立", "meta": "xai-grok-sandbox/src/lib.rs:86-88", "why": "三條件 AND，少一個就不裝 seccomp 網濾。", "start": 86, "hi": [87], "lines": ["fn restrict_network_at_known_linux_launches(applied: bool, configured: bool) -> bool {", "    applied && configured && cfg!(target_os = \"linux\")", "}"]}, "agent-budget": {"type": "code", "kind": "workflow", "title": "child-agent 預算預設 128，上限 1024", "meta": "xai-workflow/src/lib.rs:15-17", "why": "每個 agent() 與 parallel() 項花一格。", "start": 15, "hi": [15, 16], "lines": ["pub const DEFAULT_AGENT_BUDGET: u64 = 128;", "pub const MAX_AGENT_BUDGET: u64 = 1_024;"]}, "admit-32": {"type": "code", "kind": "子代理", "title": "同一 session 同時跑的子代理預設 32", "meta": "xai-grok-tools/.../admission.rs:6", "why": "同一 session 同時跑的子代理到 32 時預設排隊，不直接失敗。", "start": 6, "hi": [6], "lines": ["pub const DEFAULT_MAX_CONCURRENT: usize = 32;", "", "/// What happens to a spawn that arrives at the concurrent limit.", "#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]", "pub enum LimitBehavior {", "    #[default]", "    Queue,", "    Fail,", "}"]}, "stall-2": {"type": "code", "kind": "goal", "title": "連續兩次相同缺口指紋就當停滯", "meta": "xai-grok-shell/.../goal_tracker.rs:16-20", "why": "這是比 run cap 10 更便宜的主停條件。", "start": 16, "hi": [20], "lines": ["/// Consecutive identical gap fingerprints that trip the stall", "/// early-exit: two in a row means the model produced no change in the", "/// flagged gaps between attempts, so iterating further is futile and", "/// the goal auto-pauses before exhausting the run cap.", "pub(crate) const GOAL_CLASSIFIER_STALL_THRESHOLD: u32 = 2;"]}}</script>
+<script>
+/* 原文對照面板。點圖上帶小圓點的節點，或句子裡的 .peek 小標籤，右側滑出原文。
+   停用 JS 時面板不會出現，出處仍在每一節末尾的引文行，所以資訊不會消失。 */
+(function () {
+  var MAP = JSON.parse(document.getElementById("SRC_MAP").textContent);
+  var pane = document.getElementById("srcpane");
+  var scrim = document.getElementById("srcscrim");
+  var last = null;
+
+  function codeBlock(d) {
+    var pre = document.createElement("pre");
+    var codeEl = document.createElement("code");
+    d.lines.forEach(function (line, i) {
+      var n = d.start + i;
+      var row = document.createElement("span");
+      row.className = d.hi.indexOf(n) >= 0 ? "l hi" : "l";
+      var num = document.createElement("span");
+      num.className = "ln";
+      num.textContent = String(n);
+      row.appendChild(num);
+      row.appendChild(document.createTextNode(line));
+      codeEl.appendChild(row);
+    });
+    pre.appendChild(codeEl);
+    return pre;
+  }
+
+  function refBlock(d) {
+    var frag = document.createDocumentFragment();
+    var ul = document.createElement("ul");
+    ul.className = "refmeta";
+    d.rows.forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML = "<b>" + r[0] + "</b>：" + r[1];
+      ul.appendChild(li);
+    });
+    frag.appendChild(ul);
+    var q = document.createElement("blockquote");
+    q.innerHTML = d.quote;
+    frag.appendChild(q);
+    if (d.url) {
+      var p = document.createElement("p");
+      p.className = "dlink";
+      p.innerHTML = '<a class="xref" href="' + d.url + '">' + d.linktext + "</a>";
+      frag.appendChild(p);
+    }
+    return frag;
+  }
+
+  function open(id, trigger) {
+    var d = MAP[id];
+    if (!d) return;
+    last = trigger || null;
+    document.getElementById("src-kind").textContent = d.kind || "";
+    document.getElementById("src-title").textContent = d.title || "";
+    document.getElementById("src-meta").textContent = d.meta || "";
+    document.getElementById("src-why").innerHTML = d.why || "";
+    var body = document.getElementById("src-body");
+    body.textContent = "";
+    body.appendChild(d.type === "code" ? codeBlock(d) : refBlock(d));
+    pane.classList.add("on");
+    scrim.classList.add("on");
+    pane.setAttribute("aria-hidden", "false");
+    pane.scrollTop = 0;
+    pane.focus();
+  }
+
+  function close() {
+    pane.classList.remove("on");
+    scrim.classList.remove("on");
+    pane.setAttribute("aria-hidden", "true");
+    if (last && last.focus) last.focus();
+  }
+
+  document.addEventListener("click", function (ev) {
+    var t = ev.target.closest ? ev.target.closest("[data-snip]") : null;
+    if (t) { open(t.getAttribute("data-snip"), t); return; }
+    if (ev.target.id === "srcclose" || ev.target.id === "srcscrim") close();
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { close(); return; }
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    var t = ev.target.closest ? ev.target.closest("[data-snip]") : null;
+    if (t) { ev.preventDefault(); open(t.getAttribute("data-snip"), t); }
+  });
+})();
+</script>
+</body>
+</html>

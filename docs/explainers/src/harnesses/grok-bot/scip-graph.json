@@ -1,0 +1,103 @@
+{
+  "generated": "2026-08-30",
+  "tool": "scip-typescript 0.4.0",
+  "clone": "/mnt/e/grok-bot-0.18-reconstructed",
+  "documents": 8,
+  "indexedFns": 327,
+  "nodes": [
+    {
+      "id": "n0",
+      "name": "dispatchUserTurn",
+      "file": "host/extensions/transcript/send-turn-dispatch.ts",
+      "line": 49,
+      "seed": true,
+      "scipCallees": 1
+    },
+    {
+      "id": "n2",
+      "name": "sendPrompt",
+      "file": "host/extensions/transcript/send-pipeline.ts",
+      "line": 100,
+      "seed": true,
+      "scipCallees": 2
+    },
+    {
+      "id": "n3",
+      "name": "sendPromptOnce",
+      "file": "host/extensions/transcript/send-pipeline.ts",
+      "line": 149,
+      "seed": true,
+      "scipCallees": 22
+    },
+    {
+      "id": "n26",
+      "name": "runTurn",
+      "file": "host/extensions/transcript/turn-runtime.ts",
+      "line": 327,
+      "seed": true,
+      "scipCallees": 11
+    },
+    {
+      "id": "n38",
+      "name": "runTurnLoop",
+      "file": "packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts",
+      "line": 2548,
+      "seed": true,
+      "scipCallees": 57
+    },
+    {
+      "id": "n50",
+      "name": "executeStepWithMetrics",
+      "file": "packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts",
+      "line": 3175,
+      "seed": true,
+      "scipCallees": 2
+    },
+    {
+      "id": "n97",
+      "name": "runStep",
+      "file": "packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts",
+      "line": 1868,
+      "seed": false,
+      "scipCallees": 0
+    },
+    {
+      "id": "n99",
+      "name": "handle",
+      "file": "packages/agent/actions/user-message-action/user-message-action-handler.ts",
+      "line": 328,
+      "seed": true,
+      "scipCallees": 4
+    },
+    {
+      "id": "n102",
+      "name": "run",
+      "file": "host/runner/sand-agent-runner.ts",
+      "line": 1177,
+      "seed": true,
+      "scipCallees": 0
+    }
+  ],
+  "edges": [
+    {
+      "from": "n2",
+      "to": "n3"
+    },
+    {
+      "from": "n3",
+      "to": "n0"
+    },
+    {
+      "from": "n38",
+      "to": "n50"
+    },
+    {
+      "from": "n50",
+      "to": "n97"
+    },
+    {
+      "from": "n99",
+      "to": "n38"
+    }
+  ]
+}

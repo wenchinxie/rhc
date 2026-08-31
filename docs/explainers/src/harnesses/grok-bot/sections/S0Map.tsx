@@ -1,0 +1,30 @@
+import { Peek } from "../../../components/Peek";
+import { DAG_SVG } from "../dagMarkup";
+
+export function S0Map() {
+  return (
+    <>
+      <h2 id="s0">
+        <span className="no">0</span>七塊職責總覽
+      </h2>
+      <p>
+        這張圖是產品的七塊工作。畫面交出送出；調度決定誰接
+        <code>sendPrompt</code>
+        ；機器是隔離環境；接納去重並寫回聲。迴圈每一步字一出就回畫面；沒結束時要人（問句、權限、插話）或要工具；工具結果寫回再問。目錄是可呼叫清單，執行才 spawn。
+        <span className="stamp">2026-08-30 first-principles</span>
+      </p>
+      <figure id="map">
+        <div
+          className="overflow dagbox wide"
+          dangerouslySetInnerHTML={{ __html: DAG_SVG }}
+        />
+      </figure>
+      <p className="src">
+        圖按七塊職責排出。原始碼複製{" "}
+        <code>/mnt/e/grok-bot-0.18-reconstructed</code> @ a9f633e · 產品 0.18.0 ·
+        應用程式識別 <code>com.anysphere.sand</code>。
+        <Peek snip="product">產品名</Peek>
+      </p>
+    </>
+  );
+}

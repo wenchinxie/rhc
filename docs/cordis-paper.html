@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>這篇 plugin runtime 論文：卸載要留下拆法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,650;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1915;
+    --muted: #5c564c;
+    --paper: #f3eee4;
+    --card: #fffaf2;
+    --line: #d9d0c2;
+    --rust: #9a3412;
+    --rust-soft: #f3e0d4;
+    --ok: #3f5c3a;
+    --warn: #8a5a12;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 17px/1.6 "IBM Plex Sans", "Noto Sans TC", sans-serif;
+  }
+  header.top {
+    border-bottom: 1px solid var(--line);
+    padding: 1.1rem 1.4rem 1rem;
+    background: var(--card);
+  }
+  header.top .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-family: Newsreader, "Noto Serif TC", serif;
+    font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+    font-weight: 650;
+    line-height: 1.2;
+    margin: 0.35rem 0 0.5rem;
+    max-width: 22ch;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+  }
+  nav a { color: var(--rust); text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  main { max-width: 46rem; margin: 0 auto; padding: 1.6rem 1.3rem 4rem; }
+  h2 {
+    font-family: Newsreader, "Noto Serif TC", serif;
+    font-size: 1.45rem;
+    font-weight: 650;
+    margin: 2.2rem 0 0.7rem;
+    line-height: 1.25;
+  }
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 1.4rem 0 0.4rem;
+  }
+  p { margin: 0.7rem 0; }
+  .apex p { font-size: 1.04rem; }
+  .field {
+    border-left: 3px solid var(--rust);
+    padding: 0.15rem 0 0.15rem 0.9rem;
+    margin: 1.1rem 0;
+  }
+  .field .lab {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.25rem;
+  }
+  .field p { margin: 0.25rem 0; }
+  .caption {
+    font-size: 0.86rem;
+    color: var(--muted);
+    margin: 0.35rem 0 1.1rem;
+  }
+  pre {
+    margin: 0.7rem 0 1rem;
+    padding: 0.85rem 1rem;
+    background: #1c1915;
+    color: #f3eee4;
+    overflow-x: auto;
+    font: 0.8rem/1.45 ui-monospace, "IBM Plex Mono", monospace;
+  }
+  pre.out {
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  figure {
+    margin: 1.2rem 0;
+    padding: 0.9rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+  figure svg { width: 100%; height: auto; display: block; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    margin: 0.8rem 0 1.1rem;
+  }
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  th { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+  code, .mono {
+    font-family: ui-monospace, "IBM Plex Mono", monospace;
+    font-size: 0.88em;
+  }
+  button.term {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--rust);
+  }
+  .term-q {
+    color: var(--rust);
+    font-size: 0.72em;
+    font-weight: 600;
+    margin-left: 0.12em;
+    vertical-align: super;
+  }
+  .xfer-stack { margin: 1rem 0 1.4rem; }
+  article.xfer {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 0.9rem 1rem 1rem;
+  }
+  .xfer-head { display: flex; justify-content: space-between; gap: 0.8rem; align-items: baseline; }
+  .xfer-head .name { margin: 0; font-size: 1rem; }
+  .xfer-meta .lever {
+    font-size: 0.75rem;
+    color: var(--rust);
+    background: var(--rust-soft);
+    padding: 0.12rem 0.4rem;
+  }
+  .xfer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem 0.9rem;
+    margin-top: 0.8rem;
+  }
+  .xfer-cell .lab {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.2rem;
+  }
+  .xfer-cell p { margin: 0; font-size: 0.92rem; }
+  .xfer-cell.break { grid-column: 1 / -1; }
+  footer.page {
+    margin-top: 2.6rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+  #gloss-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 25, 21, 0.18);
+    z-index: 40;
+  }
+  #gloss-backdrop.open { display: block; }
+  #gloss-card {
+    display: none;
+    position: absolute;
+    z-index: 41;
+    width: min(22rem, calc(100vw - 1.6rem));
+    background: var(--card);
+    border: 1px solid var(--ink);
+    padding: 0.75rem 0.85rem 0.85rem;
+    box-shadow: 4px 6px 0 rgba(28, 25, 21, 0.08);
+  }
+  #gloss-card.open { display: block; }
+  #gloss-card-title { margin: 0 0 0.3rem; font-size: 1rem; }
+  #gloss-card-text { margin: 0; font-size: 0.92rem; }
+  #glossary { margin-top: 2.4rem; }
+  .gcard {
+    border-top: 1px solid var(--line);
+    padding: 0.7rem 0;
+  }
+  .gcard h3 { margin: 0 0 0.25rem; }
+  .live {
+    margin: 0.9rem 0 1.1rem;
+    padding: 0.9rem 1rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--ink);
+  }
+  .live .now {
+    font-family: ui-monospace, "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    margin: 0 0 0.7rem;
+    color: var(--rust);
+  }
+  .pegs {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin: 0 0 0.7rem;
+  }
+  .peg {
+    min-width: 6.2rem;
+    padding: 0.55rem 0.6rem 0.5rem;
+    border: 1px dashed var(--line);
+    background: var(--paper);
+    font-size: 0.88rem;
+  }
+  .peg.on {
+    border: 1px solid var(--ink);
+    background: var(--rust-soft);
+  }
+  .peg .k { font-weight: 600; display: block; word-break: break-all; }
+  .peg .v { color: var(--muted); font-size: 0.8rem; }
+  .undos {
+    font-size: 0.86rem;
+    color: var(--muted);
+    margin: 0 0 0.7rem;
+  }
+  .demo-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .demo-bar button {
+    appearance: none;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font: 600 0.92rem/1.2 "IBM Plex Sans", sans-serif;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+  }
+  .demo-bar button.primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  @media (max-width: 640px) {
+    .xfer-grid { grid-template-columns: 1fr; }
+    .xfer-cell.break { grid-column: auto; }
+    h1 { max-width: none; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="kicker">論文核對 · 2026-08-15 · rhc</div>
+  <h1>這篇 plugin runtime 論文：卸載要留下拆法</h1>
+  <p class="caption">Shi, Zhang, Cui，《A Programming Paradigm for Spatiotemporal Composability》，2026-08-13 preprint。<a href="https://github.com/cordiverse/paper">github.com/cordiverse/paper</a></p>
+  <nav>
+    <a href="#demo">掛板示範</a>
+    <a href="#apex">結論</a>
+    <a href="#two-axes">兩軸</a>
+    <a href="#map">對到程式</a>
+    <a href="#audit">論文查核</a>
+    <a href="#xfer">轉用</a>
+    <a href="#glossary">詞卡</a>
+  </nav>
+</header>
+<main>
+<section id="demo">
+  <h2>掛板示範：同一個 dict，每次 hang 留 undo</h2>
+  <p>人決定這次 process 掛哪些 plugin（<code>MOUNT</code>）。每一 step 模型回一個工具名。loop 是另一個 plugin，只做 <code>board.use(那個名字)</code>。兩段接在同一塊掛板上：loop 的 <button type="button" class="term" data-gloss="inject" aria-haspopup="dialog" aria-expanded="false">inject<span class="term-q" aria-hidden="true">?</span></button> 等 <code>search_tool</code>／<code>use_tool</code> 掛好才開工。腳本：<span class="mono">docs/board.py</span>。</p>
+  <div class="live">
+    <p class="now" id="demo-line">按「下一步」開始</p>
+    <div class="pegs">
+      <div class="peg" id="peg-st"><span class="k">search_tool</span><span class="v" id="val-st">（空）</span></div>
+      <div class="peg" id="peg-ut"><span class="k">use_tool</span><span class="v" id="val-ut">（空）</span></div>
+      <div class="peg" id="peg-loop"><span class="k">loop ready</span><span class="v" id="val-loop">no</span></div>
+      <div class="peg" id="peg-gh"><span class="k">mcp__github__create_issue</span><span class="v" id="val-gh">（空）</span></div>
+      <div class="peg" id="peg-sl"><span class="k">mcp__slack__post</span><span class="v" id="val-sl">（空）</span></div>
+    </div>
+    <p class="undos" id="demo-pick">this step -&gt;</p>
+    <p class="undos" id="demo-log">items: []</p>
+    <div class="demo-bar">
+      <button type="button" class="primary" id="demo-next">下一步</button>
+      <button type="button" id="demo-reset">重來</button>
+    </div>
+  </div>
+<pre id="board-src">MOUNT = ["github"]   # 這次 process 有什麼。YAML / profile。
+
+
+def loop_step(board, model_choice):
+    # loop 裡沒有 github / slack。
+    return board.use(model_choice)
+
+
+def main():
+    board = Board()
+    tools = Plugin(board, "tools", inject=[])
+    tools.hang("search_tool", "search")
+    tools.hang("use_tool", "dispatch")
+
+    loop = Plugin(board, "loop", inject=["search_tool", "use_tool"])
+    # loop.ready() 等 tools 掛上，不是等某一個產品
+
+    for name in MOUNT:
+        plugin = Plugin(board, name, inject=["use_tool"])
+        plugin.hang("mcp__github__create_issue", "opened issue")
+
+    loop_step(board, "mcp__github__create_issue")  # 模型這 step 選的
+    loop_step(board, "mcp__slack__post")           # KeyError：這次沒掛 slack</pre>
+</section>
+
+<section class="apex" id="apex">
+  <p><strong>這篇論文把 plugin 卸載寫成 runtime 保證：每次改共用狀態都留下拆法，依賴沒齊就停工。</strong>作者是史一凡（北大／DeepSeek）、張煒（北大）、崔天意（DeepSeek）。稿件標成 2026-08-13 draft，內容還會改。</p>
+  <p>DeepSeek Harness 的「everything is a plugin」掛在這套保證上。論文的實作證據是聊天機器人框架 <button type="button" class="term" data-gloss="koishi" aria-haspopup="dialog" aria-expanded="false">Koishi<span class="term-q" aria-hidden="true">?</span></button>，超過 4000 個社群 plugin。自我演化的 agent harness 寫在結論當下一步，不是已量測結果。</p>
+  <p>對 rhc：借 <code>ctx.effect</code> 回傳拆法，以及 <button type="button" class="term" data-gloss="inject" aria-haspopup="dialog" aria-expanded="false">inject<span class="term-q" aria-hidden="true">?</span></button> 等 key。不要先抄演算或定理清單。</p>
+
+  <div class="field" id="summary">
+    <p class="lab">summary</p>
+    <p>掛上東西時記下怎麼拆。料不齊就不動手。料被拿走，先拆靠它的人。</p>
+  </div>
+  <div class="field" id="feynman">
+    <p class="lab">feynman</p>
+    <p>想像一塊共用掛板。一個工位把釘子釘上去，掛燈、掛尺。工位收攤時必須拔自己釘的釘子，燈才不會留在別人板上。開工前要看鑽孔機在不在板上；鑽孔機被拿走，這個工位先停、先拔釘，再讓鑽孔機離開。論文把「拔釘」做成每次改掛板都帶回來的拆法，把「等鑽孔機」做成掛板一變就通知工位。</p>
+  </div>
+  <div class="field" id="use_case">
+    <p class="lab">use_case</p>
+    <p>as_of 2026-08-13。來源：論文 PDF；DSH <code>vendor/cordis</code> 與 <code>docs/cordis-primer.md</code>。已落地：<button type="button" class="term" data-gloss="koishi" aria-haspopup="dialog" aria-expanded="false">Koishi<span class="term-q" aria-hidden="true">?</span></button> 用 <button type="button" class="term" data-gloss="cordis" aria-haspopup="dialog" aria-expanded="false">Cordis<span class="term-q" aria-hidden="true">?</span></button> v3 跑開放 plugin 生態。DSH vendor 的是 v4.0.0-rc.7。不是證據：用這篇論文證明 DSH 的 agent loop 正確。</p>
+  </div>
+</section>
+
+<section id="two-axes">
+  <h2>論文做的是把卸載與依賴做成 runtime 保證</h2>
+  <p>靜態組合在編譯期定案：函式呼叫、import、繼承。動態組合要在跑的時候掛上、卸下、改設定。作業系統用重啟行程換時間軸；容器編排器用服務邊界換空間軸。論文說這兩層太粗：重啟丟掉行程內快取與進行中工作，容器又表達不了同一位址空間裡的依賴。</p>
+  <p>VS Code 是反例。Marketplace 2026-06-09：安裝數前 100 個擴充裡，87 個有可執行碼，卸載要重啟 extension host；只有 7 個對非內建擴充宣告 <code>extensionDependencies</code>。擴充靠主機提供的 command／view，彼此幾乎不宣告依賴。</p>
+  <p>論文拆兩軸，合稱 <button type="button" class="term" data-gloss="spatiotemporal" aria-haspopup="dialog" aria-expanded="false">時空可組合<span class="term-q" aria-hidden="true">?</span></button>：</p>
+  <table>
+    <thead>
+      <tr><th>軸</th><th>問什麼</th><th>論文機制</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>時間</td>
+        <td>卸下一個工位，掛板能不能回到它來之前</td>
+        <td><button type="button" class="term" data-gloss="revertible" aria-haspopup="dialog" aria-expanded="false">可逆副作用<span class="term-q" aria-hidden="true">?</span></button>：每次改 Γ 都帶反函數，runtime 累積拆法</td>
+      </tr>
+      <tr>
+        <td>空間</td>
+        <td>工位怎麼宣告、發現、等別人提供的料</td>
+        <td><button type="button" class="term" data-gloss="reactive-co" aria-haspopup="dialog" aria-expanded="false">反應式共效<span class="term-q" aria-hidden="true">?</span></button>：對規格把每次改掛板分成開工／停工／沒事</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>古典 effect／coeffect 是編譯期註解。這篇把它們 reify 成跑得動的 Context 型別。</p>
+</section>
+
+<section id="time">
+  <h2>時間軸：每次改掛板都留下拆法</h2>
+  <p>一個副作用是 Γ → Γ × (Γ → Γ)：改現況，並交出拆法。拆法只保證在「它剛改完的那個狀態」還原，不是任意狀態都行。</p>
+  <p>掛板旁邊放一個累積器 φ。每做一次改動，就把這次的拆法接上去。全部拆完等於從頭沒掛過（Theorem 7）。同一工位自己的釘子，後掛的先拔（Theorem 16，LIFO）。</p>
+  <p>兩個工位的釘子要能交錯拔，論文多要一個條件：<button type="button" class="term" data-gloss="independence" aria-haspopup="dialog" aria-expanded="false">獨立<span class="term-q" aria-hidden="true">?</span></button>（Definition 19）。兩邊的改動要可交換，而且不能改壞對方交出來的拆法。這個條件不自動成立。做不到就退回兩條較弱的路：同一工位仍 LIFO；跨工位靠共效規格排卸載順序。</p>
+  <figure>
+    <svg viewBox="0 0 640 168" role="img" aria-labelledby="fig1-title fig1-cap">
+      <title id="fig1-title">掛板、釘子、拆法</title>
+      <rect x="8" y="18" width="624" height="132" fill="#fffaf2" stroke="#1c1915"/>
+      <rect x="28" y="42" width="170" height="88" fill="#f3e0d4" stroke="#9a3412"/>
+      <text x="113" y="78" text-anchor="middle" font-size="14" font-family="IBM Plex Sans,sans-serif">工位掛燈</text>
+      <text x="113" y="100" text-anchor="middle" font-size="12" fill="#5c564c" font-family="IBM Plex Sans,sans-serif">留下拔釘法</text>
+      <path d="M210 86 H268" stroke="#1c1915" marker-end="url(#arr)"/>
+      <rect x="276" y="42" width="170" height="88" fill="#fffaf2" stroke="#1c1915"/>
+      <text x="361" y="78" text-anchor="middle" font-size="14" font-family="IBM Plex Sans,sans-serif">掛板 Γ + φ</text>
+      <text x="361" y="100" text-anchor="middle" font-size="12" fill="#5c564c" font-family="IBM Plex Sans,sans-serif">拆法往回疊</text>
+      <path d="M458 86 H516" stroke="#1c1915" marker-end="url(#arr)"/>
+      <rect x="524" y="42" width="92" height="88" fill="#fffaf2" stroke="#1c1915"/>
+      <text x="570" y="90" text-anchor="middle" font-size="14" font-family="IBM Plex Sans,sans-serif">收回</text>
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6" fill="none" stroke="#1c1915"/>
+        </marker>
+      </defs>
+    </svg>
+    <p class="caption" id="fig1-cap">圖：工位釘燈時把拔釘法交給掛板。卸載跑 φ，燈離開，板回到原狀。</p>
+  </figure>
+</section>
+
+<section id="space">
+  <h2>空間軸：缺料就停，料走了先拆依賴者</h2>
+  <p>共效表 Σ 是有型別的部分函式：key → 值。寫入 <code>set(k,v)</code> 本身就是一次可拆的改動，拆法是刪掉那個 key。</p>
+  <p>一個 plugin 宣告規格 d（它要讀的 key）。掛板從 σ 變到 σ′ 時，對 d 只分三種：剛齊（開工）、剛缺（停工）、沒變（沒事）。齊了才執行 e；缺了就跑累積器。</p>
+  <p>單向排序免費：B 要的 key 由 A 提供，B 只能在 A 開工之後開工。反向要額外機器：A 卸載時先通知依賴者，等他們拆完，A 的值還留在表上。這是 §4.3.1 的 withdrawal，對應程式裡 UNLOADING 先宣告停供、再 dispose。</p>
+  <p><button type="button" class="term" data-gloss="isolate" aria-haspopup="dialog" aria-expanded="false">isolate<span class="term-q" aria-hidden="true">?</span></button> 與 intercept 不改共用表。它們長出子掛板，丟掉子環境就夠了，沒有要追蹤的拆法。</p>
+</section>
+
+<section id="calc">
+  <h2>plugin 加 fiber 才把兩軸接到整棵樹</h2>
+  <p>一個 plugin 是三元組 (d, p, e)：要讀的 key、會寫的 key、開工時跑的副作用。實例叫 fiber。registry 是一棵以 root 為根的樹。共用表是所有 ACTIVE fiber 的 p 的不交聯集。同一 realm 裡兩條實例不能寫同一個 key。</p>
+  <p>§4.2 先假設轉移原子、立刻、不會失敗。§4.3 再放進真實 runtime：withdrawal、iteration、非同步、失敗。卸載一旦開始會跑完，這叫慣性。§4.4 證明保存、全域時間／空間可組合、progress、合流。</p>
+  <p>整棵樹要卸得乾，得兩邊可交換，或靠共效把卸載排好。論文沒說「任意亂改共用物件都能拆乾淨」。</p>
+</section>
+
+<section id="map">
+  <h2>對上這套 runtime 就是 ctx.effect 與 inject</h2>
+  <p><button type="button" class="term" data-gloss="cordis" aria-haspopup="dialog" aria-expanded="false">Cordis<span class="term-q" aria-hidden="true">?</span></button> 自稱 meta-framework：不管聊天或 coding，只賣組合語義。分三層：core library、設定檔載入器、上面的應用（<button type="button" class="term" data-gloss="koishi" aria-haspopup="dialog" aria-expanded="false">Koishi<span class="term-q" aria-hidden="true">?</span></button>、DSH）。</p>
+  <table>
+    <thead>
+      <tr><th>論文</th><th>程式</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Γ、γ</td><td><code>ctx</code></td></tr>
+      <tr><td>e 交拆法</td><td><code>ctx.effect(callback)</code> 回傳 disposer</td></tr>
+      <tr><td>get / set</td><td><code>ctx.get</code> / <code>ctx.set</code></td></tr>
+      <tr><td>規格 d</td><td><code>fiber.inject</code></td></tr>
+      <tr><td>e 本體</td><td><code>fiber.apply</code></td></tr>
+      <tr><td>φ</td><td><code>fiber.dispose</code>，LIFO</td></tr>
+      <tr><td>實例</td><td><code>fiber</code>，<code>ctx.plugin</code> / <code>ctx.use</code></td></tr>
+      <tr><td>隔離</td><td><code>ctx.isolate(key, realm)</code></td></tr>
+      <tr><td>宣告式樹 + HMR</td><td>設定載入器 / Include / HMR</td></tr>
+    </tbody>
+  </table>
+  <p>Algorithm 5：<code>refresh</code> 重算 target。target 變了且沒有進行中轉移，才開 reload 或 unload。reload 先記下這次看到的 provider uid，再跑 apply。unload 先等依賴者拆完，再跑 dispose。uid 不重用，換了一個提供同一個值的 fiber，仍算依賴變了。</p>
+  <p>HMR 是交易：新模組 import 失敗就還原 cache，用舊組件重建 fiber，不留半套。</p>
+</section>
+
+<section id="audit">
+  <h2>論文沒有用 DSH 當證據</h2>
+  <p>形式部分自洽：定義、track／recover、notify、fiber 規則、一串定理。這是一篇 runtime 語義論文，不是 agent 論文。</p>
+  <p>經驗部分窄。§5.3 觀察 <button type="button" class="term" data-gloss="koishi" aria-haspopup="dialog" aria-expanded="false">Koishi<span class="term-q" aria-hidden="true">?</span></button>：作者寫「超過 4000 個社群 plugin」，跨 IM adapter 與資料庫 driver 有真依賴拓撲，主控台可原地停用 plugin。威脅：單一生態、單一語言、觀察而非對照實驗。它跑的是 <button type="button" class="term" data-gloss="cordis" aria-haspopup="dialog" aria-expanded="false">Cordis<span class="term-q" aria-hidden="true">?</span></button> v3；論文寫的是 v4。</p>
+  <p>§8 把自我演化 harness 列成未來驗證。DSH 的 self-modification 套件對得上這個故事，但這篇 PDF 沒有 DSH 數字、沒有卸載成功率、沒有和 VS Code／OS 重啟比過。</p>
+  <p>前提若破，保證跟著破：副作用繞過 <code>ctx.effect</code>；兩個寫者搶同一個 key 且沒做 <button type="button" class="term" data-gloss="isolate" aria-haspopup="dialog" aria-expanded="false">isolate<span class="term-q" aria-hidden="true">?</span></button>；拆法只在「當初那個狀態」成立，卻在別人工位改過的掛板上硬拔。</p>
+</section>
+
+<section id="xfer">
+  <h2>建議 rhc 只借 effect 與 inject</h2>
+  <p>建議：個人 harness 若走 plugin 組合，第一條契約是「改掛板必回傳拆法；缺 key 就不要 apply」。DSH 已經 vendor 這層，讀它比重寫演算便宜。</p>
+  <div class="xfer-stack">
+    <article class="xfer" id="xfer-cordis-paper">
+      <header class="xfer-head">
+        <h3 class="name">Shi et al. 2026-08-13 · 這篇論文</h3>
+        <div class="xfer-meta"><span class="lever">rhc 主線</span></div>
+      </header>
+      <div class="xfer-grid">
+        <div class="xfer-cell paper">
+          <p class="lab">機制</p>
+          <p><code>ctx.effect</code> 把 callback 的回傳值當拆法疊進 <code>fiber.dispose</code>。unload 先通知依賴 fiber，再 LIFO 跑拆法。<code>inject</code> 是 key 集合；表一變就 <code>refresh</code>，決定 reload 或 unload。</p>
+        </div>
+        <div class="xfer-cell ours">
+          <p class="lab">前提</p>
+          <p>對共用狀態的改動都走掛板。每個 key 在一個 realm 只有一個 ACTIVE 寫者。拆法在自己剛寫完的狀態上成立。</p>
+        </div>
+        <div class="xfer-cell fit">
+          <p class="lab">適配</p>
+          <p>DSH 的 agent-loop、tools、llm 都是可卸載 row。rhc 若要熱換工具或模型，同一契約避免重啟丟掉 session。</p>
+        </div>
+        <div class="xfer-cell break">
+          <p class="lab">不抄</p>
+          <p>不先實作 §4 演算與合流證明。不把 <button type="button" class="term" data-gloss="koishi" aria-haspopup="dialog" aria-expanded="false">Koishi<span class="term-q" aria-hidden="true">?</span></button> 4000 plugin 當規模目標。HMR 交易不當第一個功能。可交換條件未證明前，不要假設可以任意交錯卸載。</p>
+        </div>
+      </div>
+    </article>
+  </div>
+  <p>下一步：在 <code>/home/hanson/src/deepseek-harness</code> 跟一次 <code>ctx.effect</code> 與一個 <code>inject: ['sessions']</code> 的卸載路徑，對 <code>fiber.dispose</code>。完成條件：卸一個 tool plugin 後，<code>ctx.tools</code> 不再列出它，session 還在。</p>
+</section>
+
+<section id="glossary">
+  <h2>詞卡</h2>
+  <article class="gcard" id="gloss-cordis"><h3>Cordis</h3><p>追蹤拆法、解析依賴的 meta-framework。core 管 runtime；設定檔那層做對帳與熱替換。</p></article>
+  <article class="gcard" id="gloss-spatiotemporal"><h3>時空可組合</h3><p>時間：卸得乾。空間：依賴用宣告等齊，料走了要通知。</p></article>
+  <article class="gcard" id="gloss-revertible"><h3>可逆副作用</h3><p>每次改掛板都交出拆法。runtime 把它們疊起來，卸載依序跑。</p></article>
+  <article class="gcard" id="gloss-reactive-co"><h3>反應式共效</h3><p>plugin 宣告要的 key。掛板一變，對這份名單分成開工、停工、沒事。</p></article>
+  <article class="gcard" id="gloss-inject"><h3>inject</h3><p>要等齊的 key 名單。沒齊就不會跑 apply。</p></article>
+  <article class="gcard" id="gloss-isolate"><h3>isolate</h3><p>同一個 key 在不同子環境解到不同值。長出子掛板，丟掉即可，不追拆法。</p></article>
+  <article class="gcard" id="gloss-independence"><h3>獨立</h3><p>兩個改動可交換，且不改壞對方的拆法。交錯卸載的前提。</p></article>
+  <article class="gcard" id="gloss-koishi"><h3>Koishi</h3><p>聊天機器人框架。論文用它當生產觀察，不是 DSH。</p></article>
+</section>
+
+<footer class="page">
+  讀過 PDF 全文目錄與 §1 到 §5、§8。公式頁以機制轉述，未逐條重證定理。頁面路徑 <span class="mono">docs/cordis-paper.html</span>。
+</footer>
+</main>
+
+<div id="gloss-backdrop" hidden></div>
+<aside id="gloss-card" role="dialog" aria-modal="true" aria-labelledby="gloss-card-title">
+  <h3 id="gloss-card-title"></h3>
+  <p id="gloss-card-text"></p>
+</aside>
+
+<script>
+(function () {
+  var GLOSS = {
+    cordis: { t: "Cordis", d: "追蹤拆法、解析依賴的 meta-framework。core 管 runtime；設定檔那層做對帳與熱替換。" },
+    spatiotemporal: { t: "時空可組合", d: "時間：卸得乾。空間：依賴用宣告等齊，料走了要通知。" },
+    revertible: { t: "可逆副作用", d: "每次改掛板都交出拆法。runtime 把它們疊起來，卸載依序跑。" },
+    "reactive-co": { t: "反應式共效", d: "plugin 宣告要的 key。掛板一變，對這份名單分成開工、停工、沒事。" },
+    inject: { t: "inject", d: "要等齊的 key 名單。沒齊就不會跑 apply。" },
+    isolate: { t: "isolate", d: "同一個 key 在不同子環境解到不同值。長出子掛板，丟掉即可，不追拆法。" },
+    independence: { t: "獨立", d: "兩個改動可交換，且不改壞對方的拆法。交錯卸載的前提。" },
+    koishi: { t: "Koishi", d: "聊天機器人框架。論文用它當生產觀察，不是 DSH。" }
+  };
+
+  var backdrop = document.getElementById("gloss-backdrop");
+  var card = document.getElementById("gloss-card");
+  var titleEl = document.getElementById("gloss-card-title");
+  var textEl = document.getElementById("gloss-card-text");
+  var openBtn = null;
+
+  function placeNear(btn) {
+    var r = btn.getBoundingClientRect();
+    var w = card.offsetWidth || 320;
+    var left = window.scrollX + r.left;
+    if (left + w > window.scrollX + window.innerWidth - 12) {
+      left = window.scrollX + window.innerWidth - w - 12;
+    }
+    card.style.left = Math.max(8, left) + "px";
+    card.style.top = window.scrollY + r.bottom + 8 + "px";
+  }
+
+  function closeGloss() {
+    card.classList.remove("open");
+    backdrop.classList.remove("open");
+    backdrop.hidden = true;
+    card.style.display = "none";
+    if (openBtn) openBtn.setAttribute("aria-expanded", "false");
+    openBtn = null;
+  }
+
+  function openGloss(key, btn) {
+    var g = GLOSS[key];
+    if (!g) return;
+    titleEl.textContent = g.t;
+    textEl.textContent = g.d;
+    card.style.display = "block";
+    backdrop.hidden = false;
+    backdrop.classList.add("open");
+    card.classList.add("open");
+    if (openBtn && openBtn !== btn) openBtn.setAttribute("aria-expanded", "false");
+    openBtn = btn;
+    btn.setAttribute("aria-expanded", "true");
+    placeNear(btn);
+  }
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("button.term");
+    if (btn) {
+      e.preventDefault();
+      var key = btn.getAttribute("data-gloss");
+      if (openBtn === btn) closeGloss();
+      else openGloss(key, btn);
+      return;
+    }
+    if (!card.contains(e.target)) closeGloss();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeGloss();
+  });
+
+  window.addEventListener("resize", function () {
+    if (openBtn) placeNear(openBtn);
+  });
+})();
+</script>
+<script>
+(function () {
+  var items = {};
+  var plugins = { tools: [], github: [], slack: [] };
+  var pick = "";
+  var step = 0;
+  var lineEl = document.getElementById("demo-line");
+  var logEl = document.getElementById("demo-log");
+  var pickEl = document.getElementById("demo-pick");
+  var nextBtn = document.getElementById("demo-next");
+  var resetBtn = document.getElementById("demo-reset");
+  if (!lineEl || !nextBtn) return;
+
+  var pegIds = {
+    search_tool: ["peg-st", "val-st"],
+    use_tool: ["peg-ut", "val-ut"],
+    mcp__github__create_issue: ["peg-gh", "val-gh"],
+    mcp__slack__post: ["peg-sl", "val-sl"]
+  };
+
+  function hang(plugin, key, value) {
+    items[key] = value;
+    plugins[plugin].push(key);
+  }
+
+  function unload(plugin) {
+    var keys = plugins[plugin];
+    while (keys.length) {
+      delete items[keys.pop()];
+    }
+  }
+
+  function paint() {
+    Object.keys(pegIds).forEach(function (name) {
+      var ids = pegIds[name];
+      var peg = document.getElementById(ids[0]);
+      var val = document.getElementById(ids[1]);
+      if (items[name]) {
+        peg.className = "peg on";
+        val.textContent = items[name];
+      } else {
+        peg.className = "peg";
+        val.textContent = "（空）";
+      }
+    });
+    logEl.textContent = "items: [" + Object.keys(items).join(", ") + "]";
+    pickEl.textContent = pick || "this step ->";
+    var loopEl = document.getElementById("val-loop");
+    var loopPeg = document.getElementById("peg-loop");
+    var ready = items.search_tool && items.use_tool;
+    if (loopEl && loopPeg) {
+      loopEl.textContent = ready ? "yes" : "no";
+      loopPeg.className = ready ? "peg on" : "peg";
+    }
+  }
+
+  var steps = [
+    { line: "board = Board()", run: function () { return "empty; loop ready? no"; } },
+    {
+      line: "tools.hang(search_tool, use_tool)",
+      run: function () {
+        hang("tools", "search_tool", "search");
+        hang("tools", "use_tool", "dispatch");
+        return "loop inject satisfied";
+      }
+    },
+    {
+      line: 'MOUNT = ["github"]; hang create_issue',
+      run: function () {
+        hang("github", "mcp__github__create_issue", "opened issue");
+        return "this process has github";
+      }
+    },
+    {
+      line: 'loop_step(board, "mcp__github__create_issue")',
+      run: function () {
+        pick = "model said that name -> " + items.mcp__github__create_issue;
+        return "loop only does items[name]";
+      }
+    },
+    {
+      line: 'loop_step(board, "mcp__slack__post")',
+      run: function () {
+        pick = "KeyError: slack not in MOUNT";
+        return "model asked; runtime has no such tool";
+      }
+    }
+  ];
+
+  function reset() {
+    items = {};
+    plugins = { tools: [], github: [], slack: [] };
+    pick = "";
+    step = 0;
+    lineEl.textContent = "按「下一步」開始";
+    nextBtn.disabled = false;
+    paint();
+  }
+
+  nextBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (step >= steps.length) return;
+    var s = steps[step];
+    var msg = s.run();
+    lineEl.textContent = (step + 1) + "/" + steps.length + "  " + s.line + "  ->  " + msg;
+    step += 1;
+    if (step >= steps.length) nextBtn.disabled = true;
+    paint();
+  });
+
+  resetBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    reset();
+  });
+
+  reset();
+})();
+</script>
+</body>
+</html>

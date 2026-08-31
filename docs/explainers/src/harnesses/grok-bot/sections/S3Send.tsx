@@ -1,0 +1,56 @@
+import { Peek } from "../../../components/Peek";
+import { Term } from "../../../components/Term";
+import { ScipGraph } from "../ScipGraph";
+
+export function S3Send() {
+  return (
+    <>
+      <h2 id="s3">
+        <span className="no">3</span>出廠送出走 Cursor，控制面把請求交給 host
+      </h2>
+      <p>
+        設定沒寫時，模型來源是 <code>cursor</code>。控制面看到送出請求（
+        <code>sendPrompt</code>）且來源是 cursor，回{" "}
+        <code>handled: false</code>
+        （表示自己不處理），請求因此繼續打到遠端機器上的 HTTP 入口。
+        <Peek snip="router-cursor">不處理</Peek>
+      </p>
+      <p>
+        遠端接送出行程的 <Term k="send-pipeline">SendPipeline</Term>{" "}
+        讀用來分辨是不是同一則送出的編號（
+        <code>clientNonce</code>
+        ）：沒有就送一次；同一個編號還在處理就併進那次。
+        <Peek snip="send-prompt">nonce</Peek>{" "}
+        通過後把使用者剛送出的那行文字寫進對話、標記已接受、排隊跑模型的一回合（
+        <code>runTurn</code>
+        ）。控制面只在事件串流的對話記錄上記這行文字，自己不當寫入者。
+      </p>
+      <p>
+        這一回合程式裡接著進 <code>SandAgentRunner</code>，再進{" "}
+        <code>packages/agent</code> 的 <code>runTurnLoop</code>
+        。模型與工具在一步裡互相呼叫，上限 5000 次。
+        <span className="stamp">人工常數 SAND_AGENT_MAX_STEPS</span>
+        改它的成本是重測長任務會不會被提前掐斷。
+        <Peek snip="max-steps">5000</Peek>
+      </p>
+      <p>
+        串流文字、思考過程、工具事件經 runner 轉發；控制面的
+        client-side-tool-v2 轉送器送回畫面。
+      </p>
+      <p>
+        下圖跟{" "}
+        <a className="xref" href="#s0">
+          §0
+        </a>{" "}
+        同一套樹：主幹、右側岔路、左側迴圈走道。左欄是畫面、調度、接納、迴圈、執行。框上是這步在做什麼，第二行是 SCIP 對上的函式。
+        <code>dispatchUserTurn</code> 到 <code>runTurn</code> 中間是 queue 閉包，SCIP 沒畫邊。
+        <span className="stamp">scip-typescript 0.4.0 · 2026-08-30</span>
+      </p>
+      <ScipGraph />
+      <p className="src">
+        <code>inference-router.ts:212</code>、<code>send-pipeline.ts</code>、
+        <code>turn-agent-composition.ts:142</code>。
+      </p>
+    </>
+  );
+}

@@ -1,0 +1,64 @@
+import { Peek } from "../../../components/Peek";
+import { Term } from "../../../components/Term";
+import { Xfer } from "../../../components/Xfer";
+
+export function S5Box() {
+  return (
+    <>
+      <h2 id="s5">
+        <span className="no">5</span>遠端沙箱機器是出廠預設
+      </h2>
+      <p>
+        主行程用 <code>BrokeredHostConnector.connect</code> 呼叫 Cursor 後端{" "}
+        <code>ensureSandBox</code>
+        ，後端填上入口網址、權杖（通行字）、與遠端畫面連線資訊。
+        <Peek snip="remote-box">ensureSandBox</Peek>{" "}
+        網址為空代表後端故障。後端暫時不給機器時，桌面預設再等 60 秒，上限 15
+        分鐘。
+        <span className="stamp">BOX_BLOCKED_FALLBACK_HOLD_MS</span>
+        改它的成本是重測被擋時畫面要等多久。
+      </p>
+      <p>
+        設定 <code>boxRuntime === "local-docker"</code>{" "}
+        才改連這台電腦上的容器 <code>grok-bot-local-vm</code>，入口{" "}
+        <code>http://127.0.0.1:1340</code>，映像{" "}
+        <code>cursorenvironments/universal:sand-box-latest</code>。
+        <Peek snip="docker">切換</Peek> <Peek snip="docker-port">1340</Peek>{" "}
+        就緒超時 180 秒。
+        <span className="stamp">重建稿常數</span>
+        改埠或映像要重測容器對上控制面。
+      </p>
+      <Xfer
+        title="host 放進遠端機器，不放在桌面旁邊"
+        cells={[
+          {
+            lab: "機制",
+            body: (
+              <>
+                Cursor 後端配一台機器，裡面跑{" "}
+                <Term k="sand-host">host-main</Term>{" "}
+                與代跑命令的服務。桌面只留桌面程式、控制面、本機命令服務。
+              </>
+            ),
+          },
+          {
+            lab: "前提",
+            body: "命令與檔案預設只在遠端機器跑與存放。入口網址必須由後端蓋章。",
+          },
+          {
+            lab: "適配",
+            body: "host/main 的鎖、代跑服務、連線入口都假設自己在遠端機器裡。入口網址（gateway_url）是空的就當成後端故障。",
+          },
+          {
+            lab: "不抄",
+            body: "本機另開的隔離環境（容器）只當疊層開關，預設路徑仍打遠端 ensureSandBox。",
+          },
+        ]}
+      />
+      <p className="src">
+        <code>box-host-connector.ts</code>、
+        <code>local-docker-host-connector.ts</code>。
+      </p>
+    </>
+  );
+}
