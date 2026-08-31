@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/index.ts",
+    "dev": "bun --hot --preload ./mdx-plugin.ts src/index.ts",
     "vite": "vite",
     "start": "NODE_ENV=production bun src/index.ts",
     "build": "bun run build.ts"

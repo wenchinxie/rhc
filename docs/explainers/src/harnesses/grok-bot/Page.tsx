@@ -16,10 +16,16 @@ const TOC = [
   {
     href: "#s7",
     n: "7",
-    label: "Lauren Tan 工作坊：分類與全稿",
+    label: "Lauren Tan 工作坊",
     children: [
-      { href: "#s7-cats", n: "7.0", label: "依時間切的八塊" },
-      { href: "#s7-full", n: "7.1", label: "全稿 00:00 到 72:04" },
+      { href: "#s7-0", n: "7.0", label: "AI 是配對寫程式的人" },
+      { href: "#s7-1", n: "7.1", label: "驗證是讓 agent 跑真程式" },
+      { href: "#s7-2", n: "7.2", label: "Glass、功能地圖、Pstack" },
+      { href: "#s7-3", n: "7.3", label: "how 技能與評測" },
+      { href: "#s7-4", n: "7.4", label: "主廚、Benny、信任階梯" },
+      { href: "#s7-5", n: "7.5", label: "重寫、Dune、護欄進 CI" },
+      { href: "#s7-6", n: "7.6", label: "用量、Grok 4.6、非工程也出碼" },
+      { href: "#s7-7", n: "7.7", label: "延長問答、演示、傳訊" },
     ],
   },
 ];

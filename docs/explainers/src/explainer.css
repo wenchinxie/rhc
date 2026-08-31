@@ -244,16 +244,18 @@
   }
   p.tape .stamp { margin-right: .45em; }
 
-  /* 工作坊全稿：時間軸清單。分類表連到 #t-<秒>。 */
-  ol.catmap { list-style: none; margin: 1rem 0 0; padding: 0; }
-  ol.catmap > li {
-    display: grid; grid-template-columns: 7.2rem 1fr;
-    gap: .4rem 1rem; padding: .55rem 0;
-    border-bottom: 1px solid var(--line);
-    font-size: var(--fs-xs); line-height: 1.55;
+  /* 工作坊：每塊摘要底下接該段逐字稿。 */
+  .tape-cut { margin: 1.4rem 0 0; }
+  .tape-cut > p .when {
+    font-family: var(--mono); color: var(--ink-3);
+    margin-right: .7em;
   }
-  ol.catmap .when { font-family: var(--mono); color: var(--ink-3); }
-  ol.catmap b { font-weight: 700; display: block; }
+  .tape-cut .talk { margin: .7rem 0 0; }
+  .tape-cut p.tape .ts {
+    font-family: var(--mono); color: var(--ink-3);
+    text-decoration: none; border: 0; margin-right: .55em;
+  }
+  .tape-cut p.tape .ts:hover { color: var(--pen-ink); }
   ol.talk {
     list-style: none; margin: 1rem 0 0; padding: 0;
     border-top: 1px solid var(--line);

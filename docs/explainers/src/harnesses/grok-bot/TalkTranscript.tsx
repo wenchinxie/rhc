@@ -4,27 +4,21 @@ export type Seg = {
   end: number;
   t: string;
   text: string;
-  was?: string;
+  en?: string;
+  block?: string;
 };
 
 export function TalkTranscript(props: { segments: Seg[] }) {
   return (
-    <ol className="talk">
+    <div className="talk">
       {props.segments.map((s) => (
-        <li key={s.id} id={s.id}>
+        <p key={s.id} id={s.id} className="tape" title={s.en}>
           <a className="ts" href={`#${s.id}`}>
             {s.t}
           </a>
-          <span>
-            {s.text}
-            {s.was ? (
-              <span className="fix" title={s.was}>
-                改
-              </span>
-            ) : null}
-          </span>
-        </li>
+          {s.text}
+        </p>
       ))}
-    </ol>
+    </div>
   );
 }
