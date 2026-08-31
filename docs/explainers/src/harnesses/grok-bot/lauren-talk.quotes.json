@@ -1,0 +1,521 @@
+{
+  "model": "faster-whisper/large-v3",
+  "nSeg": 854,
+  "nFix": 66,
+  "nQuote": 57,
+  "quotes": [
+    {
+      "id": "t-0",
+      "t": "00:00",
+      "start": 0.0,
+      "end": 15.22,
+      "block": "s7-0",
+      "text": "就我個人來說，我覺得 AI 最好的用法其實是當一個搭檔，像是跟你一起 pair programming 的人，而不是一個用來取代寫程式這件事的工具，或者更糟，把思考外包出去。",
+      "en": "Personally, I think that the best use of AI is really as like a pair, like someone you're pair programming with, and not a tool to just replace the act of writing code, or worse, outsourcing your thinking."
+    },
+    {
+      "id": "t-164",
+      "t": "00:16",
+      "start": 16.46,
+      "end": 44.56,
+      "block": "s7-0",
+      "text": "然後我覺得有一種傾向，因為 AI 太令人興奮了，你就想到處都放 AI，然後被看成是那種，怎麼說，對 AI 很跟得上的人。於是你會感到這種壓力：我就是要，我得提高生產力，我這週得 ship 大概一百個 PR，幾乎搞不懂自己在幹嘛，靠 vibe code 一路衝到一百萬 ARR 或怎樣的。",
+      "en": "And I think there's a tendency, you know, because AI is so exciting, you want to put AI everywhere and be seen as someone who's very, you know, what do you call it, like on the ball, I guess, with AI. that you feel this pressure of like, I'm just gonna, I gotta increase my productivity, I gotta ship like 100 PRs this week and barely understand what I'm doing and vibe code my way to a million ARR or whatever."
+    },
+    {
+      "id": "t-465",
+      "t": "00:46",
+      "start": 46.58,
+      "end": 65.36,
+      "block": "s7-0",
+      "text": "但我覺得我自己親身體會到的一件事是：雖然用 AI 的時候，我寫程式會省一點時間，但我其實花更多時間在審查 AI 做了什麼、再去修正它。所以我試過很多人說的那種做法。",
+      "en": "But I think one of the things that I've personally seen is that although when I use AI, I save some time writing the code, I actually find myself spending more time reviewing what the AI did and correcting it. So I've tried the thing that a lot of people say."
+    },
+    {
+      "id": "t-665",
+      "t": "01:06",
+      "start": 66.56,
+      "end": 123.32,
+      "block": "s7-0",
+      "text": "與其直接 prompt AI 把功能整個做出來，你大概是先讓它幫你寫一份 spec，然後你再審查那份 spec，接著再做整套流程。然後那其實是很花時間的過程。而且如果你並沒有真的搞懂 AI 在幹嘛，那我覺得你是在害自己，因為就像在學校你用計算機，或你有開書考試一樣，當開發者的技能其實在於懂得怎麼用工具；我覺得當你把思考完全外包出去，那真的很危險。但我覺得，我不知道，我知道別人會怎麼回應這個，所以對我來說，我很好奇，我想 Colin，你的經驗也是，但對我來說我覺得最重要的技能",
+      "en": "Instead of prompting an AI to just build a feature outright, you sort of get it to build a spec for you first, then you review that spec, and then you do that whole thing. Then it's such a time-consuming process. And if you don't really understand what the AI is doing, then I think you're doing yourself a disservice because it's like the same way that in school you use a calculator or you know you have an open book exam the the skill of being a developer is really in like the knowledge of using tools and I think when you just completely outsource that you know thinking I think that's like really dangerous but I think I don't know I know what other people will say to that so for me I think I'm curious like i guess Colin, your experience as well but for me i think the most important skill"
+    },
+    {
+      "id": "t-1233",
+      "t": "02:03",
+      "start": 123.32,
+      "end": 323.54,
+      "block": "s7-1",
+      "text": "你跟 agent 一起工作時，工具箱裡應該要有的就是驗證；我說的驗證是指 agent 真的有能力去跑程式碼，或是拿 CPU traces、heap snapshots，或打開 iOS simulator，反正不管你的應用是怎麼呈現給使用者的，它都能做一樣的事情、真的跑起來、真的測、真的驗證。這工作不能省，因為就是這件事把迴路真正閉合。它不能保證你的 agent 會寫出好的程式碼，但至少能讓它們寫出正確的程式碼，這對能不能信任你的 agent 來說是非常、非常大的一步。我可以分享一個我們在 Cursor 裡的例子。喔，讓我打開這個。好，就是了。所以，關於 Cursor 的 Agent Window，這其實是個蠻有趣的故事。我五個月前加入 Cursor 的時候，其實我本來要加入另一個團隊，本來要加入 cloud agents 那個團隊，但因為我有很多做 React 的經驗，而 Agent Window 是一個 React 應用，所以他們請我基本上去幫忙 Agent Window 的工作。可是當時其實沒什麼 skills 可以幫我，所以我發現自己就這樣：好，Agent 大概一週後就要上線了對吧，期限很緊，然後我就坐在那邊想，好，我要打開 Chrome DevTools 的 Performance，自己抓一個 trace，自己看，試著搞懂這個 flame graph。記住，那時我才第一週，我根本不知道自己在看什麼，不是說完全沒概念，但整個程式碼庫對我來說是全新的。然後我發現我的 agent 也一樣完全搞不懂。我會把 trace 截圖、把 trace 下載下來傳給它，它就會說「嗯對，看起來大概是這個」，然後很有自信地講「就是這個東西」，接著我去修那個，結果發現那根本不是真正的問題。所以這是一個非常、非常慢的過程。如果你自己做過任何效能相關的工作，或者甚至只是跟 agent 一起開發、卻沒有驗證的 skill，那你就是驗證者，好嗎？你就是瓶頸。你叫你的 agent 去做一件事，它就跑去寫一些程式碼，然後你打開本機的 dev build，開始說「喔，不行」，接著你還得複製貼上螢幕截圖、或 console errors、或什麼的，然後你的 agent 才慢慢地拿那些東西試著理解，然後修掉那件事，但你就一直卡在迴路裡，一直當瓶頸，所以",
+      "en": "that you should have in your toolbox when you work with agents is verification and by verification i mean the ability for an agent to actually run the code or take cpu traces or heap snapshots or you know open an ios simulator whatever you know however your application is exposed to your users it can do the same thing and run it for real and actually test and verify it don't work because that's the thing that really closes the loop it doesn't guarantee your agent writes good code but it allows them to at least write correct code which is a big a really big step forward for being able to trust your agents i will i can share one example that we have uh within cursor uh oops where let me open this there you go uh so for the for cursors agent window uh so this is actually an interesting story but uh when i joined cursor five months ago uh they're actually uh well i was supposed to join a different team i was supposed to join like the cloud agents team uh but then since i have a lot of experience working on react and agents window is a react application uh i was uh i was asked to basically help out with uh the agent window work uh but um there wasn't really a lot of like skills to help me so i just found myself that okay uh agent was going to launch in like a week right we have a really tight deadline and um there was uh you know i was just sitting there like okay i'm going to open up Performance, the Chrome dev tools and just like take a trace look at it myself and try to make sense of this flame graph and keep in mind i was just like in my first week so i had no idea what i was looking at no idea what you know i mean i had some idea but you know the code base was completely fresh to me and I realized like my agent had no idea either you know like I would take a screenshot of the trace I would download the trace I would send it to it and it'd be like yeah it kind of looks like this you know and it would like confidently state like it's this thing and then I'd try to fix that and turns out that's not the actual thing so this was a very very slow process and if you've ever done any like performance work yourself or you know just even development with an agent where you don't have a verification skill you are the verifier all right you you're the bottleneck you you you tell your agent to do something and then it goes off and write some code then you open up your you know local dev build and then you start to say oh you know it doesn't work then you have to copy paste screen uh you know screenshots or console errors or whatever uh and then your agent like slowly kind of like uh you know works with that and then tries to understand it and um that fix the thing but then you're constantly just in the loop and and being a bottleneck so"
+    },
+    {
+      "id": "t-3235",
+      "t": "05:23",
+      "start": 323.54,
+      "end": 381.22,
+      "block": "s7-2",
+      "text": "其實沒辦法平行化，所以 control Glass 這個 skill 大概是我替 Cursor 做的第一批 skill 之一。順帶一提，Glass 是我們內部對 Agent Window 的代號，不過它就是 Cursor 啦。這個 skill 本身的程式碼其實沒那麼有趣，你的 agent 很容易就能幫你做出一個：如果你在做 Electron app、web app，甚至 iOS 應用，你可以教你的 agent 怎麼用 Chrome DevTools protocol，或者透過 Apple 也有一些工具，用來跑模擬器、抓 traces，還有程式化控制，所以這真的很有用。不過我真正想講的是這個東西，它得讀我。",
+      "en": "there's really no way to parallelize so the control glass skill is like one of the first skills i built uh for cursor uh and glass by the way is the code name for agent's window that we use internally but it's just cursor i guess um and so this skill uh is i guess that the code itself is not super interesting your agent can very easily make one for you where if if you're building an electron app or a web app or even ios applications you can teach your agent how to use like the chrome dev tools protocol or through apple has some utilities as well for running the simulator and taking traces and controlling programmatic control as well so that's really useful. But one thing I actually want to talk about is the this thing, where it has to read me."
+    },
+    {
+      "id": "t-3812",
+      "t": "06:21",
+      "start": 381.22,
+      "end": 576.95,
+      "block": "s7-2",
+      "text": "所以這個 skill 附帶一個很獨特的功能，不對，不是功能，是一個獨特的檔案，叫做功能地圖。故事是這樣：我做了這個 skill，然後 agent 終於能真的跑起 Agent Window、抓 traces 之類的。可是它完全不知道 Agent Window 是什麼。所以有人會說，左邊 sidebar 很 lag，或者右邊的 PR tab 壞了。然後 agent 就會亂抓，花很多時間去翻程式碼，這個功能在哪、UI 上要怎麼到那裡，基本上完全沒用。我在本地跑這個 skill，它會起一個 dev build，然後就一直轉，我試著點這裡，它不知道怎麼走到東西，體驗超差。誰在我螢幕上畫箭頭啊。所以對，這個功能地圖真的很有用，因為它教 agent 怎麼走到你所有的功能。在我做的 plugin Pstack 裡，你 Google 搜 Pstack Cursor 就找得到。那個 plugin 裡有一個 create verification skill，會幫你自己設好類似這樣的東西，包含功能地圖。它會去探索程式碼，建出這個初始功能地圖，告訴你的 agent 怎麼走到各個不同功能。這超強，因為現在有用戶回報進來，你甚至可以把很模糊的回報或截圖對應上去。我們 Cursor 內部有個 Slack channel，很多人在給 Agent Window、Grok Bot 之類的回饋，回報常常很爛、品質很差，常常就是一張截圖，然後有人打問號問號問號，這是什麼。沒有這個的話，你的 agent 就會一臉茫然；有了這樣的功能地圖，它就有多很多上下文，知道怎麼導航、怎麼走到各個功能。例如 sidebar 是什麼、裡面有哪些子功能、從使用者角度怎麼走到、各種鍵盤快捷鍵，甚至你透過 CDP 選取東西用的 DOM 元素、那些 attributes，都在裡面。所以再說一次，這對 agent 真的非常非常強。Pstack 有附 create verification skill，也有 maintain verification skill，所以你可以持續更新。",
+      "en": "So this skill comes with this very unique feature called, or not feature, a unique file called a feature map. And so the story then is like, I built this skill. And so now the agent was able to actually run the agent window and take traces and whatnot. But it had no idea what the agent window was. So, you know, like someone would say like, oh, the left sidebar is like, laggy or something like that. Or, you know, the right side, the PR tab is not working. And the agent would just be like kind of flailing around, it would spend a lot of time trying to like look up the code and you know where is this feature how do i actually get to it on the ui which made it basically completely useless uh you know like we would i would run this skill locally and you know it would spawn a dev build uh but then it just be churning like i just try to click here it wouldn't know how to get to things um and it was just an awful experience uh so who is putting arrows on my screen. So yeah, this feature map has been really useful because it teaches the agent how to get to all of the features that you have. And in Pstack, the plugin that I've made, if you search for Pstack cursor on Google, you'll find it. But there is a create verification skill in that plugin where it actually helps you set up something like this for yourself, including the feature map. So it will actually explore the code and build up this initial feature map that tells your agent how to get to all of the different features that you have. And this is extremely powerful because now that you have these user reports that come in, you can actually map even like a vague report or even a screenshot. So we have this internally at Cursor where we have a slack channel where you know lots of people giving us feedback on the agents window and Grok Bot and whatnot uh and oftentimes the report is very bad like very low quality like someone just put very often we get like a screenshot like and then someone just says question mark question mark question mark like what is this and you know like without this your agents are like i have no clue right but with a feature map like this it has a lot more context and understanding of how actually navigate how to get to all the different features uh so like you know example like i guess like the sidebar like what is the sidebar uh you know like all the different sub features that are present in it um like from the user point of view which is how to get to it all the different keyboard shortcuts uh even like the the what do you call it the dom elements or yeah like the attributes that you use for selecting things through the CDP are all there. So again, yeah, this is like really, really powerful for agents. And Pstack ships that create verification skill, but also a maintain verification skill. So you can keep this up to date."
+    },
+    {
+      "id": "t-5778",
+      "t": "09:37",
+      "start": 577.88,
+      "end": 635.8,
+      "block": "s7-3",
+      "text": "酷。對。我本來想問你是怎麼做出那個的。所以你能不能多分享一點那個過程，放在 Pstack 的脈絡裡，還有對不熟的人簡單說一下 Pstack 是什麼？對，所以 Pstack 挺有意思的，因為，嗯，首先名字有點搞笑，那個 p，Pstack 的 p 其實是 potato potato stack，因為我，呃，有個挺有名的人 Gary Tan，是 Y Combinator 的 CEO，他做了一個叫 G-Stack、Gary Stack 的 plugin。好笑的是我們同姓，但完全沒關係。可是我覺得拿 Gary 開個玩笑挺好玩的，做一個 Pstack 當我自己版本的他的 plugin，只是調成符合我自己那套工程實務。但其實我一開始根本沒打算要做 Pstack。",
+      "en": "Cool. Yeah. I was just going to ask how you created that. So do you mind sharing a little bit more about that process in the context of Pstack and maybe just what Pstack is for the folks aren't familiar yeah so Pstack is pretty interesting because uh well first of all the name is kind of goofy like the p the p and Pstack is like potato potato stack because i um so uh there is a pretty uh famous person gary tan who is the ceo of y combinator and he's come up with this plugin called G-Stack, Gary Stack. And funnily enough, we share the last name, we have no relations. But I thought it'd be funny to kind of, you know, poke fun at Gary and make Pstack my version of his plugin, but kind of just tailor it to my own set of engineering practices. But I honestly actually never set out to build Pstack."
+    },
+    {
+      "id": "t-6358",
+      "t": "10:35",
+      "start": 635.8,
+      "end": 848.8,
+      "block": "s7-3",
+      "text": "它就是從一堆 skill 開始的，對，我先從那個 Control Glass skill 開始，然後又做了另一個叫 how 的 skill，那也是我透過觀察 agents 注意到的。嗯，所以在我早期試著往上爬這條梯子的時候，我是超 in the loop，基本上把我的 agents 挑到極致。我會跟它說，這個功能壞了，這是 bug report，為什麼不能用？然後 agent 常常就很有把握地說，喔一定是這個，一定是這個東西。可是我一看實際的 tool calls，發現它根本沒在讀我以為會受影響的那份程式碼，這讓我極度懷疑。到那個點我就覺得，我不能再相信這個 agent 了，因為它完全在 hallucinate。我覺得很容易就累積那種不信任，然後覺得無力，不知道怎麼幫你的 agents 成功。但管理的類比真的超有用，想像你是工程團隊的 manager，手下有一個工程師，程式寫得很好，可是完全沒有業務脈絡，你才剛雇用他，他五秒前才 onboard。那你要怎麼教這個人變有效？做法就是透過 skill。skill 其實就是 markdown，對，但它編碼了很多資訊、指示，你真的可以從 agent 拉出很多智慧。Twitter 上有人說，把 agent 拉到不同的 latent space，講得比較炫，其實意思就是，LLM 是在預測下一個 token，你先給它一些高品質的 tokens，它就能在比較高、比較聰明的空間做 pattern match。那個 model 挺有意思的。但對，我是非常非常漸進地做出 Pstack 的。就是從真的觀察 agents，它們各種不同的失敗模式開始，每次看到我就說，好，我要把這個做成 skill，對，例如不要 hallucinate，真的去搜、去查程式碼，多用 sub agents，還有，對，不要猜。對，這樣說得通。這邊有一個後續問題，我自己也想問，聊天室裡也有一堆人在問，大概分兩部分。一是你怎麼維護這些 skills？產品會隨時間變，顯然有很多人在對這個 codebase 出貨，那這些 skills 怎麼維護？再來是，你怎麼知道你的 verification 夠好了？就是說，你能不能信任你建的那些 verification loops，信任它們跑完之後的輸出？對，我來講一下，我覺得這兩個有點相關，也許我先講這個。那我怎麼維護這些 skills？如果你不熟這個概念，eval 本質上就是一種……嗯，我心裡的 mental model 是，它就像給 agent 用的 unit test",
+      "en": "it just started with a bunch of skills right like i started with that control glass skill and then i started with another skill like called how which i also noticed through like observing agents um so like you know in the early days of me you know trying to climb this ladder i was like super in the loop and i was basically nitpicking my agents to an extreme degree i was like i would tell it um you know this feature has stopped working here's a bug report like why isn't it working and very often the agent would just like confidently state like oh it has to be this right it has to be this thing and i noticed like when i looked at the actual tool calls i noticed it wasn't actually reading the code that i thought should be affected and that made me just extremely suspicious and at that point i was like i'm not gonna i can't trust any this agent anymore because it's just it's just completely hallucinating and i think i think it's very easy to just you know like build up that distrust and not and kind of feel helpless like you know you don't know how to help your agents succeed but like again i think the the management analogy is super helpful because like imagine if you were a manager of an engineering team and you had an engineer on your team who was a really good coder no business context whatsoever you know they just you just hired them and they onboarded you know like five seconds ago uh and so how do you actually teach that person to be effective so how you do that is through a skill a skill being just you know it's just marked down right but you know encodes a lot of information instructions a lot of uh you can really draw out a lot of intelligence from an agent by well some people on twitter call it like you know pull the agent to a different latent space which is kind of like a fancy way of just saying like since uh you know llms are sort of like they predict the next token uh when you give it some high quality tokens uh to begin with then you know it it can kind of pattern match on like a higher space that's you know smarter um so that's like a very interesting model there but yeah i built Pstack very very incrementally uh so uh started with just really observing how agents you know all the fail different failure modes of of that agents were having and every time i saw that i just okay i'm just gonna make that a skill right like stop hallucinating actually go and search up look up the code use a lot of sub agents uh and yeah stop guessing yeah that makes sense one one kind of follow-up question here uh both for myself and from a bunch of people in the chat so i guess it's two two parts so one is like how do you maintain these skills so like product changes over time obviously there's a lot of people who are shipping against the code base so how do these skills get maintained uh and then second to that is like how do you know when your verification is is good enough uh like in you know you can trust that the verification loops that you built are gonna i guess you trust that the outputs uh when they're done uh yeah maybe i'll talk about um i think they're somewhat related maybe i'll start with this one first so like how do I maintain these skills? So if you're not familiar with this concept, an eval is essentially like a way to... well I think the mental model I have is like it's like a unit test for an agent"
+    },
+    {
+      "id": "t-8502",
+      "t": "14:10",
+      "start": 850.24,
+      "end": 1133.52,
+      "block": "s7-3",
+      "text": "而且你其實可以自己做 evals。不需要特別的 framework。你可以依你想要多科學、多嚴謹來自己建一套。呃，我的螢幕是紅的。對，有個小按鈕。嗯，抱歉，把畫圖關一下之類的，我看不到螢幕。對，抱歉，麻煩各位不要在螢幕上畫，那就太好了。嗯，控制裡有個小按鈕，對，那個小下拉選單。呃，怎麼清？對，好，你弄好了，完美。嗯，對，所以 evals 基本上就是幫你的 skills 做 unit test 的方式。其實在 Pstack 裡，我們在 potato mode 底下會出一個 playbook，你搜一下叫 eval playbook，做法其實挺嚴謹的。本質上我做的是，我會 spawn 很多不同的 sub agents，讓我的主 coordinator agent 先擬出我想要這個 skill 做到什麼的 rubric，然後它再 spawn 這些 sub-agents，並幫它們各自建獨立目錄，命名還故意不讓 sub-agent 知道自己正在被評估，因為 agents 其實會察覺，一察覺行為就會變。但它會做一堆這類事，本質上就是測我正在做或改的 skill 是不是真的在做我以為它在做的事。Cursor 一個很好的地方是我們支援超多不同 models。所以你其實可以跨各種不同 models 去 eval 你的 skill，看它在那個不同矩陣上表現如何，尤其是你自己在用的那些 models。我很常這樣做。每次我改一個 skill，我就會跑一次這種，像 eval playbook，確認它真的帶來我想要的結果。但我得說，維護 skills 其實挺難的，我覺得需要很多品味和觀察，你得擅長當後座駕駛。意思是，如果你做過 pair programming，你看同事寫 code，你就會想，這大概可以做得更好，你為什麼不這樣做？你會問同事很多問題。這邊有點類似，你不想只當 agent 的被動觀察者，在你自己那套 skills 剛建立的初期，你要很坐在駕駛座上。當然，你可以用像 Pstack 這種東西，但如果你在建自己的 skills，我覺得打開所有 tool calls，讀程式碼、讀 agent 行為跟它們的 thinking blocks，是看出它們哪裡失敗的很好方式，對，它們卡在哪。然後你就可以去為那個建一個 skill。至於 verification，你怎麼信任它，我覺得也是很類似的迭代迴圈。我其實對 verification skill 也用了同一套流程去驗證。eval 有趣的一點是，你可以某種程度 hill climb 它們，意思是你的 eval 可以產出一個分數，對，你讓 coordinator 產出分數，但你也可以用不同 model 的 judge agent 來交叉比對，確保第一個 model 沒有偏誤，對，就是那個在評斷所有在跑這件事的 sub agents 的 model。但你也可以 hill climb，意思是你可以在 Cursor 用 /loop，然後說，好，繼續在這個 eval 上 loop，直到全部都是十分滿分為例。我對 Control skill 也基本上用同一套做法，所以那其實挺放手的。我大概就是那樣做出那個 skill 的，像裡面的 CLI。隨時間它變得真的很好。但對，一開始絕對不是很順利，需要很多迭代。我覺得這裡對我有一個類比，嗯，我後面另一張投影片會講這個類比，在我的",
+      "en": "and you can actually make your own evals. You don't need like a special framework for them. You can build one depending on like you know how scientific and how rigorous you want to be. uh my screen is red yeah there's a little button um sorry like disabling the drawing or something i can't see my screen yeah sorry if you guys could not draw on the screen that'd be great but um there's a little button in the control yeah the little drop down um how do i clear yeah okay yeah you got it perfect um yeah so evals are a way to unit test your skills basically and actually in Pstack we ship under potato mode there's a playbook if you search for it called eval playbook and it's it's like not it's actually pretty rigorous the way it's done but essentially what I do is I spawn a lot of different sub agents I have like my main coordinator agent come up with a rubric for what I want the skill to do um and then it spawns all these sub-agents and it it creates individual directories for them which are cleverly named to not let the sub-agent know that it's being evaluated because agents can actually tell and when they do they change their behavior uh but it does a bunch of stuff like that to um essentially yeah like test whether or not the skill i'm making or changing is actually doing what I think it does. And one of the really nice things about Cursor is that we support so many different models. So you can actually eval your skill across all sorts of different models and get a sense of how well it performs across that different matrix, especially for the models that you use. So I do this a lot. Every time I modify a skill, I will run one of these, like the eval playbook uh and make sure that you know it's actually leading to a result i want uh but i will say like maintaining skills is actually pretty hard uh it requires i think a lot of taste and observation so you kind of need to be very good at being a backseat driver you know i mean like if you do pair if you've ever done pair programming for example uh and you watch a co-worker code and you're just like you could probably do this better you know you could do, you know, like, why did you not do this, right? You ask a lot of questions to your coworker, and it's kind of a similar thing here, like, you don't want to just be a passive observer of the agent, you want to be very in the driver's seat in the initial stages when you're building up your own set of skills. You know, obviously, you can use something like PSAC, but if you're building your own set of skills, it's very, I think, you know, opening up all the tool calls and, like, reading the code and reading all the agent behavior and their thinking blocks is a really great way to see where they fail, right? Like what, you know, where are they being done? And then you can go and build a skill for that. And then with verification, how you trust it is, it's, I think it's also a very similar iteration loop where, you know, like I actually did the same process for verifying the verification skill where i actually get um so one thing that's interesting about evals is that you can sort of hill climb them meaning that uh your eval can produce a score right a score that you can get your coordinator to produce but also you can have a judge agent of a different model to kind of cross-reference and make sure that the first model is not being biased right the model that's judging all of the sub agents that are running the thing uh but you can also like hill climb so meaning that you can you can use like slash loop in cursor and you can say okay keep looping on this eval right until everything is 10 out of 10 as an example uh and i did the same the basically the same approach with the control skill and so i kind of it was very it was very hands-off actually uh so you know i uh i kind of built i built that skill that way like the cli in that skill um and over time it's gotten really good uh but yeah it was definitely not super smooth at the beginning it required a lot of iteration and i think there's an analogy here for me which is um well i make this analogy later in a different slide on my"
+    },
+    {
+      "id": "t-11335",
+      "t": "18:53",
+      "start": 1133.52,
+      "end": 1214.12,
+      "block": "s7-4",
+      "text": "我這邊在畫，但我覺得現在當工程師，你比較像是一個管理者，或者我喜歡的比喻是你像餐廳的主廚，你是大廚，你不再自己煮所有的菜了，你有一整個廚子團隊，對吧，你有線廚、有副廚，各種不同的站點，而你的工作是去設計這個環境，你負責把廚房架起來，你負責把任務分給不同的人。所以這是一種很有趣的工作方式，而這基本上就是我怎麼把這些驗證技能建起來的。好，我這邊有一個球，我想再往下一層。所以假設我們想建一個 eval 或一個 skill，針對某件事，而且我們希望它能自己變好，我覺得你是在建議這個。你是在 work tree 裡做，用子代理、再加 reviewer agent 那種隔離的方式嗎？還是發生在某種雲端託管的環境？實務步驟是什麼？如果我想去做這件事，幫某件事建一套驗證系統，我該怎麼做，或從哪開始？",
+      "en": "drawing here uh but i think of it like uh you know as a as a engineer now you're sort of more like like maybe a manager or the analogy i like is like you're like a chef in a restaurant uh you're the head chef uh you're not cooking all the food yourself anymore you have a team of cooks right you have line cooks you have a sous chef you know all these different stations um and it's your job to really design the environment you know you you're in charge of setting up the kitchen you're in charge of you know like giving tasks to different people so um yeah it's a very interesting way of working uh but yeah that's that's how i've basically built uh these verification skills yeah just just one ball there i'm like i have to go try to go one layer deeper so are you let's say we wanted to build um an eval or a skill for for something and we wanted to get better on its own, which is what I think you're suggesting. Are you doing that in a work tree, kind of isolated with the sub-agents and then the reviewer agent and all that? Is it happening in some type of cloud-hosted environment? What's the practical steps? If I wanted to go do this and set up a verification system for something, what would I do or where would I start?"
+    },
+    {
+      "id": "t-12172",
+      "t": "20:17",
+      "start": 1217.28,
+      "end": 1252.24,
+      "block": "s7-4",
+      "text": "我覺得最好的起點是本機，因為你可以觀察。你可以確實看到你的代理在做什麼，所以如果你在幫自己建驗證技能，我一定會從本機開始，就讓你的代理把應用程式起來，不管是 CLI、桌面 app，還是什麼，這樣你才能真正觀察，對吧，你可以看到代理怎麼跟應用互動，你可以看到它怎麼呼叫那些讓它跟應用互動的不同 API。",
+      "en": "I think that the best place to start is local because you can observe. You can definitely observe what your agents are doing so uh if you're building a verification skill for yourself uh i would definitely start local and just have your agent bring up the application whether it's like a cli or a desktop app or whatever and so you can actually observe right you can see how the agent is interacting with the the application you can see it you know how it calls like the different APIs that allow it to interact with the the application."
+    },
+    {
+      "id": "t-12543",
+      "t": "20:54",
+      "start": 1254.38,
+      "end": 1315.95,
+      "block": "s7-4",
+      "text": "但就我個人來說，我基本上幾乎全面押在雲端代理上，因為它們非常強大。Cursor 真正強大的其實是雲端代理，如果你花一點時間把環境設好，這些控制技能、這些驗證技能會帶來很大的回報，因為它不只是讓你單一工程師變更好，它其實會把你整個團隊拉上來，甚至整個公司，因為你可以開始想雲端代理，你可以開始想那些會自動做事的自動化。這個我稍後會再講一點，但我先帶進去：比方說，我常常講我們有一個叫 Benny 的代理，它會接住我們收到的所有 bug 回報，然後自動在雲端跑起來，打開它自己的桌面。",
+      "en": "But for me, personally, I have basically been kind of all in mostly all in on cloud agents, because they're extremely powerful. And the really powerful thing about cursor is the cloud agents, actually, where if you spend a little bit of time setting up the environment, these control skills, these verification skills pay a huge amount of dividends because it's not just something that makes you as a single engineer better it actually levels up your whole team uh and even your whole company because uh you can actually start thinking about cloud agents you can start thinking about automations that automatically do things like uh i'll i get i kind of talk about this a bit later but i'll just kind of get into it uh where For example, I talk a lot about this agent we have called Benny who takes all of the bug reports that we get and it automatically goes off in the cloud, opens up its desktop."
+    },
+    {
+      "id": "t-13164",
+      "t": "21:56",
+      "start": 1316.43,
+      "end": 1402.79,
+      "block": "s7-4",
+      "text": "它在自己的電腦上跑 Cursor，用同一套控制技能去跟應用互動，試著重現那個 bug 或使用者回報。對，這超強大，因為我馬上就能自動拿到超多資訊。像這個例子裡你可以看到，Benny 真的重現了這個 bug，但它在 main 上已經修好了，所以它其實確認了我們已經把這個問題解決了，我只要再發一版 Cursor 的 build 就好。那是很大的資訊，我不用自己去跟一個代理坐著花一個小時去搞清楚這修好了沒修好，你就拿回超多時間。而且我團隊上每個人都受益，公司裡每個人都受益。所以我絕對覺得用雲端代理超強大。但這像一趟旅程，你得先信任它，對吧，你才能到這個點。這就回到我這邊講的，這很難，幾乎不可能。而且我絕對會勸你不要硬跳，如果你還在這個區間，你不要一下子跳到我現在要一次生出一百個、幾千個雲端代理，因為你只會浪費很多 token，而且會貴到不行。",
+      "en": "It runs Cursor in its own computer and it uses the same control skills to interact with the application and try to reproduce the bug or the user report. right and this is so so powerful because at once i can immediately i get so much information from this automatically like here in this example you can see that uh the benny actually reproduced the bug uh but it's already fixed on main so it actually confirms that we fixed this problem already and all i need to do is just release another build of of cursor uh so that's like huge information there that i didn't have to go off and sit with an agent you know and spend an hour trying to fit like is this fixed is this not fixed so you you you gain back so much time uh but you know everybody on my team benefits from this everybody in the company benefits from this uh so definitely think that uh you know keeping these using cloud agents is super powerful uh but yeah it's like a journey you have to trust it first right before you you get to this point and that's it goes back to what i was saying here where you know it's very hard it's almost impossible And I would definitely encourage you not to try to jump from, you know, like if you're still in this zone, you don't want to jump to like, I'm going to spawn a hundred or thousands of cloud agents right now because you're just going to waste a lot of tokens and it's going to be extremely expensive."
+    },
+    {
+      "id": "t-14027",
+      "t": "23:22",
+      "start": 1402.79,
+      "end": 1553.89,
+      "block": "s7-4",
+      "text": "好。那先大概回顧到目前為止：如果我們要走你走過的這趟旅程，就是從驗證開始，建一些技能、一些方法，去判斷代理至少產出正確的程式碼。像你說的，好不好的程式碼可能是另一個問題，但至少在技術上有解到問題，靠看 stack traces、看 app 裡的實際行為之類的。然後一旦我們在本機信任它了，我們就可以開始想擴到雲端，跑更多自己去撿訊號的代理，對吧，不管是進來的 bug 回報還是什麼，它們可以去撿起來、把問題解決、把 PR 交回來。然後也許最後一步是自動 merge PR，那是你現在到的地方，不一定是每個人都到的。對對。然後在 main 上 review。這樣大概對嗎？對，完全正確。我想這就是為什麼我畫了這條曲線，對吧，因為這基本上就是描述我的旅程：一開始我幾乎只能用幾個代理，而且每一件事我都在盯著看。我覺得從這裡走到那裡真的沒有捷徑，因為這真的關乎你個人對代理的信任程度，對吧。顯然，當工程師你不會想把垃圾程式碼直接丟進 production，所以你怎麼真正建立起那個信任，需要很多品味跟判斷。但我覺得像 Pstack 這種 plugin 絕對能幫你更快上手。所以大概是：如果你信任我、也信任 Pstack，那延伸下去你也許可以信任你的代理；但如果你不信任我，我絕對不會鼓勵大家盲目信任我。如果你自己建一組技能，你當然可以去看 Pstack，把它 fork 下來、做成自己的、改進那些技能，我絕對鼓勵那樣。但對我來說，這一切一直回到信任。我們這個聊天室裡每個人對工程都有不同標準，我們的 code base 裡重要的東西也不一樣。當你能把那些都編進技能裡，而且你能驗證你的代理真的在做那些事，那就讓你真正往這條曲線往上走，開始自動化事情。我還有一塊想講，如果有。好，你繼續，我邊講邊再接問題。",
+      "en": "Yeah. So just to kind of recap so far, basically the, if we wanted to go on the journey that you've kind of gone on, it would be to start with verification, building some skills and some ways of determining that the agents are producing at least like correct code, whether, like you said, whether it's good code or not is maybe a separate question, but like it's technically solving the problem by looking at, you know, stack traces, looking at, you know, the actual behavior in the app and so on. and then once we trust it locally then we can start to think about scaling into the cloud and running more agents that are picking up signals i guess on their own right so whether that's like a bug report that comes in or something they can go and pick it up and solve the problem and give us back a pr and then maybe the last step is like auto merging the prs which uh is where you're at maybe not where everyone yeah yeah um and then reviewing them on main but um is that is that about right yeah exactly i think yeah that's why i drew this this uh this this curve right because that this basically describes my journey of you know when i started barely could use a couple agents and i was just observing every single thing i think there's really no shortcut for going from here to there because this is really about your personal level of trust in agents right um obviously you know as an engineer you don't want to just slop code into production so how do you actually build up that trust takes um a lot of uh i guess taste and judgment um but uh you know like i think plugins like Pstack definitely can help you get up to speed much quicker uh and so i guess it's like if you trust me and you trust Pstack then in by extension you can maybe trust your agents but if you don't trust me and i definitely would not encourage people to blindly trust me uh uh you know if you build up your own set of skills that you can obviously you know take a look at pset and kind of fork it make it your own improve the skills definitely encourage that but for me it's really all about it just keeps coming back to trust you know every one of us here in this chat have a different standard for engineering and there are different things that are important for us in our code base and when you are able to encode all of that into skills and you can verify that your agent is actually doing them that allows you to really kind of ascend this curve and um uh you know start automating things uh there's another piece i wanted to talk about um if there's yeah go for it i'll pick up more questions as i go"
+    },
+    {
+      "id": "t-15538",
+      "t": "25:53",
+      "start": 1553.89,
+      "end": 1808.57,
+      "block": "s7-5",
+      "text": "對，我覺得這邊還有第三塊我還沒講到，其實蠻有意思的，就是重構跟重寫。我猜產業裡最有爭議的話題之一，就是該不該重寫你的 app。因為工程師很容易這樣，尤其是你剛進一家公司，看到 codebase，就會想說靠這個超爛誰寫的，太糟了，我想整包重寫。這種衝動很常見。而且我覺得以前還沒有 agents 的時候，甚至現在某種程度上，大家還是會很用力勸你不要去重寫東西。但我今天其實想講為什麼你可能應該考慮看看。因為我覺得真的要看情況。brownfield 應用我覺得其實處境還不錯，尤其如果本來就設得好。最近我跟一些人聊過，我也一直在觀察，注意到一個平行現象：很多大公司才有的問題，現在變成每個人的問題了。那種大公司問題，像我以前在 Meta，我們有超大的 monorepo，不知道幾萬個工程師一直敲鍵盤在 ship code，Meta 也有很多很強的工程師，但說實話你會很驚訝，code quality 其實沒那麼好。所以我常開玩笑說，在 AI sloth 之前，我們先有 human sloth。然後很多大公司 infra，像 Meta 或 Google 這種真正的大科技公司，其實就是為這個設計的，你等於在遷就，這聽起來很糟，但就是團隊裡能力最弱的那個工程師，對吧？你建 frameworks、建 conventions、建護欄，限制 credentials，這樣你的 intern 才不會把 production 資料庫整個清掉。如果你已經有那種等級的 infra，我覺得你的 agents 其實已經可以做得相當扎實，對吧？因為護欄已經在那裡，agents 不會在 codebase 裡搞出大破壞，或至少不會搞太過頭，你也可以再加更多護欄。但我覺得 greenfield 應用，全新的應用，在我看來風險最大，機會也最大。因為如果你 vibe code 一個專案、一個 prototype，像我們做 Grok Bot 那樣，Grok Bot 是非常非常非常快就搞起來的。如果你還沒聽過 Grok Bot，那是我們昨天才剛上線的新應用，超酷的，讓你編排、建立各自有自己身份的個別 agents，然後你可以去編排它們，真的很酷，一定要去看看。但對，那是非常 greenfield 的應用，大部分 prototype 都是這樣，所以是很快 vibe code 出來的，人類根本沒在看 code。我最近有一則推文講到 organic architecture，也許我待會找得出來，但重點是：當你有一個完全 vibe coded 的應用，基本上完全沒有護欄。所以你給 agents 一個任務，它們就會用當下最方便的方法去解。久了你就會落到這種情況：codebase 開始失控，因為你看不懂它。agents 某種程度上懂，但它們建出來的東西是為了走捷徑而優化的。然後你就會很痛苦，那個應用會有一堆問題。",
+      "en": "but yeah i think there's a third part to this which i haven't talked about yet which is kind of an interesting one which is like refactoring and rewriting like one of the uh i guess most controversial one of the most controversial topics in the industry i think is like should you rewrite your app or not um because i think engineers are very prone to this where especially when you join a company you come in and you see like the code base and you're like man this is shit like who wrote this code you know it's terrible i want to rewrite the whole thing there is a very common inclination and i think a lot of you know before agents um and i guess arguably even now people will definitely discourage you from rewriting stuff but i'm actually here to make a case for why you might want to consider it um because i think it really depends uh you know brownfield applications i think are actually in a pretty good spot especially if they're set up well already uh and like recently i've been talking to some people but uh you know i was just observing i just noticed this parallel which is that a lot of big tech company problems are now everybody's problems um and the big tech company problem you know like when i was working at meta like we had this giant monorepo we had like i don't know tens of thousands of engineers just you know like banging on their keyboards and shipping code and a lot of really great engineers at meta uh but uh i'll say like you know you'll be surprised that the code quality is actually not that good um and so i often joke that like you know before ai sloth we had human sloth um and so you know i think a lot of big tech infra like uh like what meta has or google you know you know really big tech companies are actually designed for that where you're sort of like you're catering to the the you know like uh this sounds so bad to say but like the the least capable engineer on your team, right? You build frameworks, you build conventions, you build guardrails, you know, you restrict credentials so that, you know, your intern doesn't wipe your production database. There's, you know, if you have that level of infra already, I think your agents can actually already do a very solid job, right? Because they have, the guardrails are already in place for agents to not cause havoc or not cause too much havoc uh in your code base um and you can always add more you know guardrails uh but i think like greenfield applications especially are you know like the brand new applications are like the biggest risk in my opinion uh and also the greatest opportunity because you know if you vibe code a project uh a prototype um like we did for Grok Bot you know Grok Bot was spun up very very very quickly um and if you if you haven't heard of Grok Bot it's like a new application we just launched yesterday uh it's it's really cool uh lets you orchestrate your create like individual agents that have their own identity and you can kind of orchestrate them it's super cool definitely check it out but yeah that was it's like a very it was a very greenfield application like most prototypes are so it's like vibe coded very quickly humans were not reading the code at all and uh i had this tweet recently uh where i said something about organic architecture um maybe i'll find it uh but the idea is that uh when you have a completely vibe coded application you essentially have no guardrails whatsoever so uh your agents when you give them a task they will just solve it in whatever method is the most convenient and over time you get into this uh situation where you have a code base that is spiraling out of control because you don't understand it uh your agents understand it i guess in a way but like they've built something that is you know optimized for shortcuts. And, you know, you will suffer, you have a lot of issues with that application."
+    },
+    {
+      "id": "t-18105",
+      "t": "30:10",
+      "start": 1810.52,
+      "end": 1818.7,
+      "block": "s7-5",
+      "text": "所以我覺得一開始就把 codebase 設成很強的約束，是非常必要的。",
+      "en": "So I think starting your codebase with, like, very strong constraints is very much needed."
+    },
+    {
+      "id": "t-18195",
+      "t": "30:19",
+      "start": 1819.58,
+      "end": 1852.28,
+      "block": "s7-5",
+      "text": "因為當你有一個你信得過的 codebase，對吧，當你有真正幫得上忙的護欄，能幫你、幫你的 agents 寫出好 code，你就能走到我說過的那段曲線：我今天醒來，agents 已經幫我 merge 了大概二十個 PRs。那是因為我砸了很多時間，超過六百個 PRs，我昨天算過，是我把整個 Grok Bot 重構成我一直在建的那套新架構時做的。",
+      "en": "Because, like, when you have a codebase that you can trust, right, when you have guardrails that actually help you, help your agents write good code, you can get into the, you know, like, into this part of the curve where I said, you know, I woke up today and I had like 20 PRs merged by my agents. And that's because I invested a lot of time, over 600 PRs, I calculated yesterday when I refactored all of Grok Bot to this new architecture that I've been building."
+    },
+    {
+      "id": "t-18547",
+      "t": "30:54",
+      "start": 1854.7,
+      "end": 2069.57,
+      "block": "s7-5",
+      "text": "對，我已經到一個地步，我真的不太再看 code 了，我說這話不是為了推銷你們 tokens，而是因為走到那一步花了很多功夫，我砸了很多 tokens，才把 codebase 弄到我不用再盯著看。但我很興奮，因為那個潛力不只讓我受益，也讓每個在貢獻 Grok Bot 的人受益，還讓設計師、產品經理，甚至 GTM 的人也能幫 Grok Bot 加功能，而我不用擔心，不用半夜醒來想靠北有人剛 merge 了一個效能回歸，對吧。我有一堆約束，而且 CI 寫 Grok Bot 的 code 其實很煩，但 agents 把那些煩都吸收掉了。對，我很樂意講那到底是什麼。嗯，我想有一個問題，在我們進到這一段之前，就是關於你的 CI 長什麼樣，或者有哪些約束，還有平均 PR 大小，我稍早有看到那個問題，就給大家一個大概的感覺，不一定要數學上的平均，就是一般 PR 大概多大，是不是只有幾行之類的。對，我覺得看情況，我試著用一種不會，對，你不用分享實際數字或真正的平均，大概的基準就好。嗯，我們有，好這其實沒那麼有趣，但一個有趣的事實是，Grok Bot 跟 Cursor 裡的 virtualization 其實是靠 Pstack 驅動的，那是有人做的一個蠻新的 library，很有意思，你們可以去看看，不過那其實沒那麼重要。平均 PR 大小我其實不知道，我也不確定要不要點開這些，大概可以，但我會說它們可能從幾百行或五十行到一千行都有，看那個東西在做什麼。像這裡我其實在刪一堆檔案，所以我預期大部分都是刪除。但對，它會變，沒有硬性上限，也不是全都五十行，絕對沒有硬性上限，但我會鼓勵我的 agents 把工作拆成多個 PRs。我這樣做主要是因為我喜歡那個想法，也許在 agents 的世界、commit 這麼多的時候這更難做到，但我喜歡 git history 是很豐富的 context 來源，也喜歡每個 PR 差不多原子地描述那一小塊在做什麼，這樣我也比較容易 revert，以及釐清說喔我 ship 了一個 bug，就是這個、在這裡，而不是埋在一個誰知道塞了什麼的四萬行 PR 裡。但我對 PR 大小沒有硬性上限。好，然後還有一個關於 CI 的小問題，一樣你不用開螢幕分享你的 CI，但大概能不能描述一下 CI 長什麼樣，或者有多嚴格？",
+      "en": "And yeah, I've gotten to a point where I don't really look, I really don't look at the code anymore and um i say that not just you know to sell you tokens but because i you know it took a lot of work to get to that point i spent a lot of tokens to get the code base to this point where i no longer have to look at it uh but i'm very excited because you know of the potential where you know it's not just this doesn't just benefit me it benefits everyone contributing to growth bot and it also empowers you know designers and product managers and you know people even gtm people to add features to Grok Bot and i don't have to worry you know i don't have to wake up at night in in the middle of the night and worry like oh shit someone's just merged a perf regression right i have a ton of constraints and ci is like it's actually very annoying to write code in in Grok Bot but like agents absorb all of that annoyance um but yeah i'm happy to talk about what exactly that is um yeah i think one question um yeah before we get into the this part here is just around that element of like what your your your ci looks like or maybe some of the constraints and then also like the average pr size i saw a question about that earlier just to give people a you know kind of a glance it doesn't have to be like mathematically average but just uh you know like what generally the size of the pr is um if it's only a couple lines of code or you know um yeah um i think it depends on me i'm trying to do this in a way where i'm not gonna like yeah you don't have to share the actual number of you like an actual average just this is fine benchmark but like we have so okay this is not that interesting but uh well fun fact is that virtualization in Grok Bot and in uh cursor is actually powered by uh pretext which is a sort of new library that someone's built um that's really interesting you should you should check it out but that's not really that important uh i think the average pr size i actually don't know i don't know if i want to click on these uh i probably can but i would say like they can range anywhere from a few hundred lines or 50 lines to like a thousand depending on what the thing is doing uh so like here i'm actually like deleting a bunch of files so i expect that it's just like mostly deletion uh but yeah it kind of varies there's no like yeah there's no like hard cap or they're all like 50 line there's definitely no hard cap but i do encourage my agents to split up their work into multiple prs uh i do that mostly because uh i like i like the idea of that i guess maybe this is much harder to do now as in the world of agents and you have like so many commits but i like the idea that you know the git history is very rich source of context uh and i like the i like each pr to sort of atomically describe what that small piece of thing is doing which also makes it easier for me to revert changes and like figure out you know oh i shipped a bug and it's this it's here it's not in this 40,000 line pr where who knows what landed in there uh but i i don't have a hard cap on pr size cool and then um yeah also quick question on like ci so again you don't have to go into like uh the screen share like your ci does but just generally would you describe what the ci kind of looks like uh or how strict it is"
+    },
+    {
+      "id": "t-20711",
+      "t": "34:31",
+      "start": 2071.17,
+      "end": 2278.03,
+      "block": "s7-5",
+      "text": "對，所以特別就 Grok Bot 來說，Dune 是我們為 Grok Bot 建的那套架構的一種半開玩笑的代號。CI 看起來很煩，因為什麼都有檢查。比如說，如果你寫過 React，你知道 React 最大的踩雷之一就是 useEffect，所以在 Dune、在 Grok Bot，我們禁用了 useEffect。Dune 的心智模型你可以想成是給 Electron apps 用的 Next.js，是設計給 agents 來寫的，也是為我們 agent-forward 的應用客製的。所以 CI 檢查非常針對這個，比如說不要用這些 effect，禁用了，CI 會 fail、會罵你。還有一些比較有趣、可能讓人皺眉的，像我其實也禁用 code comments，這很有意思。但我發現百分之九十九的時候，agents 寫的 code comments 都在講某種歷史東西，其實跟 code 完全無關。它常常會寫喔 Lauren 說你永遠不該這樣做，然後這就進了 code comment，什麼？為什麼？那不是我當成什麼持久的全域規則在講，我只是說你這個 PR 很爛、那一段該改。令人意外的是 agents 其實沒那麼懂我們，或者它們假設太多，做事方式也很蠢。所以對，我們就把你想得到、agents 很糟的東西全都禁掉。一個我們在 Agent Window 其實很痛苦的例子是，如果你用過 Agent Window，你一定看過效能問題，我們一直在修，但這是沒完沒了的掙扎，因為有超多 PRs 被 merge，任何一個都可能讓效能、穩定性或可靠度回歸。Agent Window 還沒有這套架構，我打算把這個學習帶回去，把那邊整個重構，但它回歸超常發生。一個例子是我們在 process 之間隔離很差。在 Electron 你有 renderer thread 在畫 UI，也有 main thread 可以跑其他不用卡住 renderer 的 code，但我們分得不好，所以常常一不小心就把 code 拉到 renderer thread 上跑，然後你突然在跟 renderer 搶資源。如果你要 60 fps，每一幀都得在十六毫秒內畫完，每一幀的 deadline 非常非常短，如果你想要很順的產品。而當你開始不小心把計算很重、或 IO 很多的東西拉進來，你就會開始很卡，FPS 掉得很兇。",
+      "en": "uh yeah so uh well specifically for Grok Bot so dune is the it's the sort of cheeky code code name for the architecture that we built for Grok Bot um the ci looks pretty annoying because there's checks for everything so like literally i have um uh well if you've written any react for example you know you know that one of the biggest foot guns in react is use effect uh so in uh dune and in Grok Bot we've banned use effect so dune is just the the mental model of what dune is uh you can kind of think of it as like next js for uh electron apps and it's designed for agents to write uh and it's like custom for you know our agent forward applications um so the ci checks are very like specific to that like you know don't use these effect it's it's it's banned like ci will fail uh and yell at you we have like some of the more interesting ones that people might raise eyebrows is like i actually ban code comments as well uh which is very interesting um but i've noticed that 99 of the time agents just write code comments that kind of describe some historical thing that is actually totally irrelevant to the code um like it will often say like you know oh lauren said you should never do this and it's now in the code comment like what like why what that was i didn't say that as like a durable you know global rule i just meant like your this pr sucks and you should change that part agents don't really understand us that well surprisingly uh and or they kind of assume too much and they kind of do things in like very stupid ways so like yeah we just ban everything everything you can imagine like the agents are bad at we ban uh so one example that we actually suffer a lot in the agents window is we have uh you know if you've used agents window you've definitely seen performance issues and you know we're constantly trying to fix them uh but it's like a it's a never-ending struggle because there's so many pull requests that get merged every any one of them could just regress performance or stability or reliability uh you know the agents window doesn't have this architecture yet i plan to do bring this learning back there and kind of refactor everything there but it just regresses super often because there's just one example is like we have very poor isolation between processes so like on Electron you have a renderer thread that renders your UI but you also have like a main thread that you can run other code that you know doesn't need to block the renderer but we do a poor job of separating those things and so oftentimes you just accidentally have code that gets pulled into running on the renderer thread and then all of a sudden you're competing with the renderer that you know that has a very if you want like 60 fps you have to every frame that gets drawn has to be done in 16 milliseconds so very very small you know deadline per frame uh if you want you know a very smooth product uh and when you start building bringing in accidentally bringing in you know things that are like very computationally heavy or they have a lot of io So then you just get into like a lot of jank and your FPS really drops."
+    },
+    {
+      "id": "t-22781",
+      "t": "37:58",
+      "start": 2278.17,
+      "end": 2285.83,
+      "block": "s7-5",
+      "text": "你開始掉幀。會出現超過十六毫秒的 long tasks，然後體驗就變得很卡頓。",
+      "en": "You start, you know, losing frames. You get long tasks that take more than 16 milliseconds and you just get this really choppy experience."
+    },
+    {
+      "id": "t-22869",
+      "t": "38:06",
+      "start": 2286.96,
+      "end": 2540.47,
+      "block": "s7-5",
+      "text": "所以我們在做 Electron app 學到的那些 pattern，全部都編進這個 framework 了，而且會變成硬性失敗。在 Grok Bot 裡我們真的有叫 electron-main、electron-renderer 的目錄，還有 import CI，會去檢查 dependency graph，確保你不會不小心從一個目錄把程式碼 import 到另一個。這個由 CI 強制執行，也有 Bugbot，就是 Cursor 的 code review 工具，跑在 CI 上。在我們的 agents md 裡到處都有。我這裡有講到，我覺得要做出好的 code base 有很多層。當然 code base 本身是一層，如果你有這種極度嚴格的架構，做功能的方式非常制式，那就是最強、最強的 enforcement，因為 agent 超愛抄現有的 pattern。Grok Bot 的一個例子是我們有叫 feature 的概念，還有 entry points、transcript cards，就是你在聊天裡看到的那些卡片，這些大概都是 framework 裡的名詞，建立它們有很制式的做法。舉例來說，一個 feature 全部都在單一目錄裡，所有構成那個 feature 的程式碼都活在同一個目錄。全部共置在一處，超好用，agent 不用到處撈、搞不清楚東西在哪。它只要看那個 feature，哦好，我在做 Grok Bot 的 onboarding feature，我就在這個目錄工作。百分之八十的工作大概都封裝在那裡。這又是為最笨的 agent 設計的，你不用想。這個 framework 我的關鍵原則之一是：最短路徑就是最好的路徑。因為那剛好對上 agent 寫 code 的習慣，它們真的很愛走捷徑，會找最快解法，那為什麼不把那條路做成最好的解法？我大概不會講到所有細節，而且這個 framework 比較像想法和原則的集合，不是什麼要開源的東西。你要的話可以截圖，叫你的 agent 也幫你做類似的東西。重點真的是這些層次：code base 是一部分，有 features、目錄、擋不該 import 的依賴，全部強制執行；還有靜態分析、CI checks，我們有很多針對觀察到的壞 pattern 的 lint、compiler diagnostics；還有 rules 和 Bugbot。我覺得大概三四五比較軟，這兩個才真的會讓 CI 掛掉，有硬性約束，agent 就不能隨便寫爛 code。rules、skills、Bugbot，你的 agent 還是可能忘，或者不一定每次都一致套用。所以我喜歡把它們疊起來，但我不喜歡只靠它們當唯一的 enforcement，因為太軟了。如果你只有 rules、Bugbot、skills 跟一份 style guide，你的 code base 遲早會看起來像一堆垃圾，抱歉這樣講，但我真的建議投資能硬性強制的東西，對吧？",
+      "en": "So all of those patterns that we've learned basically building Electron apps, we've encoded into this framework and it becomes like a hard failure. So in Grok Bot, we literally have a directory called electron-main, electron-renderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another. So that's enforced by CI, as well as Bugbot, which is our, which cursors my code review tool that runs on CI. uh you know in our agents md it's everywhere like so i i i um i have this thing here where i talk about like um you know like there are multiple layers i think for building a good code base obviously the code base is one where uh if you have an architecture like this where it's extremely strict uh you know the the the way to build features is very conventional that's like the strongest strongest level of enforcement because agents just love to copy existing patterns so one example of this in Grok Bot is like we have this these concepts called like a feature and we have entry points and transcript cards like oh you know the cards that you see in the chat these are all like like nouns i guess in in the framework and so there's a very conventional way of creating them. And so like a feature is all in a single directory, as an example. And so all of the code that contributes to that feature lives in one directory. So it's all co located in one place, makes it super easy, you know, agents don't have to like, grab around and try to figure out like where all the things are. It just looks at the feature and like, oh, okay, I'm working on the onboarding feature in Grok Bot. I'm just going to work in this directory. And for 80% of the work it's mostly just very encapsulated there but uh like it's like very it's like design again for you know like the dumbest agent like you don't have to think right the the the one of the key principles i have for this framework is like the shortest the shortest path is the best path so uh because that plays exactly to how agents love to write codes like they like to take shortcuts, really. They'll find the quickest way to solve the problem, so why not make that the best way to solve the problem? So I probably won't get into all the specific details, and this framework's really more of a collection of ideas and principles rather than something that will open source. You can screenshot this, I guess, if you want, and tell your agent to build something like this for you too but it's really all about the layers the code base is one part with features and directories and import blocking import dependencies that shouldn't be imported and it all enforces that and static analysis there's CI checks, we have a lot of lints for bad patterns that we observe compiler diagnostics there's also rules and bug bot which are I think like three four five are more soft right these two actually make make ci rid right so that you know there's a hard constraint where the agent can't just write crappy code for rules and skills and bug bot your agents can still forget right you can still or it may not always consistently apply them so i like to layer them but i don't i don't like to rely on them as the only source of enforcement because it's very very soft right and if you if you only have rules and Bugbot and skills and a style guide for your code you will it's only a matter of time before your code base looks like complete trash i'm sorry to say that but uh i definitely recommend yeah like you know investing in, you know, things that can be hard and forced, right?"
+    },
+    {
+      "id": "t-25405",
+      "t": "42:20",
+      "start": 2540.53,
+      "end": 2545.45,
+      "block": "s7-5",
+      "text": "而這也是為什麼，你選用的 tech stack，可能也很重要。",
+      "en": "And this is why, you know, maybe the choice of tech stack that you use is also very important."
+    },
+    {
+      "id": "t-25473",
+      "t": "42:27",
+      "start": 2547.37,
+      "end": 2581.39,
+      "block": "s7-5",
+      "text": "比如說我覺得 Rust 又開始超紅，因為 compiler 超嚴，對吧？Compiler 強制很多東西。有個 borrow checker 你得安撫它。只要你確保 agent 不要寫 unsafe 區塊，你大概可以有點信心：程式碼能 compile 大概就能跑、也還行。但它給你那種信任跟信心，讓你身為人類工程師不用再自己去檢查。",
+      "en": "Like, I think, for example, Rust is sort of making, you know, it's, like, getting super popular again because the compiler is so strict, right? The compiler enforces so many different things. You know, there's a borrow checker that you have to appease. And as long as you make sure your agents don't write unsafe code blocks, you can more or less feel somewhat confident that if the code compiles it probably works and it's good. But it gives you that level of trust and confidence that you as a human engineer no longer need to go and check it yourself."
+    },
+    {
+      "id": "t-25813",
+      "t": "43:01",
+      "start": 2581.39,
+      "end": 2629.95,
+      "block": "s7-5",
+      "text": "你靠程式碼跟靜態分析，真的讓這件事順很多。最糟的地方大概是卡在 code review 地獄，你是用真人讀 code、說「好你不該這樣做」來強制 code base 裡所有約束跟 invariant。每次你得這樣做，就該當成 code smell、一種 anti-pattern，然後問自己：好，與其我在 PR 上留言，我怎麼把這變成硬性規則？我怎麼變成一條 lint rule？怎麼變成 CI 失敗？或者，我怎麼從根本上徹底消掉這個問題？",
+      "en": "You rely on code and static analysis to actually make that a lot smoother. And I guess the worst part, the worst place to be in is if you are stuck in code review land where you actually enforce all of the constraints the invariants in your code base by literally the human person saying you know reading the code i'm like okay you should not do this right every time you have to do that you should consider that as a code smell like a anti-pattern and you should say okay instead of me commenting on the pr how do i turn this into a hard rule right how do i turn this into a lint rule how I would turn this into a CI failure? Or how do I even categorically eliminate this problem entirely?"
+    },
+    {
+      "id": "t-26319",
+      "t": "43:51",
+      "start": 2631.95,
+      "end": 2656.99,
+      "block": "s7-5",
+      "text": "我還可以講另一個我做過的 migration，不過我大概先停在這。好。對，坦白講我覺得我現在就處在你剛描述的狀態，就是我還沒有這些規則。所以這場結束後我有一些事要去做。在擴展 agent 這件事上，我本地大概同時跑兩三個平行的，我相信在場大多數人也差不多，對。",
+      "en": "I can talk about another migration I've done, but I'll probably pause here. Sure. Yeah, I feel like that's where I am, to be honest, is what you're describing right now, which is that I don't have all of these rules. So I have some things to go do after this session. In terms of being able to scale my agents, I'm definitely on maybe a couple of parallel ones locally staged like two to three locally and i'm sure most people here are on the same so uh yeah"
+    },
+    {
+      "id": "t-26569",
+      "t": "44:16",
+      "start": 2656.99,
+      "end": 2699.77,
+      "block": "s7-6",
+      "text": "我知道我們只剩幾分鐘了，Lauren，你還有什麼想特別講的嗎？顯然問題很多，我可以再抓，但我想留幾分鐘給你，看你還有沒有想聊的。嗯，我覺得我已經講超多了，那我們就直接問問題吧。好，酷。有一個問題出現過好幾次，就是關於 token 用量。問題是：你在講的這套，對那些只有一般 token 用量、基本上沒有無限 tokens 可用的人來說，是不是現實可行的？我覺得這點問得很好。顯然我在一個有無限 tokens 的 AI lab 工作，所以我絕對不能",
+      "en": "i know we only have a couple minutes left lauren was there anything else that you wanted to to highlight i obviously there's lots of questions so i can grab more but i want to give you a few minutes if there's anything else you want to talk about well i think i've been yapping for quite a lot so maybe let's just do questions okay cool uh one question that had a couple of uh came up a couple times was just around like token usage so the question is like is is what you're describing a realistic thing for people who are on you know uh a normal set of token usage they don't have you know basically unlimited tokens uh to work with i think that's a really good point i mean like obviously you know i work at an ai lab where we have unlimited tokens so uh i definitely cannot"
+    },
+    {
+      "id": "t-27012",
+      "t": "45:01",
+      "start": 2701.21,
+      "end": 2853.97,
+      "block": "s7-6",
+      "text": "說每個人都該用跟我一模一樣的方式來做。我覺得有可能做到這個程度，而且不用砸到破產。但如果你是工程主管，或你領導一家新創，對我來說這是 ROI 的問題。對，前期你會在 tokens 上花很多錢，重構 codebase 會吃掉很多 tokens，把這些東西都加進去也會吃掉一堆 tokens。但我們正走向 agents 會寫所有程式碼的世界，你又想保持很精簡，對吧？你不想一直加人，你也不想變成 Meta 那種一萬人的工程組織。那固然是好煩惱，但 overhead 超多，什麼規劃之類的，就我個人來說，那其實沒那麼好玩。我覺得你會想保持很靈活。Agents 的重點就是讓你做到以前做不到的事。對我來說，那才是 agents 的價值。不是把 tokens 砸在每一件小事上。對我來說，我以前做不到的，是單靠自己在一個 codebase 裡強制執行到這種程度的約束。我只是一個人。要自己把這個 framework 建起來、做完所有重構、全部自己測、全部驗證，會花我好幾年。想像一下如果現在還是 agent 時代之前、就只有我一個人在跑，會花超久，對吧？而且我薪水也不低。所以我覺得工程主管可能會問的，就是這個取捨：你要僱人來做這件事，還是把 tokens 花在把 codebase 建好，讓最天真、最笨的 agents 也能做得不錯。而當你真的到這個程度，連不到 Claude 等級的 agents 也能把程式寫得很好。這對我個人也回報很多，我不只賦能了自己，還有 PM、設計師、不熟 Grok Bot 的工程師，都能用可持續的方式貢獻。",
+      "en": "say that you know this is something everyone should do in the exact same way that i did it i think it's possible to get to this point without you know breaking the bank but you know if you're like an engineering leader or you know you're you have a startup that you lead um i think to me it's a question of roi um and it's like uh yes you spend a lot of money on tokens in the upfront stage you know like refactoring your code base is going to take a lot of tokens uh adding all these things uh is going to take a bunch of tokens but if we're heading to a world where agents are writing all the code and you know you want to be very lean right you don't want to have to hire you don't want to be you don't want to become like meta right like i mean like in terms of you don't want to become a 10 000 person engineering org because i mean that's a cool problem to have but also you know you have so much overhead there's like planning you know like you it's it's uh personally i i wouldn't uh it's not super fun but um i think you want to stay very nimble. Agents are all about allowing you to do things that you couldn't do before. That's really, to me, the value of agents. It's not just storing tokens on every single little thing. But to me, the thing I couldn't do before is enforce this level of constraints in a code base by myself. I'm just a single person. It would have taken me years to build this framework uh and do all the refactoring and test everything myself and verify you know like run imagine if it was just me right now in in pre-agent era just like running you know it would take me so long right and my salary is pretty high right like so you know the the question i think an engineering leader might have is just then you know like what is there's a trade-off of do you hire someone to do this or do you spend the tokens to set up a code base so that even the the most naive right the dumbest agents can do a good job and when you actually get to this point like even agents that are not you know Claude-size do an excellent job of writing code and this pays a lot of dividends as well for me personally where i've empowered not just myself But, again, like, PMs, designers, engineers who are not familiar with Grok Bot to just contribute in a way that is sustainable."
+    },
+    {
+      "id": "t-28552",
+      "t": "47:35",
+      "start": 2855.28,
+      "end": 2881.72,
+      "block": "s7-6",
+      "text": "所以我覺得，對，這絕對是一種取捨。沒有什麼是免費的。而且 tokens 滿貴的。不過，喔，不知道你們有多少人看到，我們今天其實宣布了 Grok 4.6。超興奮的。終於出來了。所以 Grok 4.6 會是，很很聰明。在 benchmarks 上表現很好。而且 tokens 是一樣的，",
+      "en": "So, I think, yeah, it's definitely, like, a trade-off for sure. You know, like, nothing is, like, free for sure. And tokens are pretty expensive. But, oh, actually, I don't know how many of you have seen this, but we actually announced Grok 4.6 today. So, very exciting. Finally out. So, yeah, Grok 4.6 would be, like, a great... is very, very smart. It's really good on the benchmarks. And it's the same, the tokens,"
+    },
+    {
+      "id": "t-28826",
+      "t": "48:02",
+      "start": 2882.6,
+      "end": 3108.7,
+      "block": "s7-6",
+      "text": "嗯，希望我沒講錯，但我相信每 token 的成本跟 4.5 一樣。所以你其實是用同樣的成本換到更多智慧。我覺得這是 Cursor，Cursor 跟 SpaceX AI，很想優化的一塊，就是成本對智慧的那個 Pareto 前沿。我們不一定想建史上最大的模型，因為跑起來超貴。重點是怎麼找到那個甜蜜點，對吧？你不需要巨型模型，但它就是超聰明，而且 inference 又不貴。不過，對，總結一下，我覺得如果你自己做分析，ROI 會相當正面，投資這種東西得到的 ROI，不只賦能你自己，還讓整個團隊生產力高超多，對吧？想像你有一支像我這樣的工程師大軍，每天在出一堆改進跟修 bug，那挺令人興奮的。酷。結束前最後一個問題，給線上產品的人。假設我們真的有一支工程師大軍在狂出貨，Lauren，我好奇產品團隊或公司其他職能怎麼跟上？既然你出貨這麼快，他們有沒有更大量用 AI 做自己的工作？你能講多少就講多少，顯然你不在那個角色，只是好奇怎麼運作。嗯，我覺得這正是 Grok Bot 強大到過頭的地方。在 Grok Bot 之前，顯然 Cursor 只有 Cursor，我們只有 Agent Window、有 CLI、有 IDE，這些真的是進階用戶工具，是為開發者設計的，所以非常開發者中心。你可以在裡面做知識工作，但 UI 並沒有為那件事優化。所以我們其實沒有，嗯，我覺得很多人，GTM、產品，可能有用 Cursor 做事，但對他們來說絕對不算愉快的體驗。我覺得現在有了 Grok Bot，對非技術的人來說，這基本上就是他們的時刻。這是一種非常非常容易上手的方式，用很舒服、很熟悉的介面來用 agents，看起來像 iMessage。而且也很好玩，你可以幫你的 agent 取個有趣的名字，你可以用很自然的方式做 orchestration，每個 agent 就像一個人，現在你有一組 agents 在做事，例如你管的每個帳號配一個 agent，或者如果你是 PM，你可以有一個 agent 把 Lauren 昨晚做的所有工作摘要出來，然後你就知道我做了什麼，對吧？所以我覺得我們的 PM 很常在用這個，他們也在出程式碼。常常他們就會說，喔這有個 bug，我修好了，你可以看一下嗎？然後我去 review，結果簡直完美，我就說 OK，蓋章。所以我覺得這顯示 Dune 架構撐得住，對吧？那些非常嚴格的約束，讓非工程專家也能以高水準貢獻。我覺得我已經看到很多回報，設計師跟 PM 可以直接出功能，這就讓 Grok Bot 團隊超快，對吧？",
+      "en": "well, hopefully I'm not saying this incorrectly, but I believe the cost per token is the same as 4.5. So you're actually getting more intelligence for the same cost. I think this is an area that Cursor tries to, Cursor and SpaceX AI, try to really optimize for, like that Pareto frontier of you know cost versus intelligence uh you know we don't necessarily want to build the biggest model ever because that is extremely expensive to run it's really about like how do you find that sweet spot right you don't you don't need a giant model but it's just super smart right and it's not very expensive for inference uh but uh yeah i think to kind of round it up um i think it's like a it's it's there's a if you do your own analysis i feel like it's pretty positive it'll be pretty positive that the roi you get from investing in stuff like this uh just empowers not just yourself but your whole team to be so much more productive right like imagine if you have an army of engineers like me who are shipping so much improvements and and bug fixes uh you know every day right like that is pretty exciting cool uh one last question before we wrap up this one is for the people in product on the call so let's say we do have an army of engineers who are shipping like lauren i'm just curious like how is the product team or other functions of your company keeping up given that like if you're shipping so quickly have are they using ai more to do their jobs like as much as you can speak to that and obviously you know like you're not in that role but just curious about how that works um i think this is where Grok Bot has been actually exceedingly powerful uh where so before Grok Bot like you know uh obviously cursor only had cursor like we only had agents window we had a cli we had an ide and these are really like power user tools right they're designed for developers so it's very very developer centric you can do knowledge work in them but it like the ui is not really optimized for that so we actually didn't really have uh well i think like a lot of people like you know gtm product like they might have used cursor uh to do their work but it definitely wasn't like a delightful experience with them um i think now with Grok Bot uh it's become Grok Bot is basically like their moment for people who are not in tech in my opinion like it's like it's like a very very accessible way to use agents in a very comfortable very familiar interface it looks like imessage um and it's very fun too you know you can give your agent a fun name uh you can have you can kind of do orchestration with in a very like natural way where you can sort of you know each agent is like a person right now you got a team of agents like working on you have one one agent per account that you manage as an example or if you're a pm you have you know you can have an agent that summarizes all the work that lauren did last night and then now you know what i did right so i think our pms are leveraging that a lot and their shipping code too uh so you know oftentimes they will just say oh here's a bug i fixed it can you look at it and then i'll go review it and actually it's just perfect i'm like okay stamp uh so uh that i think that shows that you know the the dune architecture is holding up right the all the the really strict constraints allow people who are not experts in engineering to contribute at a high level uh so i'm i feel like i'm already seeing that pay off a lot where uh you know designers and pms are just able to to ship features directly and that just makes the Grok Bot team super fast, right?"
+    },
+    {
+      "id": "t-31087",
+      "t": "51:48",
+      "start": 3108.74,
+      "end": 3119.78,
+      "block": "s7-6",
+      "text": "我們可以出貨這麼快，而且我們還有很多計畫。所以我很興奮要再出更多東西。",
+      "en": "Where we can ship so quickly and we have a lot planned. So I'm very excited to ship more stuff."
+    },
+    {
+      "id": "t-31202",
+      "t": "52:00",
+      "start": 3120.28,
+      "end": 3148.06,
+      "block": "s7-7",
+      "text": "對，太棒了。我們時間到了。那 Lauren，如果大家想支持你，也許可以去試試看 Grok Bot，試一下 4.6，然後給一些回饋。不過真的很棒。非常感謝你撥出時間。而且所有可以用 Grok Bot 的使用情境，我覺得我們聽到很多案例，它很直覺。它看起來就像 iMessage。我看過有些人把 Grok Bot 分享給媽媽，然後媽媽就開始上手用 Grok Bot。",
+      "en": "Yeah, that's awesome. We are at time. So I guess, Lauren, if folks want to support you, maybe go try Grok Bot, try out 4.6 and, you know, provide some feedback. But yeah, this was awesome. Really appreciate you taking the time. And yeah, like all the use cases where you can use Grok Bot are, I think we've heard a lot of cases where it's like very intuitive. You know, it looks like iMessage. I've seen a couple of people share Grok Bot with their mom and their mom's onboarding onto Grok Bot."
+    },
+    {
+      "id": "t-31489",
+      "t": "52:28",
+      "start": 3148.98,
+      "end": 3184.38,
+      "block": "s7-7",
+      "text": "所以我真的被 Grok Bot 的迴響嚇到了，反應非常好。還有很多事要做對吧？這邊那邊還有幾個 bug 要修。但整體非常正面，也很興奮我們終於推出了，而且你今天又宣布了另一個消息，把這兩件事放在一起，現在可能做到什麼。所以 Grok 4.6 真的很強，它比 4.5 聰明很多，而且 token 成本一樣。",
+      "en": "So I've been really blown away by how well received Grok Bot is. There's still a lot more to do, right? Like we have a few bugs here and there that we have to fix. but overall it's been very positive um and very excited that we finally get got to launch it and you announced another announcement today so pairing those two together what is now possible um so Grok 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is at the same token cost."
+    },
+    {
+      "id": "t-31854",
+      "t": "53:05",
+      "start": 3185.48,
+      "end": 3224.46,
+      "block": "s7-7",
+      "text": "所以我覺得對 coding 任務、還有我做的那種工作，因為我做很多工程相關的事，我很多時候用 Grok 4.6。它就是能力強很多。真的非常快。我還是會用其他模型，像 Claude 跟 Sonnet。但 Grok 就是超快。而且便宜，價格親民。所以我很喜歡用。對，我記得我們跟 SpaceX AI 團隊一起推 Grok 4.5 的時候談過一件事，大概是我們會訓練不只是為了 code 的模型。我覺得從 Grok 4.6、還有對 Grok Bot 的一些投入，我們持續看到，這些很強的模型還能做到更多事。",
+      "en": "So I think for coding tasks and the type of work that I do, because I do a lot of engineering work, I use Grok 4.6 a lot for that. And it's just way more capable. It's really, really fast. I still use the other models too, like Claude and Sonnet. But Grok is just so fast. And it's affordable. It's cheap. So I really like using it. Yeah, I think one thing that we talked about when we launched Grok 4.5 with the SpaceX AI team was sort of this idea that we're going to train models for more than just code. And I think what we're continuing to see with Grok 4.6 and some of the investments in Grok Bot, like really, there's a lot more that's possible with these really great models."
+    },
+    {
+      "id": "t-32246",
+      "t": "53:44",
+      "start": 3224.6,
+      "end": 3253.44,
+      "block": "s7-7",
+      "text": "所以我們就是很期待模型持續進步，能參與 frontier 模型的討論，也能把這些帶到世界上。對。我對你這邊展示的東西真的很興奮，因為我知道 Cursor 一開始主要是在 agentic coding 那一塊。我稍早有分享，Cursor 其實是我開始用 vibe coding 工具的入口。它是我真正用的第一個工具。我用 Cursor 的模型，然後一路更新下去。到今天我還在用。",
+      "en": "And so, yeah, we're just excited for the models to keep improving, to be part of the discussion on the frontier of models, and yeah, to be able to bring that into the world. Yeah. I'm really excited what you show here because I know that cursor started off mainly in the agentics coding space. I was sharing earlier that Cursor is actually my gateway into starting to use vibe coding tools in general. It was the first actual tool I used. I used the Cursor models, and then I just kept updating from there. And I still, to this day, use it."
+    },
+    {
+      "id": "t-32538",
+      "t": "54:13",
+      "start": 3253.88,
+      "end": 3356.34,
+      "block": "s7-7",
+      "text": "然後我在真正測試 Grok Bot 之前就意識到，噢，你可以用同一個工具做研究、做其他事。而且即便大家說 agents 在擴張、在成長，主要還是 coding agents，因為要用 agents 處理日常事務的基礎設施跟 UX 真的很糟。我覺得 OpenClaw 也許是第一個 mainstream 的，但就像你說的，我不覺得我媽會去用 OpenClaw。連我自己，我在 Telegram 裡設了一整套 OpenClaw，UI 看起來有點像這樣，我有 shopping agent、各種東西，然後它一直壞，我老是在修。這個超棒，我超愛整個 UI 跟結構。你們做 Grok Bot 的設計流程是怎樣的？對，brief 基本上就是保持簡單。如果要俏皮一點講，我覺得這其實很真實：很多 AI 應用給你很多控制和能力，但那種能力常常跟複雜度綁在一起。所以我們這邊的設計 brief 真的是：我們怎麼能先把這件事做得非常簡單。訊息介面大概就是從這裡得到一點靈感，然後當然還有後來加的一些設計細節。不知道 Lauren 你有沒有要補的，畢竟你差不多一手做出來。我會說是我做出來的，但團隊真的很努力追求非常乾淨、簡單的使用者介面，因為如果你用過 Cursor，你大概是 power developer、power user，有很多旋鈕跟功能，非常針對 coding 量身打造。而對 Grok Bot，我們真的想用全新的角度想：如果你的 agent 更像一位同事，那會長什麼樣子。",
+      "en": "And then I realized before I was actually testing out Grok Bot, I was like, oh, you can use this same tool to do research, to do other things. And still, even though people say agents are expanding and growing, it's still mainly coding agents because the actual infrastructure in the ux to use agents for everyday things sucks i think OpenClaw was maybe the first mainstream but like you mentioned i don't think my mom would ever be using OpenClaw and um even myself i set up a whole OpenClaw in a telegram it looks kind of like this in my ui and i have my shopping agent my all that stuff and it breaks all the time and i'm always like like trying to fix it this is awesome and i love the whole ui and structure how did you what was like the design process going through creating this creating Grok Bot yeah i mean the the brief was basically keep it simple uh if i if to be a little cheeky and i think that's actually really real it's like a lot of ai applications have you know a lot of control and power that they give you but sometimes that power is like balanced with complexity and so really our design brief here was like how can we make this really simple first and foremost and so that's kind of where the messaging interface became a little bit inspired from and then of course some of the design touches that we added over time i don't know lauren if you'd add anything kind of having built it all uh i would say i built it all but um i think uh that the team really strove for a very clean simple user interface because like you know if you've used cursor you're probably like a power developer power user it's like very there's like a lot of knobs and whistles and and uh like very it's very tailored focus for coding and with Grok Bot we really wanted to take a fresh perspective on what would it look like if your agent was really more like a colleague."
+    },
+    {
+      "id": "t-33573",
+      "t": "55:57",
+      "start": 3357.3,
+      "end": 3368.68,
+      "block": "s7-7",
+      "text": "所以你不一定想微觀管理你的同事，說你現在在用哪些 tool calls？你想跟它像跟人講話一樣。你想看他們在電腦上在做什麼。",
+      "en": "And so you don't necessarily want to micromanage your colleague and say, what tool calls are you using right now? But you want to talk to it like a person. You want to see what they're doing on their computer."
+    },
+    {
+      "id": "t-33700",
+      "t": "56:10",
+      "start": 3370.02,
+      "end": 3386.0,
+      "block": "s7-7",
+      "text": "所以我們試著把介面做得非常優雅、簡單。超酷。我很喜歡你們兩位一起接受訪問，因為有產品面，有軟體工程面。幕後其實還有一整個團隊。這上面花了很多功夫。噢等一下，除了你們兩位還有其他人？",
+      "en": "So we've tried to keep the interface really elegant and simple. Really cool. I love that I have both of you two on the interview because We have the product side, we have the software engineering side. It's a whole team behind the scenes, too. There's a lot of work on this. Oh, wait, there's more people besides just you two?"
+    },
+    {
+      "id": "t-33873",
+      "t": "56:27",
+      "start": 3387.38,
+      "end": 3418.42,
+      "block": "s7-7",
+      "text": "上面？沒有，當然有。所以你們兩位都在，可以很全面地看到做出 Grok Bot、把這個產品推到 mainstream 到底需要什麼。我也知道用戶可能跟典型的 Cursor 用戶有點不一樣。你們想像 Grok Bot 的 mainstream 採用者會是誰？對，我覺得我們真的認為這對每個人都有用。有點像我們內部看到這次上線時說的，外面有很多工作其實非常適合被做得更有效率。",
+      "en": "On it? No, for sure. And so having you both here, you get a really comprehensive overview of what it actually takes to create Grok Bot and get this product into the mainstream. I do know the user might be a little bit different from the typical cursor user. Who are you envisioning are going to be the mainstream adopters of Grok Bot? Yeah, I think we really see this being useful for everyone. So kind of like what we were saying when we saw this launch internally, I think there's a lot of work out there that's just rife to be made more efficient."
+    },
+    {
+      "id": "t-34193",
+      "t": "56:59",
+      "start": 3419.32,
+      "end": 3547.94,
+      "block": "s7-7",
+      "text": "而我覺得我們內部為什麼做這個，動機是我們看到 Cursor 裡一堆人在自己做 agents，有點像自己拼 chats、做 Slack bots。其實 Lauren 有一個很有名的 Slack bot，到現在還活在我們的 Slack 裡。那樣子要把東西組起來需要很多 context，所以想法是，我們能不能把它包起來？那些 bots 是給部署工程、軟體工程、還有我們 ops 團隊用的，然後我們就想說，能不能用很有趣的方式把它產品化。對，我常常講我做的那個叫 Benny 的 bot，牠像一隻小狗，那是牠的 avatar，但我對 Benny 的想法其實是，我這個人頗懶，然後我想搞清楚怎麼辦，我們 Cursor 收到超多 bug reports 對吧，我想全部修掉。所以我開始想，我要怎麼讓我的 agents 在我睡覺的時候自動幫我修 bug，那就是我們早期一些實驗的靈感，去做比較 persistent 的 bot。我覺得有些想法是從那邊帶過來的，因為我被問超多次，你怎麼做出來的、我要怎麼做自己的，我想那啟發了 Grok Bot 背後的一些想法，像是如果每個人都能定義自己的 bot，給它一個 identity，再給它自己的電腦、還有 routines 跟自動化。像我現在就有 bots，每次有人給 Grok Bot 回饋，我的 bots 就自動去修，我只要 review 他們的 code。那你現在的工作是什麼？這確實變得很有意思，我幾乎像是我數位同事的 manager。對，蠻有意思的。其實 Grok Bot 有多少是用 Grok Bot 做出來的，這點也很驚人。對，這是一個超酷的 feedback loop，這些 agents 可以自己 triage issues，可以寫 code，也可以連到 cloud agents。不知道 Lauren 你那邊有沒有我們想分享的 demo。",
+      "en": "And I think the motivation for why we built this internally is we actually saw a bunch of folks within Cursor who were building their own agents, kind of like constructing the chats together, building Slack bots. Actually, Lauren had a really famous Slack bot that still lives in our Slack instance. and it's sort of like that takes a lot of context to put together uh and so the idea was well could we package that up and these bots were for for deployed engineering and for like software engineering for our ops teams and and really just wanting to say like could we productize that in a really in a really fun way so yeah yeah uh so yeah i i talk a lot about this bot that i built called benny he's like this little dog uh that's his avatar but uh the idea i had with benny was really uh you know like i'm a fairly lazy person uh and i wanted to figure out how can i you know we're getting so many bug reports for a cursor right and and i wanted to just fix them all yeah uh and so i started thinking about how would i make it so my agents can just automatically fix bugs for me while i sleep and so that was the inspiration for some of our earlier experiments with you know building like uh like a more like persistent bot uh and so i think there were some ideas that we took from there because i got so many questions like how do you how did you build any how can i build my own i think that inspired uh some of the thinking behind Grok Bot like you know what if everybody could define one of their own uh like bots you know give it an identity and give it things like its own computer plus routines and automations so like i have like a bot like bots right now that are you know every time someone gives us feedback on Grok Bot my bots are automatically going off and fixing them for me and i just like review their code so what's your job now it's definitely become interesting it's like i'm almost like a manager for my for my digital colleagues yeah so it's pretty interesting it's actually remarkable how much of Grok Bot was built with Grok Bot too yeah that's like it was a it's been a really cool feedback loop where these agents can self-triage issues they can they can write code and so they can connect to cloud agents and i don't know if you have a demo of that lauren that we wanted to share."
+    },
+    {
+      "id": "t-35479",
+      "t": "59:07",
+      "start": 3547.94,
+      "end": 3563.94,
+      "block": "s7-7",
+      "text": "對，我有。喔，我超愛這些 demo。這太好玩了。體驗這個最好的方式就是做成互動式的。沒錯。你解釋完一件事，然後你會想，哇，我剛好有個 demo 開著。讓我現在直接秀給你看它實際上怎麼運作。我們會在贊助商訊息之後繼續監控。",
+      "en": "Yeah, I do. Ooh, I love these demos. This is so fun. It's like the best way to experience this is to make it interactive. Exactly. You explain something and you're like, wow, I do have a demo pulled up. Let me just show you now how it actually works. We'll continue monitoring right after this message from our sponsors."
+    },
+    {
+      "id": "t-35648",
+      "t": "59:24",
+      "start": 3564.8,
+      "end": 3570.76,
+      "block": "s7-7",
+      "text": "Eleven Labs，能在每個管道與模態以人類水準溝通的 AI。Elevenlabs.io slash MTS。",
+      "en": "Eleven Labs, AI that communicates at human level across every channel and modality. Elevenlabs.io slash MTS."
+    },
+    {
+      "id": "t-35750",
+      "t": "59:35",
+      "start": 3575.01,
+      "end": 3585.83,
+      "block": "s7-7",
+      "text": "在 Neon 上擴展你的新創。數百萬開發者與新創已經選擇 Neon 作為後端。從免費方案開始，或為你的新創取得高達十萬美元的點數，網址 neon.com.mts。",
+      "en": "Scale your startup on Neon. Millions of developers and startups have already chosen Neon for their backend. Start on the free plan or get up to $100,000 in credits for your startup at neon.com.mts."
+    },
+    {
+      "id": "t-35897",
+      "t": "59:49",
+      "start": 3589.73,
+      "end": 3598.59,
+      "block": "s7-7",
+      "text": "特別感謝我們的贊助商 Kong，AI 連通平台。以嚴謹的安全性與治理連接 API、LLM、代理與系統。konghq.com。",
+      "en": "Special thanks to our sponsor Kong, the AI connectivity platform. Connect APIs, LLMs, agents, and systems with serious security and governance. konghq.com."
+    },
+    {
+      "id": "t-36023",
+      "t": "60:02",
+      "start": 3602.32,
+      "end": 3670.61,
+      "block": "s7-7",
+      "text": "對，所以我有點，我已經問過我的幕僚長，今天有沒有看到什麼有趣的 bug。然後它找到了幾個。你也可以看到我在我的 bot 電腦上開著 X，以防萬一，不過對，我可以叫它派發，所以我這邊有一個 sand team，抱歉是 Grok Bot team，他們各自負責不同的功能，然後現在我的幕僚長會把那些任務派給那些代理，過一分鐘我們就會看到一堆訊息，我會傳給我不同的團隊成員，然後他們會去做那些任務，最後我會拿到一個可以 review 的 pull request，會有影片、會有截圖，對，所以這是另一個例子，這是我的工程團隊代理之一，我覺得這幾乎是一個不太明顯的功能，但如果你在 Cursor 上設定了 cloud agents，你的 Grok Bot bots 其實可以把它們啟動起來。",
+      "en": "Yeah, so I kind of, I asked my chief of staff already, like if there's any interesting bugs that we saw today. And it's found a few. You can also see I have X open on the, on the my bots computer just in case uh but yeah you know i can i can tell it to dispatch uh so like i have a i have a sand team over here i'm sorry a Grok Bot team uh so each of them kind of are responsible for a different feature uh and so now my chief of staff is gonna like send off those tasks to those uh agents uh and in a minute we'll see a bunch of messages that i'll send to the you my different my team members uh and then they'll go off and actually work on those tasks uh and then at the end of it i'll get like a pull request that i can review i'll get videos i'll get a screenshot um and uh yeah so like here's another example where uh this is like one of my engineering team agents and uh i think this is like almost like a feature that's not super obvious but uh If you set up cloud agents on Cursor, your Grok Bot bots can actually kick them off."
+    },
+    {
+      "id": "t-36709",
+      "t": "61:10",
+      "start": 3670.91,
+      "end": 3678.49,
+      "block": "s7-7",
+      "text": "所以在這裡，我有一個 cloud agent 正在跑，有它自己的電腦，由這個代理在管理。",
+      "en": "So here, I have a cloud agent that's running with its own computer that this agent is managing."
+    },
+    {
+      "id": "t-36795",
+      "t": "61:19",
+      "start": 3679.56,
+      "end": 3707.38,
+      "block": "s7-7",
+      "text": "然後它已經有一堆事情在進行中了。所以我之後有一堆 PR 要 review。我覺得軟體開發的未來有一件事真的很令人興奮，就是真的在跟一堆做特定任務的代理對話、一起工作，然後你退一步，變成他們的管理者。而那種願景在這裡以一種很好玩的方式成真了。太厲害了。而且我看到這裡是一堆貓的照片。喔對。所以你所有的代理都是真的貓。",
+      "en": "And so it's got a bunch of things in flight already. So I have a bunch of PRs to review later. I think there's something really exciting about the future of software development here, too, where it's really talking to and working with a bunch of agents that are doing specific tasks And then you kind of just step back and become the manager of them. And it sort of feels like that vision is coming true in a really fun way here. That's amazing. And I see here it's a bunch of cat photos. Oh, yeah. So all your agents are actual cats."
+    },
+    {
+      "id": "t-37076",
+      "t": "61:47",
+      "start": 3707.62,
+      "end": 3714.78,
+      "block": "s7-7",
+      "text": "對，我就是愛貓。所以我決定給他們很蠢的大頭貼，好讓我的 Grok Bot 有一點個人風格。",
+      "en": "Yeah, I just love cats. So I decided to give them silly profile pictures just to personalize my Grok Bot a little bit."
+    },
+    {
+      "id": "t-37158",
+      "t": "61:55",
+      "start": 3715.8,
+      "end": 3746.06,
+      "block": "s7-7",
+      "text": "我是說，預設的 Grok Bot 頭像也超可愛。而且我加這些是在我們加那些之前。但就是玩玩而已，對吧？對。Roshan，你剛才提到一件事，那當然是 agentic coding 未來正在發生的趨勢。而 Cursor 一直站在最前線看這一切發生。越來越多的程式碼被自動化，由這些代理來完成。所以作為人類，你變成這些代理的操偶師，他們幫你處理所有這些任務。我知道那是你特別興奮的一個世界。",
+      "en": "I mean, the default Grok Bot avatars are super cute as well. And I added these before we added those. But it's just having a bit of fun, you know? Yeah. Roshan, you hinted towards something that is a trend that, of course, is happening with the future of agentic coding. And Cursor has been at the front and center of seeing all of this happen. More and more code is getting automated and is done by these agents. And so as a human, you become this puppeteer of agents who are handling all these tasks for you. I know that's a world that you are particularly excited about."
+    },
+    {
+      "id": "t-37465",
+      "t": "62:26",
+      "start": 3746.5,
+      "end": 3765.82,
+      "block": "s7-7",
+      "text": "你可以再多分享一點嗎？你為什麼對這個感到興奮？這在人的層面到底解鎖了什麼，可能是主流觀眾沒意識到的？對，完全可以。我覺得如果要我選一個詞，就是效率。我覺得不管職位是什麼，大家腦子裡都有超多想法。像我自己就有很多產品想法想做進 Cursor。",
+      "en": "Can you share a little bit more? Why are you excited about that? What does that actually unlock at maybe the human level that people in the mainstream audience might not realize? Yeah, totally. I think that, like, if I had to pick one word, it would be efficiency. I think there's so many ideas in people's heads, regardless of role, again. Like, I have so many product ideas I want to build into Cursor."
+    },
+    {
+      "id": "t-37668",
+      "t": "62:46",
+      "start": 3766.82,
+      "end": 3802.84,
+      "block": "s7-7",
+      "text": "而這就是限制因素。從想法到存在的那條管線裡，總是會有瓶頸。所以我覺得這個承諾是：你可以把一群 agents 丟去處理這些問題，然後它們產出真的高品質、而且跟我自己會放進產品的品味對齊的東西，這就是願景對吧？這差不多就是那個夢想。就是能從想法走到存在。所以對我來說，要努力的方向是：我們能不能把這些東西做成，不管我是在管理一堆 agents、還是請 agents 去管其他 agents、還是跟 Lauren 的 agents 一起工作，不管長什麼樣，我們都能真的把那個週期一再縮短、壓縮、再壓縮。",
+      "en": "And it's the limiting factor. Like, there's always some bottleneck in that, like, idea to existence pipeline. And so I think the promise of being able to throw fleets of agents at these problems and then have them produce things that are really high quality and sort of aligned with the taste that I would myself put into a product, that's the vision, right? That's sort of the dream. It's like being able to go from thought to existence. So to me, that's the thing to work towards is can we build these things in a way where whether I'm managing a bunch of agents or asking agents to manage other agents or working with Lauren's agents or whatever that looks like, we're able to really shorten, compress, compress, compress that cycle more and more."
+    },
+    {
+      "id": "t-38029",
+      "t": "63:22",
+      "start": 3802.92,
+      "end": 3823.46,
+      "block": "s7-7",
+      "text": "而且如果你看 Cursor 作為一家公司的演進，某種程度上我們就是這樣往那個未來打造自己的：持續導入越來越多 agent 工具跟複雜度。所以對，我覺得那就是願景，我們也很興奮。那在軟體工程團隊這邊有什麼變化？從你剛開始在 Cursor 工作到現在，有什麼不同？",
+      "en": "And I think if you kind of like look at the evolution of Cursor as a company, that's sort of how we've built in a lot of ways, built ourselves towards that future is by, you know, continuing to introduce more and more sort of like agent tools and complexity there. So, yeah, I think that's the vision and we're excited for it. And then how has it changed on the software engineering team? What differences from when you started working at Cursor to how it is now?"
+    },
+    {
+      "id": "t-38246",
+      "t": "63:44",
+      "start": 3824.6,
+      "end": 4117.43,
+      "block": "s7-7",
+      "text": "我覺得在 agent 的世界裡，工程師角色的演進方式是，就像我提過的，你有點像是自己那些 agents 的工程經理。但我覺得我們現在作為工程師的一大責任，也包括把 codebase 維持在一個狀態，讓產品經理、設計師也能貢獻高品質的程式碼，這也是我在 Twitter 上常講的：投資在重構、改寫，甚至重寫你的 codebase，讓 agents 真的能好好發揮，就算有時候它們不是很聰明的 agents。像是把你的規則跟風格指南編碼成真正的 lint 規則，或是會讓 CI 失敗的硬性約束。所以我覺得那個大解鎖是：作為工程師，我可以賦能超多人去做他們以前做不到的事，我自己也能做以前做不到的事，因為我在 Cursor 做過很多大型重構跟遷移，而且幾乎是我一個人做的。哇。就是帶著那些 cat agents，對，那些 cat agents 整個狂奔，我轉換了一堆東西，本來要我或一組工程師花好幾個月甚至好幾年才做完的。哇，太猛了。而從外人的角度你可能會想，好，現在 agents 都能寫這些程式了，軟體工程師的角色還剩什麼？但如果你真的看現場在發生什麼，對這些工程師的需求比以往都還高。而且大概就往你剛剛暗示的那個方向。現在你能用軟體把從想法到執行的時間線壓得這麼短。我們現在才剛有像 Grok Bot 這種東西，那是你們在做的。然後你還能用 Grok Bot 去建 Grok Bot，再丟進商業產品。這也是你看到越來越多的趨勢嗎？對。我是說，原型化想法的時間已經大幅下降了，所以測試東西真的很快。我覺得我們，像 Grok Bot 背後那組團隊，能動得超快，就是因為這些工具變好了。當然模型變強也是很大一塊。所以對，講到 Grok Bot 這邊，動機真的就是我們怎麼能讓這個產品對大家越來越有幫助。至於趨勢，我覺得這會越來越容易。我覺得人還是有很強的角色要扮演，不管是品味那套論點還是其他組合。但對，我覺得想法到處都是，看到越來越多成真會很令人興奮。哇。對，我個人很喜歡的那個類比或隱喻是這樣：我很喜歡食物，我是美食愛好者，我有點把我的 agents 想成一個廚房，我叫它米其林廚房。所以也許我的角色變了，我可能不再自己煮所有菜，但我有一組 bots 跟 agents，像是我聘來的，我透過 skills 或重構訓練它們，用我會用的方式寫出好程式。所以我的角色變得比較像主廚：也許我組盤、我負責品質控管。但如果你大量投資，早早擁有一組有能力的 agents，你就能做多很多。再想想，你團隊裡每個工程師都能有一組這樣的隊伍在後面，你真的能解決更多問題，能做更多功能，不是每個都該做，但你有高很多的生產力跟速度。對，我喜歡你暗示的那個內部文化：你們真的會做東西、測一測，而且 Cursor 員工自己對其他工程師、其他產品人、大概一般消費者想看到存在的東西，有某種品味。你有沒有什麼提示可以分享，沒有也沒關係，關於接下來可能會有什麼，或是內部有人在做的東西？對，我是說我們絕對想把 Grok Bot 做得更好。我們昨天以 beta 推出，各種形狀大小的回饋湧進來。我們的目標就是盡可能讓這些助理、這些 bots 有幫助。所以絕對會繼續投資那塊。當然也很興奮模型變強，興奮能參與那個對話，而且現在有 frontier models 了。所以我覺得我們會繼續在那塊大舉投資，然後還有更多好玩的東西會來。但整體來說，我對未來非常看好，對 coding agents 跟通用 agents 的未來都很看好，我覺得會是一段很好玩的時光。",
+      "en": "I think it's like the way I see engineers roles evolve in the agent world is, you know, like I mentioned, you're sort of like an engineering manager for your agents. But I think a big part of our responsibility now as engineers is also to like, you know, keep the code base in in a condition where you know product managers designers can contribute like high quality code and that's something i talk a lot about on twitter as well which is you know like investing in refactoring rewriting even rewriting your code base so that agents can really thrive even if you're not like or they don't you know they're not very smart agents sometimes uh you know like things like encoding your rules and your style guides into actual uh like lint rules or hard constraints that uh you know fail ci so that again like the the i think the big unlock is uh as an engineer i can empower like so many other people to do things that they couldn't do before and i can do things that i couldn't do before as well because like you know i've done a lot of big refactors and migrations uh at cursor and i did them like mostly by myself wow like with one of all the cat agents yeah all the cat agents were just going wild and like you know i converted you know a bunch of stuff uh you know which would have taken me or a team of engineers months or even years to finish wow that's incredible and as an outsider's perspective you might think okay now that agents can do all this coding what's the role of a software engineer and if you actually look at what's happening on the ground, there's more demand than ever for more and more of these engineers. And it's probably towards something that you hinted. Now that you can build software with the thought to execution timeline is getting so condensed. We just now get something like Grok Bot that started off as that's something you guys are building. And then you could use Grok Bot to now build Grok Bot and put it out into commercial production. Is that also what you're seeing just as a trend happen more and more? Yeah. I mean, I think the time to prototype ideas has gone down a bunch. And so it's really quick to test things. I think we've been able, like the team behind Grok Bot has been able to move incredibly quickly just because of these tools getting better. And obviously the model is getting better as a huge component of that. And so, yeah, I think that like to bring it to the Grok Bot side of things, the motivation there is really around how can we make this product more and more helpful for folks. As far as the trend, I think like this is going to get easier. I think there's still a really strong role for people to play and all that too right whether it's the taste argument or some other combination like that but yeah i think it's just um ideas are you know abound and it's just going to be exciting to see more and more of them come to reality wow yeah the the sort of analogy or metaphor that i that i personally like a lot is this idea that uh so i like food yeah i'm a big lover of food and uh i kind of think of my agents as sort of like uh like a kitchen a michelin kitchen is what i call it and so like maybe my role has sort of changed in that maybe i'm not you know cooking all the food myself anymore uh but i have a team of bots and agents that are that i've sort of hired right and i've trained through skills or uh like refactoring to do good code the way that i would have done it and so my role is becoming more like you know like a head chef right like i i maybe assemble a plate to the food i you know i i own the quality control but you know if you invest a lot in in having like early capable team of agents you can just do so much more and now think about that like with every engineer in your team can have one of these teams behind them uh you can really you can solve a lot more problems you know you can build more features not all of them should be built but you know you you have much more productivity and velocity yeah i do like what you hinted about the internal culture of you actually build things you test it out and that the employees themselves at cursor have a certain taste for what other engineers what other product people what other consumers i guess in general would want to see exist do you have any hints that you can maybe share okay if you don't but of what might be coming up or even something that people are working on internally yeah i mean we definitely want to make Grok Bot better. We launched this as a beta yesterday. And so tons of feedback coming in of all shapes and sizes. Our goal there is just to make this as helpful, these assistants, these bots as helpful as we can. And so definitely going to continue investing there. Obviously, really excited about the models getting better too, and excited to be a part of that conversation and to have frontier models now. And so I think we're going to continue to just invest a bunch in that space and then some more fun stuff to come to. But I think overall, just very bullish on the future and the future of both coding agents but also general purpose agents and I think it's going to be a really fun time."
+    },
+    {
+      "id": "t-41190",
+      "t": "68:39",
+      "start": 4119.05,
+      "end": 4172.67,
+      "block": "s7-7",
+      "text": "我個人真的很興奮能看到更多效能跟可靠性，作為工程師那是我很在意的事。我們有一些很有意思的功能正在討論。其實早期我塞進 Grok Bot 的一件事是支援 iMessage，這樣你真的可以傳訊給你的 bots。我不知道我們會不會幫 Grok 加這個，但我知道這是常見需求，所以我們絕對在想這類東西。心智模型就是：這些是同事對吧？所以你的同事不是只能透過 Slack 找得到，你可以傳訊給他們、可以打電話給他們。想像一個世界，你有這些隨時在線的同事，你可以隨時隨地跟他們講話，而他們就在那邊幫你做好事，這很有意思。天啊，我等不及可以傳訊或打電話給他們了。",
+      "en": "I'm personally really excited to see more performance and reliability as an engineer and that's something I care about a lot. We have some really interesting features that we're debating. Actually, one thing that I hacked into Grok Bot in the early days was support for iMessage so you can actually text your bots i don't know if we'll add it for for Grok but i know it's like a common ask so we're definitely like you know thinking about things like this where again it's like the mental model is these are colleagues right you know so like how do you like your your colleague is accessible not just through slack right that you can text them you can call them uh so it's interesting to kind of imagine a world where you have these always on colleagues that you can talk to at anytime from anywhere uh and they're just off doing good work for you oh my gosh i can't wait to be able to text them or call them."
+    },
+    {
+      "id": "t-41730",
+      "t": "69:33",
+      "start": 4173.01,
+      "end": 4200.27,
+      "block": "s7-7",
+      "text": "我看過一個迷因，大概是：我的 agents 在 standup 互相講，然後它們說抱歉，我整個週末都沒上線。然後就像，你是個 agent 耶。我也不確定那到底是什麼意思。對，也許我們需要 agent 特休。對，agent 特休，把電腦關掉。來吧。最後一件我真的想提的，因為這真的很猛：你們當然不只在做 Grok Bot、不只在應用層，也在模型層。然後 Grok 4.6，CursorBench 上的 benchmarks 出來了。",
+      "en": "I saw this meme where it's like, my agents were talking to each other in their standup and they're like, sorry, I was off like all weekend. It's like, you're an agent. I don't know exactly what that means. Yeah, maybe we need agent PTO. Yeah, agent PTO, turn your computer off. Let's do it. One last thing I did want to bring up because this is really impressive is you guys, of course, we're not just working on Grok Bot, not just working on the application layer, but also on the model layer. And Grok 4.6, the benchmarks came out on CursorBench."
+    },
+    {
+      "id": "t-42002",
+      "t": "70:00",
+      "start": 4200.27,
+      "end": 4261.98,
+      "block": "s7-7",
+      "text": "3.2，真的很驚人。我想趁我們還有時間，在直播上講一下。Grok 4.6 extra high 拿到 70.8%，平均每個任務成本 2.81。對照一下，Fable 5 Max 拿到 70.5%，但要花 17.32 美元。這是巨大的變化。這個模型可能會怎麼改變一般消費者跟 agents、跟 AI 整體的互動方式？對，你先說。所以對，這絕對是我很放在心上的事，因為我常想這個：我在 Cursor 工作，我有無限 tokens，所以我可以瘋狂刷 token，但顯然很多我們的客戶跟使用者比較在意成本。所以我個人最興奮的是：你有一個非常有效率的模型，跟其他一些大模型一樣好，但成本只是零頭。",
+      "en": "3.2 and were really impressive. And I wanted to address them here on air while we still have time. You had Grok 4.6 extra high scored 70.8% at an average cost of 2.81 per task. For context, Fable 5 Max scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change how the everyday consumer actually interacts with agents with ai as a whole yeah go ahead uh so yeah this is definitely like very top of mind for me because uh you know i think about this a lot because i i work at cursor i have unlimited tokens and so i can just you know you know go crazy with token maxing but obviously a lot of our customers and our users are you know are more cost conscious so personally what i'm most excited about is this idea that you have a very efficient model that is as good as some of the other big models, but at a fraction of the cost."
+    },
+    {
+      "id": "t-42625",
+      "t": "71:02",
+      "start": 4262.56,
+      "end": 4328.26,
+      "block": "s7-7",
+      "text": "而且我覺得這是很多領導跟工程師現在都在談的很重要議題：使用 AI 的成本不斷上升。所以我覺得在那個討論裡，Grok 4.6 是一個很有意思的選擇。每間公司對自己要用的模型組合都會有自己的要求，所以我覺得 Grok 4.6 是一個非常有吸引力的選項對吧？如果你在考慮那些更大的模型，它們也非常強，但你想要稍微便宜一點的，Grok 就是很棒的選擇。對，就像你有二十塊美金的預算要做完所有 AI 任務，每個任務成本降下去，你就能做更多任務。所以我覺得效率這場遊戲超好玩，因為感覺你就是能做更多：你可以有更多 bots，或寫更多程式。所以對，就是這個想法，而且我覺得這正在整個產業發生，非常令人興奮，就是用這些 tokens 能做更多事情，就這樣。",
+      "en": "And I feel like that's a very important topic that a lot of leaders and engineers are having right now, which is the rising cost of using AI. So I think Grok 4.6 is a really interesting choice in that discussion. you know like every every company is going to have their own requirements for the type of model mix that they use so i think grok 4.6 makes a very compelling you know a very compelling option right if you're considering between like some of the the bigger models which are also extremely capable but you want something like a little bit more you know cheaper grok is like an excellent choice yeah it's like if you have a budget of 20 bucks to do all of your ai tasks and the cost per task goes down it's like you can just do more tasks so i think the efficiency game is just such a fun one to play because it feels like you just can do more like you can have more bots or write more code and so yeah just like this idea and i think this is happening across the industry which is very exciting but just like being able to do more things with the tokens are just like"
+    }
+  ]
+}

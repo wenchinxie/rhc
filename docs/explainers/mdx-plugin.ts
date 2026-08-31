@@ -1,7 +1,7 @@
 import { plugin } from "bun";
 import { compile } from "@mdx-js/mdx";
 
-plugin({
+const mdxPlugin = {
   name: "mdx",
   setup(build) {
     build.onLoad({ filter: /\.mdx$/ }, async (args) => {
@@ -13,4 +13,7 @@ plugin({
       return { contents: String(compiled.value), loader: "jsx" };
     });
   },
-});
+};
+
+plugin(mdxPlugin);
+export default mdxPlugin;

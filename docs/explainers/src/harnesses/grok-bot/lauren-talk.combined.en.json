@@ -1,0 +1,521 @@
+{
+  "model": "faster-whisper/large-v3",
+  "nSeg": 854,
+  "nFix": 66,
+  "nQuote": 57,
+  "quotes": [
+    {
+      "id": "t-0",
+      "t": "00:00",
+      "start": 0.0,
+      "end": 15.22,
+      "en": "Personally, I think that the best use of AI is really as like a pair, like someone you're pair programming with, and not a tool to just replace the act of writing code, or worse, outsourcing your thinking.",
+      "nSeg": 1,
+      "block": "s7-0"
+    },
+    {
+      "id": "t-164",
+      "t": "00:16",
+      "start": 16.46,
+      "end": 44.56,
+      "en": "And I think there's a tendency, you know, because AI is so exciting, you want to put AI everywhere and be seen as someone who's very, you know, what do you call it, like on the ball, I guess, with AI. that you feel this pressure of like, I'm just gonna, I gotta increase my productivity, I gotta ship like 100 PRs this week and barely understand what I'm doing and vibe code my way to a million ARR or whatever.",
+      "nSeg": 6,
+      "block": "s7-0"
+    },
+    {
+      "id": "t-465",
+      "t": "00:46",
+      "start": 46.58,
+      "end": 65.36,
+      "en": "But I think one of the things that I've personally seen is that although when I use AI, I save some time writing the code, I actually find myself spending more time reviewing what the AI did and correcting it. So I've tried the thing that a lot of people say.",
+      "nSeg": 7,
+      "block": "s7-0"
+    },
+    {
+      "id": "t-665",
+      "t": "01:06",
+      "start": 66.56,
+      "end": 123.32,
+      "en": "Instead of prompting an AI to just build a feature outright, you sort of get it to build a spec for you first, then you review that spec, and then you do that whole thing. Then it's such a time-consuming process. And if you don't really understand what the AI is doing, then I think you're doing yourself a disservice because it's like the same way that in school you use a calculator or you know you have an open book exam the the skill of being a developer is really in like the knowledge of using tools and I think when you just completely outsource that you know thinking I think that's like really dangerous but I think I don't know I know what other people will say to that so for me I think I'm curious like i guess Colin, your experience as well but for me i think the most important skill",
+      "nSeg": 11,
+      "block": "s7-0"
+    },
+    {
+      "id": "t-1233",
+      "t": "02:03",
+      "start": 123.32,
+      "end": 323.54,
+      "en": "that you should have in your toolbox when you work with agents is verification and by verification i mean the ability for an agent to actually run the code or take cpu traces or heap snapshots or you know open an ios simulator whatever you know however your application is exposed to your users it can do the same thing and run it for real and actually test and verify it don't work because that's the thing that really closes the loop it doesn't guarantee your agent writes good code but it allows them to at least write correct code which is a big a really big step forward for being able to trust your agents i will i can share one example that we have uh within cursor uh oops where let me open this there you go uh so for the for cursors agent window uh so this is actually an interesting story but uh when i joined cursor five months ago uh they're actually uh well i was supposed to join a different team i was supposed to join like the cloud agents team uh but then since i have a lot of experience working on react and agents window is a react application uh i was uh i was asked to basically help out with uh the agent window work uh but um there wasn't really a lot of like skills to help me so i just found myself that okay uh agent was going to launch in like a week right we have a really tight deadline and um there was uh you know i was just sitting there like okay i'm going to open up Performance, the Chrome dev tools and just like take a trace look at it myself and try to make sense of this flame graph and keep in mind i was just like in my first week so i had no idea what i was looking at no idea what you know i mean i had some idea but you know the code base was completely fresh to me and I realized like my agent had no idea either you know like I would take a screenshot of the trace I would download the trace I would send it to it and it'd be like yeah it kind of looks like this you know and it would like confidently state like it's this thing and then I'd try to fix that and turns out that's not the actual thing so this was a very very slow process and if you've ever done any like performance work yourself or you know just even development with an agent where you don't have a verification skill you are the verifier all right you you're the bottleneck you you you tell your agent to do something and then it goes off and write some code then you open up your you know local dev build and then you start to say oh you know it doesn't work then you have to copy paste screen uh you know screenshots or console errors or whatever uh and then your agent like slowly kind of like uh you know works with that and then tries to understand it and um that fix the thing but then you're constantly just in the loop and and being a bottleneck so",
+      "nSeg": 29,
+      "block": "s7-1"
+    },
+    {
+      "id": "t-3235",
+      "t": "05:23",
+      "start": 323.54,
+      "end": 381.22,
+      "en": "there's really no way to parallelize so the control glass skill is like one of the first skills i built uh for cursor uh and glass by the way is the code name for agent's window that we use internally but it's just cursor i guess um and so this skill uh is i guess that the code itself is not super interesting your agent can very easily make one for you where if if you're building an electron app or a web app or even ios applications you can teach your agent how to use like the chrome dev tools protocol or through apple has some utilities as well for running the simulator and taking traces and controlling programmatic control as well so that's really useful. But one thing I actually want to talk about is the this thing, where it has to read me.",
+      "nSeg": 8,
+      "block": "s7-2"
+    },
+    {
+      "id": "t-3812",
+      "t": "06:21",
+      "start": 381.22,
+      "end": 576.95,
+      "en": "So this skill comes with this very unique feature called, or not feature, a unique file called a feature map. And so the story then is like, I built this skill. And so now the agent was able to actually run the agent window and take traces and whatnot. But it had no idea what the agent window was. So, you know, like someone would say like, oh, the left sidebar is like, laggy or something like that. Or, you know, the right side, the PR tab is not working. And the agent would just be like kind of flailing around, it would spend a lot of time trying to like look up the code and you know where is this feature how do i actually get to it on the ui which made it basically completely useless uh you know like we would i would run this skill locally and you know it would spawn a dev build uh but then it just be churning like i just try to click here it wouldn't know how to get to things um and it was just an awful experience uh so who is putting arrows on my screen. So yeah, this feature map has been really useful because it teaches the agent how to get to all of the features that you have. And in Pstack, the plugin that I've made, if you search for Pstack cursor on Google, you'll find it. But there is a create verification skill in that plugin where it actually helps you set up something like this for yourself, including the feature map. So it will actually explore the code and build up this initial feature map that tells your agent how to get to all of the different features that you have. And this is extremely powerful because now that you have these user reports that come in, you can actually map even like a vague report or even a screenshot. So we have this internally at Cursor where we have a slack channel where you know lots of people giving us feedback on the agents window and Grok Bot and whatnot uh and oftentimes the report is very bad like very low quality like someone just put very often we get like a screenshot like and then someone just says question mark question mark question mark like what is this and you know like without this your agents are like i have no clue right but with a feature map like this it has a lot more context and understanding of how actually navigate how to get to all the different features uh so like you know example like i guess like the sidebar like what is the sidebar uh you know like all the different sub features that are present in it um like from the user point of view which is how to get to it all the different keyboard shortcuts uh even like the the what do you call it the dom elements or yeah like the attributes that you use for selecting things through the CDP are all there. So again, yeah, this is like really, really powerful for agents. And Pstack ships that create verification skill, but also a maintain verification skill. So you can keep this up to date.",
+      "nSeg": 30,
+      "block": "s7-2"
+    },
+    {
+      "id": "t-5778",
+      "t": "09:37",
+      "start": 577.88,
+      "end": 635.8,
+      "en": "Cool. Yeah. I was just going to ask how you created that. So do you mind sharing a little bit more about that process in the context of Pstack and maybe just what Pstack is for the folks aren't familiar yeah so Pstack is pretty interesting because uh well first of all the name is kind of goofy like the p the p and Pstack is like potato potato stack because i um so uh there is a pretty uh famous person gary tan who is the ceo of y combinator and he's come up with this plugin called G-Stack, Gary Stack. And funnily enough, we share the last name, we have no relations. But I thought it'd be funny to kind of, you know, poke fun at Gary and make Pstack my version of his plugin, but kind of just tailor it to my own set of engineering practices. But I honestly actually never set out to build Pstack.",
+      "nSeg": 9,
+      "block": "s7-3"
+    },
+    {
+      "id": "t-6358",
+      "t": "10:35",
+      "start": 635.8,
+      "end": 848.8,
+      "en": "it just started with a bunch of skills right like i started with that control glass skill and then i started with another skill like called how which i also noticed through like observing agents um so like you know in the early days of me you know trying to climb this ladder i was like super in the loop and i was basically nitpicking my agents to an extreme degree i was like i would tell it um you know this feature has stopped working here's a bug report like why isn't it working and very often the agent would just like confidently state like oh it has to be this right it has to be this thing and i noticed like when i looked at the actual tool calls i noticed it wasn't actually reading the code that i thought should be affected and that made me just extremely suspicious and at that point i was like i'm not gonna i can't trust any this agent anymore because it's just it's just completely hallucinating and i think i think it's very easy to just you know like build up that distrust and not and kind of feel helpless like you know you don't know how to help your agents succeed but like again i think the the management analogy is super helpful because like imagine if you were a manager of an engineering team and you had an engineer on your team who was a really good coder no business context whatsoever you know they just you just hired them and they onboarded you know like five seconds ago uh and so how do you actually teach that person to be effective so how you do that is through a skill a skill being just you know it's just marked down right but you know encodes a lot of information instructions a lot of uh you can really draw out a lot of intelligence from an agent by well some people on twitter call it like you know pull the agent to a different latent space which is kind of like a fancy way of just saying like since uh you know llms are sort of like they predict the next token uh when you give it some high quality tokens uh to begin with then you know it it can kind of pattern match on like a higher space that's you know smarter um so that's like a very interesting model there but yeah i built Pstack very very incrementally uh so uh started with just really observing how agents you know all the fail different failure modes of of that agents were having and every time i saw that i just okay i'm just gonna make that a skill right like stop hallucinating actually go and search up look up the code use a lot of sub agents uh and yeah stop guessing yeah that makes sense one one kind of follow-up question here uh both for myself and from a bunch of people in the chat so i guess it's two two parts so one is like how do you maintain these skills so like product changes over time obviously there's a lot of people who are shipping against the code base so how do these skills get maintained uh and then second to that is like how do you know when your verification is is good enough uh like in you know you can trust that the verification loops that you built are gonna i guess you trust that the outputs uh when they're done uh yeah maybe i'll talk about um i think they're somewhat related maybe i'll start with this one first so like how do I maintain these skills? So if you're not familiar with this concept, an eval is essentially like a way to... well I think the mental model I have is like it's like a unit test for an agent",
+      "nSeg": 35,
+      "block": "s7-3"
+    },
+    {
+      "id": "t-8502",
+      "t": "14:10",
+      "start": 850.24,
+      "end": 1133.52,
+      "en": "and you can actually make your own evals. You don't need like a special framework for them. You can build one depending on like you know how scientific and how rigorous you want to be. uh my screen is red yeah there's a little button um sorry like disabling the drawing or something i can't see my screen yeah sorry if you guys could not draw on the screen that'd be great but um there's a little button in the control yeah the little drop down um how do i clear yeah okay yeah you got it perfect um yeah so evals are a way to unit test your skills basically and actually in Pstack we ship under potato mode there's a playbook if you search for it called eval playbook and it's it's like not it's actually pretty rigorous the way it's done but essentially what I do is I spawn a lot of different sub agents I have like my main coordinator agent come up with a rubric for what I want the skill to do um and then it spawns all these sub-agents and it it creates individual directories for them which are cleverly named to not let the sub-agent know that it's being evaluated because agents can actually tell and when they do they change their behavior uh but it does a bunch of stuff like that to um essentially yeah like test whether or not the skill i'm making or changing is actually doing what I think it does. And one of the really nice things about Cursor is that we support so many different models. So you can actually eval your skill across all sorts of different models and get a sense of how well it performs across that different matrix, especially for the models that you use. So I do this a lot. Every time I modify a skill, I will run one of these, like the eval playbook uh and make sure that you know it's actually leading to a result i want uh but i will say like maintaining skills is actually pretty hard uh it requires i think a lot of taste and observation so you kind of need to be very good at being a backseat driver you know i mean like if you do pair if you've ever done pair programming for example uh and you watch a co-worker code and you're just like you could probably do this better you know you could do, you know, like, why did you not do this, right? You ask a lot of questions to your coworker, and it's kind of a similar thing here, like, you don't want to just be a passive observer of the agent, you want to be very in the driver's seat in the initial stages when you're building up your own set of skills. You know, obviously, you can use something like PSAC, but if you're building your own set of skills, it's very, I think, you know, opening up all the tool calls and, like, reading the code and reading all the agent behavior and their thinking blocks is a really great way to see where they fail, right? Like what, you know, where are they being done? And then you can go and build a skill for that. And then with verification, how you trust it is, it's, I think it's also a very similar iteration loop where, you know, like I actually did the same process for verifying the verification skill where i actually get um so one thing that's interesting about evals is that you can sort of hill climb them meaning that uh your eval can produce a score right a score that you can get your coordinator to produce but also you can have a judge agent of a different model to kind of cross-reference and make sure that the first model is not being biased right the model that's judging all of the sub agents that are running the thing uh but you can also like hill climb so meaning that you can you can use like slash loop in cursor and you can say okay keep looping on this eval right until everything is 10 out of 10 as an example uh and i did the same the basically the same approach with the control skill and so i kind of it was very it was very hands-off actually uh so you know i uh i kind of built i built that skill that way like the cli in that skill um and over time it's gotten really good uh but yeah it was definitely not super smooth at the beginning it required a lot of iteration and i think there's an analogy here for me which is um well i make this analogy later in a different slide on my",
+      "nSeg": 54,
+      "block": "s7-3"
+    },
+    {
+      "id": "t-11335",
+      "t": "18:53",
+      "start": 1133.52,
+      "end": 1214.12,
+      "en": "drawing here uh but i think of it like uh you know as a as a engineer now you're sort of more like like maybe a manager or the analogy i like is like you're like a chef in a restaurant uh you're the head chef uh you're not cooking all the food yourself anymore you have a team of cooks right you have line cooks you have a sous chef you know all these different stations um and it's your job to really design the environment you know you you're in charge of setting up the kitchen you're in charge of you know like giving tasks to different people so um yeah it's a very interesting way of working uh but yeah that's that's how i've basically built uh these verification skills yeah just just one ball there i'm like i have to go try to go one layer deeper so are you let's say we wanted to build um an eval or a skill for for something and we wanted to get better on its own, which is what I think you're suggesting. Are you doing that in a work tree, kind of isolated with the sub-agents and then the reviewer agent and all that? Is it happening in some type of cloud-hosted environment? What's the practical steps? If I wanted to go do this and set up a verification system for something, what would I do or where would I start?",
+      "nSeg": 13,
+      "block": "s7-4"
+    },
+    {
+      "id": "t-12172",
+      "t": "20:17",
+      "start": 1217.28,
+      "end": 1252.24,
+      "en": "I think that the best place to start is local because you can observe. You can definitely observe what your agents are doing so uh if you're building a verification skill for yourself uh i would definitely start local and just have your agent bring up the application whether it's like a cli or a desktop app or whatever and so you can actually observe right you can see how the agent is interacting with the the application you can see it you know how it calls like the different APIs that allow it to interact with the the application.",
+      "nSeg": 6,
+      "block": "s7-4"
+    },
+    {
+      "id": "t-12543",
+      "t": "20:54",
+      "start": 1254.38,
+      "end": 1315.95,
+      "en": "But for me, personally, I have basically been kind of all in mostly all in on cloud agents, because they're extremely powerful. And the really powerful thing about cursor is the cloud agents, actually, where if you spend a little bit of time setting up the environment, these control skills, these verification skills pay a huge amount of dividends because it's not just something that makes you as a single engineer better it actually levels up your whole team uh and even your whole company because uh you can actually start thinking about cloud agents you can start thinking about automations that automatically do things like uh i'll i get i kind of talk about this a bit later but i'll just kind of get into it uh where For example, I talk a lot about this agent we have called Benny who takes all of the bug reports that we get and it automatically goes off in the cloud, opens up its desktop.",
+      "nSeg": 11,
+      "block": "s7-4"
+    },
+    {
+      "id": "t-13164",
+      "t": "21:56",
+      "start": 1316.43,
+      "end": 1402.79,
+      "en": "It runs Cursor in its own computer and it uses the same control skills to interact with the application and try to reproduce the bug or the user report. right and this is so so powerful because at once i can immediately i get so much information from this automatically like here in this example you can see that uh the benny actually reproduced the bug uh but it's already fixed on main so it actually confirms that we fixed this problem already and all i need to do is just release another build of of cursor uh so that's like huge information there that i didn't have to go off and sit with an agent you know and spend an hour trying to fit like is this fixed is this not fixed so you you you gain back so much time uh but you know everybody on my team benefits from this everybody in the company benefits from this uh so definitely think that uh you know keeping these using cloud agents is super powerful uh but yeah it's like a journey you have to trust it first right before you you get to this point and that's it goes back to what i was saying here where you know it's very hard it's almost impossible And I would definitely encourage you not to try to jump from, you know, like if you're still in this zone, you don't want to jump to like, I'm going to spawn a hundred or thousands of cloud agents right now because you're just going to waste a lot of tokens and it's going to be extremely expensive.",
+      "nSeg": 12,
+      "block": "s7-4"
+    },
+    {
+      "id": "t-14027",
+      "t": "23:22",
+      "start": 1402.79,
+      "end": 1553.89,
+      "en": "Yeah. So just to kind of recap so far, basically the, if we wanted to go on the journey that you've kind of gone on, it would be to start with verification, building some skills and some ways of determining that the agents are producing at least like correct code, whether, like you said, whether it's good code or not is maybe a separate question, but like it's technically solving the problem by looking at, you know, stack traces, looking at, you know, the actual behavior in the app and so on. and then once we trust it locally then we can start to think about scaling into the cloud and running more agents that are picking up signals i guess on their own right so whether that's like a bug report that comes in or something they can go and pick it up and solve the problem and give us back a pr and then maybe the last step is like auto merging the prs which uh is where you're at maybe not where everyone yeah yeah um and then reviewing them on main but um is that is that about right yeah exactly i think yeah that's why i drew this this uh this this curve right because that this basically describes my journey of you know when i started barely could use a couple agents and i was just observing every single thing i think there's really no shortcut for going from here to there because this is really about your personal level of trust in agents right um obviously you know as an engineer you don't want to just slop code into production so how do you actually build up that trust takes um a lot of uh i guess taste and judgment um but uh you know like i think plugins like Pstack definitely can help you get up to speed much quicker uh and so i guess it's like if you trust me and you trust Pstack then in by extension you can maybe trust your agents but if you don't trust me and i definitely would not encourage people to blindly trust me uh uh you know if you build up your own set of skills that you can obviously you know take a look at pset and kind of fork it make it your own improve the skills definitely encourage that but for me it's really all about it just keeps coming back to trust you know every one of us here in this chat have a different standard for engineering and there are different things that are important for us in our code base and when you are able to encode all of that into skills and you can verify that your agent is actually doing them that allows you to really kind of ascend this curve and um uh you know start automating things uh there's another piece i wanted to talk about um if there's yeah go for it i'll pick up more questions as i go",
+      "nSeg": 23,
+      "block": "s7-4"
+    },
+    {
+      "id": "t-15538",
+      "t": "25:53",
+      "start": 1553.89,
+      "end": 1808.57,
+      "en": "but yeah i think there's a third part to this which i haven't talked about yet which is kind of an interesting one which is like refactoring and rewriting like one of the uh i guess most controversial one of the most controversial topics in the industry i think is like should you rewrite your app or not um because i think engineers are very prone to this where especially when you join a company you come in and you see like the code base and you're like man this is shit like who wrote this code you know it's terrible i want to rewrite the whole thing there is a very common inclination and i think a lot of you know before agents um and i guess arguably even now people will definitely discourage you from rewriting stuff but i'm actually here to make a case for why you might want to consider it um because i think it really depends uh you know brownfield applications i think are actually in a pretty good spot especially if they're set up well already uh and like recently i've been talking to some people but uh you know i was just observing i just noticed this parallel which is that a lot of big tech company problems are now everybody's problems um and the big tech company problem you know like when i was working at meta like we had this giant monorepo we had like i don't know tens of thousands of engineers just you know like banging on their keyboards and shipping code and a lot of really great engineers at meta uh but uh i'll say like you know you'll be surprised that the code quality is actually not that good um and so i often joke that like you know before ai sloth we had human sloth um and so you know i think a lot of big tech infra like uh like what meta has or google you know you know really big tech companies are actually designed for that where you're sort of like you're catering to the the you know like uh this sounds so bad to say but like the the least capable engineer on your team, right? You build frameworks, you build conventions, you build guardrails, you know, you restrict credentials so that, you know, your intern doesn't wipe your production database. There's, you know, if you have that level of infra already, I think your agents can actually already do a very solid job, right? Because they have, the guardrails are already in place for agents to not cause havoc or not cause too much havoc uh in your code base um and you can always add more you know guardrails uh but i think like greenfield applications especially are you know like the brand new applications are like the biggest risk in my opinion uh and also the greatest opportunity because you know if you vibe code a project uh a prototype um like we did for Grok Bot you know Grok Bot was spun up very very very quickly um and if you if you haven't heard of Grok Bot it's like a new application we just launched yesterday uh it's it's really cool uh lets you orchestrate your create like individual agents that have their own identity and you can kind of orchestrate them it's super cool definitely check it out but yeah that was it's like a very it was a very greenfield application like most prototypes are so it's like vibe coded very quickly humans were not reading the code at all and uh i had this tweet recently uh where i said something about organic architecture um maybe i'll find it uh but the idea is that uh when you have a completely vibe coded application you essentially have no guardrails whatsoever so uh your agents when you give them a task they will just solve it in whatever method is the most convenient and over time you get into this uh situation where you have a code base that is spiraling out of control because you don't understand it uh your agents understand it i guess in a way but like they've built something that is you know optimized for shortcuts. And, you know, you will suffer, you have a lot of issues with that application.",
+      "nSeg": 41,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-18105",
+      "t": "30:10",
+      "start": 1810.52,
+      "end": 1818.7,
+      "en": "So I think starting your codebase with, like, very strong constraints is very much needed.",
+      "nSeg": 1,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-18195",
+      "t": "30:19",
+      "start": 1819.58,
+      "end": 1852.28,
+      "en": "Because, like, when you have a codebase that you can trust, right, when you have guardrails that actually help you, help your agents write good code, you can get into the, you know, like, into this part of the curve where I said, you know, I woke up today and I had like 20 PRs merged by my agents. And that's because I invested a lot of time, over 600 PRs, I calculated yesterday when I refactored all of Grok Bot to this new architecture that I've been building.",
+      "nSeg": 5,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-18547",
+      "t": "30:54",
+      "start": 1854.7,
+      "end": 2069.57,
+      "en": "And yeah, I've gotten to a point where I don't really look, I really don't look at the code anymore and um i say that not just you know to sell you tokens but because i you know it took a lot of work to get to that point i spent a lot of tokens to get the code base to this point where i no longer have to look at it uh but i'm very excited because you know of the potential where you know it's not just this doesn't just benefit me it benefits everyone contributing to growth bot and it also empowers you know designers and product managers and you know people even gtm people to add features to Grok Bot and i don't have to worry you know i don't have to wake up at night in in the middle of the night and worry like oh shit someone's just merged a perf regression right i have a ton of constraints and ci is like it's actually very annoying to write code in in Grok Bot but like agents absorb all of that annoyance um but yeah i'm happy to talk about what exactly that is um yeah i think one question um yeah before we get into the this part here is just around that element of like what your your your ci looks like or maybe some of the constraints and then also like the average pr size i saw a question about that earlier just to give people a you know kind of a glance it doesn't have to be like mathematically average but just uh you know like what generally the size of the pr is um if it's only a couple lines of code or you know um yeah um i think it depends on me i'm trying to do this in a way where i'm not gonna like yeah you don't have to share the actual number of you like an actual average just this is fine benchmark but like we have so okay this is not that interesting but uh well fun fact is that virtualization in Grok Bot and in uh cursor is actually powered by uh pretext which is a sort of new library that someone's built um that's really interesting you should you should check it out but that's not really that important uh i think the average pr size i actually don't know i don't know if i want to click on these uh i probably can but i would say like they can range anywhere from a few hundred lines or 50 lines to like a thousand depending on what the thing is doing uh so like here i'm actually like deleting a bunch of files so i expect that it's just like mostly deletion uh but yeah it kind of varies there's no like yeah there's no like hard cap or they're all like 50 line there's definitely no hard cap but i do encourage my agents to split up their work into multiple prs uh i do that mostly because uh i like i like the idea of that i guess maybe this is much harder to do now as in the world of agents and you have like so many commits but i like the idea that you know the git history is very rich source of context uh and i like the i like each pr to sort of atomically describe what that small piece of thing is doing which also makes it easier for me to revert changes and like figure out you know oh i shipped a bug and it's this it's here it's not in this 40,000 line pr where who knows what landed in there uh but i i don't have a hard cap on pr size cool and then um yeah also quick question on like ci so again you don't have to go into like uh the screen share like your ci does but just generally would you describe what the ci kind of looks like uh or how strict it is",
+      "nSeg": 35,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-20711",
+      "t": "34:31",
+      "start": 2071.17,
+      "end": 2278.03,
+      "en": "uh yeah so uh well specifically for Grok Bot so dune is the it's the sort of cheeky code code name for the architecture that we built for Grok Bot um the ci looks pretty annoying because there's checks for everything so like literally i have um uh well if you've written any react for example you know you know that one of the biggest foot guns in react is use effect uh so in uh dune and in Grok Bot we've banned use effect so dune is just the the mental model of what dune is uh you can kind of think of it as like next js for uh electron apps and it's designed for agents to write uh and it's like custom for you know our agent forward applications um so the ci checks are very like specific to that like you know don't use these effect it's it's it's banned like ci will fail uh and yell at you we have like some of the more interesting ones that people might raise eyebrows is like i actually ban code comments as well uh which is very interesting um but i've noticed that 99 of the time agents just write code comments that kind of describe some historical thing that is actually totally irrelevant to the code um like it will often say like you know oh lauren said you should never do this and it's now in the code comment like what like why what that was i didn't say that as like a durable you know global rule i just meant like your this pr sucks and you should change that part agents don't really understand us that well surprisingly uh and or they kind of assume too much and they kind of do things in like very stupid ways so like yeah we just ban everything everything you can imagine like the agents are bad at we ban uh so one example that we actually suffer a lot in the agents window is we have uh you know if you've used agents window you've definitely seen performance issues and you know we're constantly trying to fix them uh but it's like a it's a never-ending struggle because there's so many pull requests that get merged every any one of them could just regress performance or stability or reliability uh you know the agents window doesn't have this architecture yet i plan to do bring this learning back there and kind of refactor everything there but it just regresses super often because there's just one example is like we have very poor isolation between processes so like on Electron you have a renderer thread that renders your UI but you also have like a main thread that you can run other code that you know doesn't need to block the renderer but we do a poor job of separating those things and so oftentimes you just accidentally have code that gets pulled into running on the renderer thread and then all of a sudden you're competing with the renderer that you know that has a very if you want like 60 fps you have to every frame that gets drawn has to be done in 16 milliseconds so very very small you know deadline per frame uh if you want you know a very smooth product uh and when you start building bringing in accidentally bringing in you know things that are like very computationally heavy or they have a lot of io So then you just get into like a lot of jank and your FPS really drops.",
+      "nSeg": 46,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-22781",
+      "t": "37:58",
+      "start": 2278.17,
+      "end": 2285.83,
+      "en": "You start, you know, losing frames. You get long tasks that take more than 16 milliseconds and you just get this really choppy experience.",
+      "nSeg": 2,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-22869",
+      "t": "38:06",
+      "start": 2286.96,
+      "end": 2540.47,
+      "en": "So all of those patterns that we've learned basically building Electron apps, we've encoded into this framework and it becomes like a hard failure. So in Grok Bot, we literally have a directory called electron-main, electron-renderer, and we have import CI, I guess, where we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another. So that's enforced by CI, as well as Bugbot, which is our, which cursors my code review tool that runs on CI. uh you know in our agents md it's everywhere like so i i i um i have this thing here where i talk about like um you know like there are multiple layers i think for building a good code base obviously the code base is one where uh if you have an architecture like this where it's extremely strict uh you know the the the way to build features is very conventional that's like the strongest strongest level of enforcement because agents just love to copy existing patterns so one example of this in Grok Bot is like we have this these concepts called like a feature and we have entry points and transcript cards like oh you know the cards that you see in the chat these are all like like nouns i guess in in the framework and so there's a very conventional way of creating them. And so like a feature is all in a single directory, as an example. And so all of the code that contributes to that feature lives in one directory. So it's all co located in one place, makes it super easy, you know, agents don't have to like, grab around and try to figure out like where all the things are. It just looks at the feature and like, oh, okay, I'm working on the onboarding feature in Grok Bot. I'm just going to work in this directory. And for 80% of the work it's mostly just very encapsulated there but uh like it's like very it's like design again for you know like the dumbest agent like you don't have to think right the the the one of the key principles i have for this framework is like the shortest the shortest path is the best path so uh because that plays exactly to how agents love to write codes like they like to take shortcuts, really. They'll find the quickest way to solve the problem, so why not make that the best way to solve the problem? So I probably won't get into all the specific details, and this framework's really more of a collection of ideas and principles rather than something that will open source. You can screenshot this, I guess, if you want, and tell your agent to build something like this for you too but it's really all about the layers the code base is one part with features and directories and import blocking import dependencies that shouldn't be imported and it all enforces that and static analysis there's CI checks, we have a lot of lints for bad patterns that we observe compiler diagnostics there's also rules and bug bot which are I think like three four five are more soft right these two actually make make ci rid right so that you know there's a hard constraint where the agent can't just write crappy code for rules and skills and bug bot your agents can still forget right you can still or it may not always consistently apply them so i like to layer them but i don't i don't like to rely on them as the only source of enforcement because it's very very soft right and if you if you only have rules and Bugbot and skills and a style guide for your code you will it's only a matter of time before your code base looks like complete trash i'm sorry to say that but uh i definitely recommend yeah like you know investing in, you know, things that can be hard and forced, right?",
+      "nSeg": 47,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-25405",
+      "t": "42:20",
+      "start": 2540.53,
+      "end": 2545.45,
+      "en": "And this is why, you know, maybe the choice of tech stack that you use is also very important.",
+      "nSeg": 2,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-25473",
+      "t": "42:27",
+      "start": 2547.37,
+      "end": 2581.39,
+      "en": "Like, I think, for example, Rust is sort of making, you know, it's, like, getting super popular again because the compiler is so strict, right? The compiler enforces so many different things. You know, there's a borrow checker that you have to appease. And as long as you make sure your agents don't write unsafe code blocks, you can more or less feel somewhat confident that if the code compiles it probably works and it's good. But it gives you that level of trust and confidence that you as a human engineer no longer need to go and check it yourself.",
+      "nSeg": 9,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-25813",
+      "t": "43:01",
+      "start": 2581.39,
+      "end": 2629.95,
+      "en": "You rely on code and static analysis to actually make that a lot smoother. And I guess the worst part, the worst place to be in is if you are stuck in code review land where you actually enforce all of the constraints the invariants in your code base by literally the human person saying you know reading the code i'm like okay you should not do this right every time you have to do that you should consider that as a code smell like a anti-pattern and you should say okay instead of me commenting on the pr how do i turn this into a hard rule right how do i turn this into a lint rule how I would turn this into a CI failure? Or how do I even categorically eliminate this problem entirely?",
+      "nSeg": 9,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-26319",
+      "t": "43:51",
+      "start": 2631.95,
+      "end": 2656.99,
+      "en": "I can talk about another migration I've done, but I'll probably pause here. Sure. Yeah, I feel like that's where I am, to be honest, is what you're describing right now, which is that I don't have all of these rules. So I have some things to go do after this session. In terms of being able to scale my agents, I'm definitely on maybe a couple of parallel ones locally staged like two to three locally and i'm sure most people here are on the same so uh yeah",
+      "nSeg": 5,
+      "block": "s7-5"
+    },
+    {
+      "id": "t-26569",
+      "t": "44:16",
+      "start": 2656.99,
+      "end": 2699.77,
+      "en": "i know we only have a couple minutes left lauren was there anything else that you wanted to to highlight i obviously there's lots of questions so i can grab more but i want to give you a few minutes if there's anything else you want to talk about well i think i've been yapping for quite a lot so maybe let's just do questions okay cool uh one question that had a couple of uh came up a couple times was just around like token usage so the question is like is is what you're describing a realistic thing for people who are on you know uh a normal set of token usage they don't have you know basically unlimited tokens uh to work with i think that's a really good point i mean like obviously you know i work at an ai lab where we have unlimited tokens so uh i definitely cannot",
+      "nSeg": 8,
+      "block": "s7-6"
+    },
+    {
+      "id": "t-27012",
+      "t": "45:01",
+      "start": 2701.21,
+      "end": 2853.97,
+      "en": "say that you know this is something everyone should do in the exact same way that i did it i think it's possible to get to this point without you know breaking the bank but you know if you're like an engineering leader or you know you're you have a startup that you lead um i think to me it's a question of roi um and it's like uh yes you spend a lot of money on tokens in the upfront stage you know like refactoring your code base is going to take a lot of tokens uh adding all these things uh is going to take a bunch of tokens but if we're heading to a world where agents are writing all the code and you know you want to be very lean right you don't want to have to hire you don't want to be you don't want to become like meta right like i mean like in terms of you don't want to become a 10 000 person engineering org because i mean that's a cool problem to have but also you know you have so much overhead there's like planning you know like you it's it's uh personally i i wouldn't uh it's not super fun but um i think you want to stay very nimble. Agents are all about allowing you to do things that you couldn't do before. That's really, to me, the value of agents. It's not just storing tokens on every single little thing. But to me, the thing I couldn't do before is enforce this level of constraints in a code base by myself. I'm just a single person. It would have taken me years to build this framework uh and do all the refactoring and test everything myself and verify you know like run imagine if it was just me right now in in pre-agent era just like running you know it would take me so long right and my salary is pretty high right like so you know the the question i think an engineering leader might have is just then you know like what is there's a trade-off of do you hire someone to do this or do you spend the tokens to set up a code base so that even the the most naive right the dumbest agents can do a good job and when you actually get to this point like even agents that are not you know Claude-size do an excellent job of writing code and this pays a lot of dividends as well for me personally where i've empowered not just myself But, again, like, PMs, designers, engineers who are not familiar with Grok Bot to just contribute in a way that is sustainable.",
+      "nSeg": 24,
+      "block": "s7-6"
+    },
+    {
+      "id": "t-28552",
+      "t": "47:35",
+      "start": 2855.28,
+      "end": 2881.72,
+      "en": "So, I think, yeah, it's definitely, like, a trade-off for sure. You know, like, nothing is, like, free for sure. And tokens are pretty expensive. But, oh, actually, I don't know how many of you have seen this, but we actually announced Grok 4.6 today. So, very exciting. Finally out. So, yeah, Grok 4.6 would be, like, a great... is very, very smart. It's really good on the benchmarks. And it's the same, the tokens,",
+      "nSeg": 8,
+      "block": "s7-6"
+    },
+    {
+      "id": "t-28826",
+      "t": "48:02",
+      "start": 2882.6,
+      "end": 3108.7,
+      "en": "well, hopefully I'm not saying this incorrectly, but I believe the cost per token is the same as 4.5. So you're actually getting more intelligence for the same cost. I think this is an area that Cursor tries to, Cursor and SpaceX AI, try to really optimize for, like that Pareto frontier of you know cost versus intelligence uh you know we don't necessarily want to build the biggest model ever because that is extremely expensive to run it's really about like how do you find that sweet spot right you don't you don't need a giant model but it's just super smart right and it's not very expensive for inference uh but uh yeah i think to kind of round it up um i think it's like a it's it's there's a if you do your own analysis i feel like it's pretty positive it'll be pretty positive that the roi you get from investing in stuff like this uh just empowers not just yourself but your whole team to be so much more productive right like imagine if you have an army of engineers like me who are shipping so much improvements and and bug fixes uh you know every day right like that is pretty exciting cool uh one last question before we wrap up this one is for the people in product on the call so let's say we do have an army of engineers who are shipping like lauren i'm just curious like how is the product team or other functions of your company keeping up given that like if you're shipping so quickly have are they using ai more to do their jobs like as much as you can speak to that and obviously you know like you're not in that role but just curious about how that works um i think this is where Grok Bot has been actually exceedingly powerful uh where so before Grok Bot like you know uh obviously cursor only had cursor like we only had agents window we had a cli we had an ide and these are really like power user tools right they're designed for developers so it's very very developer centric you can do knowledge work in them but it like the ui is not really optimized for that so we actually didn't really have uh well i think like a lot of people like you know gtm product like they might have used cursor uh to do their work but it definitely wasn't like a delightful experience with them um i think now with Grok Bot uh it's become Grok Bot is basically like their moment for people who are not in tech in my opinion like it's like it's like a very very accessible way to use agents in a very comfortable very familiar interface it looks like imessage um and it's very fun too you know you can give your agent a fun name uh you can have you can kind of do orchestration with in a very like natural way where you can sort of you know each agent is like a person right now you got a team of agents like working on you have one one agent per account that you manage as an example or if you're a pm you have you know you can have an agent that summarizes all the work that lauren did last night and then now you know what i did right so i think our pms are leveraging that a lot and their shipping code too uh so you know oftentimes they will just say oh here's a bug i fixed it can you look at it and then i'll go review it and actually it's just perfect i'm like okay stamp uh so uh that i think that shows that you know the the dune architecture is holding up right the all the the really strict constraints allow people who are not experts in engineering to contribute at a high level uh so i'm i feel like i'm already seeing that pay off a lot where uh you know designers and pms are just able to to ship features directly and that just makes the Grok Bot team super fast, right?",
+      "nSeg": 39,
+      "block": "s7-6"
+    },
+    {
+      "id": "t-31087",
+      "t": "51:48",
+      "start": 3108.74,
+      "end": 3119.78,
+      "en": "Where we can ship so quickly and we have a lot planned. So I'm very excited to ship more stuff.",
+      "nSeg": 3,
+      "block": "s7-6"
+    },
+    {
+      "id": "t-31202",
+      "t": "52:00",
+      "start": 3120.28,
+      "end": 3148.06,
+      "en": "Yeah, that's awesome. We are at time. So I guess, Lauren, if folks want to support you, maybe go try Grok Bot, try out 4.6 and, you know, provide some feedback. But yeah, this was awesome. Really appreciate you taking the time. And yeah, like all the use cases where you can use Grok Bot are, I think we've heard a lot of cases where it's like very intuitive. You know, it looks like iMessage. I've seen a couple of people share Grok Bot with their mom and their mom's onboarding onto Grok Bot.",
+      "nSeg": 14,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-31489",
+      "t": "52:28",
+      "start": 3148.98,
+      "end": 3184.38,
+      "en": "So I've been really blown away by how well received Grok Bot is. There's still a lot more to do, right? Like we have a few bugs here and there that we have to fix. but overall it's been very positive um and very excited that we finally get got to launch it and you announced another announcement today so pairing those two together what is now possible um so Grok 4.6 is uh really powerful it's uh you know uh much more intelligent than 4.5 is at the same token cost.",
+      "nSeg": 9,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-31854",
+      "t": "53:05",
+      "start": 3185.48,
+      "end": 3224.46,
+      "en": "So I think for coding tasks and the type of work that I do, because I do a lot of engineering work, I use Grok 4.6 a lot for that. And it's just way more capable. It's really, really fast. I still use the other models too, like Claude and Sonnet. But Grok is just so fast. And it's affordable. It's cheap. So I really like using it. Yeah, I think one thing that we talked about when we launched Grok 4.5 with the SpaceX AI team was sort of this idea that we're going to train models for more than just code. And I think what we're continuing to see with Grok 4.6 and some of the investments in Grok Bot, like really, there's a lot more that's possible with these really great models.",
+      "nSeg": 18,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-32246",
+      "t": "53:44",
+      "start": 3224.6,
+      "end": 3253.44,
+      "en": "And so, yeah, we're just excited for the models to keep improving, to be part of the discussion on the frontier of models, and yeah, to be able to bring that into the world. Yeah. I'm really excited what you show here because I know that cursor started off mainly in the agentics coding space. I was sharing earlier that Cursor is actually my gateway into starting to use vibe coding tools in general. It was the first actual tool I used. I used the Cursor models, and then I just kept updating from there. And I still, to this day, use it.",
+      "nSeg": 13,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-32538",
+      "t": "54:13",
+      "start": 3253.88,
+      "end": 3356.34,
+      "en": "And then I realized before I was actually testing out Grok Bot, I was like, oh, you can use this same tool to do research, to do other things. And still, even though people say agents are expanding and growing, it's still mainly coding agents because the actual infrastructure in the ux to use agents for everyday things sucks i think OpenClaw was maybe the first mainstream but like you mentioned i don't think my mom would ever be using OpenClaw and um even myself i set up a whole OpenClaw in a telegram it looks kind of like this in my ui and i have my shopping agent my all that stuff and it breaks all the time and i'm always like like trying to fix it this is awesome and i love the whole ui and structure how did you what was like the design process going through creating this creating Grok Bot yeah i mean the the brief was basically keep it simple uh if i if to be a little cheeky and i think that's actually really real it's like a lot of ai applications have you know a lot of control and power that they give you but sometimes that power is like balanced with complexity and so really our design brief here was like how can we make this really simple first and foremost and so that's kind of where the messaging interface became a little bit inspired from and then of course some of the design touches that we added over time i don't know lauren if you'd add anything kind of having built it all uh i would say i built it all but um i think uh that the team really strove for a very clean simple user interface because like you know if you've used cursor you're probably like a power developer power user it's like very there's like a lot of knobs and whistles and and uh like very it's very tailored focus for coding and with Grok Bot we really wanted to take a fresh perspective on what would it look like if your agent was really more like a colleague.",
+      "nSeg": 23,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-33573",
+      "t": "55:57",
+      "start": 3357.3,
+      "end": 3368.68,
+      "en": "And so you don't necessarily want to micromanage your colleague and say, what tool calls are you using right now? But you want to talk to it like a person. You want to see what they're doing on their computer.",
+      "nSeg": 6,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-33700",
+      "t": "56:10",
+      "start": 3370.02,
+      "end": 3386.0,
+      "en": "So we've tried to keep the interface really elegant and simple. Really cool. I love that I have both of you two on the interview because We have the product side, we have the software engineering side. It's a whole team behind the scenes, too. There's a lot of work on this. Oh, wait, there's more people besides just you two?",
+      "nSeg": 8,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-33873",
+      "t": "56:27",
+      "start": 3387.38,
+      "end": 3418.42,
+      "en": "On it? No, for sure. And so having you both here, you get a really comprehensive overview of what it actually takes to create Grok Bot and get this product into the mainstream. I do know the user might be a little bit different from the typical cursor user. Who are you envisioning are going to be the mainstream adopters of Grok Bot? Yeah, I think we really see this being useful for everyone. So kind of like what we were saying when we saw this launch internally, I think there's a lot of work out there that's just rife to be made more efficient.",
+      "nSeg": 8,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-34193",
+      "t": "56:59",
+      "start": 3419.32,
+      "end": 3547.94,
+      "en": "And I think the motivation for why we built this internally is we actually saw a bunch of folks within Cursor who were building their own agents, kind of like constructing the chats together, building Slack bots. Actually, Lauren had a really famous Slack bot that still lives in our Slack instance. and it's sort of like that takes a lot of context to put together uh and so the idea was well could we package that up and these bots were for for deployed engineering and for like software engineering for our ops teams and and really just wanting to say like could we productize that in a really in a really fun way so yeah yeah uh so yeah i i talk a lot about this bot that i built called benny he's like this little dog uh that's his avatar but uh the idea i had with benny was really uh you know like i'm a fairly lazy person uh and i wanted to figure out how can i you know we're getting so many bug reports for a cursor right and and i wanted to just fix them all yeah uh and so i started thinking about how would i make it so my agents can just automatically fix bugs for me while i sleep and so that was the inspiration for some of our earlier experiments with you know building like uh like a more like persistent bot uh and so i think there were some ideas that we took from there because i got so many questions like how do you how did you build any how can i build my own i think that inspired uh some of the thinking behind Grok Bot like you know what if everybody could define one of their own uh like bots you know give it an identity and give it things like its own computer plus routines and automations so like i have like a bot like bots right now that are you know every time someone gives us feedback on Grok Bot my bots are automatically going off and fixing them for me and i just like review their code so what's your job now it's definitely become interesting it's like i'm almost like a manager for my for my digital colleagues yeah so it's pretty interesting it's actually remarkable how much of Grok Bot was built with Grok Bot too yeah that's like it was a it's been a really cool feedback loop where these agents can self-triage issues they can they can write code and so they can connect to cloud agents and i don't know if you have a demo of that lauren that we wanted to share.",
+      "nSeg": 24,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-35479",
+      "t": "59:07",
+      "start": 3547.94,
+      "end": 3563.94,
+      "en": "Yeah, I do. Ooh, I love these demos. This is so fun. It's like the best way to experience this is to make it interactive. Exactly. You explain something and you're like, wow, I do have a demo pulled up. Let me just show you now how it actually works. We'll continue monitoring right after this message from our sponsors.",
+      "nSeg": 11,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-35648",
+      "t": "59:24",
+      "start": 3564.8,
+      "end": 3570.76,
+      "en": "Eleven Labs, AI that communicates at human level across every channel and modality. Elevenlabs.io slash MTS.",
+      "nSeg": 3,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-35750",
+      "t": "59:35",
+      "start": 3575.01,
+      "end": 3585.83,
+      "en": "Scale your startup on Neon. Millions of developers and startups have already chosen Neon for their backend. Start on the free plan or get up to $100,000 in credits for your startup at neon.com.mts.",
+      "nSeg": 6,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-35897",
+      "t": "59:49",
+      "start": 3589.73,
+      "end": 3598.59,
+      "en": "Special thanks to our sponsor Kong, the AI connectivity platform. Connect APIs, LLMs, agents, and systems with serious security and governance. konghq.com.",
+      "nSeg": 5,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-36023",
+      "t": "60:02",
+      "start": 3602.32,
+      "end": 3670.61,
+      "en": "Yeah, so I kind of, I asked my chief of staff already, like if there's any interesting bugs that we saw today. And it's found a few. You can also see I have X open on the, on the my bots computer just in case uh but yeah you know i can i can tell it to dispatch uh so like i have a i have a sand team over here i'm sorry a Grok Bot team uh so each of them kind of are responsible for a different feature uh and so now my chief of staff is gonna like send off those tasks to those uh agents uh and in a minute we'll see a bunch of messages that i'll send to the you my different my team members uh and then they'll go off and actually work on those tasks uh and then at the end of it i'll get like a pull request that i can review i'll get videos i'll get a screenshot um and uh yeah so like here's another example where uh this is like one of my engineering team agents and uh i think this is like almost like a feature that's not super obvious but uh If you set up cloud agents on Cursor, your Grok Bot bots can actually kick them off.",
+      "nSeg": 14,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-36709",
+      "t": "61:10",
+      "start": 3670.91,
+      "end": 3678.49,
+      "en": "So here, I have a cloud agent that's running with its own computer that this agent is managing.",
+      "nSeg": 1,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-36795",
+      "t": "61:19",
+      "start": 3679.56,
+      "end": 3707.38,
+      "en": "And so it's got a bunch of things in flight already. So I have a bunch of PRs to review later. I think there's something really exciting about the future of software development here, too, where it's really talking to and working with a bunch of agents that are doing specific tasks And then you kind of just step back and become the manager of them. And it sort of feels like that vision is coming true in a really fun way here. That's amazing. And I see here it's a bunch of cat photos. Oh, yeah. So all your agents are actual cats.",
+      "nSeg": 10,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-37076",
+      "t": "61:47",
+      "start": 3707.62,
+      "end": 3714.78,
+      "en": "Yeah, I just love cats. So I decided to give them silly profile pictures just to personalize my Grok Bot a little bit.",
+      "nSeg": 2,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-37158",
+      "t": "61:55",
+      "start": 3715.8,
+      "end": 3746.06,
+      "en": "I mean, the default Grok Bot avatars are super cute as well. And I added these before we added those. But it's just having a bit of fun, you know? Yeah. Roshan, you hinted towards something that is a trend that, of course, is happening with the future of agentic coding. And Cursor has been at the front and center of seeing all of this happen. More and more code is getting automated and is done by these agents. And so as a human, you become this puppeteer of agents who are handling all these tasks for you. I know that's a world that you are particularly excited about.",
+      "nSeg": 11,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-37465",
+      "t": "62:26",
+      "start": 3746.5,
+      "end": 3765.82,
+      "en": "Can you share a little bit more? Why are you excited about that? What does that actually unlock at maybe the human level that people in the mainstream audience might not realize? Yeah, totally. I think that, like, if I had to pick one word, it would be efficiency. I think there's so many ideas in people's heads, regardless of role, again. Like, I have so many product ideas I want to build into Cursor.",
+      "nSeg": 7,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-37668",
+      "t": "62:46",
+      "start": 3766.82,
+      "end": 3802.84,
+      "en": "And it's the limiting factor. Like, there's always some bottleneck in that, like, idea to existence pipeline. And so I think the promise of being able to throw fleets of agents at these problems and then have them produce things that are really high quality and sort of aligned with the taste that I would myself put into a product, that's the vision, right? That's sort of the dream. It's like being able to go from thought to existence. So to me, that's the thing to work towards is can we build these things in a way where whether I'm managing a bunch of agents or asking agents to manage other agents or working with Lauren's agents or whatever that looks like, we're able to really shorten, compress, compress, compress that cycle more and more.",
+      "nSeg": 6,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-38029",
+      "t": "63:22",
+      "start": 3802.92,
+      "end": 3823.46,
+      "en": "And I think if you kind of like look at the evolution of Cursor as a company, that's sort of how we've built in a lot of ways, built ourselves towards that future is by, you know, continuing to introduce more and more sort of like agent tools and complexity there. So, yeah, I think that's the vision and we're excited for it. And then how has it changed on the software engineering team? What differences from when you started working at Cursor to how it is now?",
+      "nSeg": 4,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-38246",
+      "t": "63:44",
+      "start": 3824.6,
+      "end": 4117.43,
+      "en": "I think it's like the way I see engineers roles evolve in the agent world is, you know, like I mentioned, you're sort of like an engineering manager for your agents. But I think a big part of our responsibility now as engineers is also to like, you know, keep the code base in in a condition where you know product managers designers can contribute like high quality code and that's something i talk a lot about on twitter as well which is you know like investing in refactoring rewriting even rewriting your code base so that agents can really thrive even if you're not like or they don't you know they're not very smart agents sometimes uh you know like things like encoding your rules and your style guides into actual uh like lint rules or hard constraints that uh you know fail ci so that again like the the i think the big unlock is uh as an engineer i can empower like so many other people to do things that they couldn't do before and i can do things that i couldn't do before as well because like you know i've done a lot of big refactors and migrations uh at cursor and i did them like mostly by myself wow like with one of all the cat agents yeah all the cat agents were just going wild and like you know i converted you know a bunch of stuff uh you know which would have taken me or a team of engineers months or even years to finish wow that's incredible and as an outsider's perspective you might think okay now that agents can do all this coding what's the role of a software engineer and if you actually look at what's happening on the ground, there's more demand than ever for more and more of these engineers. And it's probably towards something that you hinted. Now that you can build software with the thought to execution timeline is getting so condensed. We just now get something like Grok Bot that started off as that's something you guys are building. And then you could use Grok Bot to now build Grok Bot and put it out into commercial production. Is that also what you're seeing just as a trend happen more and more? Yeah. I mean, I think the time to prototype ideas has gone down a bunch. And so it's really quick to test things. I think we've been able, like the team behind Grok Bot has been able to move incredibly quickly just because of these tools getting better. And obviously the model is getting better as a huge component of that. And so, yeah, I think that like to bring it to the Grok Bot side of things, the motivation there is really around how can we make this product more and more helpful for folks. As far as the trend, I think like this is going to get easier. I think there's still a really strong role for people to play and all that too right whether it's the taste argument or some other combination like that but yeah i think it's just um ideas are you know abound and it's just going to be exciting to see more and more of them come to reality wow yeah the the sort of analogy or metaphor that i that i personally like a lot is this idea that uh so i like food yeah i'm a big lover of food and uh i kind of think of my agents as sort of like uh like a kitchen a michelin kitchen is what i call it and so like maybe my role has sort of changed in that maybe i'm not you know cooking all the food myself anymore uh but i have a team of bots and agents that are that i've sort of hired right and i've trained through skills or uh like refactoring to do good code the way that i would have done it and so my role is becoming more like you know like a head chef right like i i maybe assemble a plate to the food i you know i i own the quality control but you know if you invest a lot in in having like early capable team of agents you can just do so much more and now think about that like with every engineer in your team can have one of these teams behind them uh you can really you can solve a lot more problems you know you can build more features not all of them should be built but you know you you have much more productivity and velocity yeah i do like what you hinted about the internal culture of you actually build things you test it out and that the employees themselves at cursor have a certain taste for what other engineers what other product people what other consumers i guess in general would want to see exist do you have any hints that you can maybe share okay if you don't but of what might be coming up or even something that people are working on internally yeah i mean we definitely want to make Grok Bot better. We launched this as a beta yesterday. And so tons of feedback coming in of all shapes and sizes. Our goal there is just to make this as helpful, these assistants, these bots as helpful as we can. And so definitely going to continue investing there. Obviously, really excited about the models getting better too, and excited to be a part of that conversation and to have frontier models now. And so I think we're going to continue to just invest a bunch in that space and then some more fun stuff to come to. But I think overall, just very bullish on the future and the future of both coding agents but also general purpose agents and I think it's going to be a really fun time.",
+      "nSeg": 56,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-41190",
+      "t": "68:39",
+      "start": 4119.05,
+      "end": 4172.67,
+      "en": "I'm personally really excited to see more performance and reliability as an engineer and that's something I care about a lot. We have some really interesting features that we're debating. Actually, one thing that I hacked into Grok Bot in the early days was support for iMessage so you can actually text your bots i don't know if we'll add it for for Grok but i know it's like a common ask so we're definitely like you know thinking about things like this where again it's like the mental model is these are colleagues right you know so like how do you like your your colleague is accessible not just through slack right that you can text them you can call them uh so it's interesting to kind of imagine a world where you have these always on colleagues that you can talk to at anytime from anywhere uh and they're just off doing good work for you oh my gosh i can't wait to be able to text them or call them.",
+      "nSeg": 18,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-41730",
+      "t": "69:33",
+      "start": 4173.01,
+      "end": 4200.27,
+      "en": "I saw this meme where it's like, my agents were talking to each other in their standup and they're like, sorry, I was off like all weekend. It's like, you're an agent. I don't know exactly what that means. Yeah, maybe we need agent PTO. Yeah, agent PTO, turn your computer off. Let's do it. One last thing I did want to bring up because this is really impressive is you guys, of course, we're not just working on Grok Bot, not just working on the application layer, but also on the model layer. And Grok 4.6, the benchmarks came out on CursorBench.",
+      "nSeg": 15,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-42002",
+      "t": "70:00",
+      "start": 4200.27,
+      "end": 4261.98,
+      "en": "3.2 and were really impressive. And I wanted to address them here on air while we still have time. You had Grok 4.6 extra high scored 70.8% at an average cost of 2.81 per task. For context, Fable 5 Max scored 70.5%, but at $17.32. This is a huge change. How does this model maybe change how the everyday consumer actually interacts with agents with ai as a whole yeah go ahead uh so yeah this is definitely like very top of mind for me because uh you know i think about this a lot because i i work at cursor i have unlimited tokens and so i can just you know you know go crazy with token maxing but obviously a lot of our customers and our users are you know are more cost conscious so personally what i'm most excited about is this idea that you have a very efficient model that is as good as some of the other big models, but at a fraction of the cost.",
+      "nSeg": 10,
+      "block": "s7-7"
+    },
+    {
+      "id": "t-42625",
+      "t": "71:02",
+      "start": 4262.56,
+      "end": 4328.26,
+      "en": "And I feel like that's a very important topic that a lot of leaders and engineers are having right now, which is the rising cost of using AI. So I think Grok 4.6 is a really interesting choice in that discussion. you know like every every company is going to have their own requirements for the type of model mix that they use so i think grok 4.6 makes a very compelling you know a very compelling option right if you're considering between like some of the the bigger models which are also extremely capable but you want something like a little bit more you know cheaper grok is like an excellent choice yeah it's like if you have a budget of 20 bucks to do all of your ai tasks and the cost per task goes down it's like you can just do more tasks so i think the efficiency game is just such a fun one to play because it feels like you just can do more like you can have more bots or write more code and so yeah just like this idea and i think this is happening across the industry which is very exciting but just like being able to do more things with the tokens are just like",
+      "nSeg": 13,
+      "block": "s7-7"
+    }
+  ]
+}
