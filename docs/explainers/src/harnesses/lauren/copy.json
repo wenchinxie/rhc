@@ -1,0 +1,136 @@
+{
+  "title": "How a SpaceXAI worker vibe codes",
+  "subtitle": "Lauren Tan（@poteto），SpaceXAI／Grok Bot，約 72 分鐘",
+  "kicker": "@poteto · SpaceXAI",
+  "mastNote": "2026-08-27 · @0xCodez",
+  "labels": {
+    "background": "背景",
+    "see": "看出來",
+    "did": "她做了什麼",
+    "video": "影片",
+    "plugin": "Pstack",
+    "mapsTo": "對缺口",
+    "toc": "目錄",
+    "lang": "語言"
+  },
+  "plugin": {
+    "title": "Pstack",
+    "url": "https://github.com/cursor/plugins/tree/main/pstack",
+    "lede": "control glass、how、功能地圖與評測都在這個 Cursor 外掛裡；她 repo 裡是 /lauren-mode，外掛裡是 /poteto-mode。"
+  },
+  "background": "Lauren Tan（@poteto）從 Cursor 做到 SpaceXAI／Grok Bot。她試過先寫完整規格再動手，整條路太慢。不懂 AI 在幹嘛是在害自己；開發者的技能是會用工具，把思考外包很危險。所以她把 AI 當 pair programming 的人：省下寫碼時間，拿去審查與修正產出。業界壓力是一週約一百則 PR、幾乎看不懂還 vibe code 衝 ARR。",
+  "problem": "沒有驗證技能，人就是驗收員：agent 交來的東西要人過目。人當瓶頸，就沒辦法平行。",
+  "problemItems": [
+    {
+      "title": "Agent 不對使用者看到的介面真跑、真測。",
+      "why": "沒有驗證技能，人自己開本機、貼截圖與錯誤；人就是瓶頸。"
+    },
+    {
+      "title": "Agent 很有把握地講 bug，卻不搜、不讀該讀的碼。",
+      "why": "tool call 沒讀該讀的碼，結論不可信。"
+    },
+    {
+      "title": "Agent 能開視窗，卻找不到該進的畫面。",
+      "why": "能開視窗，卻不知道側欄或 PR 分頁怎麼走，在 UI 上亂抓。"
+    }
+  ],
+  "solutions": [
+    {
+      "title": "她建驗證與 Glass，讓 agent 真跑、真測、抓追蹤。",
+      "mapsTo": "1",
+      "process": "她對 Colin 說，跟 agent 共事最重要的技能是驗證：對使用者看到的同一套介面真跑、真測。第一個技能 control glass（收進 Pstack）用 Chrome DevTools 協定驅動 Glass，把視窗跑起來，抓 CPU 追蹤與記憶體快照。",
+      "reason": "驗證迴路閉合，人就不必自己當驗收員，才能平行。"
+    },
+    {
+      "title": "how 強迫搜讀，評測當技能的單元測試。",
+      "mapsTo": "2",
+      "process": "她看 agent 失敗：很有把握地講 bug，tool call 卻沒讀該讀的碼，於是做 how 技能（收進 Pstack）逼它搜、讀。評測當技能的單元測試，跨模型跑、用 /loop 爬到 10／10。",
+      "reason": "猜的路被堵死，講 bug 之前得先讀碼。"
+    },
+    {
+      "title": "功能地圖寫清路徑與快捷鍵。",
+      "mapsTo": "3",
+      "process": "Agent 能開 Glass、抓追蹤，卻不知道側欄或 PR 分頁怎麼走。她在技能裡加功能地圖，寫清路徑、快捷鍵、點選時對的元素。",
+      "reason": "開得起來的視窗，也找得到該進的畫面。"
+    }
+  ],
+  "tldrLines": [
+    "她建驗證與 Glass，讓 agent 真跑、真測、抓追蹤。",
+    "how 強迫搜讀，評測當技能的單元測試。",
+    "功能地圖寫清路徑與快捷鍵。"
+  ],
+  "apexLead": "她建驗證與 Glass，讓 agent 真跑、真測、抓追蹤。",
+  "apexItems": [
+    "how 強迫搜讀，評測當技能的單元測試。",
+    "功能地圖寫清路徑與快捷鍵。"
+  ],
+  "intro": "",
+  "xH2": "來源：X 貼文",
+  "xLede": "下面四則是來源：三則 @poteto，一則是 @0xCodez。1000 則／月、加倍、Pstack、outer loop 寫在這裡。",
+  "xCaptions": {
+    "jul29": "她寫：這個月用 Cursor 幾乎送出 1000 則 PR。",
+    "jul29b": "同日她指向一篇較長的文，寫怎麼走到這個量。",
+    "aug19": "上個月 1000、這個月朝加倍；pstack、outer loop、雲端 agent 全天轉。",
+    "aug27": "@0xCodez 貼出，並引她「上個月 1000+、這個月加倍」與「20+ GrokBot agents」。"
+  },
+  "tapeH2": "",
+  "tapeLede": "",
+  "blocks": [
+    {
+      "id": "s7-0",
+      "n": "1",
+      "when": "00:00 到 02:02",
+      "title": "pair programming",
+      "body": "業界有一週約一百則 PR、幾乎看不懂還 vibe code 衝 ARR 的壓力。她試過先寫完整規格再動手，太慢。不懂 AI 在幹嘛是在害自己；開發者的技能是會用工具，把思考外包很危險。所以她把 AI 當 pair programming 的人：省下寫碼時間，拿去審查與修正產出。"
+    },
+    {
+      "id": "s7-1",
+      "n": "2",
+      "when": "02:03 到 05:22",
+      "title": "驗證閉合才能平行",
+      "body": "最重要的技能是驗證：agent 能對使用者看到的同一套介面真跑、真測；CPU 追蹤、記憶體快照都算。人若自己當驗收員，人就是瓶頸，沒辦法平行化。"
+    },
+    {
+      "id": "s7-2",
+      "n": "3",
+      "when": "05:23 到 09:36",
+      "title": "Glass 與功能地圖",
+      "body": "control glass 技能（收進 Pstack）用 Chrome DevTools 協定驅動 Glass，把視窗跑起來、抓效能追蹤。Agent 能開視窗卻不知道 UI 怎麼走，功能地圖補路徑、快捷鍵；Pstack 的建立驗證技能會帶功能地圖。"
+    },
+    {
+      "id": "s7-3",
+      "n": "4",
+      "when": "09:37 到 18:52",
+      "title": "how 強迫搜讀",
+      "body": "how 技能（收進 Pstack）來自她看 agent 失敗：很有把握地講 bug，tool call 卻沒讀該讀的碼；技能逼它搜、讀。評測當技能的單元測試，跨模型跑、用 /loop 爬到 10／10；repo 裡是 /lauren-mode，外掛裡是 /poteto-mode。"
+    },
+    {
+      "id": "s7-4",
+      "n": "5",
+      "when": "18:53 到 25:52",
+      "title": "主廚先本機再上雲",
+      "body": "工程師比較像主廚：佈廚房、分站點，品管留給自己；驗證技能從本機開始，看 agent 怎麼把應用跑起來、怎麼呼叫 API。Benny 接到錯誤回報就在雲端桌面開 Cursor，用同一套控制技能重現；信任還沒到位就一次生 100 或 1000 個雲端 agent，會燒 token。"
+    },
+    {
+      "id": "s7-5",
+      "n": "6",
+      "when": "25:53 到 44:15",
+      "title": "投資重構加護欄",
+      "body": "Grok Bot 原型很快 vibe code 出來，人根本沒在看碼，幾乎沒護欄，agent 走最方便的捷徑；她投資重構，約 600 多則 PR，當天醒來約 20 則已被 agent 合進去。Dune 上線後，CI 禁 useEffect、禁大多數註解。"
+    },
+    {
+      "id": "s7-6",
+      "n": "7",
+      "when": "44:16 到 51:59",
+      "title": "Token 跟聘人比過",
+      "body": "她在沒有 token 上限的 AI lab 工作；重構與加護欄前期會吃很多 token，她把這筆花費跟聘人比過。對工程主管這是 ROI：錢花在 codebase，還是一直加人；護欄到位後，PM、設計師也能交碼。"
+    },
+    {
+      "id": "s7-7",
+      "n": "8",
+      "when": "52:00 到 72:04",
+      "title": "幕僚長把錯派出去",
+      "body": "問答裡她演示幕僚長：把當天錯誤派給各功能機器人。Grok Bot 畫面像 iMessage，設好後可踢 Cursor 雲端 agent；早期她把 iMessage 接進去當同事傳訊。"
+    }
+  ]
+}

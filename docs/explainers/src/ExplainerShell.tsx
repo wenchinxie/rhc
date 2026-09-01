@@ -24,11 +24,15 @@ export function ExplainerShell(props: {
   kicker?: string;
   mastNote?: string;
   toc: TocLink[];
+  tocLabel?: string;
+  tocLead?: ReactNode;
+  headerExtra?: ReactNode;
   railNote?: ReactNode;
   gloss: Record<string, { t: string; d: string; avoid?: string[] }>;
   srcMapJson: string;
   children: ReactNode;
 }) {
+  const tocLabel = props.tocLabel ?? "目錄";
   useEffect(() => {
     window.GLOSS = props.gloss;
     window.initExplainerShell?.();
@@ -37,13 +41,14 @@ export function ExplainerShell(props: {
   return (
     <>
       <button type="button" id="tocbtn" aria-controls="toc" aria-expanded="false">
-        目錄
+        {tocLabel}
       </button>
       <div id="tocscrim" hidden />
-      <nav className="toc" id="toc" aria-label="目錄">
-        <button type="button" id="tocclose" aria-label="關閉目錄">
+      <nav className="toc" id="toc" aria-label={tocLabel}>
+        <button type="button" id="tocclose" aria-label={tocLabel}>
           ×
         </button>
+        {props.tocLead}
         {props.kicker ? <div className="t">{props.kicker}</div> : null}
         {props.toc.map((l) => (
           <Fragment key={l.href}>
@@ -66,6 +71,7 @@ export function ExplainerShell(props: {
             {props.subtitle ? <span>{props.subtitle}</span> : null}
           </h1>
           {props.mastNote ? <p className="mast-note">{props.mastNote}</p> : null}
+          {props.headerExtra}
         </header>
         {props.children}
       </article>

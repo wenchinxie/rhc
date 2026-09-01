@@ -1,0 +1,136 @@
+{
+  "title": "How a SpaceXAI worker vibe codes",
+  "subtitle": "Lauren Tan (@poteto), SpaceXAI / Grok Bot, ~72 min",
+  "kicker": "@poteto · SpaceXAI",
+  "mastNote": "2026-08-27 · @0xCodez",
+  "labels": {
+    "background": "Background",
+    "see": "What you see",
+    "did": "What she did",
+    "video": "Video",
+    "plugin": "Pstack",
+    "mapsTo": "Gap",
+    "toc": "Contents",
+    "lang": "Language"
+  },
+  "plugin": {
+    "title": "Pstack",
+    "url": "https://github.com/cursor/plugins/tree/main/pstack",
+    "lede": "control glass, how, the feature map, and the evals live in this Cursor plugin; in her repo /lauren-mode, in the plugin /poteto-mode."
+  },
+  "background": "Lauren Tan (@poteto) went from Cursor to SpaceXAI / Grok Bot. She tried full specs before coding; the whole path was too slow. Not knowing what the AI is doing hurts you; a developer's skill is using tools, and outsourcing thinking is dangerous. So she treats AI as a pair programming partner: save the coding time, spend it reviewing and fixing the output. Industry pressure is about a hundred PRs a week, barely understanding the code, still vibe coding for ARR.",
+  "problem": "Without verification skills, the human is the acceptance desk: whatever the agent ships, a person has to check. Human as bottleneck means no parallelism.",
+  "problemItems": [
+    {
+      "title": "The agent does not really run or test the UI the user sees.",
+      "why": "No verification skill; the human boots locally, pastes screenshots and errors; the human is the bottleneck."
+    },
+    {
+      "title": "The agent names the bug with confidence, yet does not search or read the code it should.",
+      "why": "The tool call never read the right code; the conclusion is not trustworthy."
+    },
+    {
+      "title": "The agent can open the window, yet cannot find the screen it needs.",
+      "why": "It can open the window, but does not know the sidebar or PR tab path, and flails in the UI."
+    }
+  ],
+  "solutions": [
+    {
+      "title": "She built verification and Glass so the agent really runs, tests, and takes traces.",
+      "mapsTo": "1",
+      "process": "She told Colin the most important skill for working with an agent is verification: really run and test the same UI the user sees. The first skill, control glass (shipped in Pstack), drives Glass over the Chrome DevTools protocol, brings the window up, and captures CPU traces and memory snapshots.",
+      "reason": "Close the verification loop and the human is no longer the acceptance desk; then you can parallelize."
+    },
+    {
+      "title": "how forces search and read; evals are unit tests for skills.",
+      "mapsTo": "2",
+      "process": "She watched agents fail: naming the bug with confidence while the tool call never read the code it should, so she built the how skill (shipped in Pstack) to force search and read. Evals are unit tests for skills, run across models, climb to 10/10 with /loop.",
+      "reason": "The guessing path is blocked; it has to read code before it names a bug."
+    },
+    {
+      "title": "The feature map writes the paths and shortcuts.",
+      "mapsTo": "3",
+      "process": "The agent could open Glass and take traces, yet did not know the sidebar or PR tab path. She added a feature map to the skill: paths, shortcuts, the right element to click.",
+      "reason": "A window you can open is also a screen you can reach."
+    }
+  ],
+  "tldrLines": [
+    "She built verification and Glass so the agent really runs, tests, and takes traces.",
+    "how forces search and read; evals are unit tests for skills.",
+    "The feature map writes the paths and shortcuts."
+  ],
+  "apexLead": "She built verification and Glass so the agent really runs, tests, and takes traces.",
+  "apexItems": [
+    "how forces search and read; evals are unit tests for skills.",
+    "The feature map writes the paths and shortcuts."
+  ],
+  "intro": "",
+  "xH2": "Source: X posts",
+  "xLede": "Four source posts below: three from @poteto, one from @0xCodez. 1000 PRs/month, doubling, Pstack, and the outer loop are written here.",
+  "xCaptions": {
+    "jul29": "She wrote: almost 1000 PRs shipped with Cursor this month.",
+    "jul29b": "Same day she pointed at a longer write-up on how she got to that volume.",
+    "aug19": "Last month 1000, this month toward double; pstack, outer loop, cloud agents running all day.",
+    "aug27": "@0xCodez posted, quoting her \"1000+ last month, doubling this month\" and \"20+ GrokBot agents\"."
+  },
+  "tapeH2": "",
+  "tapeLede": "",
+  "blocks": [
+    {
+      "id": "s7-0",
+      "n": "1",
+      "when": "00:00 to 02:02",
+      "title": "pair programming",
+      "body": "Industry pressure is about a hundred PRs a week, barely understanding the code, still vibe coding for ARR. She tried full specs before coding; too slow. Not knowing what the AI is doing hurts you; a developer's skill is using tools, and outsourcing thinking is dangerous. So she treats AI as a pair programming partner: save the coding time, spend it reviewing and fixing the output."
+    },
+    {
+      "id": "s7-1",
+      "n": "2",
+      "when": "02:03 to 05:22",
+      "title": "Verification closed, then parallel",
+      "body": "The most important skill is verification: the agent really runs and tests the same UI the user sees; CPU traces and memory snapshots count. If the human is the acceptance desk, the human is the bottleneck, and you cannot parallelize."
+    },
+    {
+      "id": "s7-2",
+      "n": "3",
+      "when": "05:23 to 09:36",
+      "title": "Glass and the feature map",
+      "body": "The control glass skill (shipped in Pstack) drives Glass over the Chrome DevTools protocol, brings the window up, and takes performance traces. The agent can open the window yet does not know the UI path; the feature map fills in paths and shortcuts. Pstack's create-verification skill ships with a feature map."
+    },
+    {
+      "id": "s7-3",
+      "n": "4",
+      "when": "09:37 to 18:52",
+      "title": "how forces search and read",
+      "body": "The how skill (shipped in Pstack) came from watching agents fail: naming the bug with confidence while the tool call never read the code it should; the skill forces search and read. Evals are unit tests for skills, run across models, climb to 10/10 with /loop; in her repo /lauren-mode, in the plugin /poteto-mode."
+    },
+    {
+      "id": "s7-4",
+      "n": "5",
+      "when": "18:53 to 25:52",
+      "title": "Chef: local first, then cloud",
+      "body": "Engineers are more like chefs: set the kitchen, assign stations, keep QC yourself. Verification skills start local: watch how the agent boots the app and calls the API. When Benny gets a bug report he opens Cursor on a cloud desktop and reproduces with the same control skills; spinning 100 or 1000 cloud agents before trust is there burns tokens."
+    },
+    {
+      "id": "s7-5",
+      "n": "6",
+      "when": "25:53 to 44:15",
+      "title": "Invest in refactor and guardrails",
+      "body": "The Grok Bot prototype was vibe-coded fast; nobody was reading the code, almost no guardrails, agents took the easy shortcut. She invested in a refactor, ~600+ PRs; waking up that day about 20 had already been merged by agents. After Dune shipped, CI bans useEffect and most comments."
+    },
+    {
+      "id": "s7-6",
+      "n": "7",
+      "when": "44:16 to 51:59",
+      "title": "Tokens vs hiring",
+      "body": "She works at an AI lab with no token cap; early refactor and guardrails burn a lot of tokens, and she compared that spend to hiring. For eng leads it is ROI: money into the codebase, or keep adding headcount. Once the rails are in, PMs and designers can ship code too."
+    },
+    {
+      "id": "s7-7",
+      "n": "8",
+      "when": "52:00 to 72:04",
+      "title": "Chief of staff routes the bugs",
+      "body": "In Q&A she demoed a chief of staff: route that day's errors to each feature bot. The Grok Bot UI looks like iMessage; once set up it can kick a Cursor cloud agent. Early on she wired iMessage in as coworker chat."
+    }
+  ]
+}

@@ -89,6 +89,12 @@
       .wide, .full { width: 100%; }
   }
   .apex { margin-bottom: 1rem; }
+  .apex .tldr {
+    font-family: var(--mono); font-size: var(--fs-2xs); letter-spacing: .12em;
+    color: var(--ink-3); margin: 0 0 .45rem;
+  }
+  .apex .tldr + p { margin: 0 0 1.1rem; }
+  .apex p + .tldr { margin-top: 1.25rem; }
   /* 開場的列舉:序號懸掛在文字欄外,結論粗體先給,證據跟在同一項裡。
      讀者要能數得出來有幾條,而不必在長句裡自己找第一第二。 */
   .apex ol.enum { list-style: none; margin: .9rem 0 1rem; padding: 0; }
@@ -250,6 +256,76 @@
     font-family: var(--mono); color: var(--ink-3);
     margin-right: .7em;
   }
+  article.xfer blockquote.tweet {
+    white-space: pre-wrap;
+    font-size: var(--fs-xs);
+    line-height: 1.62;
+  }
+  .videobadge { margin: 1.4rem 0 .35rem; }
+  .videobadge-frame {
+    position: relative; background: var(--paper-2);
+    border: 1px solid var(--line-strong); border-radius: 6px;
+    overflow: hidden; aspect-ratio: 16 / 9;
+  }
+  .videobadge-frame video {
+    display: block; width: 100%; height: 100%;
+    object-fit: cover; background: var(--ink);
+  }
+  .videobadge-x {
+    position: absolute; left: .7rem; bottom: .7rem; z-index: 2;
+    font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .04em;
+    color: var(--paper); background: oklch(0.19 0.002 106 / 0.72);
+    border: 1px solid oklch(0.98 0.005 95 / 0.35);
+    border-radius: 999px; padding: .28em .7em;
+    text-decoration: none;
+  }
+  .videobadge-x:hover { color: var(--paper); border-color: var(--pen); }
+  .videobadge-dur {
+    position: absolute; right: .7rem; bottom: .7rem; z-index: 2;
+    font-family: var(--mono); font-size: var(--fs-2xs);
+    color: var(--paper); background: oklch(0.19 0.002 106 / 0.72);
+    border-radius: 4px; padding: .18em .45em;
+  }
+  .videobadge figcaption {
+    margin: .55rem 0 0; font-size: var(--fs-xs);
+    color: var(--ink-3); line-height: 1.55;
+  }
+  .videobadge + .tape-cut { margin-top: .55rem; }
+  .videobadge + .tape-cut > h2 {
+    font-size: var(--fs-h3);
+    margin: .35rem 0 .7rem;
+    padding-top: .55rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .lang-switch {
+    display: inline-flex;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: .85rem 0 0;
+  }
+  nav.toc .lang-switch {
+    display: flex;
+    width: max-content;
+    margin: 0 0 .9rem .85rem;
+  }
+  .lang-switch button {
+    font: inherit;
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    letter-spacing: .02em;
+    color: var(--ink-2);
+    background: var(--paper);
+    border: 0;
+    padding: .32em .95em;
+    cursor: pointer;
+  }
+  .lang-switch button + button { border-left: 1px solid var(--line-strong); }
+  .lang-switch button[aria-pressed="true"] {
+    color: var(--paper);
+    background: var(--ink);
+  }
+  .lang-switch button:hover:not([aria-pressed="true"]) { color: var(--pen-ink); }
   .tape-cut .talk { margin: .7rem 0 0; }
   .tape-cut p.tape .ts {
     font-family: var(--mono); color: var(--ink-3);
@@ -343,6 +419,7 @@
   }
   body.rail-on nav.toc {
     display: block; position: sticky; top: 3.4rem;
+    align-self: start;
     min-width: 0;
     margin-top: clamp(1.2rem, 4vw, 3rem);
     border-top: 3px solid var(--ink); padding-top: 1rem;
