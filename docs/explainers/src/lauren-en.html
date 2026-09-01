@@ -1,3 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How a SpaceXAI worker vibe codes</title>
+    <script type="module" src="./lauren-en-frontend.tsx" async></script>
+  </head>
+  <body>
+    <script type="application/json" id="SRC_MAP">{}</script>
+    <script>
+var GLOSS = {
+  pstack: { t: "Pstack", d: "Lauren Tan's public Cursor plugin. control glass, how, the feature map, and evals live here. /lauren-mode in her repo, /poteto-mode in the plugin.", avoid: [] },
+  dune: { t: "Dune", d: "Her name for Grok Bot's agent-oriented architecture. She compared it to Next.js for Electron.", avoid: [] },
+  glass: { t: "Glass", d: "Internal name for Agent Window. control glass drives it over the Chrome DevTools protocol.", avoid: [] },
+  "feature-map": { t: "feature map", d: "A list of how to reach each screen, shortcuts, and the element to click.", avoid: [] },
+  benny: { t: "Benny", d: "Her standing bot. A bug report opens Cursor on a cloud desktop and the same verification skills reproduce it.", avoid: [] }
+};
+window.GLOSS = GLOSS;
+    </script>
+    <script>
 /* design-explainer rail / spy / gloss / srcpane. Call initExplainerShell()
    after React paints. Safe to call twice only if you reload the page. */
 window.initExplainerShell = window.initExplainerShell || function initExplainerShell() {
@@ -208,3 +229,22 @@ window.initExplainerShell = window.initExplainerShell || function initExplainerS
 
 };
 if (document.querySelector("nav.toc")) window.initExplainerShell();
+
+    </script>
+    <div id="root"></div>
+    <div id="gloss-backdrop"></div>
+    <div id="gloss-card" role="dialog" aria-modal="false">
+      <div id="gloss-card-title"></div>
+      <div id="gloss-card-text"></div>
+    </div>
+    <div id="srcscrim" aria-hidden="true"></div>
+    <aside id="srcpane" tabindex="-1" aria-label="原文對照" aria-hidden="true">
+      <button id="srcclose" type="button" aria-label="關閉對照面板">×</button>
+      <p id="src-kind"></p>
+      <h2 id="src-title"></h2>
+      <p id="src-meta"></p>
+      <div id="src-why"></div>
+      <div id="src-body"></div>
+    </aside>
+  </body>
+</html>

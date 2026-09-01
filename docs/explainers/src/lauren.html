@@ -1,3 +1,24 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How a SpaceXAI worker vibe codes</title>
+    <script type="module" src="./lauren-frontend.tsx" async></script>
+  </head>
+  <body>
+    <script type="application/json" id="SRC_MAP">{}</script>
+    <script>
+var GLOSS = {
+  pstack: { t: "Pstack", d: "Lauren Tan 公開的 Cursor 外掛。P 是 potato。裡面有建立／維護驗證技能、評測劇本。她在自家程式庫叫 /lauren-mode，外掛裡叫 /poteto-mode。", avoid: [] },
+  dune: { t: "Dune", d: "Lauren Tan 給 Grok Bot 那套架構取的內部代號。她說可以想成給 Electron 桌面程式用的 Next.js，專門讓 agent 寫。", avoid: [] },
+  glass: { t: "Glass", d: "Cursor 內部對 Agent Window 的代號。control glass 讓 agent 用 Chrome DevTools 協定把視窗跑起來。", avoid: [] },
+  "feature-map": { t: "功能地圖", d: "一份清單，寫畫面上每個功能怎麼走到、鍵盤捷徑、以及點選時要對的網頁元素屬性。", avoid: [] },
+  benny: { t: "Benny", d: "Lauren Tan 做的常駐機器人。接到錯誤回報就在雲端桌面打開 Cursor，用同一套驗證技能重現問題。", avoid: [] }
+};
+window.GLOSS = GLOSS;
+    </script>
+    <script>
 /* design-explainer rail / spy / gloss / srcpane. Call initExplainerShell()
    after React paints. Safe to call twice only if you reload the page. */
 window.initExplainerShell = window.initExplainerShell || function initExplainerShell() {
@@ -208,3 +229,22 @@ window.initExplainerShell = window.initExplainerShell || function initExplainerS
 
 };
 if (document.querySelector("nav.toc")) window.initExplainerShell();
+
+    </script>
+    <div id="root"></div>
+    <div id="gloss-backdrop"></div>
+    <div id="gloss-card" role="dialog" aria-modal="false">
+      <div id="gloss-card-title"></div>
+      <div id="gloss-card-text"></div>
+    </div>
+    <div id="srcscrim" aria-hidden="true"></div>
+    <aside id="srcpane" tabindex="-1" aria-label="原文對照" aria-hidden="true">
+      <button id="srcclose" type="button" aria-label="關閉對照面板">×</button>
+      <p id="src-kind"></p>
+      <h2 id="src-title"></h2>
+      <p id="src-meta"></p>
+      <div id="src-why"></div>
+      <div id="src-body"></div>
+    </aside>
+  </body>
+</html>
