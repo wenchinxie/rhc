@@ -1,0 +1,32 @@
+{
+  "posts": [
+    {
+      "id": "jul29",
+      "date": "2026-07-29",
+      "user": "@poteto",
+      "url": "https://x.com/poteto/status/2082371906309849354",
+      "text": "shipped almost 1000 PRs this month with cursor"
+    },
+    {
+      "id": "jul29b",
+      "date": "2026-07-29",
+      "user": "@poteto",
+      "url": "https://x.com/poteto/status/2082607895934611844",
+      "text": "btw if you're wondering how i shipped 1000 PRs this month, i wrote this post that goes into my journey of getting to this point"
+    },
+    {
+      "id": "aug19",
+      "date": "2026-08-19",
+      "user": "@poteto",
+      "url": "https://x.com/poteto/status/2090141955695198633",
+      "text": "this is a huge release! i shipped 1000 PRs last month and am on track to doubling that this month, all thanks to cloud agents. you can also launch cloud agents with Grok @Bot btw!\n\nhere's how i'm so productive:\n\n• i built pstack (https://github.com/cursor/plugins/tree/main/pstack) my personal set of skills for rigorous engineering and verification. inside of our codebase i call it /lauren-mode, but it's called /poteto-mode in pstack.\n• i use Grok @Bot routines to farm context for me: bug reports on slack, user complaints on X, generating new feature ideas. Grok Bot feeds my \"outer loop\", where i think about what to point my factory at next.\n• i make heavy use of /goal, /loop, and /swarm inside of pstack to run my Full Autopilot playbook, which lets your agents/bots fully own, verify, and ship a task from start to finish.\n• everything runs on cloud agents, so my bots work 24/7 even when i'm asleep or my laptop is offline."
+    },
+    {
+      "id": "aug27",
+      "date": "2026-08-27",
+      "user": "@0xCodez",
+      "url": "https://x.com/0xCodez/status/2093013117156331552",
+      "text": "SpaceXAI engineer (ex-Cursor):\n\n\"my GrokBot agents shipped 1000+ PRs last month, and I will double it this month.\n\ni'm running 20+ GrokBot agents with /loop, /goal, /swarm inside pstack, which lets agents fully own, verify and ship tasks.\"\n\nIn a 1-hour session, a SpaceXAI engineer showed how to build a team of agents that will work for you 24/7"
+    }
+  ]
+}
