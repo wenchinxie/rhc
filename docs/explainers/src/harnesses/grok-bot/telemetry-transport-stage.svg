@@ -1,0 +1,57 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 562" role="img" aria-label="telemetry transport-stage 家族" aria-describedby="dagcap-s8-transport-stage">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M380.0,387.0 L470,387" marker-end="url(#ar)"/>
+  <path d="M260,426 L260,470" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-transport-cap" tabindex="0" role="button" aria-label="送出追蹤三階段事件，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">送出追蹤三階段事件</text>
+    <text class="sub" x="94" y="71">開始送出／閘道回應／SSE 回聲</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">port</text>
+  <g class="app lay-port src" data-snip="t-transport-cap" tabindex="0" role="button" aria-label="TransportStageEgress port，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">TransportStageEgress port</text>
+    <text class="sub" x="94" y="179">createTransportStageRecorder 收的介面</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">轉接</text>
+  <g class="app lay-adapter">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">轉發行程自己就是 adapter</text>
+    <text class="sub" x="94" y="287">同一支檔案兼記錄與轉送</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="391">管線</text>
+  <g class="dec lay-pipe src" data-snip="t-transport-cap" tabindex="0" role="button" aria-label="同時在途超過 64 筆？，開啟原文">
+    <polygon points="260,348 380.0,387.0 260,426 140.0,387.0"/>
+    <text text-anchor="middle" x="260" y="392.0">同時在途超過 64 筆？</text>
+    <circle class="srcdot" cx="260" cy="409" r="4"/>
+  </g>
+  <g class="app lay-pipe">
+    <rect x="470" y="358" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="382">這筆直接放棄</text>
+    <text class="sub" x="484" y="402">連 dispatch 都不呼叫，不進佇列不計數</text>
+  </g>
+  <text class="elab" x="272" y="452.0">未超過</text>
+  <text class="lay" text-anchor="end" x="76" y="506">落地</text>
+  <g class="app lay-sink src" data-snip="t8-transport-forward" tabindex="0" role="button" aria-label="轉發執行器 reportTransportStage，開啟原文">
+    <rect x="80" y="470" width="360" height="64" rx="8"/>
+    <text x="94" y="497">轉發執行器 reportTransportStage</text>
+    <text class="sub" x="94" y="517">落地成送出追蹤 span，不是結構化日誌</text>
+    <path class="srcfold" d="M431,534 L440,534 L440,525 z"/>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-transport-stage">轉發中的送出階段報告同時在途上限 64 筆，超過的新報告直接放棄；落地終點是一段追蹤 span，跟其餘家族落地成結構化日誌是不同的終點。</p>

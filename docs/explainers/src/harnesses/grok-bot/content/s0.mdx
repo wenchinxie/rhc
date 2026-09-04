@@ -1,21 +1,113 @@
-import { Peek, Dag } from "../../../mdx-components"
+import { H2, H3, Term } from "../../../mdx-components"
+import { Dag } from "../../../mdx-components"
 import { DAG_SVG } from "../dagMarkup"
 
 <>
-      <h2 id="s0">
-        <span className="no">0</span>七塊職責總覽
-      </h2>
-      <p>
-        這張圖是產品的七塊工作。畫面交出送出；調度決定誰接
-        <code>sendPrompt</code>
-        ；機器是隔離環境；接納去重並寫回聲。迴圈每一步字一出就回畫面；沒結束時要人（問句、權限、插話）或要工具；工具結果寫回再問。目錄是可呼叫清單，執行才 spawn。
-        <span className="stamp">2026-08-30 first-principles</span>
-      </p>
-      <Dag svg={DAG_SVG} />
-      <p className="src">
-        圖按七塊職責排出。原始碼複製{" "}
-        <code>/mnt/e/grok-bot-0.18-reconstructed</code> @ a9f633e · 產品 0.18.0 ·
-        應用程式識別 <code>com.anysphere.sand</code>。
-        <Peek snip="product">產品名</Peek>
-      </p>
-    </>
+<H2 id="s0" n="0">資料夾地圖：41 個節點、120 條匯入邊、每個資料夾歸一章</H2>
+<p>這張表把整棵樹攤開：1722 個檔案、430267 行程式碼，依匯入圖聚成 41 個資料夾節點、120 條資料夾間的匯入邊；下面 92 列是章節真正落地的分割，每一列一個資料夾，對到本文 8 章其中一章，或列為不涵蓋。每章對應一棵從種子函式追出的執行問題；資料夾歸給樹碰到最多次的那一章；沒有樹碰到的資料夾要嘛跨切、要嘛列為不涵蓋。</p>
+<H3 id="s0-1" n="0.1">每個資料夾歸哪一章</H3>
+<div className="overflow wide">
+<table>
+<thead><tr>
+<th>資料夾</th><th>章</th><th>職責（一句）</th><th>檔數</th><th>行數</th><th>主要匯入對象（前三個，帶次數）</th>
+</tr></thead>
+<tbody>
+<tr><td><code>research-archives</code></td><td><a className="xref" href="#s1">§1</a></td><td>重建過程的調查紀錄檔案。</td><td>5</td><td>2005769</td><td>－</td></tr>
+<tr><td><code>frontend</code></td><td><a className="xref" href="#s1">§1</a></td><td>renderer 端的 Vite 專案，含開發控制面元件與 UI 溯源清單。</td><td>322</td><td>56442</td><td>－</td></tr>
+<tr><td><code>manifests</code></td><td><a className="xref" href="#s1">§1</a></td><td>重建過程留下的稽核清單，記錄 renderer 依賴閉包與行程綁定範圍。</td><td>3</td><td>29828</td><td>－</td></tr>
+<tr><td><code>scripts</code></td><td><a className="xref" href="#s1">§1</a></td><td>建置、打包、驗證與復原前端的維運腳本集合。</td><td>33</td><td>7367</td><td>－</td></tr>
+<tr><td><code>tests</code></td><td><a className="xref" href="#s1">§1</a></td><td><Term k="reconstruction">重建疊層</Term>行為的整合測試，例如更新器守衛與路由設定。</td><td>8</td><td>576</td><td>－</td></tr>
+<tr><td><code>src/app</code></td><td><a className="xref" href="#s1">§1</a></td><td>重建包裝用的最外層 package.json，不含執行程式碼。</td><td>1</td><td>92</td><td>－</td></tr>
+<tr><td><code>host</code>（本層檔案）</td><td><a className="xref" href="#s2">§2</a></td><td><Term k="sand-host">host-main</Term> 開機、鎖檔、gateway 入口與路徑等核心檔案。</td><td>34</td><td>5678</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>electron-main</code>（本層檔案）</td><td><a className="xref" href="#s2">§2</a></td><td>桌面主行程進入點，開視窗、掛選單、寫視窗狀態。</td><td>16</td><td>3464</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>node-agent-coordinator</code></td><td><a className="xref" href="#s2">§2</a></td><td>主行程與 host 之間的中介行程，轉發控制埠與推論路由。</td><td>24</td><td>3106</td><td>shared（26）、internal（8）、host（1）</td></tr>
+<tr><td><code>electron-main/coordinator</code></td><td><a className="xref" href="#s2">§2</a></td><td>主行程生出並管理 node-agent-<Term k="coordinator">coordinator</Term> 子行程的程式碼。</td><td>17</td><td>2347</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>electron-main/adapters</code></td><td><a className="xref" href="#s2">§2</a></td><td>主行程對外接線層，串 IPC、帳號、實驗旗標與遙測。</td><td>14</td><td>1533</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>electron-preload</code></td><td><a className="xref" href="#s2">§2</a></td><td>渲染行程 preload 腳本，掛 IPC 橋接與 VNC 相關介面。</td><td>16</td><td>1514</td><td>shared（8）、internal（3）</td></tr>
+<tr><td><code>electron-main/account</code></td><td><a className="xref" href="#s2">§2</a></td><td>桌面端的 Cursor 帳號登入、機器識別與登入漏斗遙測。</td><td>14</td><td>1294</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>host/box</code></td><td><a className="xref" href="#s2">§2</a></td><td>host 端管理<Term k="box">沙箱機器</Term>的工廠、傳檔與 exec daemon 生命週期。</td><td>17</td><td>1058</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>shared/rpc</code></td><td><a className="xref" href="#s2">§2</a></td><td>host、<Term k="coordinator">coordinator</Term>、preload 之間共用的 RPC 通道定義。</td><td>7</td><td>607</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>electron-main/startup</code></td><td><a className="xref" href="#s2">§2</a></td><td>開機時的使用者資料搬遷與升級檢查。</td><td>6</td><td>561</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>box-exec-daemon</code></td><td><a className="xref" href="#s2">§2</a></td><td>在<Term k="box">沙箱機器</Term>裡代跑命令的服務行程。</td><td>3</td><td>499</td><td>packages/proto（8）</td></tr>
+<tr><td><code>packages/redacted-protos</code></td><td><a className="xref" href="#s3">§3</a></td><td>套用遮蔽規則後的 protobuf 訊息包裝層。</td><td>80</td><td>17533</td><td>packages/redaction（140）、packages/proto（80）</td></tr>
+<tr><td><code>host/extensions/transcript</code></td><td><a className="xref" href="#s3">§3</a></td><td>host 的送出處理擴充，含 <Term k="send-pipeline">SendPipeline</Term> 與回合、群聊協調。</td><td>54</td><td>14141</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>host/runner</code>（本層檔案）</td><td><a className="xref" href="#s3">§3</a></td><td>回合迴圈執行器本體，組裝 agent runner 與工具集。</td><td>52</td><td>11764</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/agent</code>（本層檔案）</td><td><a className="xref" href="#s3">§3</a></td><td>agent 套件核心：狀態、模式判斷、上下文組裝、工具串流。</td><td>66</td><td>11260</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/agent/actions</code></td><td><a className="xref" href="#s3">§3</a></td><td>使用者送出與各類動作（背景任務、shell、完成通知）的處理器。</td><td>23</td><td>6904</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/agent/utils</code></td><td><a className="xref" href="#s3">§3</a></td><td>agent 套件的共用工具函式，如 token 追蹤與規則比對。</td><td>35</td><td>3748</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/agent/prompts</code></td><td><a className="xref" href="#s3">§3</a></td><td>組裝系統提示的使用者資訊、技能清單與規則片段。</td><td>42</td><td>3586</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/agent-summarization</code></td><td><a className="xref" href="#s3">§3</a></td><td>背景摘要管線，含逾時處理與技能持久化。</td><td>12</td><td>2207</td><td>packages/redaction（11）、packages/context（6）、packages/metrics（2）</td></tr>
+<tr><td><code>packages/agent/self-summary</code></td><td><a className="xref" href="#s3">§3</a></td><td>回合過長時的自我摘要與各家模型的壓縮處理器。</td><td>6</td><td>1460</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/agent-core</code></td><td><a className="xref" href="#s3">§3</a></td><td>互動紀錄的查詢、更新與目標延續邏輯。</td><td>15</td><td>1204</td><td>packages/proto（21）、packages/context（4）、packages/redaction（4）</td></tr>
+<tr><td><code>packages/redaction</code></td><td><a className="xref" href="#s3">§3</a></td><td>訊息隱私分類與遮蔽規則。</td><td>7</td><td>884</td><td>－</td></tr>
+<tr><td><code>packages/context</code></td><td><a className="xref" href="#s3">§3</a></td><td>otel 與 logger 等跨套件共用的執行環境。</td><td>6</td><td>625</td><td>－</td></tr>
+<tr><td><code>packages/prompt-jsx</code></td><td><a className="xref" href="#s3">§3</a></td><td>以 JSX 語法組裝提示內容的渲染器。</td><td>3</td><td>493</td><td>－</td></tr>
+<tr><td><code>packages/agent/loop-detection</code></td><td><a className="xref" href="#s3">§3</a></td><td>偵測單一訊息或整體迴圈重複的模組。</td><td>2</td><td>383</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>packages/metrics</code></td><td><a className="xref" href="#s3">§3</a></td><td>單一計數器介面。</td><td>1</td><td>39</td><td>packages/context（1）</td></tr>
+<tr><td><code>shared/node/experiments</code></td><td><a className="xref" href="#s4">§4</a></td><td>Statsig 實驗旗標的讀取與快取。</td><td>8</td><td>6236</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>host/extensions/inference</code></td><td><a className="xref" href="#s4">§4</a></td><td>host 端的推論擴充，管 Cursor session 與 provider 選擇。</td><td>9</td><td>882</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/chat-inference</code></td><td><a className="xref" href="#s4">§4</a></td><td>呼叫模型的 prompt executor 與逾時分類。</td><td>11</td><td>652</td><td>packages/context（3）、packages/utils（1）、packages/metrics（1）</td></tr>
+<tr><td><code>packages/chat-inference-proto</code></td><td><a className="xref" href="#s4">§4</a></td><td>推論用的 protobuf client 與轉換器。</td><td>4</td><td>636</td><td>packages/proto（4）、packages/chat-inference（4）、packages/context（2）</td></tr>
+<tr><td><code>shared/node/cursor-backend</code></td><td><a className="xref" href="#s4">§4</a></td><td>Cursor 後端的推論、圖片產生與 MCP 執行呼叫。</td><td>5</td><td>524</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>packages/agent/tools</code></td><td><a className="xref" href="#s5">§5</a></td><td>工具定義、清單生成與逾時策略。</td><td>77</td><td>11980</td><td>packages/proto（203）、packages/context（124）、packages/redaction（97）</td></tr>
+<tr><td><code>host/runner/tools</code></td><td><a className="xref" href="#s5">§5</a></td><td>回合裡各類工具（瀏覽器、電腦操作、狀態）的實作。</td><td>24</td><td>5230</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/shell-exec</code></td><td><a className="xref" href="#s5">§5</a></td><td>shell 執行核心，含各殼層狀態傾印與 ripgrep 呼叫。</td><td>34</td><td>3584</td><td>packages/context（14）、packages/utils（7）</td></tr>
+<tr><td><code>shared/node/mcp</code></td><td><a className="xref" href="#s5">§5</a></td><td>MCP 目錄快取、驗證與帳號授權生命週期。</td><td>24</td><td>2707</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>packages/agent-exec</code></td><td><a className="xref" href="#s5">§5</a></td><td>工具真正執行前的各類前置檢查與 shell 串流讀取。</td><td>60</td><td>2100</td><td>packages/proto（52）、packages/context（6）、packages/metrics（2）</td></tr>
+<tr><td><code>packages/cursor-plugins</code></td><td><a className="xref" href="#s5">§5</a></td><td>外掛市集清單解析、下載與載入器。</td><td>28</td><td>2043</td><td>packages/utils（6）、packages/hooks（2）、packages/git-core（1）</td></tr>
+<tr><td><code>host/extensions/mcp</code></td><td><a className="xref" href="#s5">§5</a></td><td>host 端的 MCP 服務與技能發布擴充。</td><td>8</td><td>753</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/hooks</code></td><td><a className="xref" href="#s5">§5</a></td><td>hook 型別定義與系統提醒淨化。</td><td>28</td><td>244</td><td>－</td></tr>
+<tr><td><code>packages/hooks-carriers</code></td><td><a className="xref" href="#s5">§5</a></td><td>把 hook 額外內容渲染進提示的載體。</td><td>8</td><td>136</td><td>packages/hooks（4）、packages/proto（3）</td></tr>
+<tr><td><code>packages/hooks-exec</code></td><td><a className="xref" href="#s5">§5</a></td><td>hook 執行錯誤處理。</td><td>1</td><td>60</td><td>－</td></tr>
+<tr><td><code>packages/mcp-agent-exec</code></td><td><a className="xref" href="#s5">§5</a></td><td>MCP 呼叫的 agent-exec 轉接。</td><td>1</td><td>23</td><td>－</td></tr>
+<tr><td><code>packages/mcp-core</code></td><td><a className="xref" href="#s5">§5</a></td><td>MCP 型別的最小共用層。</td><td>4</td><td>5</td><td>－</td></tr>
+<tr><td><code>packages/local-exec</code></td><td><a className="xref" href="#s6">§6</a></td><td>本機執行共用邏輯，含背景 shell 生命週期與清理。</td><td>37</td><td>3084</td><td>packages/context（16）、packages/proto（14）、packages/utils（8）</td></tr>
+<tr><td><code>host/agent-isolation</code></td><td><a className="xref" href="#s6">§6</a></td><td>host 端的對話資料 blob 儲存、worker pool 與舊格式淘汰。</td><td>9</td><td>1848</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>electron-main/box</code></td><td><a className="xref" href="#s6">§6</a></td><td>主行程端管理沙箱連線的通道、重連與遠端存取憑證快取。</td><td>12</td><td>926</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>local-exec-daemon</code></td><td><a className="xref" href="#s6">§6</a></td><td>在使用者電腦上跑本機工具的獨立行程。</td><td>3</td><td>478</td><td>packages/agent-exec（6）、packages/local-exec（6）、host（5）</td></tr>
+<tr><td><code>host/local-exec</code></td><td><a className="xref" href="#s6">§6</a></td><td>host 端呼叫本機命令服務的協定與核准流程。</td><td>6</td><td>444</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>shared/node/egress-tunnel</code></td><td><a className="xref" href="#s6">§6</a></td><td><Term k="box">沙箱機器</Term>對外連線的通道控制器與 WebSocket client。</td><td>5</td><td>287</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>host/extensions/box-store-sync</code></td><td><a className="xref" href="#s7">§7</a></td><td><Term k="box">沙箱機器</Term>檔案與物件儲存的同步管線。</td><td>27</td><td>5502</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/agent-store-sync</code></td><td><a className="xref" href="#s7">§7</a></td><td>跨端儲存同步的排程、驗證與衝突處理。</td><td>24</td><td>4237</td><td>packages/proto（2）、packages/constants（2）</td></tr>
+<tr><td><code>host/extensions/session</code></td><td><a className="xref" href="#s7">§7</a></td><td>頻道與對話的名冊、復原與摘要管理。</td><td>27</td><td>1573</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>host/transcript-mirror</code></td><td><a className="xref" href="#s7">§7</a></td><td>transcript 的二進位鏡像編解碼與路由。</td><td>8</td><td>1313</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>electron-main/secrets</code></td><td><a className="xref" href="#s7">§7</a></td><td>桌面端 secrets 的 IPC 與使用者秘密儲存。</td><td>4</td><td>837</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>packages/agent-kv</code></td><td><a className="xref" href="#s7">§7</a></td><td>agent 狀態的型別化 blob 儲存。</td><td>7</td><td>724</td><td>packages/context（4）、packages/proto（3）、packages/metrics（2）</td></tr>
+<tr><td><code>host/extensions/memory</code></td><td><a className="xref" href="#s7">§7</a></td><td>跨對話記憶的服務與專案成員關係。</td><td>6</td><td>618</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/agent-transcript</code></td><td><a className="xref" href="#s7">§7</a></td><td>transcript 的路徑與追蹤格式定義。</td><td>4</td><td>483</td><td>packages/utils（2）、packages/proto（2）、packages/context（2）</td></tr>
+<tr><td><code>host/extensions/auth</code></td><td><a className="xref" href="#s7">§7</a></td><td>憑證續期與使用者全名等認證服務。</td><td>4</td><td>332</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>shared/node/settings</code></td><td><a className="xref" href="#s7">§7</a></td><td>設定檔（settings.json）的讀寫實作。</td><td>1</td><td>168</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>host/storage</code></td><td><a className="xref" href="#s7">§7</a></td><td>每個 agent 的 SQLite 儲存、路徑與復原。</td><td>5</td><td>35</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>host/extensions/secrets</code></td><td><a className="xref" href="#s7">§7</a></td><td>host 端的 secrets 服務擴充。</td><td>2</td><td>9</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>host/extensions/telemetry</code></td><td><a className="xref" href="#s8">§8</a></td><td>host 端各功能模組的遙測映射與服務。</td><td>34</td><td>4811</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>electron-main/telemetry</code></td><td><a className="xref" href="#s8">§8</a></td><td>主行程遙測管線，含 pipes、sinks 與各類崩潰上報。</td><td>32</td><td>1028</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>shared/observability</code></td><td><a className="xref" href="#s8">§8</a></td><td>遙測事件詞彙、結構化日誌傳輸與 Sentry 隱私模式。</td><td>12</td><td>900</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>electron-main/process-metrics</code></td><td><a className="xref" href="#s8">§8</a></td><td>行程資源量測的取樣、收集與傳輸。</td><td>9</td><td>656</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>host/extensions/codebase-telemetry</code></td><td><a className="xref" href="#s8">§8</a></td><td>程式庫快照遙測擴充。</td><td>9</td><td>270</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>packages/analytics-client</code></td><td><a className="xref" href="#s8">§8</a></td><td>遙測事件的緩衝與格式轉換共用層。</td><td>3</td><td>154</td><td>packages/proto（2）</td></tr>
+<tr><td><code>node-agent-coordinator/telemetry</code></td><td><a className="xref" href="#s8">§8</a></td><td><Term k="coordinator">coordinator</Term> 轉發遙測的節流記錄器。</td><td>1</td><td>90</td><td>shared（26）、internal（8）、host（1）</td></tr>
+<tr><td><code>packages/agent-analytics</code></td><td><a className="xref" href="#s8">§8</a></td><td>單一分析事件模組。</td><td>1</td><td>81</td><td>－</td></tr>
+<tr><td><code>packages/proto</code></td><td>不涵蓋</td><td>protobuf 產生碼，只在被引用處提到</td><td>157</td><td>245398</td><td>－</td></tr>
+<tr><td><code>packages/utils</code></td><td>不涵蓋</td><td>工具函式，各章遇到時點名</td><td>27</td><td>3988</td><td>－</td></tr>
+<tr><td><code>shared</code>（本層檔案）</td><td>不涵蓋</td><td>errors、system-errno 等共用小件</td><td>67</td><td>1801</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>electron-main/dev</code></td><td>不涵蓋</td><td>開發控制面</td><td>12</td><td>866</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>host/extensions/automations</code></td><td>不涵蓋</td><td>排程自動化，不在核心路徑</td><td>8</td><td>835</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>host/extensions/content-search</code></td><td>不涵蓋</td><td>搜尋擴充</td><td>6</td><td>638</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>shared/media</code></td><td>不涵蓋</td><td>附件媒體處理</td><td>12</td><td>602</td><td>packages/proto（13）、internal（11）、host（2）</td></tr>
+<tr><td><code>host/extensions/attachments</code></td><td>不涵蓋</td><td>附件</td><td>8</td><td>502</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>internal</code></td><td>不涵蓋</td><td>內部型別</td><td>2</td><td>394</td><td>－</td></tr>
+<tr><td><code>electron-main/update</code></td><td>不涵蓋</td><td>更新器，重建包預設關閉</td><td>14</td><td>345</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>host/extensions/cross-user-sharing</code></td><td>不涵蓋</td><td>分享</td><td>12</td><td>323</td><td>shared（335）、packages/proto（108）、internal（99）</td></tr>
+<tr><td><code>electron-main/mcp</code></td><td>不涵蓋</td><td>MCP 設定 UI 端</td><td>5</td><td>303</td><td>shared（132）、packages/proto（23）、host（19）</td></tr>
+<tr><td><code>packages/constants</code></td><td>不涵蓋</td><td>常數表</td><td>18</td><td>277</td><td>－</td></tr>
+<tr><td><code>packages/context-rpc</code></td><td>不涵蓋</td><td>context 的 rpc 版</td><td>1</td><td>236</td><td>packages/context（2）</td></tr>
+<tr><td><code>packages/agent-client</code></td><td>不涵蓋</td><td>沒有任何匯入者</td><td>1</td><td>221</td><td>packages/proto（1）、packages/agent-kv（1）</td></tr>
+<tr><td><code>electron-dev-controls</code></td><td>不涵蓋</td><td>開發工具視窗</td><td>1</td><td>156</td><td>electron-main（4）、host（1）、shared（1）</td></tr>
+<tr><td><code>packages/git-core</code></td><td>不涵蓋</td><td>git 小工具</td><td>4</td><td>122</td><td>－</td></tr>
+</tbody>
+</table>
+</div>
+<H3 id="s0-2" n="0.2">行程拓樸總覽</H3>
+<Dag svg={DAG_SVG} />
+<p className="dagcap" id="s0-dagcap">六個行程根：桌面主行程 electron-main 起渲染器與中介行程（渲染器用 MessagePort、其餘皆用 spawn），並另外生出本機命令服務；中介行程以 HTTP loopback 連上<Term k="box">沙箱機器</Term>的 host，host 再生出代跑命令的 box-exec-daemon。細節見 <a className="xref" href="#s2">§2</a>。</p>
+</>

@@ -1,0 +1,49 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 498" role="img" aria-label="telemetry analytics-direct 家族" aria-describedby="dagcap-s8-analytics-direct">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M380.0,387.0 L470,387" marker-end="url(#ar)"/>
+  <path d="M260,426 L260,470" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">onboarding 步驟事件</text>
+    <text class="sub" x="94" y="71">onboardingStep 一類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">port</text>
+  <g class="app lay-port src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="ProductAnalytics port，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">ProductAnalytics port</text>
+    <text class="sub" x="94" y="179">trackEvent 一支方法</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">轉接</text>
+  <g class="app lay-adapter src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="SandProductAnalytics，開啟原文">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">SandProductAnalytics</text>
+    <text class="sub" x="94" y="287">跟 host 的結構化日誌 adapter 同一支建構式蓋出來</text>
+    <path class="srcfold" d="M431,304 L440,304 L440,295 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="391">落地</text>
+  <g class="dec lay-sink">
+    <polygon points="260,348 380.0,387.0 260,426 140.0,387.0"/>
+    <text text-anchor="middle" x="260" y="392.0">canRecordEvents() 允許？</text>
+  </g>
+  <g class="app lay-sink">
+    <rect x="470" y="358" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="382">直接丟棄</text>
+    <text class="sub" x="484" y="402">未 activate 或 gate 關閉時不重試不計數</text>
+  </g>
+  <text class="elab" x="272" y="452.0">允許</text>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-analytics-direct">全文件唯一一條打進產品分析後端的事件；gate 沒開就整包丟棄，跟 Sentry 一樣沒有佇列層。</p>

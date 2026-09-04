@@ -1,51 +1,358 @@
-import { Peek, Term } from "../../../mdx-components"
-import { ScipGraph } from "../ScipGraph"
+import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-      <h2 id="s3">
-        <span className="no">3</span>出廠送出走 Cursor，控制面把請求交給 host
-      </h2>
-      <p>
-        設定沒寫時，模型來源是 <code>cursor</code>。控制面看到送出請求（
-        <code>sendPrompt</code>）且來源是 cursor，回{" "}
-        <code>handled: false</code>
-        （表示自己不處理），請求因此繼續打到遠端機器上的 HTTP 入口。
-        <Peek snip="router-cursor">不處理</Peek>
-      </p>
-      <p>
-        遠端接送出行程的 <Term k="send-pipeline">SendPipeline</Term>{" "}
-        讀用來分辨是不是同一則送出的編號（
-        <code>clientNonce</code>
-        ）：沒有就送一次；同一個編號還在處理就併進那次。
-        <Peek snip="send-prompt">nonce</Peek>{" "}
-        通過後把使用者剛送出的那行文字寫進對話、標記已接受、排隊跑模型的一回合（
-        <code>runTurn</code>
-        ）。控制面只在事件串流的對話記錄上記這行文字，自己不當寫入者。
-      </p>
-      <p>
-        這一回合程式裡接著進 <code>SandAgentRunner</code>，再進{" "}
-        <code>packages/agent</code> 的 <code>runTurnLoop</code>
-        。模型與工具在一步裡互相呼叫，上限 5000 次。
-        <span className="stamp">人工常數 SAND_AGENT_MAX_STEPS</span>
-        改它的成本是重測長任務會不會被提前掐斷。
-        <Peek snip="max-steps">5000</Peek>
-      </p>
-      <p>
-        串流文字、思考過程、工具事件經 runner 轉發；控制面的
-        client-side-tool-v2 轉送器送回畫面。
-      </p>
-      <p>
-        下圖跟{" "}
-        <a className="xref" href="#s0">
-          §0
-        </a>{" "}
-        同一套樹：主幹、右側岔路、左側迴圈走道。左欄是畫面、調度、接納、迴圈、執行。框上是這步在做什麼，第二行是 SCIP 對上的函式。
-        <code>dispatchUserTurn</code> 到 <code>runTurn</code> 中間是 queue 閉包，SCIP 沒畫邊。
-        <span className="stamp">scip-typescript 0.4.0 · 2026-08-30</span>
-      </p>
-      <ScipGraph />
-      <p className="src">
-        <code>inference-router.ts:212</code>、<code>send-pipeline.ts</code>、
-        <code>turn-agent-composition.ts:142</code>。
-      </p>
-    </>
+  <H2 id="s3" n="3">上限五千，那個一千沒人讀</H2>
+  <p>
+    使用者在畫面按下送出，第一站是{" "}
+    <Term k="coordinator">coordinator</Term>
+    ，接著才到遠端機器上接送出的行程。送出的動作走的是{" "}
+    <code>UserMessageActionHandler</code>，它繼承{" "}
+    <code>AbstractUserMessageActionHandler</code>
+    ，真正的步進迴圈本體其實寫在父類別上，不是每種動作各寫一份。
+    <Peek snip="entry-handler">繼承在父類別</Peek>
+  </p>
+  <H3 id="s3-1" n="3.1">送出先過 <Term k="send-pipeline">SendPipeline</Term> 收斂重複點擊</H3>
+  <p>
+    連點兩次送出不會變成兩個回合。
+    <Term k="send-pipeline">SendPipeline</Term> 用{" "}
+    <code>clientNonce</code>
+    判斷：同一個編號還在處理中就併進那次呼叫，不另外起一個。
+    <Peek snip="send-prompt">nonce 併單</Peek>
+    通過後，<code>dispatchUserTurn</code>{" "}
+    把這句話包成一個排他任務排進佇列，同一個 session 同時只跑一個回合。
+    <Peek snip="dispatch-queue">排進佇列</Peek>
+    佇列跑到時交給 <code>turnRuntime.runTurn</code>
+    ，這裡才真正呼叫進 <code>runner.run</code>，也就是 host 端步進迴圈的入口。
+    <Peek snip="runner-run">交棒進迴圈</Peek>
+  </p>
+  <H3 id="s3-2" n="3.2">使用者訊息只是十二種動作之一</H3>
+  <p>
+    <code>AnysphereAgent</code>{" "}
+    建構時把十二種動作各自的 handler 塞進一張表，使用者訊息只占其中一格。
+    <Peek snip="action-map">十二格分派表</Peek>
+    除了 <code>userMessageAction</code>，表裡還登錄了訂閱通知、目標延續、恢復、摘要、
+    shell 指令、取消、執行計畫、非同步提問完成、背景任務完成、背景 shell、背景
+    subagent，一共十二種。這代表同一套步進迴圈骨架被摘要、恢復、背景任務共用，不是使用者訊息獨有的邏輯。
+  </p>
+  <H3 id="s3-3" n="3.3">外層五千步，內層工具跟模型輪流開口</H3>
+  <p>
+    一輪送出真正吃到的步數上限是五千，不是一千。
+    <code>SandAgentRunner.run</code> 的外層迴圈每一步呼叫一次{" "}
+    <code>this.options.runStep</code>
+    ，回傳 <code>done</code> 就跳出，五千步還沒 done 就丟例外。
+    <Peek snip="step-loop">外層迴圈</Peek>
+    這個五千定義在 <code>turn-agent-composition.ts</code>
+    ，同一個常數也被寫進餵給 <code>AnysphereAgent</code> 的靜態設定當{" "}
+    <code>maxSteps</code>。
+    <Peek snip="static-config">同一個常數兩處用</Peek>
+    <code>packages/agent/index.ts</code>{" "}
+    另外宣告一個名字很像的一千，整份原始碼複製裡沒有第二個地方讀它，只是躺在檔案裡的死常數。
+    <Peek snip="dead-1000">死常數沒人讀</Peek>
+  </p>
+  <p>
+    內層迴圈才是真正一步一步跟模型對話的地方，寫在 <code>runTurnLoop</code>
+    ，讀的是 <code>this.config.maxSteps</code>。
+    <Peek snip="inner-loop">內層迴圈讀 config</Peek>
+    迴圈條件本身就檢查 <code>ctx.signal.aborted</code>
+    ，不用等某一步跑完才發現被中止。每一步呼叫 <code>runStep</code>
+    （跟 host 端那個同名方法是兩層不同的東西）
+    <Peek snip="runstep-sig">同名不同層</Peek>
+    ，內部再呼叫 <code>rootPromptExecutor.executeToolStream</code>
+    ，模型輸出跟工具執行在同一次呼叫裡發生。
+    <Peek snip="exec-tool-stream">模型加工具一起跑</Peek>
+    需要模型單獨開口、不跑工具的場合改叫 <code>executeModelStreamOnly</code>。
+    <Peek snip="exec-model-only">只要模型不要工具</Peek>
+    第三個方法 <code>stream</code> 最原始，繞過工具封裝，摘要模組直接拿它送一次性的請求。
+    <Peek snip="raw-stream">摘要直接呼叫</Peek>
+  </p>
+  <p>
+    工具執行失敗不會直接把整個回合炸掉。
+    <code>executeToolResultOrError</code> 把 <code>tool.execute</code>
+    包一層 try/catch，失敗就分類成逾時、參數錯、環境錯等固定的錯誤類型再回傳。
+    <Peek snip="tool-exec-core">失敗先分類</Peek>
+    這一步跑完，工具結果連同模型自己的回覆一起變成同一批訊息，塞回{" "}
+    <code>rootPromptExecutor</code> 的歷史，下一步模型看到的就是包含工具結果的完整上下文。
+    <Peek snip="tool-to-history">併回訊息歷史</Peek>
+  </p>
+  <H3 id="s3-4" n="3.4">沒有工具呼叫，這一輪才真正結束</H3>
+  <p>
+    done 不是模型自己說了算，是迴圈算出來的。
+    <code>hasEnded</code>{" "}
+    等於這一步沒有工具呼叫、也沒有排進來的新訊息，或者剛好撞到最後一步。
+    <Peek snip="inner-done">done 怎麼算出來</Peek>
+    一旦沒工具呼叫，迴圈就地 <code>break</code>
+    ；如果是撞到最後一步、又沒設定 <code>doNotFailOnMaxSteps</code>
+    ，丟的是「Reached maximum number of steps」，跟 host
+    層那句「Agent exceeded N steps」是兩個不同層的例外，一個算正常的超步保護，一個算最外層的保險絲。
+    <Peek snip="inner-throw">兩層各丟各的例外</Peek>
+  </p>
+  <p>
+    送出新訊息會直接中止進行中的回合，不用等它自然結束。
+    <code>interrupt</code> 呼叫 <code>AbortController.abort</code>
+    ，這個訊號同時餵給內層迴圈的條件跟每一步的 <code>runStep</code>。
+    <Peek snip="abort-runner">abort 怎麼傳進去</Peek>
+    迴圈跑完，不管是正常結束、abort、還是超步丟出，host
+    層才呼叫 <code>this.options.settle</code>{" "}
+    收尾，把這回合最終的文字、有沒有送出訊息、有沒有被中止整理成一份結果交回{" "}
+    <code>turnRuntime</code>。
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>階段</th>
+          <th>所在檔</th>
+          <th>進入條件</th>
+          <th>離開條件</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>送出去重排隊</td>
+          <td><code>send-pipeline.ts</code> / <code>send-turn-dispatch.ts</code></td>
+          <td>使用者按下送出</td>
+          <td>併單，或排進 <code>runTurn</code></td>
+        </tr>
+        <tr>
+          <td>host 外層迴圈</td>
+          <td><code>sand-agent-runner.ts</code></td>
+          <td><code>runner.run</code> 被呼叫</td>
+          <td><code>stepResult.done</code>，或滿五千步丟例外</td>
+        </tr>
+        <tr>
+          <td>agent 內層迴圈</td>
+          <td><code>abstract-user-message-action-handler.ts</code></td>
+          <td>外層每一步呼叫進來</td>
+          <td>沒工具呼叫就 <code>break</code>，或撞到 <code>config.maxSteps</code></td>
+        </tr>
+        <tr>
+          <td>模型加工具</td>
+          <td><code>tool-stream-executor.ts</code></td>
+          <td>這一步需要跑工具</td>
+          <td>拿到工具呼叫結果</td>
+        </tr>
+        <tr>
+          <td>工具回填</td>
+          <td><code>tools/core.ts</code></td>
+          <td>工具呼叫回來</td>
+          <td>結果或分類後的錯誤併回訊息歷史</td>
+        </tr>
+        <tr>
+          <td>中止與收尾</td>
+          <td><code>sand-agent-runner.ts</code></td>
+          <td>新訊息送到，或迴圈跑完</td>
+          <td><code>abort</code>，或 <code>settle</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    步進迴圈本體在這裡整理完；模型串流的實際供應方在{" "}
+    <a className="xref" href="#s4">§4</a>
+    ，工具集怎麼組出來在{" "}
+    <a className="xref" href="#s5">§5</a>
+    ，這裡跑完的訊息怎麼落地在{" "}
+    <a className="xref" href="#s7">§7</a>
+    ，計時與 otel span 記在{" "}
+    <a className="xref" href="#s8">§8</a>
+    ，畫面到 gateway 的交接在{" "}
+    <a className="xref" href="#s2">§2</a>
+    。
+  </p>
+  <H3 id="s3-5" n="3.5">TranscriptManager 的插座板</H3>
+  <p>
+    <code>TranscriptManager</code> 一共暴露十九個 <code>setXxx</code>
+    ，七個是觀察者、十二個是能力插座，物件本身活在跟筆電分開、用來跑命令的那台遠端機器上的{" "}
+    <Term k="sand-host">host-main</Term>
+    行程裡，由 extension 系統拿到一個實例後逐一插線。十九個欄位建構時就有預設值，沒有一個是裸的
+    null：多數是可以直接呼叫、什麼都不做的假物件，只有一個例外會真的拋錯。
+    <Peek snip="tm-field-defaults">十九個欄位的預設值</Peek>
+    setter 本身極簡，幾乎每個都只做「把參數塞進同名欄位」這一件事，只有
+    <code>setMemory</code> 多做一步同步進 <code>sessionStore</code>。
+    <Peek snip="tm-setter-block">十九個 setter 排排站</Peek>
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>setter</th>
+          <th>誰插進來（extension）</th>
+          <th>迴圈怎麼用</th>
+          <th>沒插時</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>setAgentForgottenObserver</code></td>
+          <td><Term k="sand-host">host-main</Term> 開機收尾直接呼叫，不走 extension 依賴</td>
+          <td>agent-lifecycle.ts 忘記代理人時通知 agent 被忘記</td>
+          <td>欄位是 undefined，<code>?.()</code> 靜默跳過</td>
+        </tr>
+        <tr>
+          <td><code>setListenerConnectObserver</code></td>
+          <td>transcript/extension.ts 插上，轉發成 host 事件</td>
+          <td>
+            <Peek snip="tr-listener-observer">呼叫點</Peek>
+          </td>
+          <td>欄位是 undefined，try/catch 內 <code>?.()</code> 直接跳過</td>
+        </tr>
+        <tr>
+          <td><code>setConnectorConnectCardObserver</code></td>
+          <td><Term k="sand-host">host-main</Term> 開機收尾直接呼叫</td>
+          <td>
+            <Peek snip="tr-connector-observer">呼叫點</Peek>
+          </td>
+          <td>同上，靜默跳過</td>
+        </tr>
+        <tr>
+          <td><code>setAgentRunLifecycleObserver</code></td>
+          <td>transcript/extension.ts 插上，轉發成 host 事件</td>
+          <td>runner-registry.ts 透過轉發生命週期事件轉呼叫</td>
+          <td>欄位是 undefined，事件不會送出去</td>
+        </tr>
+        <tr>
+          <td><code>setTelemetry</code></td>
+          <td>transcript/extension.ts 插上，值已被 host-telemetry-service 包過一層</td>
+          <td>
+            <Peek snip="tr-telemetry-start">開輪處</Peek>
+          </td>
+          <td>預設 no-op 遙測物件，方法都在但什麼都不做</td>
+        </tr>
+        <tr>
+          <td><code>setProductAnalytics</code></td>
+          <td>transcript/extension.ts 插上</td>
+          <td>automation-runtime.ts、group-chat-glue.ts 等多處呼叫 <code>trackEvent</code></td>
+          <td>預設 no-op 分析物件，同樣是假物件</td>
+        </tr>
+        <tr>
+          <td><code>setTraceFlusher</code></td>
+          <td>transcript/extension.ts 插上，值是 <code>flushTracing</code></td>
+          <td>
+            <Peek snip="tr-trace-flusher">收尾處</Peek>
+          </td>
+          <td>預設 <code>() =&gt; {}</code>，空函式</td>
+        </tr>
+        <tr>
+          <td><code>setTurnExecution</code></td>
+          <td>
+            <Peek snip="ext-turn-execution">接線處</Peek>
+          </td>
+          <td>
+            <Peek snip="send-pipeline-execution">送出前檢查</Peek>
+          </td>
+          <td>預設 <code>canExecute</code> 恆假，真的呼叫 <code>createRunner</code> 才拋錯</td>
+        </tr>
+        <tr>
+          <td><code>setForeverBox</code></td>
+          <td>這份重建樹裡找不到任何呼叫端，插座是空的</td>
+          <td>
+            <Peek snip="box-forever-status">呼叫點</Peek>
+          </td>
+          <td>預設空 box 常數，回傳假的 absent 狀態，不拋錯</td>
+        </tr>
+        <tr>
+          <td><code>setTrayErrors</code></td>
+          <td>transcript/extension.ts 插上，值是 <code>deps.trays</code></td>
+          <td>
+            <Peek snip="tr-tray-errors">呼叫點</Peek>
+          </td>
+          <td>預設 <code>NO_TRAY_ERRORS</code>，<code>pushError</code> 是空函式</td>
+        </tr>
+        <tr>
+          <td><code>setAttachments</code></td>
+          <td>transcript/extension.ts 插上，值是 attachments 依賴</td>
+          <td>透過 <code>Ingestor</code> 建構供各處建立附件寫入器</td>
+          <td>預設空附件常數，回傳假路徑、不真的存檔</td>
+        </tr>
+        <tr>
+          <td><code>setMemory</code></td>
+          <td>transcript/extension.ts 插上，值是 <code>deps.memory</code></td>
+          <td>run-lifecycle.ts 切換活躍代理人時呼叫 <code>setActiveAgent</code></td>
+          <td>預設 <code>NO_MEMORY</code>，<code>setActiveAgent</code> 是空函式</td>
+        </tr>
+        <tr>
+          <td><code>setContentSearch</code></td>
+          <td>transcript/extension.ts 插上</td>
+          <td>roster-search.ts 先讀 <code>isSearchReady</code> 再決定要不要搜</td>
+          <td>預設空搜尋常數，<code>isSearchReady</code> 恆假，直接跳過</td>
+        </tr>
+        <tr>
+          <td><code>setChannelDelivery</code></td>
+          <td>這份重建樹裡找不到任何呼叫端，插座是空的</td>
+          <td>
+            <Peek snip="bg-channel-delivery">呼叫點</Peek>
+          </td>
+          <td>預設函式直接丟出「未登錄」錯誤，十九個插座裡唯一沒插就丟例外的</td>
+        </tr>
+        <tr>
+          <td><code>setChannelActivity</code></td>
+          <td>這份重建樹裡找不到任何呼叫端，插座是空的</td>
+          <td>background-wakes.ts 通知頻道活躍度時呼叫活動回呼</td>
+          <td>欄位是 undefined，<code>?.()</code> 跳過</td>
+        </tr>
+        <tr>
+          <td><code>setChannelConfigChanged</code></td>
+          <td>這份重建樹裡找不到任何呼叫端，插座是空的</td>
+          <td>widget-responses.ts 存完設定呼叫頻道設定回呼</td>
+          <td>欄位是 undefined，<code>?.()</code> 跳過</td>
+        </tr>
+        <tr>
+          <td><code>setAutomationConfigChanged</code></td>
+          <td>transcript/extension.ts 插上，轉發成 host 事件</td>
+          <td>automation-runtime.ts、spend-guard 等處呼叫自動化設定回呼</td>
+          <td>欄位是 undefined，<code>?.()</code> 跳過</td>
+        </tr>
+        <tr>
+          <td><code>setShouldEmitAutomations</code></td>
+          <td>
+            <Peek snip="sand-host-observers">接線處</Peek>
+          </td>
+          <td>automation-runtime.ts、workflow-commands.ts 直接呼叫（沒有 <code>?.</code>）決定要不要送自動化清單</td>
+          <td>預設 <code>() =&gt; true</code>，恆常放行，不是空函式也不是拋錯</td>
+        </tr>
+        <tr>
+          <td><code>setXuserDelegate</code></td>
+          <td>cross-user-sharing extension 依實驗旗標插拔</td>
+          <td>group-chat-glue.ts、shared-rooms.ts 讀 <code>xuserDelegate</code> 判斷要不要走跨帳號共享</td>
+          <td>預設 <code>null</code>，呼叫端自己判斷 null 再決定要不要 fallback</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    開機順序看 <code>transcriptExtension</code> 自己宣告的 <code>dependencies</code>
+    ：附件、內容搜尋、記憶、session、telemetry、tray、turn-execution 七個先插好，extension
+    系統才會呼叫它的 <code>start()</code>，manager 剛 new 出來這七個插座就一次插滿。表中「未登錄」錯誤是 <code>SandChannelDeliveryUnregisteredError</code>，no-op 分析物件是 <code>createNoopSandProductAnalytics()</code>。
+    <Peek snip="ext-dependencies">七個依賴排隊</Peek>
+    <Peek snip="ext-wiring-plain">start() 裡一次插七個</Peek>
+    接著同一個 <code>start()</code> 還會再插上另外三個觀察者：<code>setAutomationConfigChanged</code>、
+    <code>setListenerConnectObserver</code>、<code>setAgentRunLifecycleObserver</code>
+    ，三個都是同一種寫法，把事件原樣包一層轉發給 <code>context.host.events.emit</code>。
+    <Peek snip="ext-observers">三個觀察者接的都是轉發</Peek>
+    值得留意的是 <code>deps.telemetry.brain</code> 插進 <code>setTelemetry</code>
+    之前已經被 host-telemetry-service 包過一層：<code>this.brain =
+    withAutomationRunAnalytics(this.logs, this.analytics)</code>，插座板收到的不是裸的
+    logs 物件，是先被自動化分析裝飾過的版本。
+    <Peek snip="telemetry-brain-wrap">brain 是包過的 telemetry</Peek>
+    另外三個觀察者插座則要等 <Term k="sand-host">host-main</Term> 收尾階段才用 <code>optionalMethod</code>
+    保護著手動呼叫，不是跟著 <code>dependencies</code> 清單走。
+    <Peek snip="sand-host-observers">收尾階段才插的三個</Peek>
+  </p>
+  <p>
+    七個觀察者跟十二個能力插座是兩種不同的合約。觀察者是迴圈通知它、不等回傳值，全部用
+    <code>?.</code> 或 <code>optionalMethod</code> 保護，沒插上就整段安全跳過，
+    <Peek snip="tr-listener-observer">典型的觀察者寫法</Peek>
+    telemetry 更進一步：沒插時給的不是 undefined，是一個假物件，讓
+    <code>turn.setModel</code>、<code>turn.finalize</code> 這類鏈式呼叫不必額外判斷。能力插座則是迴圈真的要吃它的回傳值或執行結果，
+    多數預設一樣是安全假物件（<code>EMPTY_FOREVER_BOX</code>、<code>NO_TRAY_ERRORS</code>）
+    <Peek snip="tm-capability-stubs">兩個安全假物件的樣子</Peek>，
+    但兩個明確的例外打破了「插座板永遠安全」這個印象：<code>execution</code>
+    的 <code>canExecute</code> 讀起來安全，真的呼叫 <code>createRunner</code>
+    卻會拋錯；<code>channelDelivery</code> 更直接，沒插時的預設本身就是
+    <code>throw</code>，逼呼叫端自己補一層 <code>.catch</code>。
+    <Peek snip="tm-unwired-execution">execution 的兩段式預設</Peek>
+    這種插座板設計，跟{" "}
+    <a className="xref" href="#s8">§8</a>
+    那份 telemetry port/adapter 是同一套哲學的放大版：一份介面、多種實作、預設永遠是不會讓迴圈崩潰的那個版本，唯二例外都刻意設計成「呼叫端得先檢查或自己接住」。
+  </p>
+</>

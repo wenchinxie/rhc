@@ -1,29 +1,93 @@
-import { Peek, Term } from "../../../mdx-components"
+import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-      <h2 id="s4">
-        <span className="no">4</span>遠端命令與本機命令分兩路，權限預設先問再跑
-      </h2>
-      <p>
-        <Term k="box">沙箱機器</Term>
-        （跟筆電分開的那台遠端機器）裡的命令走{" "}
-        <code>box-exec-daemon</code>，聽 <code>127.0.0.1:1337</code>
-        ，接受 <code>exec</code> 跑命令請求。
-        <span className="stamp">埠 1337 寫死</span>
-        改它的成本是重測 host 怎麼找這支服務。
-        <Peek snip="box-exec">1337</Peek>
-      </p>
-      <p>
-        使用者電腦上的命令走 <code>local-exec-daemon</code> →{" "}
-        <code>packages/local-exec</code> → <code>shell-exec</code>{" "}
-        在受限環境裡起動行程。權限只有 always（一律准）、ask（先問再跑）、never（一律不准），預設 ask；動作五種：跑命令、送輸入、讀檔、列目錄、寫檔。
-        <Peek snip="perm">ask</Peek>
-      </p>
-      <p>
-        外掛與工具伺服器的掛載屬另一條故事；這一節只分清命令在遠端跑還是在使用者電腦跑。
-      </p>
-      <p className="src">
-        <code>box-exec-daemon/server.ts</code>、
-        <code>local-tool-permission.ts</code>。
-      </p>
-    </>
+  <H2 id="s4" n="4">出廠只認 Cursor，其他都是重建</H2>
+  <p>
+    設定沒寫時，模型來源只有一種，<code>cursor</code>。四個供應者被列成同一個聯集型別，出廠沒選就落在第一個。
+    <Peek snip="provider-list">四選一</Peek>{" "}
+    控制面收到送出請求時只要看這個值是不是 <code>cursor</code>，是的話就回「不處理」，請求原封不動繼續往下走；
+    <Peek snip="router-cursor">不處理</Peek>{" "}
+    不是的話，控制面自己接手把回答讀完，不再送到 <Term k="sand-host">host-main</Term>。
+    以下四節屬於 <Term k="reconstruction">重建疊層</Term> 加上去的內容，不是出廠就有的功能，分別講四條線各自怎麼打、憑證放哪、路由器住在哪一層，以及一張表收斂差異。疊層怎麼判別留給
+    <a className="xref" href="#s1">§1</a>。
+  </p>
+  <H3 id="s4-1" n="4.1">預設值就寫在讀設定那一行</H3>
+  <p>
+    沒有設定檔，或設定檔沒寫這個欄位時，讀值的函式直接回傳字串 <code>"cursor"</code>，這行本身就是預設值的定義，沒有另外一份「預設設定檔」。
+    <Peek snip="settings-default">預設值</Peek>{" "}
+    寫入用另一個函式，把使用者在畫面上選的供應者存回同一份 <code>settings.json</code>。README 說明文件把這個選擇稱作「Settings → Router」，跟程式裡的欄位對得上，四個供應者裡只有 Cursor 不需要另外登入或存金鑰。
+  </p>
+  <H3 id="s4-2" n="4.2">三條重建線各自怎麼打、憑證放哪</H3>
+  <p>
+    Cursor 走的不是這裡的三個 executor，是既有的 proto 呼叫，下一節細看；其餘三條都在 <code>source/host/extensions/inference</code> 這一個資料夾裡各自有一個 executor 函式，跟 <code>codex-direct-responses.ts</code> 這支專門處理 Codex 直連傳輸的檔案分工。Claude Code 呼叫的是 <code>@anthropic-ai/claude-agent-sdk</code> 的 <code>queryClaude</code>，先用 <code>resolveClaudeCodeCliPath</code> 找本機已安裝的 <code>claude</code> 執行檔路徑，找不到就丟錯；找到才把路徑塞進 <code>pathToClaudeCodeExecutable</code>，權限模式固定 <code>default</code>，一般對話只跑一輪，接了 MCP 工具才放寬到八輪。
+    <Peek snip="claude-exec">找執行檔</Peek>{" "}
+    它吃的是本機已登入的 Claude Code CLI，不需要另外存 API 金鑰。
+  </p>
+  <p>
+    Codex 不叫 CLI，是這份重建自己組的 HTTP 傳輸，直接打 ChatGPT 後端的 Responses 端點。
+    <Peek snip="codex-exec">直接打</Peek>{" "}
+    憑證來自使用者家目錄下的 <code>.codex/auth.json</code>（或 <code>CODEX_HOME</code> 指到的路徑），讀之前先檢查這個檔案必須是一般檔、不是連結，且權限位元不能對群組或其他人開放，否則直接拒絕；解出的 token 還要確認 <code>auth_mode</code> 是 <code>chatgpt</code> 且四個欄位都非空才算能用。
+    <Peek snip="codex-cred">私有檔</Peek>
+  </p>
+  <p>
+    OpenRouter 用的是一般 OpenAI 相容介面，套件是 <code>@ai-sdk/openai</code> 的 <code>createOpenAI</code>，指到 <code>https://openrouter.ai/api/v1</code>。憑證是環境變數 <code>OPENROUTER_API_KEY</code>，沒設的話再去讀沙箱機密庫裡存的同名鍵，兩邊都沒有就丟錯，訊息直接告訴使用者去 Settings → Router 補。
+    <Peek snip="openrouter-cred">丟錯</Peek>{" "}
+    這一段跟 <code>source/packages/chat-inference</code> 共用同一組結果型別（文字結果、影像結果、逾限錯誤），三個 executor 產生的內容最後都套進同一個殼再往上送。
+  </p>
+  <H3 id="s4-3" n="4.3">路由判斷分兩層，各管各的請求</H3>
+  <p>
+    路由判斷不是只有一處。第一層在 <Term k="coordinator">coordinator</Term> 裡：它自己存一份 <code>settings.json</code>（放在自己的 <code>dataDir</code> 底下），使用者送出訊息時先看這份設定；供應者不是 <code>cursor</code> 就直接呼叫剛才那三個 executor 把回答讀完，寫進本機一份獨立的對話紀錄檔，跟 <Term k="sand-host">host-main</Term> 完全不打交道。第二層在 <Term k="sand-host">host-main</Term> 這一側：<Term k="box">沙箱機器</Term> 裡跑原生 Cursor 對話時，同一段路由判斷又出現一次，讀的是 <code>getSandRootDir()</code> 底下的那份 <code>settings.json</code>，跟 <Term k="coordinator">coordinator</Term> 那份不是同一個檔案。
+    <Peek snip="cursor-route">再判一次</Peek>{" "}
+    會走到這裡的是子代理、電腦操作這類不經過 <Term k="coordinator">coordinator</Term> 攔截點的呼叫；供應者非 cursor 一樣改叫 <code>createProviderPromptSession</code>，是 cursor 才繼續走 <code>source/packages/chat-inference-proto</code> 底下的 proto 串流客戶端。<code>source/shared/node/experiments</code> 這個資料夾管的是另一件事：Cursor 原生路徑要用哪個底層模型設定，靠 Statsig 實驗與功能旗標決定，跟這裡的四選一路由無關，只在 Cursor 被選中時才接手。每輪串流文字怎麼被下游吃下去，留給
+    <a className="xref" href="#s3">§3</a>。
+  </p>
+  <H3 id="s4-4" n="4.4">一張表收斂四條線路</H3>
+  <p>
+    四條線路只在「呼叫誰」「憑證放哪」「出廠是否啟用」三個維度上不同，其餘共用同一套對話紀錄格式。
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>供應者</th>
+          <th>進入函式</th>
+          <th>憑證來源</th>
+          <th>出廠是否啟用</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cursor</td>
+          <td><code>createCursorInferencePromptSession</code> → proto <code>InferenceService</code></td>
+          <td>既有 Cursor / Grok Bot 登入 session</td>
+          <td>是（預設）</td>
+        </tr>
+        <tr>
+          <td>Claude Code</td>
+          <td><code>claudeExecutor</code> → <code>queryClaude</code></td>
+          <td>本機已登入的 <code>claude</code> CLI</td>
+          <td>否</td>
+        </tr>
+        <tr>
+          <td>Codex</td>
+          <td><code>codexExecutor</code> → <code>streamCodexDirectResponses</code></td>
+          <td>使用者家目錄下的 <code>.codex/auth.json</code>（私有一般檔）</td>
+          <td>否</td>
+        </tr>
+        <tr>
+          <td>OpenRouter</td>
+          <td><code>openRouterExecutor</code> → <code>streamText</code></td>
+          <td><code>OPENROUTER_API_KEY</code>（環境變數或沙箱機密庫）</td>
+          <td>否</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    本機容器沙箱另外還有一份跟供應者無關的憑證檔：閘道把 Cursor 存取權杖寫進 <code>local-docker-credential/inference.json</code>，路徑由設定檔所在資料夾算出來，跟上面四條線的憑證各自獨立存放。
+    <Peek snip="docker-cred">另存一份</Peek>{" "}
+    四條線各自的憑證檔實際放在哪一層目錄、誰負責讀寫，留給
+    <a className="xref" href="#s7">§7</a>
+    細看。
+  </p>
+</>

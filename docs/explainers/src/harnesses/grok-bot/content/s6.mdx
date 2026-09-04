@@ -1,60 +1,99 @@
-import { Term, Xfer } from "../../../mdx-components"
+import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-      <h2 id="s6">
-        <span className="no">6</span>路由器與本機容器是重建疊層
-      </h2>
-      <p>
-        設定裡的 Router 可選 Cursor、Claude Code、Codex、OpenRouter。模型來源不是
-        cursor 時，控制面自己處理送出請求，對話寫進{" "}
-        <code>inference-router-transcript.json</code>（每個對話代理留 200 則）。
-        <span className="stamp">slice(-200) 人工選</span>
-        改它的成本是重測長對話記憶被裁哪裡。活動燈每 250 ms
-        脈衝一次，畫面重整時仍能看見「思考中」。
-        <span className="stamp">250 ms 人工選</span>
-        改它的成本是重測指示燈閃爍與處理器負擔。
-      </p>
-      <p>
-        裝進應用程式的畫面仍是出廠已經編好的那份，只打窄補丁放 Router 面板（
-        <code>router-renderer-patch.mjs</code>
-        ）。這份重建稿用自己的應用程式識別與簽名打包。以上都是
-        <Term k="reconstruction">重建疊層</Term>
-        ：這份複製樹加在出廠行為上面的東西。
-      </p>
-      <Xfer
-        title="出廠畫面釘住，執行時程式才覆寫"
-        cells={[
-          {
-            lab: "機制",
-            body: (
-              <>
-                打包腳本取出廠畫面目錄，編譯 <code>source/</code>{" "}
-                寫入其上，再以雜湊記錄畫面補丁。
-              </>
-            ),
-          },
-          {
-            lab: "前提",
-            body: "出廠只交出已編好的畫面，沒有可改的畫面源碼，所以這份稿只打窄補丁。",
-          },
-          {
-            lab: "適配",
-            body: "ARCHITECTURE 把上游 0.18.0 當外部輸入；PROVENANCE 規定畫面控件要對得出廠安裝包。",
-          },
-          {
-            lab: "不抄",
-            body: (
-              <>
-                <code>frontend/</code>{" "}
-                只拿來對照與試作，打包仍用出廠畫面。
-              </>
-            ),
-          },
-        ]}
-      />
-      <p className="src">
-        <code>inference-router.ts</code>、
-        <code>scripts/lib/router-renderer-patch.mjs</code>、
-        <code>docs/ARCHITECTURE.md</code>。
-      </p>
-    </>
+  <H2 id="s6" n="6">沙箱在遠端，其餘是後補</H2>
+  <p>
+    出廠只認一條路：向 Cursor 後端要一台遠端<Term k="box">沙箱機器</Term>，這是唯一內建的通道。
+    <Term k="reconstruction">重建疊層</Term>另外加了兩條路：一條把<Term k="box">沙箱機器</Term>換成使用者自己筆電上的
+    Docker 容器，一條讓部分命令直接在筆電本身執行，兩者都是這份原始碼複製才有的東西，出廠沒有切換這兩條路的介面。
+    設定型別只承認 <code>remote</code> 與 <code>local-docker</code> 兩種值，預設是 <code>remote</code>，
+    也就是遠端<Term k="box">沙箱機器</Term>
+    <Peek snip="runtime-default">預設值</Peek>。
+  </p>
+  <H3 id="s6-1" n="6.1">遠端通道靠後端要機器，不是本機生的</H3>
+  <p>
+    遠端<Term k="box">沙箱機器</Term>的取得靠一次呼叫：桌面行程叫 Cursor 後端的 <code>ensureSandBox</code>，
+    後端配一台機器回來，把閘道網址、閘道權杖與網路權杖交回
+    <Peek snip="remote-box">要機器</Peek>。這支呼叫解決的是身分與定位問題：桌面程式不必自己知道機器在哪，
+    只要能拿到後端發的存取權杖就能連上。拿到的連線描述會先快取住，帳號沒換、快取沒過期就不必重新要一次，
+    快取物件本身只認 <code>baseUrl</code>、可選的 <code>token</code>、可選的標頭與可選的 VNC 代理設定
+    <Peek snip="descriptor-cache">描述快取</Peek>。連線建立之後，桌面另外接一條出網隧道，
+    把<Term k="box">沙箱機器</Term>裡對外的網路請求包進一條 WebSocket 隧道轉回桌面端出口，
+    這條隧道跟著連線觀察者的通知開關與重接，帳號登出或連線斷掉觀察者會通知隧道控制器把舊連線設成空值
+    <Peek snip="egress-wire">出網隧道</Peek>。要機器、記連線、轉封包三件事各管各的，
+    彼此靠介面呼叫交接，不是同一段程式碼硬寫在一起，跟{" "}
+    <a className="xref" href="#s2">§2</a>{" "}
+    描述的<Term k="sand-host">host-main</Term>開機順序是同一台遠端機器上的鄰居關係。
+  </p>
+  <H3 id="s6-2" n="6.2">本機 Docker 是<Term k="reconstruction">重建疊層</Term>，不是原生功能</H3>
+  <p>
+    切到<Term k="reconstruction">重建疊層</Term>加的本機容器之後，連線目標從後端配的機器換成寫死的映像
+    <code>public.ecr.aws/k0i0n2g5/cursorenvironments/universal:sand-box-latest</code>，
+    容器名固定叫 <code>grok-bot-local-vm</code>，閘道釘死在 <code>http://127.0.0.1:1340</code>
+    <Peek snip="docker-port">映像與埠</Peek>。容器起來不代表能用：程式碼會反覆打 <code>/health</code>
+    問閘道，最多等三分鐘，容器提早退出就抓最後幾行日誌一起丟進錯誤裡
+    <Peek snip="docker-ready">就緒輪詢</Peek>。是否走這條路的判斷點只有一句：連線函式先看設定裡的
+    <code>boxRuntime</code> 是不是 <code>local-docker</code>，是就走本機容器，不是就交回原本的遠端連接器
+    <Peek snip="docker">切換點</Peek>。切換發生在使用者按下設定開關那一刻：主行程先把新的
+    <code>boxRuntime</code> 寫進設定，啟動或停掉本機容器成功之後才呼叫<Term k="coordinator">coordinator</Term>
+    的重啟<Peek snip="runtime-switch">重啟協調</Peek>。重啟是必要的，因為<Term k="coordinator">coordinator</Term>
+    手上握著舊的閘道連線物件，不管是換成容器還是換回遠端，都得丟掉舊連線重新連一次，不重啟就會對著已經不存在的閘道發命令。
+  </p>
+  <H3 id="s6-3" n="6.3">local-exec 走使用者自己的機器，不算沙箱</H3>
+  <p>
+    第三條路徑不透過<Term k="box">沙箱機器</Term>，命令直接落在使用者自己的筆電上執行。承接命令的是一個獨立行程，
+    由桌面主行程另外拉起，帶一個一次性產生的世代權杖，用來確認之後看到的還是同一個行程而不是殘留的舊行程
+    <Peek snip="local-exec-spawn">拉起行程</Peek>。這個行程啟動後在背景常駐，收到結束訊號才收尾關閉，
+    正常啟動會寫一行「serving local exec over the gateway」，說明它替<Term k="box">沙箱機器</Term>那邊的閘道代跑本機命令
+    <Peek snip="local-exec-lane">常駐服務</Peek>。哪些命令會走這裡，答案是使用者本機工具權限允許的那一類；
+    這跟<Term k="box">沙箱機器</Term>裡由 <code>box-exec</code> 常駐服務執行的命令是兩條並行的執行路徑，
+    監聽的位址各自是 <code>127.0.0.1:1337</code>{" "}
+    <Peek snip="box-exec">box 內執行</Peek>，同一次送出裡兩者都可能被叫到，跟{" "}
+    <a className="xref" href="#s5">§5</a>{" "}
+    描述的沙箱輔助工具與白名單管的是不同一層的權限問題。
+  </p>
+  <H3 id="s6-4" n="6.4">選擇點只有一個開關，local-exec 除外</H3>
+  <p>
+    真正會左右命令在哪台機器上跑的設定只有一個：<code>boxRuntime</code>，只在遠端<Term k="box">沙箱機器</Term>
+    與本機 Docker 之間二選一，讀寫都經過主行程對外開的 <code>getBoxRuntime</code> 與 <code>setBoxRuntime</code>
+    <Peek snip="runtime-switch">讀寫入口</Peek>。local-exec 不受這個開關管，它會不會被叫到看的是使用者對本機工具的權限設定，
+    跟 <code>boxRuntime</code> 是兩組互不相干的判斷，讀者不要把三條通道誤會成同一個下拉選單裡的三個選項。
+    下表把三條通道攤開比對：
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>通道</th>
+          <th>是否出廠</th>
+          <th>執行者行程</th>
+          <th>入口位址</th>
+          <th>選上的條件</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>遠端<Term k="box">沙箱機器</Term></td>
+          <td>出廠內建</td>
+          <td>後端配的機器裡跑的 <code>box-exec</code> 與其他常駐服務</td>
+          <td><code>ensureSandBox</code> 回傳的動態閘道網址</td>
+          <td><code>boxRuntime</code> 不是 <code>local-docker</code> 時的預設路徑</td>
+        </tr>
+        <tr>
+          <td>本機 Docker</td>
+          <td><Term k="reconstruction">重建疊層</Term>加的</td>
+          <td>本機容器裡的同一套服務，結構跟遠端<Term k="box">沙箱機器</Term>相同</td>
+          <td>固定 <code>http://127.0.0.1:1340</code></td>
+          <td><code>boxRuntime</code> 設成 <code>local-docker</code></td>
+        </tr>
+        <tr>
+          <td>local-exec</td>
+          <td><Term k="reconstruction">重建疊層</Term>加的</td>
+          <td>桌面主行程另外拉起的獨立行程，跑在使用者自己筆電上</td>
+          <td>主行程與該行程之間的本機通道，不是對外的 HTTP 閘道</td>
+          <td>使用者本機工具權限允許，跟 <code>boxRuntime</code> 無關</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</>
