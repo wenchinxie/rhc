@@ -453,480 +453,3580 @@
       "clean outputs, apply the reconstructed updater guard, and pack a new ASAR."
     ]
   },
-  "tape-pair": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "AI 是配對寫程式的人，不是外包思考",
-    "meta": "00:00–00:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "開場：配對，不是取代寫碼，更不是把思考外包。",
-    "rows": [
-      [
-        "時間",
-        "00:00"
-      ],
-      [
-        "檔",
-        "lauren-talk.txt"
-      ]
+  "t-events": {
+    "type": "code",
+    "kind": "詞彙",
+    "title": "事件名稱是常數，turn 開始／結束各一個",
+    "meta": "source/shared/observability/telemetry-events.ts:6-9",
+    "why": "emit 入口不是自由字串，是一份具名常數表；turn.start／turn.outcome 是回合邊界。",
+    "start": 6,
+    "hi": [
+      7,
+      8
     ],
-    "quote": "Personally, I think that the best use of AI is really like someone you're pair programming with and not someone that is not a tool to just replace the act of writing code or worse outsourcing your thinking.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const TELEMETRY_SHIP_TIMEOUT_EVENT = \"sand.telemetry.ship_timeout\";",
+      "export const TURN_START_EVENT = \"agent.turn.start\";",
+      "export const TURN_OUTCOME_EVENT = \"agent.turn.outcome\";",
+      "export const TURN_OUTCOME_DETAIL_EVENT = \"sand.turn.outcome_detail\";"
+    ]
   },
-  "tape-verify": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "最要緊的技能是 verification",
-    "meta": "02:01–02:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "驗證＝agent 用使用者看到的同一面把應用跑真的：CPU 追蹤、heap snapshot、iOS 模擬器。",
-    "rows": [
-      [
-        "時間",
-        "02:01"
-      ]
+  "t-drop": {
+    "type": "code",
+    "kind": "詞彙",
+    "title": "掉點理由分五種，度量單位不是都一樣",
+    "meta": "source/shared/observability/telemetry-events.ts:2-5",
+    "why": "ship_failed 算「次」，其餘四種算「筆」；失敗政策讀的是這張表。",
+    "start": 2,
+    "hi": [
+      3
     ],
-    "quote": "the most important skill that you should have in your toolbox when you work with agents is verification. By verification, I mean the ability for an agent to actually run the code or take CPU traces or heap snapshots or open an iOS simulator. However your application is exposed to your users, it can do the same thing and run it for real ... It doesn't guarantee your agent writes good code, but it allows them to at least write correct code",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const TELEMETRY_DROPPED_EVENT = \"sand.telemetry.dropped\";",
+      "export const TELEMETRY_DROP_REASONS = [\"ship_failed\", \"overflow_evicted\", \"replay_expired\", \"backend_dropped\", \"account_rotated\"] as const;",
+      "export type TelemetryDropReason = (typeof TELEMETRY_DROP_REASONS)[number];",
+      "export const TELEMETRY_DROP_UNIT_BY_REASON: Record<TelemetryDropReason, \"attempts\" | \"entries\"> = { ship_failed: \"attempts\", overflow_evicted: \"entries\", replay_expired: \"entries\", backend_dropped: \"entries\", account_rotated: \"entries\" };"
+    ]
   },
-  "tape-bottleneck": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "沒有驗證技能，人就是瓶頸",
-    "meta": "04:47–05:23 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "人當驗收員就無法平行。",
-    "rows": [
-      [
-        "時間",
-        "04:47"
-      ]
+  "t-noop": {
+    "type": "code",
+    "kind": "port",
+    "title": "port 介面就是這份 report 方法清單",
+    "meta": "source/host/ports/telemetry.ts:20-27",
+    "why": "noop 版本原樣列出全部方法名，等於把 emit API 的形狀印出來看。",
+    "start": 20,
+    "hi": [
+      20,
+      22
     ],
-    "quote": "if you've ever done any performance work yourself or just even development with an agent where you don't have a verification skill, you are the verifier. You're the bottleneck. ... there's really no way to parallelize.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function createNoopSandTelemetry() {",
+      "  return {",
+      "    startTurn: () => NOOP_TURN,",
+      "    reportToolCallError: noop,",
+      "    reportToolCallStalled: noop,",
+      "    reportToolCallStarted: noop,",
+      "    reportAgentError: noop,",
+      "    reportBotBlock: noop,"
+    ]
   },
-  "tape-glass": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "進 Cursor 五個月，第一個技能是 control glass",
-    "meta": "03:18–05:36 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "Glass＝Agent Window 內部代號。本要進 cloud agents 組，因 React 被拉去趕一週後上線。",
-    "rows": [
-      [
-        "時間",
-        "03:18"
-      ]
+  "t-adapter": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "adapter 建立前，先擋沒填的 port 與缺欄位",
+    "meta": "source/electron-main/adapters/telemetry.ts:57-70",
+    "why": "resolveOptions／attach 缺函式、machineId／clientVersion 缺字串，註冊時就丟 TypeError，不會等到第一筆事件才炸。",
+    "start": 57,
+    "hi": [
+      57,
+      61,
+      62,
+      68,
+      69
     ],
-    "quote": "when I joined cursor five months ago ... I was supposed to join the cloud agents team, but then since I have a lot of experience working on React and agents window is a React application, I was asked to basically help out ... The control glass skill is one of the first skills I built for cursor. Glass, by the way, is the codename for agent's window",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "/** Artifact anchor: main.cjs:506459, `desktopTelemetry = await SandDesktopStructuredLogTelemetry.create({`. */",
+      "export function createProductionTelemetryAdapter(",
+      "  ports: ProductionTelemetryPorts,",
+      "): ElectronProductionAdapterBindings[\"telemetry\"] {",
+      "  requireFunction(ports?.resolveOptions, \"telemetry.resolveOptions\");",
+      "  requireFunction(ports?.attach, \"telemetry.attach\");",
+      "  return {",
+      "    async create(context): Promise<ProductionTelemetryService> {",
+      "      const options = await ports.resolveOptions(context);",
+      "      requireObject(options, \"telemetry.options\");",
+      "      const completeOptions = completeTelemetryOptions(options);",
+      "      if (typeof completeOptions.machineId !== \"string\" || completeOptions.machineId.length === 0) throw new TypeError(\"Missing Electron production adapter port: telemetry.machineId.\");",
+      "      if (typeof completeOptions.clientVersion !== \"string\" || completeOptions.clientVersion.length === 0) throw new TypeError(\"Missing Electron production adapter port: telemetry.clientVersion.\");",
+      "      const telemetry = await SandDesktopStructuredLogTelemetry.create(completeOptions);"
+    ]
   },
-  "tape-featmap": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "功能地圖：側欄、捷徑、CDP 選擇器",
-    "meta": "06:23–09:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "Slack 常只丟一張圖加問號。有功能地圖才找得到畫面。",
-    "rows": [
-      [
-        "時間",
-        "06:23"
-      ]
+  "t-pipe": {
+    "type": "code",
+    "kind": "管線",
+    "title": "report pipe 就是一道驗證閘：不合格直接丟棄",
+    "meta": "source/electron-main/telemetry/telemetry-report-sinks.ts:11-14",
+    "why": "ingest() 先跑 isValid，過了才呼叫 deliver；沒有中間佇列，驗證失敗當場結束。",
+    "start": 11,
+    "hi": [
+      14
     ],
-    "quote": "This skill comes with this very unique ... file called a feature map. ... it teaches the agent how to get to all of the features that you have. ... from the user point of view, shows how to get to it, all the different keyboard shortcuts, even like ... the DOM elements or the attributes that you use for selecting things through the CDP are all there.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export interface ReportPipe { ingest(report: unknown): void }",
+      "export function reportPipe<T>(isValid: (value: unknown) => value is T, deliver: (report: T) => void): ReportPipe;",
+      "export function reportPipe(isValid: (value: unknown) => boolean, deliver: (report: any) => void): ReportPipe;",
+      "export function reportPipe(isValid: (value: unknown) => boolean, deliver: (report: any) => void): ReportPipe { return { ingest(report: unknown): void { if (isValid(report)) deliver(report); } }; }"
+    ]
   },
-  "tape-pstack": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Pstack＝potato stack，對 Gary Tan 的 G-stack 開玩笑",
-    "meta": "07:39–10:33 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "外掛有 create／maintain verification skill。她沒打算做產品，技能堆出來的。",
-    "rows": [
-      [
-        "時間",
-        "07:39"
-      ]
+  "t-channels": {
+    "type": "code",
+    "kind": "分流",
+    "title": "註冊時核對 channel 名對得到 pipe，對不到就丟",
+    "meta": "source/electron-main/telemetry/telemetry-report-sinks.ts:25-27",
+    "why": "IPC channel 表跟 pipes 物件的鍵名要對得上，缺一個就在啟動時 TypeError，不是漏接事件才發現。",
+    "start": 25,
+    "hi": [
+      26
     ],
-    "quote": "in PStack, the plugin that I've made ... there is a create verification skill ... but also a maintain verification skill. ... the P in P-stack is like potato ... Gary Tan ... G-stack ... poke fun at Gary",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function registerTelemetryReportSinks(deps: { readonly pipes: TelemetryReportPipes; readonly heapMetrics: { isQuitting(): boolean; isEnabled(): Promise<boolean>; ingest(report: unknown): Promise<boolean>; requestFlush(): void }; readonly onSinkFailure: (failure: { readonly sink: \"heap-metrics\"; readonly errorClass: string }) => void; readonly handleBoxVisibilityReport: (report: { readonly report: unknown; readonly senderFrame: unknown; readonly currentMainFrame: unknown }) => void }): void {",
+      "  for (const [channel, name] of TELEMETRY_REPORT_CHANNELS) { const sink = deps.pipes[name]; if (sink === undefined) throw new TypeError(`Missing telemetry report pipe: ${name}`); ipcMain.on(channel, (_event, report) => sink.ingest(report)); }",
+      "  ipcMain.on(\"sand:report-heap-metrics\", (_event, report) => { void (async () => { if (deps.heapMetrics.isQuitting() || !await deps.heapMetrics.isEnabled()) return; if (deps.heapMetrics.isQuitting() || !await deps.heapMetrics.ingest(report)) return; deps.heapMetrics.requestFlush(); })().catch((error: unknown) => deps.onSinkFailure({ sink: \"heap-metrics\", errorClass: errorClass(error) })); });"
+    ]
   },
-  "tape-how": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "how 技能：看 tool call，禁止猜",
-    "meta": "10:41–13:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "agent 自信下結論卻沒讀該讀的碼。技能：去搜、讀碼、用子代理、別猜。",
-    "rows": [
-      [
-        "時間",
-        "10:41"
-      ]
+  "t-fanout": {
+    "type": "code",
+    "kind": "分流",
+    "title": "同一個 pipe 表分兩路：emit 上傳或轉協調器",
+    "meta": "source/electron-main/telemetry/telemetry-report-pipes.ts:38-46",
+    "why": "agentLoad／accessBlocked 走 emit() 上傳結構化日誌；agentsUnreachable／recoveryAction／rebuildLifecycle／reconciliation 轉給 coordinatorTelemetry 先聚合。",
+    "start": 38,
+    "hi": [
+      39,
+      41,
+      42
     ],
-    "quote": "I started with another skill like called how, which I also noticed through like observing agents. ... when I look at the actual tool calls, I noticed it wasn't actually reading the code that I thought should be affected. ... every time I saw that, I just, okay, I'm just gonna make that a skill ... stop hallucinating, actually go and search up, look up the code, use a lot of sub-agents and yeah, stop guessing.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function buildTelemetryReportPipes(deps: { readonly telemetry: () => TelemetryUploader | undefined; readonly productAnalytics: () => { trackEvent(name: string, properties: Readonly<Record<string, unknown>>): void } | undefined; readonly getVncTokenInfo: (host: string) => { seeded: boolean; source?: string } | undefined; readonly coordinatorTelemetry: CoordinatorTelemetry }): BuiltTelemetryReportPipes {",
+      "  const emit = (method: keyof TelemetryUploader, projection: (report: any) => { level: string; metadata: Metadata }) => (report: any): void => { const value = projection(report); const uploader = deps.telemetry(); const fn = uploader?.[method] as ((level: Level, metadata: Metadata) => void) | undefined; fn?.call(uploader, value.level as Level, value.metadata); };",
+      "  return {",
+      "    agentLoad: reportPipe(isValidAgentLoadReport, emit(\"reportAgentLoad\", agentLoadReportToTelemetry)),",
+      "    agentsUnreachable: reportPipe(isValidAgentsUnreachableReport, deps.coordinatorTelemetry.agentsUnreachable),",
+      "    accessBlocked: reportPipe(isValidAccessBlockedReport, emit(\"reportAccessBlocked\", accessBlockedReportToTelemetry)),",
+      "    recoveryAction: reportPipe(isValidRecoveryActionReport, deps.coordinatorTelemetry.recoveryAction),",
+      "    rebuildLifecycle: reportPipe(isValidRebuildLifecycleReport, deps.coordinatorTelemetry.rebuildLifecycle),",
+      "    reconciliation: reportPipe(isValidReconciliationReport, deps.coordinatorTelemetry.reconciliation),"
+    ]
   },
-  "tape-eval": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "評測是技能的單元測試；目錄名藏起「正在被評」",
-    "meta": "13:53–18:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "協調者出評分表，跨模型，另一個模型當法官。/loop 爬到 10/10。",
-    "rows": [
-      [
-        "時間",
-        "13:53"
-      ]
+  "t-sentry": {
+    "type": "code",
+    "kind": "sink",
+    "title": "Sentry 這路只送訊息，不進佇列不重送",
+    "meta": "source/electron-main/telemetry/sentry.ts:54-57",
+    "why": "captureMessage／captureException 直接呼叫 adapter，沒有 BufferedTransport，送不出就送不出。",
+    "start": 54,
+    "hi": [
+      54
     ],
-    "quote": "an eval is essentially like ... a unit test for an agent. ... My main coordinator agent come up with a rubric ... creates individual directories for them, which are cleverly named to not let the subagent know that it's being evaluated, because agents can actually tell and when they do, they change their behavior. ... you can also like hill climb ... use like slash loop in cursor ... until everything is 10 out of 10",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function captureSandSentryWarning(message: string): void { adapter.captureMessage(message, { level: \"warning\" }); }",
+      "export function captureSandDesktopCrash(error: unknown, kind: string): void { adapter.captureException(error, { tags: { \"sand.process\": \"desktop-main\", \"sand.crash_kind\": kind } }); }",
+      "export function captureSandDesktopStartupFailure(error: unknown, phase: string): void { adapter.captureException(error, { tags: { \"sand.process\": \"desktop-main\", \"sand.startup_phase\": phase } }); }",
+      "export function reportSandSentryInvariantViolation(report: { readonly name: string }): void { adapter.captureMessage(report.name, { level: \"error\", tags: { \"sand.telemetry_report\": \"invariant_violation\" } }); }"
+    ]
   },
-  "tape-benny": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Benny 在雲端桌面重現錯誤回報",
-    "meta": "20:17–22:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "先本機觀察，再把同一套驗證技能交給雲端。",
-    "rows": [
-      [
-        "時間",
-        "21:40"
-      ]
+  "t-flush-fail": {
+    "type": "code",
+    "kind": "失敗政策",
+    "title": "送不出就整批留著，換掉用壞的 client 再試",
+    "meta": "source/electron-main/telemetry/desktop-structured-log-telemetry.ts:66",
+    "why": "catch 裡只丟掉 client 快取、記一次 ship_failed，緩衝區本身不清空，下次 flush 重送同一批。",
+    "start": 66,
+    "hi": [
+      66
     ],
-    "quote": "this agent we have called Benny ... takes all of the bug reports that we get, and it automatically goes off in the cloud, opens up a cloud ... desktop, it runs cursor in its own computer. And it uses the same control skills to interact with the application and try to reproduce the bug",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "  private async flushOnce(): Promise<boolean> { if (this.options.disabled) return true; if (this.buffer.length === 0) { await this.flushListener?.(); return !this.pendingDrops(); } const batch = this.buffer.slice(); try { const client = this.client ?? (this.client = this.options.createClient()); const receipt = await client.submitLogs(batch); if (!Number.isSafeInteger(receipt.logsProcessed) || !Number.isSafeInteger(receipt.logsDropped) || receipt.logsProcessed + receipt.logsDropped !== batch.length) throw new TypeError(\"Invalid structured log receipt\"); this.buffer.splice(0, batch.length); this.recordDropped(\"backend_dropped\", receipt.logsDropped); await this.flushListener?.(); return this.buffer.length === 0; } catch { this.client = undefined; this.recordDropped(\"ship_failed\", 1); await this.flushListener?.(); return false; } }"
+    ]
   },
-  "tape-trust": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "不要一次生 100／1000 個雲端 agent",
-    "meta": "23:10–25:43 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "信任曲線沒有捷徑。可 fork Pstack，不要盲信她。",
-    "rows": [
-      [
-        "時間",
-        "23:10"
-      ]
+  "t-overflow": {
+    "type": "code",
+    "kind": "失敗政策",
+    "title": "佇列滿了才真的丟資料，丟最舊的那幾筆",
+    "meta": "source/electron-main/telemetry/desktop-structured-log-telemetry.ts:61",
+    "why": "每個帳號的緩衝區上限固定；超過就從最舊那端砍掉多出來的筆數，算進 overflow_evicted。",
+    "start": 61,
+    "hi": [
+      61
     ],
-    "quote": "you don't want to jump to like, I'm going to spawn 100 or 1000s of cloud agents right now, because you're just gonna waste a lot of tokens. ... I think there's really no shortcut for going from here to there, because this is really about your personal level of trust in agents. ... I definitely would not encourage people to blindly trust me.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "  enqueueAt(level: StructuredLogLevel, message: string, metadata: TelemetryMetadata, timestamp: number): void { if (this.options.disabled || this.disposed) return; this.buffer.push({ level, message, metadata: { ...this.options.tags, ...cleaned(metadata) }, timestamp }); const overflow = this.buffer.length - DESKTOP_STRUCTURED_LOG_SPILL_MAX_ENTRIES; if (overflow > 0) { this.buffer.splice(0, overflow); this.recordDropped(\"overflow_evicted\", overflow); } }"
+    ]
   },
-  "tape-20": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "當天醒來約 20 則合併請求已被 agent 合進去",
-    "meta": "30:30 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "帶子數字。不是推文的 1000／月。",
-    "rows": [
-      [
-        "時間",
-        "30:30"
-      ]
+  "t-coordinator-agg": {
+    "type": "code",
+    "kind": "聚合",
+    "title": "協調器先算斷線原因，再轉同一路上傳",
+    "meta": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+    "why": "協調器端先彙整斷線原因與錯誤標記，再交由上傳器統一回報結構化日誌。",
+    "start": 7,
+    "hi": [
+      7,
+      8
     ],
-    "quote": "I woke up today and I had like 20 PRs merged by my agents.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function createCoordinatorTelemetrySinks(deps: { readonly getUploader: () => any; readonly connectivity: DesktopConnectivity; readonly isQuitting: () => boolean; readonly isRebuildInFlight: () => boolean; readonly monotonicNow?: () => number }) { const now = deps.monotonicNow ?? (() => performance.now()); let lastFailure: { report: any; atMs: number } | undefined; const recent = () => lastFailure !== undefined && now() - lastFailure.atMs < RECENT_COORDINATOR_FAILURE_WINDOW_MS ? lastFailure.report : undefined; const disconnectCause = () => deps.isQuitting() ? \"user_quit\" : !deps.connectivity.isOnline() ? \"client_offline\" : deps.isRebuildInFlight() ? \"host_restarting\" : recent() === undefined ? \"unknown\" : recent().baseUrlKind === \"unknown\" ? \"backend_unreachable\" : \"host_unreachable\"; const causeTags = () => { const failure = recent(); const error = failure === undefined ? null : gatewayOutcomeError(failure.outcome, { causeSummary: failure.causeSummary, httpStatus: failure.httpStatus }); return { cause: disconnectCause(), ...(error === null ? {} : transportErrorTags(error)) }; };",
+      "  return { reportBoxReachability(report: any) { if (report.outcome !== \"ok\") lastFailure = { report, atMs: now() }; const value = reachabilityReportToTelemetry(report); deps.getUploader()?.reportBoxReachability(value.level, { ...value.metadata, ...connectivityStamps(deps.connectivity) }); }, reportBoxDnsDiagnostic: (report: any) => deps.getUploader()?.reportBoxDnsDiagnostic(dnsDiagnosticReportToTelemetry(report)), transportStream: createTransportStreamTelemetry({ monotonicNow: now, report: (level, metadata) => deps.getUploader()?.reportTransportStreamDown(level, { ...metadata, ...connectivityStamps(deps.connectivity) }) }), coordinatorLifecycle(event: any) { const value = coordinatorLifecycleTelemetry(event); deps.getUploader()?.reportCoordinatorLifecycle(value.level, value.metadata); }, recoveryAction(report: any) { const value = recoveryActionReportToTelemetry(report); deps.getUploader()?.reportRecoveryAction(value.level, value.metadata); }, boxMigrationWatch(report: any) { const alert = report.phase === \"watch_exhausted\" || report.phase === \"dropped\" && report.consecutiveFailures >= 5; deps.getUploader()?.reportBoxMigrationWatch(alert ? \"warn\" : \"info\", { phase: report.phase, error_class: report.errorClass, consecutive_failures: String(report.consecutiveFailures) }); }, rebuildLifecycle(report: any) { const value = rebuildLifecycleToTelemetry(report); if (value.event === \"escalation\") deps.getUploader()?.reportBoxRebuildEscalation(value.level, value.metadata); else deps.getUploader()?.reportBoxRebuildPendingStall(value.metadata); }, reconciliation(report: any) { const value = reconciliationReportToTelemetry(report); if (value.event === \"replica_resync\") deps.getUploader()?.reportReplicaResync(value.level, value.metadata); else deps.getUploader()?.reportSendJournalRestore(value.level, value.metadata); }, resyncCompleted(summary: any) { const value = resyncCompletedTelemetry(summary); deps.getUploader()?.reportResyncCompleted(value.level, value.metadata); }, agentsUnreachable(report: any) { const value = agentsUnreachableReportToTelemetry(report); deps.getUploader()?.reportAgentsUnreachable(value.level, { ...value.metadata, ...connectivityStamps(deps.connectivity), ...(report.phase === \"retry\" ? {} : causeTags()) }); } };"
+    ]
   },
-  "tape-600": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "重構 Grok Bot 到新架構算過 600 多則",
-    "meta": "30:39–30:48 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "帶子數字。投入在重構，之後才敢不看碼。",
-    "rows": [
-      [
-        "時間",
-        "30:39"
-      ]
+  "t-transport-cap": {
+    "type": "code",
+    "kind": "失敗政策",
+    "title": "轉發中的報告超過 64 筆就直接不送",
+    "meta": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts:39-48",
+    "why": "forward() 到上限就 return，新報告連 dispatch 都不呼叫；跟結構化日誌那路的落地重送是兩套政策。",
+    "start": 39,
+    "hi": [
+      43,
+      46,
+      47
     ],
-    "quote": "that's because I invested a lot of time, over 600 PRs I calculated yesterday, when I refactored all of Grokbot to this new architecture that I've been building.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function createTransportStageRecorder(options: { readonly clock: Clock; readonly egress: TransportStageEgress }) {",
+      "  const { clock, egress } = options;",
+      "  let inFlightReports = 0;",
+      "  const forward = (dispatch: () => Promise<unknown>) => {",
+      "    if (inFlightReports >= MAX_IN_FLIGHT_TRANSPORT_REPORTS) return;",
+      "    inFlightReports += 1;",
+      "    const settle = () => { inFlightReports -= 1; };",
+      "    try { void dispatch().then(settle, settle); }",
+      "    catch { settle(); }",
+      "  };"
+    ]
   },
-  "tape-green": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Grok Bot 是綠地 vibe code，人當時不讀碼",
-    "meta": "28:40–30:03 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "沒護欄時 agent 走最方便的捷徑，程式庫失控。",
-    "rows": [
-      [
-        "時間",
-        "28:40"
-      ]
+  "t-unclean-exit": {
+    "type": "code",
+    "kind": "註冊檢查",
+    "title": "上次退出乾不乾淨，靠一份寫在磁碟的標記檔判斷",
+    "meta": "source/electron-main/telemetry/desktop-unclean-exit-telemetry.ts:28-31",
+    "why": "啟動時讀不到乾淨關閉的標記，就回報一次 unclean_exit；超過三十天當成孤兒標記，只當資訊不當警告。",
+    "start": 28,
+    "hi": [
+      30
     ],
-    "quote": "if you vibe code a project, a prototype, like we did for Grokbot ... it was a very greenfield application ... vibe coded very quickly, humans were not reading the code at all. ... when you have a completely vibe coded application, you essentially have no guardrails whatsoever. So your agents ... will just solve it in whatever method is the most convenient.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function uncleanExitReport(settlement: UncleanExitSettlement): { level: TelemetryLevel; metadata: TelemetryMetadata } {",
+      "  const metadata = { kind: settlement.kind, prev_uptime_ms: String(settlement.prevUptimeBucketMs), prev_version: settlement.prevVersion, same_version: String(settlement.sameVersion), crash_seq_seen: String(settlement.crashSeqSeen), prev_started_at_ms: String(settlement.prevStartedAtMs) };",
+      "  return settlement.kind === \"marker_orphaned\" ? { level: \"info\", metadata } : { level: \"warn\", metadata: { ...metadata, ...desktopErrorTags(\"SAND-E0610\") } };",
+      "}"
+    ]
   },
-  "tape-dune": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Dune＝給 Electron 用的 Next.js",
-    "meta": "34:35–35:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "內部代號。為 agent 寫的應用而做。",
-    "rows": [
-      [
-        "時間",
-        "34:35"
-      ]
+  "t-agent-load": {
+    "type": "code",
+    "kind": "報告塑形",
+    "title": "代理人載入回報三種結果，失敗才算警告",
+    "meta": "source/electron-main/telemetry/agent-load-telemetry.ts:1-4",
+    "why": "ready／superseded／failed 三選一；只有 failed 升成 warn，其餘都是 info。",
+    "start": 1,
+    "hi": [
+      4
     ],
-    "quote": "Dune is the sort of cheeky code, codename for the architecture that we built for Grokbot. ... You kind of think of it as like Next.js for Electron apps and it's designed for agents to write",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const AGENT_LOAD_OUTCOMES = [\"ready\", \"superseded\", \"failed\"] as const; export const KNOWN_AGENT_LOAD_BOX_STATES = [\"pulling\", \"starting\", \"running\", \"local\", \"sleeping\", \"off\", \"unknown\"] as const;",
+      "const nonnegative = (value: unknown): value is number => typeof value === \"number\" && Number.isFinite(value) && value >= 0;",
+      "export function isValidAgentLoadReport(value: unknown): boolean { if (typeof value !== \"object\" || value === null) return false; const r = value as Record<string, unknown>; return nonnegative(r.durationMs) && [r.openRpcMs, r.queueMs, r.renderMs].every((v) => v === undefined || nonnegative(v)) && typeof r.cold === \"boolean\" && (r.stale === undefined || typeof r.stale === \"boolean\") && typeof r.boxState === \"string\" && typeof r.outcome === \"string\" && (AGENT_LOAD_OUTCOMES as readonly string[]).includes(r.outcome); }",
+      "export function agentLoadReportToTelemetry(r: any) { return { level: r.outcome === \"failed\" ? \"warn\" : \"info\", metadata: { duration_ms: String(Math.round(r.durationMs)), open_rpc_ms: r.openRpcMs === undefined ? undefined : String(Math.round(r.openRpcMs)), queue_ms: r.queueMs === undefined ? undefined : String(Math.round(r.queueMs)), render_ms: r.renderMs === undefined ? undefined : String(Math.round(r.renderMs)), cold: String(r.cold), stale: r.stale === undefined ? undefined : String(r.stale), box_state: (KNOWN_AGENT_LOAD_BOX_STATES as readonly string[]).includes(r.boxState) ? r.boxState : \"other\", outcome: r.outcome } }; }"
+    ]
   },
-  "tape-useeffect": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "CI 禁止 useEffect",
-    "meta": "34:49–35:25 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "React 最大腳槍寫進硬失敗。",
-    "rows": [
-      [
-        "時間",
-        "34:54"
-      ]
+  "t-reconciliation": {
+    "type": "code",
+    "kind": "報告塑形",
+    "title": "複本重同步逾時或放棄才算警告",
+    "meta": "source/electron-main/telemetry/reconciliation-telemetry.ts:1-3",
+    "why": "replica_resync 超過六十秒或結果是 abandoned 才升 warn；send_journal_restore 停在 parked／failed 才升 warn。",
+    "start": 1,
+    "hi": [
+      3
     ],
-    "quote": "one of the biggest foot guns in React is use effect. So in Dune and in Grokbot, we've banned use effect. ... don't use use effect. It's banned, like CI will fail and yell at you.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const REPLICA_RESYNC_WARN_DURATION_MS = 60_000; const REPLICAS = [\"roster\", \"transcript\"]; const RESYNC = [\"covered\", \"superseded\", \"abandoned\"]; const RESTORE = [\"dispatched\", \"retired\", \"parked\", \"failed\"]; const PHASES = [\"queued\", \"prepared\", \"dispatching\", \"accepted-awaiting-echo\"]; const finite = (v: unknown): v is number => typeof v === \"number\" && Number.isFinite(v) && v >= 0;",
+      "export function isValidReconciliationReport(value: unknown): boolean { if (typeof value !== \"object\" || value === null) return false; const r = value as Record<string, unknown>; if (r.kind === \"replica_resync\") return typeof r.replica === \"string\" && REPLICAS.includes(r.replica) && typeof r.outcome === \"string\" && RESYNC.includes(r.outcome) && finite(r.attempts) && finite(r.durationMs) && typeof r.bufferOverflowed === \"boolean\" && typeof r.epochChanged === \"boolean\"; if (r.kind === \"send_journal_restore\") return typeof r.outcome === \"string\" && RESTORE.includes(r.outcome) && typeof r.phase === \"string\" && PHASES.includes(r.phase) && finite(r.ageMs) && finite(r.recordCount); return false; }",
+      "export function reconciliationReportToTelemetry(r: any) { if (r.kind === \"replica_resync\") return { event: \"replica_resync\", level: r.outcome === \"abandoned\" || r.durationMs > REPLICA_RESYNC_WARN_DURATION_MS ? \"warn\" : \"info\", metadata: { replica: r.replica, outcome: r.outcome, attempts: String(Math.round(r.attempts)), duration_ms: String(Math.round(r.durationMs)), buffer_overflowed: String(r.bufferOverflowed), epoch_changed: String(r.epochChanged) } }; return { event: \"send_journal_restore\", level: r.outcome === \"parked\" || r.outcome === \"failed\" ? \"warn\" : \"info\", metadata: { outcome: r.outcome, phase: r.phase, age_ms: String(Math.round(r.ageMs)), record_count: String(Math.round(r.recordCount)) } }; }"
+    ]
   },
-  "tape-comment": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "禁止註解：agent 會把一次性抱怨寫成全域規則",
-    "meta": "35:29–36:19 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "「Lauren 說永遠不要這樣」被寫進註解。",
-    "rows": [
-      [
-        "時間",
-        "35:33"
-      ]
+  "t-send-ack": {
+    "type": "code",
+    "kind": "報告塑形",
+    "title": "送出有沒有回聲，逾時才算警告",
+    "meta": "source/electron-main/telemetry/send-ack-telemetry.ts:1-4",
+    "why": "outcome 只有 timeout 升 warn，acked／failed／queued_offline 都當 info；帶 traceId／spanId 方便對到分散式追蹤。",
+    "start": 1,
+    "hi": [
+      4
     ],
-    "quote": "I actually banned code comments as well ... 99% of the time agents just write code comments that kind of describe some historical thing that is actually totally irrelevant ... it will often say like, you know, oh, Lauren said you should never do this and it's now in a code comment.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const SEND_ACK_OUTCOMES = [\"acked\", \"failed\", \"timeout\", \"queued_offline\"] as const;",
+      "const finite = (value: unknown): value is number => typeof value === \"number\" && Number.isFinite(value) && value >= 0;",
+      "export function isValidSendAckReport(value: unknown): boolean { if (typeof value !== \"object\" || value === null) return false; const r = value as Record<string, unknown>; return finite(r.ackMs) && typeof r.outcome === \"string\" && (SEND_ACK_OUTCOMES as readonly string[]).includes(r.outcome) && finite(r.enterEpochMs) && [r.traceparent, r.traceId, r.spanId, r.clientNonce, r.conversationId].every((field) => field === undefined || typeof field === \"string\") && typeof r.isFork === \"boolean\" && finite(r.attachmentCount) && (r.commitOffsetMs === undefined || finite(r.commitOffsetMs)) && (r.commitMs === undefined || finite(r.commitMs)) && (r.clientOnlineAtTimeout === undefined || typeof r.clientOnlineAtTimeout === \"boolean\"); }",
+      "export function sendAckReportToTelemetry(report: any) { return { level: report.outcome === \"timeout\" ? \"warn\" : \"info\", metadata: { ack_ms: String(Math.round(report.ackMs)), outcome: report.outcome, client_online_at_timeout: report.clientOnlineAtTimeout === undefined ? undefined : String(report.clientOnlineAtTimeout), attachment_count: String(Math.round(report.attachmentCount)), is_fork: String(report.isFork), trace_id: report.traceId, span_id: report.spanId, client_nonce: report.clientNonce, commit_ms: report.commitMs === undefined ? undefined : String(Math.round(report.commitMs)), conversation_id: report.conversationId } }; }"
+    ]
   },
-  "tape-import": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "electron-main／electron-renderer 依賴圖由 CI 擋",
-    "meta": "38:07–38:37 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "主行程與畫面行程混 import 會搶 16ms 一幀。",
-    "rows": [
-      [
-        "時間",
-        "38:15"
-      ]
+  "t-gateway-reachability": {
+    "type": "code",
+    "kind": "報告塑形",
+    "title": "連得到閘道就 info，連不到就 warn",
+    "meta": "source/electron-main/telemetry/gateway-reachability-telemetry.ts:1-2",
+    "why": "outcome 不是 ok 就升 warn；DNS 診斷回報另成一份不分級的欄位表，供人工比對。",
+    "start": 1,
+    "hi": [
+      1
     ],
-    "quote": "in Grokbot, we literally have a directory called Electron main, Electron renderer, and we have import CI ... we actually check the dependency graph to make sure you're not accidentally importing code from one directory to another. So that's enforced by CI.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function reachabilityReportToTelemetry(report: { readonly outcome: string; readonly method: string; readonly latencyMs: number; readonly baseUrlKind: string; readonly httpStatus?: number; readonly causeSummary?: string }) {",
+      "  return { level: report.outcome === \"ok\" ? \"info\" : \"warn\", metadata: { outcome: report.outcome, method: report.method, latency_ms: String(Math.round(report.latencyMs)), base_url_kind: report.baseUrlKind, http_status: report.httpStatus === undefined ? undefined : String(report.httpStatus), cause: report.causeSummary } };"
+    ]
   },
-  "tape-shortest": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "最短路徑就是最好路徑",
-    "meta": "40:16–40:32 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "agent 愛走捷徑，所以把捷徑做成對的做法。功能放同一個目錄。",
-    "rows": [
-      [
-        "時間",
-        "40:16"
-      ]
+  "t-handoff": {
+    "type": "code",
+    "kind": "聚合",
+    "title": "交接分四階段，逾時與呼叫失敗各自定位錯誤碼",
+    "meta": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts:4-10",
+    "why": "協調器交接程序依不同階段分類回報，並對呼叫失敗與退出逾時綁定專屬錯誤碼。",
+    "start": 4,
+    "hi": [
+      8,
+      9
     ],
-    "quote": "one of the key principles I have for this framework is like, the shortest, the shortest path is the best path. So because that plays exactly to how agents love to rank, is that they like to take shortcuts, really. They'll find the quickest way to solve the problem. So why not make that the best way to solve the problem.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function createCoordinatorHandoffTelemetry(report: (level: TelemetryLevel, metadata: TelemetryMetadata) => void) {",
+      "  return {",
+      "    requested(): void { report(\"info\", { phase: \"requested\" }); },",
+      "    adopted(leg: string): void { report(\"info\", { phase: \"adopted\", leg }); },",
+      "    invokeFailed(leg: string): void { report(\"warn\", { phase: \"invoke_failed\", ...desktopErrorTags(\"SAND-E0606\", { leg }) }); },",
+      "    exitTimeout(timeoutMs: number): void { report(\"warn\", { phase: \"timeout\", ...desktopErrorTags(\"SAND-E0607\", { timeoutMs }) }); },",
+      "  };"
+    ]
   },
-  "tape-layers": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "硬約束在持續整合；規則／技能／Bugbot 是軟的",
-    "meta": "41:25–43:45 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "人在程式審查裡重複講的，應變成 lint 或 CI 失敗。",
-    "rows": [
-      [
-        "時間",
-        "41:25"
-      ]
+  "t-box-visibility": {
+    "type": "code",
+    "kind": "聚合",
+    "title": "視窗還開著就不送；真正結束才算一筆",
+    "meta": "source/electron-main/box/box-visibility-telemetry.ts:24-26",
+    "why": "沙箱可見性追蹤器僅在視窗結束或文件關閉時沖銷回報，避免未決狀態產生幽靈事件。",
+    "start": 24,
+    "hi": [
+      25,
+      26
     ],
-    "quote": "There's also rules and bug bot, which are, I think, like 345 are more soft ... For rules and skills and bug bot, your agents can still forget ... if you only have rules and bug bot and skills and a style guide ... it's only a matter of time before your code base looks like complete trash. ... Every time you have to [comment on the PR], you should consider that as a code smell ... how do I turn this into a CI failure?",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "  isRecreateCoverOpen(): boolean { return this.open.has(\"recreate\"); }",
+      "  abandonAll(): void { for (const [event, window] of this.open) this.emit(event, window, \"abandoned\", window.surface); this.open.clear(); }",
+      "  private emit(event: Event, window: OpenWindow, outcome: string, surface?: Surface): void { if (event === \"setup\") this.setupEnd = { documentKey: window.documentKey, atMs: this.now() }; this.sink.emit(event, { durationMs: Math.max(0, this.now() - window.startedAtMs), trigger: window.trigger, outcome, ...(window.operationId === undefined ? {} : { operationId: window.operationId }), ...(window.kind === undefined ? {} : { kind: window.kind }), ...(surface === undefined ? {} : { surface }) }); }"
+    ]
   },
-  "tape-prsize": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "PR 約 50 到 1000 行，無硬上限，要可原子還原",
-    "meta": "32:59–34:11 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "git 歷史當上下文。不要 40,000 行一包。",
-    "rows": [
-      [
-        "時間",
-        "32:59"
-      ]
+  "t-update": {
+    "type": "code",
+    "kind": "失敗政策",
+    "title": "sink 還沒接上時，最多先攢 64 筆",
+    "meta": "source/electron-main/update/update-telemetry.ts:22",
+    "why": "attach() 之前呼叫 reportOutcome／reportCheck／reportApply 只會排進 pending，滿了直接丟棄，不是報錯也不是阻塞；跟 BufferedTransport 的落地重送是不同的等待政策。",
+    "start": 22,
+    "hi": [
+      22
     ],
-    "quote": "they can range anywhere from a few hundred lines or 50 lines to like 1000 ... There's definitely no hard cap. But I do encourage my agents to split up their work into multiple PRs. ... I like each PR to sort of atomically describe what that small piece of thing is doing ... it's not in this 40,000 line PR",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function createUpdateTelemetryRelay(cap = 64) { let attached: any = null; const pending: ((sink: any) => void)[] = []; const deliver = (send: (sink: any) => void) => { if (attached != null) send(attached); else if (pending.length < cap) pending.push(send); }; return { reportOutcome: (report: any) => { const value = updateOutcomeToTelemetry(report); deliver((sink) => sink.reportUpdateOutcome(value.level, value.metadata)); }, reportCheck: (report: any) => { const value = updateCheckToTelemetry(report); deliver((sink) => sink.reportUpdateCheck(value.level, value.metadata)); }, reportApply: (report: any) => { const value = updateApplyToTelemetry(report); deliver((sink) => sink.reportUpdateApply(value.level, value.metadata)); }, attach: (sink: any) => { attached = sink; for (const send of pending.splice(0)) send(sink); } }; }"
+    ]
   },
-  "tape-tokens": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "實驗室代幣不限額；前期重構很貴，對的是聘人成本",
-    "meta": "44:36–47:38 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "她說不要照抄她的用量。",
-    "rows": [
-      [
-        "時間",
-        "44:52"
-      ]
+  "t-vnc": {
+    "type": "code",
+    "kind": "報告塑形",
+    "title": "連線失敗、非乾淨斷線、對焦沒落地才升警告",
+    "meta": "source/electron-main/vnc/vnc-session-telemetry.ts:17-18",
+    "why": "load_fail／reconnect 一律 warn；rfb_disconnect 看 clean 欄位；focus 看 focusLanded 欄位；其餘 phase 一律 info。",
+    "start": 17,
+    "hi": [
+      17
     ],
-    "quote": "I work at an AI lab where we have unlimited tokens. So I definitely cannot say that, you know, this is something everyone should do in the exact same way that I did it. ... refactoring a code base is going to take a lot of tokens. ... the question I think an engineering leader might have is ... do you hire someone to do this or do you spend the tokens",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function vncSessionLevel(report: VncSessionReport): \"info\" | \"warn\" { if (report.phase === \"load_fail\" || report.phase === \"reconnect\") return \"warn\"; if (report.phase === \"rfb_disconnect\") return report.clean === false ? \"warn\" : \"info\"; if (report.phase === \"focus\") return report.focusLanded === false ? \"warn\" : \"info\"; return \"info\"; }",
+      "export function vncSessionReportToTelemetry(report: VncSessionReport, tokenInfo?: { seeded: boolean; source: string }) { return { level: vncSessionLevel(report), metadata: { surface: report.surface, phase: report.phase, vnc_host: report.vncHost, display: report.display, duration_ms: report.durationMs === undefined ? undefined : String(Math.round(report.durationMs)), since_open_ms: report.sinceOpenMs === undefined ? undefined : String(Math.round(report.sinceOpenMs)), fail_code: report.failCode, clean: report.clean === undefined ? undefined : String(report.clean), focus_owner: report.focusOwner, focus_landed: report.focusLanded === undefined ? undefined : String(report.focusLanded), token_seeded: tokenInfo === undefined ? undefined : String(tokenInfo.seeded), token_source: tokenInfo?.source } }; }"
+    ]
   },
-  "tape-46": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Grok 4.6 每 token 價她相信與 4.5 相同",
-    "meta": "47:48–48:09 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "她加了「希望我沒講錯」。",
-    "rows": [
-      [
-        "時間",
-        "47:48"
-      ]
+  "t-local-exec": {
+    "type": "code",
+    "kind": "port",
+    "title": "本機執行的回報 sink 是模組級單例，換一個就頂替上一個",
+    "meta": "source/electron-main/local-exec/local-exec-lifecycle-telemetry.ts:5-6",
+    "why": "installLocalExecLifecycleReporter 回傳的卸載函式只在自己還是目前這支 sink 時才清空，避免新舊兩次安裝互相踩掉對方的卸載。",
+    "start": 5,
+    "hi": [
+      5,
+      6
     ],
-    "quote": "we actually announced grok 4.6 today. ... I believe the cost per token is the same as 4.5. So you're actually getting more intelligence for the same cost.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "let sink: LocalExecLifecycleSink | undefined;",
+      "export function installLocalExecLifecycleReporter(next?: LocalExecLifecycleSink): () => void { sink = next; return () => { if (sink === next) sink = undefined; }; }"
+    ]
   },
-  "tape-colleague": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "設計 brief：同事，不要微觀管理 tool call",
-    "meta": "55:00–56:08 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "畫面像 iMessage。Cursor 是給開發者的旋鈕。",
-    "rows": [
-      [
-        "時間",
-        "55:47"
-      ]
+  "t-connector-auth": {
+    "type": "code",
+    "kind": "詞彙",
+    "title": "連接器名稱先正規化，認不得的一律歸 other",
+    "meta": "source/shared/observability/connector-auth-telemetry.ts:7-11",
+    "why": "事件標籤只收白名單裡的連接器名，其餘一律寫成 other，防止外部連接器名稱把標籤基數撐爆。",
+    "start": 7,
+    "hi": [
+      10
     ],
-    "quote": "with Grokbot, we really wanted to take a fresh perspective on what would it look like if your agent was really more like a colleague. And so you don't necessarily want to micromanage your colleague and say, what tool calls are you using right now? But you want to talk to it like a person. You want to see what they're doing on their computer.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export function boundedConnectorTag(serverName?: string): string {",
+      "  if (serverName === undefined) return UNKNOWN_CONNECTOR_TAG;",
+      "  const normalized = serverName.toLowerCase().replace(/[^a-z0-9]/g, \"\");",
+      "  return normalized.length === 0 ? UNKNOWN_CONNECTOR_TAG : KNOWN_CONNECTOR_TAGS.has(normalized) ? normalized : OTHER_CONNECTOR_TAG;",
+      "}"
+    ]
   },
-  "tape-dispatch": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "幕僚長把當天錯誤分給 sand／group 工程機器人",
-    "meta": "60:02–60:46 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "結尾會拿到合併請求、影片、截圖。",
-    "rows": [
-      [
-        "時間",
-        "60:02"
-      ]
+  "repo-name": {
+    "type": "code",
+    "kind": "命名",
+    "title": "repo 是單一 npm 套件，跟 src/app 內部識別碼不同名",
+    "meta": "package.json:1-6",
+    "why": "確認這棵樹的套件名跟出廠內部的 sand 不是同一份東西",
+    "start": 1,
+    "hi": [
+      2,
+      6
     ],
-    "quote": "I asked my chief of staff already, like if there's any interesting bugs that we saw today ... I have a sand team over here. I'm sorry, a group team. So each of them kind of are responsible for a different feature. And so now my chief of staff is going to send off those tasks to those agents. ... at the end of it, I'll get like a full request that I can review. I'll get videos. I'll get a screenshot.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "{",
+      "  \"name\": \"grok-bot-0.18-reconstructed\",",
+      "  \"version\": \"0.18.0-reconstructed.1\",",
+      "  \"private\": true,",
+      "  \"type\": \"module\",",
+      "  \"description\": \"Source-oriented reconstruction of the publicly shipped Grok Bot 0.18.0 macOS application\","
+    ]
   },
-  "tape-cloud": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "Grok Bot 的機器人可以踢出 Cursor 雲端 agent",
-    "meta": "61:03–61:22 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "外層迴圈在 Grok Bot，寫碼工廠在雲端 agent。",
-    "rows": [
-      [
-        "時間",
-        "61:03"
-      ]
+  "provenance": {
+    "type": "code",
+    "kind": "出廠身分",
+    "title": "重建稿釘死出廠安裝包的下載位置與雜湊",
+    "meta": "PROVENANCE.md:3-11",
+    "why": "重建的邊界是這份被釘死的出廠安裝包，不是猜出來的",
+    "start": 3,
+    "hi": [
+      5,
+      6,
+      10,
+      11
     ],
-    "quote": "if you set up cloud agents on cursor, your Grokbot bots can actually kick them off. So like here ... I have a cloud agent that's running with its own computer that this agent is managing.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "The reconstruction is based on the public macOS arm64 release artifact:",
+      "",
+      "- Product: Grok Bot",
+      "- Version: 0.18.0",
+      "- Upstream bundle ID: `com.anysphere.sand`",
+      "- Electron framework: 42.1.0",
+      "- DMG URL: `https://downloads.cursor.com/grokbot/stable/darwin-arm64/0.18.0/Grok_Bot_0.18.0.dmg`",
+      "- DMG SHA-256: `a253ccd8aab01e083f9812a0264354c5034d8ba7f0610bbb557e82ae77d203eb`",
+      "- Original `app.asar` SHA-256: `6665408168466f9cacc6087e917890c17f59d2e2e9c2404a5c4a59ad79c1de58`"
+    ]
   },
-  "tape-chef": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "主廚：組盤與品管，不是每道菜自己炒",
-    "meta": "19:09 與 66:35–67:14 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "同一比喻講兩次。",
-    "rows": [
-      [
-        "時間",
-        "66:35"
-      ]
+  "guard": {
+    "type": "code",
+    "kind": "三旗標",
+    "title": "重建守衛把三個 DISABLE 旗標釘成 1",
+    "meta": "scripts/lib/build-asar.mjs:15-21",
+    "why": "這是判別疊層的具體記號，出廠版本不會被打上這段守衛",
+    "start": 15,
+    "hi": [
+      17,
+      18,
+      19
     ],
-    "quote": "I kind of think of my agents as sort of like a kitchen, a Michelin kitchen ... maybe I'm not cooking all the food myself anymore. ... my role is becoming more like a head chef. ... I maybe assemble a plate to the food. I own the quality control.",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "export const reconstructedUpdaterGuard = [",
+      "  \"// Reconstructed-build guard: do not consume official update or telemetry services.\",",
+      "  \"process.env.SAND_DISABLE_UPDATES ??= \\\"1\\\";\",",
+      "  \"process.env.SAND_DISABLE_SENTRY ??= \\\"1\\\";\",",
+      "  \"process.env.SAND_DISABLE_TELEMETRY ??= \\\"1\\\";\",",
+      "  \"\"",
+      "].join(\"\\n\");"
+    ]
   },
-  "tape-imessage": {
-    "type": "ref",
-    "kind": "逐字稿",
-    "title": "早期她把 iMessage 接到 Grok Bot：同事要能傳訊、打電話",
-    "meta": "68:45–69:28 · lauren-talk.txt · faster-whisper small.en · 2026-08-30",
-    "why": "產品是否上線她說還在想。",
-    "rows": [
-      [
-        "時間",
-        "68:45"
-      ]
+  "frontend-def": {
+    "type": "code",
+    "kind": "渲染器",
+    "title": "frontend/ 是可編輯的渲染器重建，選中做預設打包",
+    "meta": "frontend/README.md:3-6",
+    "why": "說明 frontend/ 是重建的畫面工作區，跟出廠渲染器分開保存對照",
+    "start": 3,
+    "hi": [
+      3,
+      4
     ],
-    "quote": "one thing that I try to hack, I hacked in into [Grok Bot] like when in the early days was support for like iMessage. We can actually text your bots. ... the mental model is these are colleagues. ... you can text them. You can call them. ... always on colleagues that you can talk to at any time from anywhere",
-    "url": "https://x.com/0xCodez/status/2093013117156331552",
-    "linktext": "x.com/0xCodez/status/2093013117156331552"
+    "lines": [
+      "This directory contains the editable React/TypeScript renderer reconstruction.",
+      "It is built with Vite and selected by the default macOS package. The explicit",
+      "fidelity diagnostic path retains the checksum-pinned shipped renderer hydrated",
+      "by `npm run bootstrap` for comparison."
+    ]
   },
-  "tweet-july": {
-    "type": "ref",
-    "kind": "推文",
-    "title": "2026-07-29：這個月用 Cursor 幾乎送出 1000 則 PR",
-    "meta": "2026-07-29 · @poteto",
-    "why": "帶子沒講這句。是推文。",
-    "rows": [
-      [
-        "日期",
-        "2026-07-29"
-      ],
-      [
-        "帳號",
-        "@poteto"
-      ]
+  "evidence": {
+    "type": "code",
+    "kind": "註記",
+    "title": "@evidence 只是出處註記，不是可執行的匯入",
+    "meta": "frontend/README.md:20-21",
+    "why": "讀者常誤把 @evidence 註解當成程式相依，這裡明講它只是出處標記",
+    "start": 20,
+    "hi": [
+      20,
+      21
     ],
-    "quote": "shipped almost 1000 PRs this month with cursor",
-    "url": "https://x.com/poteto/status/2082371906309849354",
-    "linktext": "x.com/poteto/status/2082371906309849354"
+    "lines": [
+      "Comments beginning with `@evidence` point to byte or symbol boundaries in the",
+      "bootstrapped 0.18.0 renderer. They are provenance annotations, not imports."
+    ]
   },
-  "tweet-aug": {
-    "type": "ref",
-    "kind": "推文",
-    "title": "2026-08-19：上個月 1000 則，這個月朝加倍；Grok Bot 是外層迴圈",
-    "meta": "2026-08-19 · @poteto",
-    "why": "同一則推文寫 pstack、/lauren-mode＝/poteto-mode、routines、/goal /loop /swarm、雲端 agent 24/7。",
-    "rows": [
-      [
-        "日期",
-        "2026-08-19"
-      ],
-      [
-        "帳號",
-        "@poteto"
-      ]
+  "coord-ipc": {
+    "type": "code",
+    "kind": "開機",
+    "title": "coordinator port 請求與交付的 IPC channel 名字",
+    "meta": "source/electron-main/coordinator/coordinator-runtime.ts:20-21",
+    "why": "證明畫面拿通道走的是固定字串，不是自己找 host",
+    "start": 20,
+    "hi": [
+      20,
+      21
     ],
-    "quote": "i shipped 1000 PRs last month and am on track to doubling that this month, all thanks to cloud agents. you can also launch cloud agents with Grok @Bot btw! ... i use Grok @Bot routines to farm context for me ... Grok Bot feeds my \"outer loop\", where i think about what to point my factory at next. ... everything runs on cloud agents, so my bots work 24/7 even when i'm asleep or my laptop is offline.",
-    "url": "https://x.com/poteto/status/2090141955695198633",
-    "linktext": "x.com/poteto/status/2090141955695198633"
+    "lines": [
+      "export const COORDINATOR_PORT_REQUEST_CHANNEL = \"sand:coordinator-port-request\";",
+      "export const COORDINATOR_PORT_CHANNEL = \"sand:coordinator-port\";"
+    ]
+  },
+  "gateway-bind": {
+    "type": "code",
+    "kind": "開機",
+    "title": "loopback 以外或釘 token 才強制帶 bearer",
+    "meta": "source/host/gateway-config.ts:41-52",
+    "why": "證明只有離開 loopback 或明確要求時才強制驗證",
+    "start": 41,
+    "hi": [
+      45,
+      49,
+      50
+    ],
+    "lines": [
+      "export function resolveGatewayServerConfig(",
+      "  env: NodeJS.ProcessEnv = process.env,",
+      "  generateToken: () => string = () => randomBytes(32).toString(\"base64url\")",
+      "): GatewayServerConfig {",
+      "  const host = env.SAND_GATEWAY_BIND_HOST?.trim() || \"127.0.0.1\";",
+      "  const port = readPort(env.SAND_HOST_PORT);",
+      "  const tls = resolveTls(env);",
+      "  const pinnedToken = env.SAND_GATEWAY_TOKEN?.trim();",
+      "  const requireAuth = !isLoopbackHost(host) || isTruthyEnv(env.SAND_GATEWAY_REQUIRE_AUTH) || (pinnedToken != null && pinnedToken.length > 0);",
+      "  const authToken = requireAuth ? (pinnedToken != null && pinnedToken.length > 0 ? pinnedToken : generateToken()) : undefined;",
+      "  return { host, ...(port === undefined ? {} : { port }), ...(authToken === undefined ? {} : { authToken }), ...(tls === undefined ? {} : { tls }) };",
+      "}"
+    ]
+  },
+  "gateway-listen": {
+    "type": "code",
+    "kind": "開機",
+    "title": "gateway 實際 listen 的那一行",
+    "meta": "source/host/gateway-server.ts:57-57",
+    "why": "證明 gateway 綁定與回傳 port 是同一步做完",
+    "start": 57,
+    "hi": [
+      57
+    ],
+    "lines": [
+      "export async function startGatewayServer(deps: GatewayServerDeps) { const host = deps.host ?? \"127.0.0.1\"; const listener = (req: IncomingMessage, res: ServerResponse) => { void handleRequest(deps, req, res).catch((error) => { if (!res.headersSent) respondError(res, statusForCommandError(error), errorMessage(error)); else res.end(); }); }; const server = deps.tls == null ? createHttpServer(listener) : createHttpsServer({ cert: deps.tls.cert, key: deps.tls.key }, listener); await new Promise<void>((resolve, reject) => { server.once(\"error\", reject); server.listen(deps.port ?? 0, host, () => { server.off(\"error\", reject); resolve(); }); }); const address = server.address(); if (address == null || typeof address === \"string\") throw new Error(\"gateway did not bind a TCP address\"); return { port: address.port, close: () => new Promise<void>((resolve, reject) => { server.closeAllConnections(); server.close((error) => error != null ? reject(error) : resolve()); }) }; }"
+    ]
+  },
+  "discovery-paths": {
+    "type": "code",
+    "kind": "開機",
+    "title": "discovery 檔案都放在 sand 根目錄下同一組路徑函式",
+    "meta": "source/host/host-paths.ts:85-89",
+    "why": "證明桌面找 host 靠的幾個檔名都在這裡",
+    "start": 85,
+    "hi": [
+      85,
+      86,
+      89
+    ],
+    "lines": [
+      "export function getGatewayDiscoveryPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"gateway.json\"); }",
+      "export function getHostLockPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"host.lock\"); }",
+      "export function getHostSecretsPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"host-secrets.json\"); }",
+      "export function getHostUpgradeMarkerPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \".sand-host-upgrade.json\"); }",
+      "export function getHostCrashMarkerPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \".sand-host-crash.json\"); }"
+    ]
+  },
+  "exec-spawn": {
+    "type": "code",
+    "kind": "開機",
+    "title": "host-main 用 spawn 生出 box-exec-daemon 子行程",
+    "meta": "source/host/box/exec-daemon-process.ts:77-88",
+    "why": "證明 box-exec-daemon 是 host-main spawn 出來的，不是沙箱自帶",
+    "start": 77,
+    "hi": [
+      77,
+      81,
+      82
+    ],
+    "lines": [
+      "  const child = spawn(options.execPath ?? process.execPath, [options.entryPath], {",
+      "    cwd: path.dirname(options.entryPath),",
+      "    env: {",
+      "      ...(options.env ?? process.env),",
+      "      SAND_BOX_EXEC_DAEMON_PORT: String(port),",
+      "      SAND_BOX_EXEC_DAEMON_AUTH_TOKEN: authToken,",
+      "      SAND_BOX_WORKSPACE_ROOT: options.workspaceRoot,",
+      "      SAND_BOX_TERMINALS_DIRECTORY: options.terminalsDirectory,",
+      "    },",
+      "    stdio: [\"ignore\", \"pipe\", \"pipe\"],",
+      "  });",
+      "  if (child.pid === undefined) throw new Error(\"box exec-daemon child did not receive a pid\");"
+    ]
+  },
+  "box-exec-run": {
+    "type": "code",
+    "kind": "執行",
+    "title": "box-exec-daemon 用 /bin/sh -lc 真正跑命令",
+    "meta": "source/box-exec-daemon/server.ts:408-410",
+    "why": "證明命令最終落到一支真正的 shell 行程，不是自己解析",
+    "start": 408,
+    "hi": [
+      409
+    ],
+    "lines": [
+      "  private spawnShell(command: string, cwd: string): ChildProcessWithoutNullStreams {",
+      "    return spawn(\"/bin/sh\", [\"-lc\", command], { cwd, env: this.#environment, detached: process.platform !== \"win32\", stdio: \"pipe\" });",
+      "  }"
+    ]
+  },
+  "oauth-loopback": {
+    "type": "code",
+    "kind": "開機",
+    "title": "coordinator 為 MCP OAuth 回跳另開的 loopback 伺服器",
+    "meta": "source/node-agent-coordinator/oauth/mcp-oauth-loopback-registry.ts:64-84",
+    "why": "證明這個伺服器只綁在 redirect_uri 指定的 loopback 位址與埠",
+    "start": 64,
+    "hi": [
+      68,
+      73
+    ],
+    "lines": [
+      "  private async bindOrigin(origin: string, port: number, redirectHost: string): Promise<LoopbackEntry> {",
+      "    const servers: Server[] = [];",
+      "    const errors: Error[] = [];",
+      "    for (const host of loopbackBindHosts(redirectHost)) {",
+      "      const server = createServer((request, response) => { void this.dispatch(origin, request, response); });",
+      "      try {",
+      "        await new Promise<void>((resolve, reject) => {",
+      "          const onError = (error: Error) => reject(error);",
+      "          server.once(\"error\", onError);",
+      "          server.listen(port, host, () => { server.off(\"error\", onError); resolve(); });",
+      "        });",
+      "        servers.push(server);",
+      "      } catch (error) {",
+      "        errors.push(error instanceof Error ? error : new Error(String(error)));",
+      "        server.close();",
+      "      }",
+      "    }",
+      "    if (servers.length === 0) throw errors[0] ?? new Error(`MCP OAuth loopback callback could not bind port ${port}.`);",
+      "    return { servers, handlers: new Set() };",
+      "  }",
+      ""
+    ]
+  },
+  "routed-mcp": {
+    "type": "code",
+    "kind": "開機",
+    "title": "routed MCP bridge 埠交給作業系統挑",
+    "meta": "source/node-agent-coordinator/routed-mcp-bridge.ts:83-86",
+    "why": "路由橋接伺服器將埠號指派交由作業系統動態挑選，並以隨機路徑作存取密鑰。",
+    "start": 83,
+    "hi": [
+      84,
+      86
+    ],
+    "lines": [
+      "  });",
+      "  await new Promise<void>((resolve, reject) => { server.once(\"error\", reject); server.listen(0, \"127.0.0.1\", resolve); });",
+      "  const address = server.address();",
+      "  if (address == null || typeof address === \"string\") throw new Error(\"Could not bind the routed MCP bridge\");"
+    ]
+  },
+  "entry-handler": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "使用者訊息的動作處理器繼承自共用抽象類別",
+    "meta": "source/packages/agent/actions/user-message-action/user-message-action-handler.ts:87-91",
+    "why": "確認使用者訊息走的是哪一個 class，步進迴圈本體其實在它的父類別上",
+    "start": 87,
+    "hi": [
+      87
+    ],
+    "lines": [
+      "export class UserMessageActionHandler extends AbstractUserMessageActionHandler {",
+      "  async initializeConversation(ctx: Any, params: Any): Promise<Any> {",
+      "    const configAny: Any = this.config;",
+      "    const { action, rootPromptExecutor, stateHandler, mcpTools, maxPrependedUserMessages, forcePrependedUserMessages, onStateUpdate } = params;",
+      "    if (!action.userMessage) throw new Error(\"User message is required\");"
+    ]
+  },
+  "action-map": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "AnysphereAgent 登錄十二種動作，使用者訊息只是一種",
+    "meta": "source/packages/agent/index.ts:66-81",
+    "why": "看實際登錄了哪些 actionHandlers，才知道使用者送出只是分派表裡的一格",
+    "start": 66,
+    "hi": [
+      69,
+      70
+    ],
+    "lines": [
+      "    this.config = normalizeAnysphereAgentConfig(config);",
+      "    this.orchestrator = new SummarizationOrchestrator(summarizationHandler, undefined, this.config.backgroundSummarizationProps, this.config.selfSummaryConfig?.tokenLimit, this.config.selfSummaryConfig?.canUseSelfSummary);",
+      "    this.actionHandlers = new Map();",
+      "    const user = new UserMessageActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver, this.orchestrator);",
+      "    this.actionHandlers.set(\"userMessageAction\", user);",
+      "    this.actionHandlers.set(\"subscriptionNotificationAction\", new SubscriptionNotificationActionHandler(user));",
+      "    this.actionHandlers.set(\"goalContinuationAction\", new GoalContinuationActionHandler(user, this.config.toolsGenerator, resourceAccessor, this.config.agentSessionId));",
+      "    this.actionHandlers.set(\"resumeAction\", new ResumeActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver, this.orchestrator));",
+      "    this.actionHandlers.set(\"summarizeAction\", new SummarizeActionHandler(this.config, resourceAccessor, interactionListener, this.orchestrator, conversationActionReceiver));",
+      "    this.actionHandlers.set(\"shellCommandAction\", new ShellCommandActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver));",
+      "    this.actionHandlers.set(\"cancelAction\", new CancelActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver));",
+      "    this.actionHandlers.set(\"executePlanAction\", new ExecutePlanActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver, this.orchestrator));",
+      "    this.actionHandlers.set(\"asyncAskQuestionCompletionAction\", new AsyncAskQuestionCompletionActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver, this.orchestrator));",
+      "    this.actionHandlers.set(\"backgroundTaskCompletionAction\", new BackgroundTaskCompletionActionHandler(this.config, resourceAccessor, interactionListener, summarizationHandler, conversationActionReceiver, this.orchestrator));",
+      "    this.actionHandlers.set(\"backgroundShellAction\", new BackgroundShellActionHandler());",
+      "    this.actionHandlers.set(\"backgroundSubagentAction\", new BackgroundSubagentActionHandler());"
+    ]
+  },
+  "dead-1000": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "同檔另有一個沒人讀的一千步常數",
+    "meta": "source/packages/agent/index.ts:33-37",
+    "why": "這個一千的數字整份原始碼複製只在這裡出現，從沒被拿來當步數上限用",
+    "start": 33,
+    "hi": [
+      35
+    ],
+    "lines": [
+      "type Any = any;",
+      "",
+      "const MAX_AGENT_STEPS = 1_000;",
+      "const stateDeserializationDuration = createHistogram(\"agent.state_deserialization_ms\", { description: \"State restore duration\" });",
+      "const actionHandlerDuration = createHistogram(\"agent.action_handler_ms\", { description: \"Action handler duration\", labelNames: [\"action\"] });"
+    ]
+  },
+  "step-loop": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "host 層外圈迴圈，上限抓不到就丟例外",
+    "meta": "source/host/runner/sand-agent-runner.ts:1264-1288",
+    "why": "看外圈迴圈怎麼呼叫 runStep、怎麼判斷 done、超過上限會丟什麼錯",
+    "start": 1264,
+    "hi": [
+      1266,
+      1269,
+      1281,
+      1287,
+      1288
+    ],
+    "lines": [
+      "      active.dispatched = true;",
+      "      if (this.options.runStep == null) return undefined;",
+      "      const maxSteps = this.options.maxSteps ?? SAND_AGENT_MAX_STEPS;",
+      "      let result: T | undefined;",
+      "      let completed = false;",
+      "      for (let step = 0; step < maxSteps; step += 1) {",
+      "        const stepResult = await this.options.runStep(step, {",
+      "          signal: controller.signal,",
+      "          emitUpdate: (update) => this.emitUpdate(update),",
+      "          prompt: trimmed,",
+      "          runOptions,",
+      "          requestId,",
+      "          state: this.#state,",
+      "          setState: state => {",
+      "            this.#state = state;",
+      "          },",
+      "        });",
+      "        if (stepResult.done) {",
+      "          result = stepResult.value;",
+      "          completed = true;",
+      "          break;",
+      "        }",
+      "      }",
+      "      if (!completed) throw new Error(`Agent exceeded ${maxSteps} steps.`);",
+      "      await this.options.settle?.(result);"
+    ]
+  },
+  "abort-runner": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "interrupt 呼叫 AbortController.abort 中止這回合",
+    "meta": "source/host/runner/sand-agent-runner.ts:1127-1144",
+    "why": "執行器在中斷呼叫時會透過控制器發出中止信號，確保進行中的回合能立即停下。",
+    "start": 1127,
+    "hi": [
+      1127,
+      1143
+    ],
+    "lines": [
+      "  interrupt(",
+      "    reason: string,",
+      "    supersede?: { readonly carriesRecovery: boolean },",
+      "  ): boolean {",
+      "    if (this.#productionTurnRunShell !== undefined) {",
+      "      return this.#productionTurnRunShell.interrupt(reason, supersede);",
+      "    }",
+      "    const active = this.#activeRun;",
+      "    if (active == null) return false;",
+      "    if (",
+      "      !active.dispatched",
+      "      && supersede != null",
+      "      && (!supersede.carriesRecovery || !active.recoveryShaped)",
+      "    ) return false;",
+      "",
+      "    this.#activeRunInterrupted = true;",
+      "    active.controller.abort({ intentional: true, reason });",
+      "    return true;"
+    ]
+  },
+  "static-config": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "同一個 5000 常數直接寫進 Agent 靜態設定",
+    "meta": "source/host/runner/turn-agent-composition.ts:268-274",
+    "why": "確認 SAND_AGENT_MAX_STEPS 不只是 host 迴圈的上限，也是餵進 AnysphereAgent config 的 maxSteps",
+    "start": 268,
+    "hi": [
+      272
+    ],
+    "lines": [
+      "        profilePromptSnapshot,",
+      "        onProfileUpdateAppended,",
+      "      );",
+      "  return {",
+      "    maxSteps: SAND_AGENT_MAX_STEPS,",
+      "    modelId: input.modelId,",
+      "    agentTokenLimit: input.agentTokenLimit,"
+    ]
+  },
+  "runstep-sig": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "packages/agent 自己也有一個 runStep",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:1868-1873",
+    "why": "host 的 runStep 跟 packages/agent 的 runStep 是兩層不同的方法，名字一樣但職責不同",
+    "start": 1868,
+    "hi": [
+      1868
+    ],
+    "lines": [
+      "  async runStep(",
+      "    parentCtx: Context,",
+      "    turn: RunStepTurnLike,",
+      "    rootPromptExecutor: RetryRootPromptExecutorLike,",
+      "    stateHandler: RunStepStateHandlerLike,",
+      "    toolsGenerator: AgentToolsGenerator,"
+    ]
+  },
+  "inner-loop": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "內層迴圈讀 config.maxSteps，且看 abort signal",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:2582-2599",
+    "why": "確認內層迴圈真正讀的是 config.maxSteps，且迴圈條件本身就檢查 abort",
+    "start": 2582,
+    "hi": [
+      2585,
+      2598
+    ],
+    "lines": [
+      "    let cliReflectGeneralFollowUpsSentInTurn = 0;",
+      "    const userMessage = await initialTurn.userMessage.get(ctx);",
+      "    stateHandler.setMode(resolveCurrentTurnMode(stateHandler.mode, userMessage.mode));",
+      "    const maxSteps = this.config.maxSteps;",
+      "    if (typeof maxSteps !== \"number\" || !Number.isFinite(maxSteps) || maxSteps <= 0) {",
+      "      throw new Error(\"Max steps must be a finite number greater than 0\");",
+      "    }",
+      "    const fileOperationLockManager = new FileOperationLockManager();",
+      "    let previousStepCount = turn.steps.length;",
+      "    let previousMode = stateHandler.mode;",
+      "    let previousQueuedMessageSource = \"none\";",
+      "    let finalAssistantMessageCharacterCount: number | undefined;",
+      "    let finalAssistantMessageUxStats: FinalAssistantMessageUxStats | undefined;",
+      "    const emptyResponseRetryTurnBudget: EmptyResponseRetryTurnBudgetLike = { retriesUsed: 0 };",
+      "    let conflictBarrierInjectionsRemaining = 2;",
+      "    try {",
+      "      for (let step = 0; step < maxSteps && !ctx.signal.aborted; step += 1) {",
+      "        try {"
+    ]
+  },
+  "inner-done": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "沒有工具呼叫也沒有排隊訊息就算這輪結束",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:2700-2709",
+    "why": "看 done 這個判斷具體怎麼算，跟 host 層 stepResult.done 是不同一件事",
+    "start": 2700,
+    "hi": [
+      2702
+    ],
+    "lines": [
+      "          turn = updatedTurn;",
+      "          currentMcpTools = updatedMcpTools;",
+      "          const hasEnded = (!hasToolCall && !hasQueuedMessages) || isLastIteration;",
+      "          if (!hasToolCall && !hasQueuedMessages && conflictBarrierInjectionsRemaining > 0 && !isLastIteration && this.config.featureFlags?.enableAgentStoreConflictNotices === true && await this.maybeInjectPreFinalConflictBarrier(ctx, rootPromptExecutor, stateHandler.getPrivacyMode())) {",
+      "            conflictBarrierInjectionsRemaining -= 1;",
+      "            this.responseComparisonCandidate = undefined;",
+      "            continue;",
+      "          }",
+      "          if (!hasEnded) {",
+      "            this.responseComparisonCandidate = undefined;"
+    ]
+  },
+  "inner-throw": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "跳出迴圈用 break，超步用另一個例外",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:2849-2853",
+    "why": "packages/agent 層超過 maxSteps 丟的錯跟 host 層那個 Agent exceeded 是兩個不同的例外",
+    "start": 2849,
+    "hi": [
+      2851,
+      2852
+    ],
+    "lines": [
+      "            }",
+      "          }",
+      "          if (!hasToolCall && !hasQueuedMessages) break;",
+      "          if (!this.config.doNotFailOnMaxSteps && isLastIteration) throw new Error(\"Reached maximum number of steps before turn ended (possible looping?)\");",
+      "        } finally {"
+    ]
+  },
+  "exec-tool-stream": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "一步之內模型輸出跟工具執行一起發生",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:1961-1966",
+    "why": "看每一步實際呼叫的是哪一個 executor 方法",
+    "start": 1961,
+    "hi": [
+      1963
+    ],
+    "lines": [
+      "      let result: StepStreamResultLike;",
+      "      try {",
+      "        result = rootPromptExecutor.executeToolStream(",
+      "          ctx,",
+      "          stateHandler,",
+      "          interactionHandler,"
+    ]
+  },
+  "exec-model-only": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "只要模型輸出、不跑工具的另一條路",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:3967-3973",
+    "why": "確認 executeModelStreamOnly 是給不需要跑工具的那種步驟用的",
+    "start": 3967,
+    "hi": [
+      3969
+    ],
+    "lines": [
+      "    let result: ModelOnlyStreamResultLike;",
+      "    try {",
+      "      result = rootPromptExecutor.executeModelStreamOnly(",
+      "        ctx,",
+      "        stateHandler,",
+      "        interactionHandler,",
+      "        toolSetHandle.getToolExecutionSet(),"
+    ]
+  },
+  "raw-stream": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "第三個方法 stream 直接繞過工具，用在摘要",
+    "meta": "source/packages/agent-summarization/summarization-handler.ts:150-157",
+    "why": "確認三個方法裡最原始的 stream 被誰在用，答案是摘要而不是一般步進迴圈",
+    "start": 150,
+    "hi": [
+      157
+    ],
+    "lines": [
+      "    {",
+      "      role: \"user\",",
+      "      content: summaryPrompt,",
+      "      providerOptions: SUMMARIZATION_CURSOR_PROVIDER_OPTIONS,",
+      "    },",
+      "  ]);",
+      "  const streamOptions = maxOutputTokens !== undefined ? { maxTokens: maxOutputTokens } : {};",
+      "  const result = executor.stream(context, undefined, undefined, streamOptions);"
+    ]
+  },
+  "tool-exec-core": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "工具執行失敗會被分類，不是直接往外丟",
+    "meta": "source/packages/agent/tools/core.ts:140-146",
+    "why": "看工具結果或錯誤是怎麼被包成一個統一形狀，準備塞回訊息歷史",
+    "start": 140,
+    "hi": [
+      140
+    ],
+    "lines": [
+      "  try { return { result: await tool.execute(ctx, interactionHandler, argsStream, meta) }; }",
+      "  catch (error) {",
+      "    if (error instanceof DeferredInteractionResponseError) throw error;",
+      "    const shouldBubble = getShouldBubbleRetryableTaskErrorsFromContext(ctx);",
+      "    if (error instanceof RetryableToolOrchestrationError && shouldBubble) throw error;",
+      "    const streamStartTimeout = maybeCreateAgentStreamStartTimeoutTurnError(error);",
+      "    if (streamStartTimeout !== undefined) throw streamStartTimeout;"
+    ]
+  },
+  "tool-to-history": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "工具結果跟模型回覆合併成同一批訊息",
+    "meta": "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts:3812-3816",
+    "why": "看工具回傳的結果具體怎麼變成下一步模型看得到的訊息歷史",
+    "start": 3812,
+    "hi": [
+      3812,
+      3813,
+      3814
+    ],
+    "lines": [
+      "    const responseMessages: CoreMessageLike[] = [",
+      "      ...splitStepData.modelResponseMessages,",
+      "      ...toolCallResults.map(result => result.resultMessage),",
+      "    ];",
+      "    const hasToolCall = toolCallResults.length > 0;"
+    ]
+  },
+  "dispatch-queue": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "SendPipeline 把回合包成一個排他任務排隊",
+    "meta": "source/host/extensions/transcript/send-turn-dispatch.ts:150-176",
+    "why": "看使用者這句話怎麼從送出行程排進 turnRuntime.runTurn",
+    "start": 150,
+    "hi": [
+      153
+    ],
+    "lines": [
+      "  const turnDone = tm.runLifecycle.enqueueExclusiveRun(",
+      "    session.id,",
+      "    () =>",
+      "      tm.turnRuntime.runTurn(",
+      "        session,",
+      "        runner,",
+      "        promptForRun,",
+      "        {",
+      "          richText,",
+      "          selectedImages,",
+      "          selectedVideos,",
+      "          attachedFilePaths: fileAttachmentPaths,",
+      "          attachedFileSizes,",
+      "          messageId: userMessageId,",
+      "          recentUserMessages,",
+      "          replyContext,",
+      "          isFork,",
+      "          traceCtx,",
+      "          enterEpochMs,",
+      "          queueStartEpochMs,",
+      "          queueStartPerfMs,",
+      "          clientNonce,",
+      "          ackToken,",
+      "        },",
+      "        epoch,",
+      "      ),",
+      "    {"
+    ]
+  },
+  "runner-run": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "turnRuntime 把回合交給 runner.run 這個入口",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:426-433",
+    "why": "看排進來的回合最後怎麼交棒進 SandAgentRunner 的步進迴圈",
+    "start": 426,
+    "hi": [
+      426
+    ],
+    "lines": [
+      "        const result = await runner.run(prompt, {",
+      "          ...options,",
+      "          ...unansweredPrompts,",
+      "          traceCtx: turnCtx,",
+      "          appendReplyReminder: true,",
+      "          requestSource: \"turn\",",
+      "          onModelResolved: (modelId: string) => turn.setModel(modelId),",
+      "        });"
+    ]
+  },
+  "provider-list": {
+    "type": "code",
+    "kind": "路由",
+    "title": "四個供應者列成同一聯集，出廠取第一個",
+    "meta": "source/shared/inference-router.ts:1-2",
+    "why": "推論模組將全部可選的模型供應商收攏於單一聯集型別，並於出廠預設時採用首項。",
+    "start": 1,
+    "hi": [
+      1,
+      2
+    ],
+    "lines": [
+      "export const SAND_INFERENCE_PROVIDERS = [\"cursor\", \"claude-code\", \"codex\", \"openrouter\"] as const;",
+      "export type SandInferenceProvider = (typeof SAND_INFERENCE_PROVIDERS)[number];"
+    ]
+  },
+  "settings-default": {
+    "type": "code",
+    "kind": "設定",
+    "title": "沒設定就回 cursor，寫入走另一個函式",
+    "meta": "source/shared/node/settings/sand-settings-store.ts:158-159",
+    "why": "預設值的定義就是這一行，沒有另一份預設設定檔。",
+    "start": 158,
+    "hi": [
+      158
+    ],
+    "lines": [
+      "  getInferenceProvider(): SandInferenceProvider { return this.load().inferenceProvider ?? \"cursor\"; }",
+      "  setInferenceProvider(value: SandInferenceProvider): void { this.update((s) => ({ ...s, inferenceProvider: value })); }"
+    ]
+  },
+  "cursor-route": {
+    "type": "code",
+    "kind": "路由",
+    "title": "host 這一側也自己讀一次設定再決定要不要轉走",
+    "meta": "source/shared/node/cursor-backend/cursor-inference.ts:184-191",
+    "why": "coordinator 攔截不到的呼叫（子代理、電腦操作）在這裡再判一次。",
+    "start": 184,
+    "hi": [
+      188,
+      189,
+      190
+    ],
+    "lines": [
+      "export function createCursorInferencePromptSession(options: Omit<SandInferenceOptions, \"backendUrl\"> & {",
+      "  readonly requestedModel: RequestedModel;",
+      "  readonly inferenceReason?: InferenceReason;",
+      "}) {",
+      "  const settingsPath = join(getSandRootDir(), \"settings.json\");",
+      "  const routedProvider = new SandSettingsStore(settingsPath).getInferenceProvider();",
+      "  if (routedProvider !== \"cursor\") return createProviderPromptSession(routedProvider);",
+      "  const client = createSandCursorBackendClient(InferenceService, options);"
+    ]
+  },
+  "claude-exec": {
+    "type": "code",
+    "kind": "供應者",
+    "title": "Claude Code 靠本機已裝的 claude 執行檔跑",
+    "meta": "source/host/extensions/inference/provider-session.ts:203-214",
+    "why": "找不到本機 CLI 就直接丟錯，不會退回別的供應者。",
+    "start": 203,
+    "hi": [
+      204,
+      214
+    ],
+    "lines": [
+      "function claudeExecutor(messages: readonly ProviderMessage[], invocationId: string, onUsage?: (usage: UsageRecord) => void, mcpServerUrl?: string) {",
+      "  const executable = resolveClaudeCodeCliPath();",
+      "  if (executable == null) throw new Error(\"Claude Code is not installed. Install and sign in to Claude Code, then reopen Grok Bot.\");",
+      "  const usage = deferred<{ promptTokens: number; completionTokens: number; totalTokens: number }>();",
+      "  const extendedUsage = deferred<{ inputTokens: number; outputTokens: number; cacheReadTokens: number; cacheWriteTokens: number; maxTokens: number }>();",
+      "  const resultResponse = deferred<ReturnType<typeof response>>();",
+      "  const metadata = deferred<Record<string, unknown>>();",
+      "  const fullStream = (async function* () {",
+      "    try {",
+      "      let final: SDKResultMessage | undefined;",
+      "      const selectedModel = process.env.SAND_CLAUDE_MODEL?.trim();",
+      "      for await (const message of queryClaude({ prompt: providerPrompt(messages), options: { pathToClaudeCodeExecutable: executable, cwd: getSandRootDir(), tools: mcpServerUrl == null ? [] : [\"mcp__grok_bot_plugins__*\"], ...(mcpServerUrl == null ? {} : { mcpServers: { grok_bot_plugins: { type: \"http\" as const, url: mcpServerUrl } }, strictMcpConfig: true }), permissionMode: \"default\", maxTurns: mcpServerUrl == null ? 1 : 8, persistSession: false, ...(selectedModel == null || selectedModel.length === 0 ? {} : { model: selectedModel }) } })) if (message.type === \"result\") final = message;"
+    ]
+  },
+  "codex-cred": {
+    "type": "code",
+    "kind": "憑證",
+    "title": "Codex 憑證檔必須是私有一般檔才會被信任",
+    "meta": "source/host/extensions/inference/provider-session.ts:67-80",
+    "why": "檔案權限與登入狀態兩層檢查都過才拿得到 token。",
+    "start": 67,
+    "hi": [
+      70,
+      76
+    ],
+    "lines": [
+      "function codexCredentials(): CodexCredentials {",
+      "  const path = join(process.env.CODEX_HOME?.trim() || join(homedir(), \".codex\"), \"auth.json\");",
+      "  const stat = lstatSync(path);",
+      "  if (!stat.isFile() || stat.isSymbolicLink() || (stat.mode & 0o077) !== 0) throw new Error(\"Codex login credentials must be a private direct regular file.\");",
+      "  const parsed = JSON.parse(readFileSync(path, \"utf8\")) as Loose;",
+      "  const accessToken = parsed?.tokens?.access_token;",
+      "  const refreshToken = parsed?.tokens?.refresh_token;",
+      "  const idToken = parsed?.tokens?.id_token;",
+      "  const accountId = parsed?.tokens?.account_id;",
+      "  if (parsed?.auth_mode !== \"chatgpt\" || typeof accessToken !== \"string\" || accessToken.length === 0 || typeof refreshToken !== \"string\" || refreshToken.length === 0 || typeof idToken !== \"string\" || idToken.length === 0 || typeof accountId !== \"string\" || accountId.length === 0) {",
+      "    throw new Error(\"Codex is not signed in with ChatGPT. Run `codex login`, then reopen Grok Bot.\");",
+      "  }",
+      "  return { accessToken, refreshToken, idToken, accountId, path, document: parsed };",
+      "}"
+    ]
+  },
+  "codex-exec": {
+    "type": "code",
+    "kind": "供應者",
+    "title": "Codex 直接打 ChatGPT 後端，不叫 codex CLI",
+    "meta": "source/host/extensions/inference/provider-session.ts:167-180",
+    "why": "端點是硬寫的 chatgpt.com 網址，跟本機安裝的 codex 執行檔無關。",
+    "start": 167,
+    "hi": [
+      168,
+      178,
+      180
+    ],
+    "lines": [
+      "function codexExecutor(messages: readonly ProviderMessage[], invocationId: string, definitions?: readonly Loose[], executeTool?: RoutedToolExecutor, onUsage?: (usage: UsageRecord) => void) {",
+      "  const credentials = codexCredentials();",
+      "  const usage = deferred<{ promptTokens: number; completionTokens: number; totalTokens: number }>();",
+      "  const extendedUsage = deferred<{ inputTokens: number; outputTokens: number; cacheReadTokens: number; cacheWriteTokens: number; maxTokens: number }>();",
+      "  const resultResponse = deferred<ReturnType<typeof response>>();",
+      "  const metadata = deferred<Record<string, unknown>>();",
+      "  const model = configuredCodexModel();",
+      "  const tools = codexTools(definitions);",
+      "  const fullStream = (async function* () {",
+      "    let text = \"\";",
+      "    try {",
+      "      for await (const event of streamCodexDirectResponses({",
+      "        fetch: codexAuthenticatedFetch(credentials),",
+      "        endpoint: \"https://chatgpt.com/backend-api/codex/responses\","
+    ]
+  },
+  "openrouter-cred": {
+    "type": "code",
+    "kind": "憑證",
+    "title": "OpenRouter 沒有本機登入，只認一把環境變數或機密庫金鑰",
+    "meta": "source/host/extensions/inference/provider-session.ts:45-49",
+    "why": "本供應商僅透過環境變數或機密庫金鑰取用，兩處皆缺時則直接拋出設定引導錯誤。",
+    "start": 45,
+    "hi": [
+      46,
+      47
+    ],
+    "lines": [
+      "function openRouterCredential(): string {",
+      "  const value = process.env.OPENROUTER_API_KEY?.trim() || persistedSecrets().OPENROUTER_API_KEY?.trim();",
+      "  if (value == null || value.length === 0) throw new Error(\"OpenRouter needs OPENROUTER_API_KEY. Add it in Settings → Router.\");",
+      "  return value;",
+      "}"
+    ]
+  },
+  "docker-cred": {
+    "type": "code",
+    "kind": "憑證",
+    "title": "本機容器沙箱另存一份跟供應者無關的憑證檔",
+    "meta": "source/electron-main/box/local-docker-host-connector.ts:50-52",
+    "why": "這份憑證是 Cursor 存取權杖轉發進容器，跟四選一路由的憑證各自獨立。",
+    "start": 50,
+    "hi": [
+      51
+    ],
+    "lines": [
+      "function inferenceCredentialPath(settingsPath: string): string {",
+      "  return join(dirname(settingsPath), \"local-docker-credential\", \"inference.json\");",
+      "}"
+    ]
+  },
+  "build-turn-tools": {
+    "type": "code",
+    "kind": "組裝",
+    "title": "buildTurnTools 依這輪身分先決定要不要圍籠",
+    "meta": "source/host/runner/tools/turn-toolset.ts:1293-1304",
+    "why": "工具集是每輪重新組出來的,不是登錄表直接照搬",
+    "start": 1293,
+    "hi": [
+      1298,
+      1303
+    ],
+    "lines": [
+      "export function buildTurnTools(",
+      "  host: TurnToolsetHost,",
+      "  turn: TurnToolsetInput,",
+      "  props?: TurnToolsetBuildProps,",
+      "): ToolSetHandle {",
+      "  if (",
+      "    host.isSubagentRunner",
+      "    && (host.isComputerUseSubagent || host.isBrowserUseSubagent) === false",
+      "    && turn.subagentConfigs === undefined",
+      "  ) {",
+      "    return fencedToolSet([], host.spotlightEnabled());",
+      "  }"
+    ]
+  },
+  "tool-owner": {
+    "type": "code",
+    "kind": "權限",
+    "title": "登錄表把每個工具名對到一個擁有團隊",
+    "meta": "source/packages/agent/tools/all-tools.ts:44-72",
+    "why": "看工具名怎麼分派給擁有團隊,含 MCP 與 SHELL 與 TASK",
+    "start": 44,
+    "hi": [
+      55,
+      68,
+      71
+    ],
+    "lines": [
+      "  CREATE_TASK: \"async\",",
+      "  DELETE: \"agent-quality\",",
+      "  EDIT_NOTEBOOK: \"agent-quality\",",
+      "  FETCH: \"agent-quality\",",
+      "  FETCH_MCP_RESOURCE: \"extensibility\",",
+      "  GENERATE_IMAGE: \"agent-quality\",",
+      "  GET_MCP_TOOLS: \"extensibility\",",
+      "  GLOB: \"agent-quality\",",
+      "  GREP: \"agent-quality\",",
+      "  LIST_MCP_RESOURCES: \"extensibility\",",
+      "  LS: \"agent-quality\",",
+      "  MCP: \"extensibility\",",
+      "  MCP_AUTH: \"extensibility\",",
+      "  MINI_SWE_AGENT_BASH: \"data-infra\",",
+      "  CONNECT_SCM: \"bugbot\",",
+      "  MOCK_READ_LINTS: \"agent-quality\",",
+      "  MULTI_STR_REPLACE: \"agent-quality\",",
+      "  READ: \"agent-quality\",",
+      "  EXTERNAL_READ: \"agent-quality\",",
+      "  READ_LINTS: \"agent-quality\",",
+      "  SEMANTIC_SEARCH: \"agent-quality\",",
+      "  SEARCH_CONVERSATIONS: \"agent-quality\",",
+      "  SET_ACTIVE_BRANCH: \"agent-quality\",",
+      "  SEND_TO_TASK: \"async\",",
+      "  SHELL: \"agent-quality\",",
+      "  STR_REPLACE: \"agent-quality\",",
+      "  SWITCH_MODE: \"agent-quality\",",
+      "  TASK: \"agent-quality\",",
+      "  CLOUD_AGENT: \"async\","
+    ]
+  },
+  "tool-team-fn": {
+    "type": "code",
+    "kind": "權限",
+    "title": "查不到的工具名一律算 agent-quality 擁有",
+    "meta": "source/packages/agent/tools/all-tools.ts:124-129",
+    "why": "當傳入工具識別碼為未知或未登錄項目時，分派函式一律將其所有權歸屬於品質團隊。",
+    "start": 124,
+    "hi": [
+      125,
+      126,
+      128
+    ],
+    "lines": [
+      "export function getToolOwnerTeam(toolIdentifier: string): ToolOwnerTeam | undefined {",
+      "  if (toolIdentifier === \"unknown\") {",
+      "    return \"agent-quality\";",
+      "  }",
+      "  return TOOL_OWNER_TEAM_MAP[toolIdentifier];",
+      "}"
+    ]
+  },
+  "team-telemetry": {
+    "type": "code",
+    "kind": "遙測",
+    "title": "擁有團隊只寫進工具呼叫的起跑日誌",
+    "meta": "source/packages/agent/tool-stream-executor.ts:549-554",
+    "why": "證明登錄表只餵記錄用的 team 欄位,不參與放行判斷",
+    "start": 549,
+    "hi": [
+      554
+    ],
+    "lines": [
+      "  const logToolCallStart = (): void => {",
+      "    didLogStart = true;",
+      "    logger.info(ctx, \"nal.tool_call.start\", {",
+      "      toolCallId: descriptor.toolCallId,",
+      "      toolName: telemetry.loggedToolName,",
+      "      team: getToolOwnerTeam(telemetry.toolIdentifier),"
+    ]
+  },
+  "review-modes": {
+    "type": "code",
+    "kind": "審核",
+    "title": "審核閘管七個 surface,各自一個模式",
+    "meta": "source/host/runner/auto-review-gate.ts:7-15",
+    "why": "列出審核閘覆蓋的七個副作用面,shell 分遠端本機兩種",
+    "start": 7,
+    "hi": [
+      8,
+      9,
+      10,
+      14
+    ],
+    "lines": [
+      "export interface AutoReviewModes {",
+      "  readonly hostShell: SandAutoReviewMode;",
+      "  readonly boxShell: SandAutoReviewMode;",
+      "  readonly mcp: SandAutoReviewMode;",
+      "  readonly computer: SandAutoReviewMode;",
+      "  readonly automationWrite: SandAutoReviewMode;",
+      "  readonly cloudAgent: SandAutoReviewMode;",
+      "  readonly subagentLaunch: SandAutoReviewMode;",
+      "}"
+    ]
+  },
+  "auto-expire": {
+    "type": "code",
+    "kind": "審核",
+    "title": "非 enforce 的 surface 直接讓待審核過期",
+    "meta": "source/host/runner/auto-review-gate.ts:31-45",
+    "why": "enforce 與非 enforce 的差別就在這個過期呼叫",
+    "start": 31,
+    "hi": [
+      33,
+      43
+    ],
+    "lines": [
+      "    currentModes(): AutoReviewModes {",
+      "      const modes = deps.getModes?.() ?? deps.baseModes;",
+      "      const nonEnforcingSurfaces = new Set<string>();",
+      "      if (modes.hostShell !== \"enforce\") nonEnforcingSurfaces.add(\"host_shell\");",
+      "      if (modes.boxShell !== \"enforce\") nonEnforcingSurfaces.add(\"box_shell\");",
+      "      if (modes.mcp !== \"enforce\") nonEnforcingSurfaces.add(\"mcp\");",
+      "      if (modes.computer !== \"enforce\") nonEnforcingSurfaces.add(\"computer\");",
+      "      if (modes.automationWrite !== \"enforce\") {",
+      "        nonEnforcingSurfaces.add(\"automation_write\");",
+      "      }",
+      "      if (modes.cloudAgent !== \"enforce\") nonEnforcingSurfaces.add(\"cloud_agent\");",
+      "      if (modes.subagentLaunch !== \"enforce\") nonEnforcingSurfaces.add(\"subagent\");",
+      "      deps.controller()?.expireSurfaces(nonEnforcingSurfaces);",
+      "      return modes;",
+      "    },"
+    ]
+  },
+  "pending-approval": {
+    "type": "code",
+    "kind": "審核",
+    "title": "還有審核卡著就丟錯,擋下一個副作用",
+    "meta": "source/host/runner/auto-review-gate.ts:46-53",
+    "why": "pending approval 擋住後續副作用的實作",
+    "start": 46,
+    "hi": [
+      48,
+      49
+    ],
+    "lines": [
+      "    assertNoPendingApproval(): void {",
+      "      const pending = deps.controller()?.getPendingApprovals() ?? [];",
+      "      if (pending.length > 0) {",
+      "        throw new SandAutoReviewPendingApprovalError(",
+      "          \"Another action is waiting for Auto-review approval; no new side effect may start yet.\",",
+      "        );",
+      "      }",
+      "    },"
+    ]
+  },
+  "shell-gate-wrap": {
+    "type": "code",
+    "kind": "審核",
+    "title": "shell 執行器先問過審核閘才真的動手",
+    "meta": "source/host/runner/turn-agent-composition.ts:1307-1319",
+    "why": "assertNoPendingApproval 在 base.execute 之前呼叫的順序證據",
+    "start": 1307,
+    "hi": [
+      1316,
+      1319
+    ],
+    "lines": [
+      "export function wrapTurnShellExecutorForAudit<Context, Args extends { readonly command: string }, Result>(",
+      "  base: { execute(context: Context, args: Args, options: unknown): Result },",
+      "  dependencies: {",
+      "    readonly assertNoPendingApproval: () => void;",
+      "    readonly auditShellCommand: (kind: \"foreground\" | \"background\", command: string, surface: \"user_machine\") => void;",
+      "  },",
+      "  kind: \"foreground\" | \"background\",",
+      ") {",
+      "  return {",
+      "    execute(context: Context, args: Args, options: unknown): Result {",
+      "      dependencies.assertNoPendingApproval();",
+      "      dependencies.auditShellCommand(kind, args.command, \"user_machine\");",
+      "      return base.execute(context, args, options);"
+    ]
+  },
+  "mcp-gate-wrap": {
+    "type": "code",
+    "kind": "審核",
+    "title": "MCP 執行器一開頭就先問審核閘",
+    "meta": "source/host/runner/turn-agent-composition.ts:1270-1276",
+    "why": "同一種閘也包住 MCP 呼叫,不只 shell",
+    "start": 1270,
+    "hi": [
+      1271
+    ],
+    "lines": [
+      "    async execute(context: ExecContext, args: Args, options?: ExecutorOptions): Promise<Result> {",
+      "      dependencies.assertNoPendingApproval();",
+      "      const providerIdentifier = args.providerIdentifier.length > 0 ? args.providerIdentifier : args.serverIdentifier;",
+      "      const settleObservation = dependencies.beginObservation({",
+      "        toolCallId: args.toolCallId ?? \"\",",
+      "        connector: dependencies.boundedConnectorTag(providerIdentifier),",
+      "        ...(() => {"
+    ]
+  },
+  "allow-precheck": {
+    "type": "code",
+    "kind": "預檢",
+    "title": "shell 命令有專屬的 allowlist 預檢執行器資源",
+    "meta": "source/packages/agent-exec/shell-allowlist-precheck.ts:1-10",
+    "why": "三種預檢各自登記一個 exec 資源,跟審核閘是分開的機制",
+    "start": 1,
+    "hi": [
+      7
+    ],
+    "lines": [
+      "import { SimpleControlledExecHandler } from \"./controlled.js\";",
+      "import type { ShellAllowlistPrecheckArgs, ShellAllowlistPrecheckResult } from \"../proto/generated/agent/v1/shell_allowlist_precheck_exec_pb.js\";",
+      "import { ExecutorResource, type Executor, type RemoteExecManager } from \"./remote.js\";",
+      "import { createResource, type ControlledExecManager } from \"./resource-provider.js\";",
+      "import { createClientDeserializer, createClientSerializer, createServerDeserializer, createServerSerializer } from \"./serialization.js\";",
+      "",
+      "export const shellAllowlistPrecheckExecutorResource = createResource<Executor<ShellAllowlistPrecheckArgs, ShellAllowlistPrecheckResult>, RemoteExecManager, ControlledExecManager>(",
+      "  (execManager) => new ExecutorResource(execManager, createServerSerializer(\"shellAllowlistPrecheckArgs\"), createClientDeserializer(\"shellAllowlistPrecheckResult\")),",
+      "  (implementation, controlledExecManager) => controlledExecManager.register(new SimpleControlledExecHandler(implementation, createServerDeserializer(\"shellAllowlistPrecheckArgs\"), createClientSerializer(\"shellAllowlistPrecheckResult\"))),",
+      ");"
+    ]
+  },
+  "force-prompt": {
+    "type": "code",
+    "kind": "權限",
+    "title": "hook 可以強制要求這次執行改成先問",
+    "meta": "source/packages/agent-exec/shell-hook-approval.ts:23-30",
+    "why": "FORCE_PROMPT 蓋掉 always 權限,逼這次命令先問使用者",
+    "start": 23,
+    "hi": [
+      27
+    ],
+    "lines": [
+      "export function createForcePromptHookApprovalRequirement(",
+      "  reason: string | undefined,",
+      "): ShellHookApprovalRequirement {",
+      "  return new ShellHookApprovalRequirement({",
+      "    kind: ShellHookApprovalRequirement_Kind.FORCE_PROMPT,",
+      "    reason: reason!,",
+      "  });",
+      "}"
+    ]
+  },
+  "plugin-agent-shape": {
+    "type": "code",
+    "kind": "外掛",
+    "title": "外掛的 agent 定義自帶一個 permissionMode 欄位",
+    "meta": "source/packages/cursor-plugins/loader.ts:21-21",
+    "why": "外掛能宣告 readonly 或 default,這層權限跟工具權限與審核閘是三件事",
+    "start": 21,
+    "hi": [
+      21
+    ],
+    "lines": [
+      "export interface LoadedAgent { path: string; name: string; description?: string | undefined; tools?: string[] | undefined; model: string; prompt: string; permissionMode: \"readonly\" | \"default\" }"
+    ]
+  },
+  "plugin-perm-parse": {
+    "type": "code",
+    "kind": "外掛",
+    "title": "permissionMode 只認 readonly,其他一律當 default",
+    "meta": "source/packages/cursor-plugins/loader.ts:76-76",
+    "why": "外掛權限的解析邏輯,沒寫或寫錯字都退回 default",
+    "start": 76,
+    "hi": [
+      76
+    ],
+    "lines": [
+      "function parsePermissionMode(raw: string | undefined): \"readonly\" | \"default\" { return (raw ?? \"\").trim().toLowerCase() === \"readonly\" ? \"readonly\" : \"default\"; }"
+    ]
+  },
+  "box-shell-spawn": {
+    "type": "code",
+    "kind": "執行",
+    "title": "沙箱機器上真正 spawn 命令的那一行",
+    "meta": "source/box-exec-daemon/server.ts:408-409",
+    "why": "遠端殼命令最終落到這行 spawn,跟本機殼是不同行程",
+    "start": 408,
+    "hi": [
+      409
+    ],
+    "lines": [
+      "  private spawnShell(command: string, cwd: string): ChildProcessWithoutNullStreams {",
+      "    return spawn(\"/bin/sh\", [\"-lc\", command], { cwd, env: this.#environment, detached: process.platform !== \"win32\", stdio: \"pipe\" });"
+    ]
+  },
+  "runtime-default": {
+    "type": "code",
+    "kind": "設定",
+    "title": "boxRuntime 只認 remote 與 local-docker，預設 remote",
+    "meta": "source/shared/box-runtime.ts:1-7",
+    "why": "確認出廠預設就是遠端沙箱機器，不是本機容器。",
+    "start": 1,
+    "hi": [
+      3
+    ],
+    "lines": [
+      "export type SandBoxRuntime = \"remote\" | \"local-docker\";",
+      "",
+      "export const DEFAULT_SAND_BOX_RUNTIME: SandBoxRuntime = \"remote\";",
+      "",
+      "export function isSandBoxRuntime(value: unknown): value is SandBoxRuntime {",
+      "  return value === \"remote\" || value === \"local-docker\";",
+      "}"
+    ]
+  },
+  "descriptor-cache": {
+    "type": "code",
+    "kind": "快取",
+    "title": "閘道描述只存網址、權杖與可選的 VNC 代理",
+    "meta": "source/electron-main/box/gateway-descriptor-cache.ts:10-22",
+    "why": "說明快取物件裝了什麼，換帳號或登出才需要清掉。",
+    "start": 10,
+    "hi": [
+      10,
+      21
+    ],
+    "lines": [
+      "export interface GatewayConnection {",
+      "  readonly baseUrl: string;",
+      "  readonly token?: string;",
+      "  readonly headers?: Readonly<Record<string, string>>;",
+      "  readonly vncProxy?: {",
+      "    readonly primaryUrl: string;",
+      "    readonly forkBaseUrl: string;",
+      "    readonly networkToken: string;",
+      "  };",
+      "}",
+      "",
+      "export interface GatewayDescriptorStore {",
+      "  read(accountScope: string): Promise<GatewayConnection | null>;"
+    ]
+  },
+  "egress-wire": {
+    "type": "code",
+    "kind": "隧道",
+    "title": "出網隧道跟著沙箱連線物件的通知開關與重接",
+    "meta": "source/electron-main/box/egress-tunnel-wiring.ts:31-48",
+    "why": "解釋隧道不是常開，而是跟著連線觀察者上下線。",
+    "start": 31,
+    "hi": [
+      39,
+      46,
+      47
+    ],
+    "lines": [
+      "export function createEgressTunnelWiring(deps: {",
+      "  readonly broadcastStatus: (status: EgressTunnelStatus) => void;",
+      "  readonly observer: { attach(listener: (info: BoxConnectionInfo | null) => void): void };",
+      "  readonly isEnabled: () => boolean;",
+      "  readonly createClient?: ConstructorParameters<typeof EgressTunnelController>[0][\"createClient\"];",
+      "  readonly log?: (...values: unknown[]) => void;",
+      "  readonly env?: NodeJS.ProcessEnv;",
+      "}): EgressTunnelController {",
+      "  const createClient = deps.createClient ?? createProductionEgressTunnelClient;",
+      "  const options: ConstructorParameters<typeof EgressTunnelController>[0] = {",
+      "    onStatus: (status) => deps.broadcastStatus(status),",
+      "    createClient,",
+      "    ...(deps.log === undefined ? {} : { log: deps.log }),",
+      "    ...(deps.env === undefined ? {} : { env: deps.env }),",
+      "  };",
+      "  const controller = new EgressTunnelController(options);",
+      "  deps.observer.attach((info) => controller.setBoxConnection(info != null ? boxConnectionToEgressConfig(info) : null));",
+      "  controller.setEnabled(deps.isEnabled());"
+    ]
+  },
+  "docker-ready": {
+    "type": "code",
+    "kind": "就緒",
+    "title": "容器起來後仍要輪詢健康檢查，最多等三分鐘",
+    "meta": "source/electron-main/box/local-docker-host-connector.ts:205-215",
+    "why": "說明容器啟動不等於能連，逾時或提早退出都丟明確錯誤。",
+    "start": 205,
+    "hi": [
+      205,
+      207,
+      215
+    ],
+    "lines": [
+      "  const deadline = Date.now() + READY_TIMEOUT_MS;",
+      "  while (Date.now() < deadline) {",
+      "    if (await gatewayReady(token)) return { baseUrl: LOCAL_DOCKER_GATEWAY_URL, token };",
+      "    const state = await inspectContainer();",
+      "    if (!state.running) {",
+      "      const logs = await runDocker([\"logs\", \"--tail\", \"80\", LOCAL_DOCKER_BOX_CONTAINER]);",
+      "      throw new Error(`Local Docker VM stopped before its gateway became ready.\\n${logs.output}`);",
+      "    }",
+      "    await new Promise((resolve) => setTimeout(resolve, 1_000));",
+      "  }",
+      "  throw new Error(\"Local Docker VM did not expose its gateway within three minutes.\");"
+    ]
+  },
+  "runtime-switch": {
+    "type": "code",
+    "kind": "開關",
+    "title": "boxRuntime 的讀寫入口，切換成功才重啟協調",
+    "meta": "source/electron-main/main-edge.ts:117-118",
+    "why": "確認三條通道裡只有這兩個處理常式在管開關。",
+    "start": 117,
+    "hi": [
+      118
+    ],
+    "lines": [
+      "    getBoxRuntime: async () => { const mode = invoke(deps.settingsStore, \"getBoxRuntime\"); invariant(isSandBoxRuntime(mode), \"Unknown box runtime.\"); return { mode, status: await getLocalDockerStatus(String(Reflect.get(deps.settingsStore, \"settingsPath\"))) }; },",
+      "    setBoxRuntime: async (raw) => { const mode = req(raw).mode; invariant(isSandBoxRuntime(mode), \"Unknown box runtime.\"); const settingsPath = String(Reflect.get(deps.settingsStore, \"settingsPath\")); invoke(deps.settingsStore, \"setBoxRuntime\", mode); try { if (mode === \"local-docker\") await startLocalDockerBox(settingsPath); else await stopLocalDockerBox(); } catch (error) { invoke(deps.settingsStore, \"setBoxRuntime\", mode === \"local-docker\" ? \"remote\" : \"local-docker\"); throw error; } invoke(deps.boxRecovery, \"restartCoordinator\"); return { mode, status: await getLocalDockerStatus(settingsPath) }; },"
+    ]
+  },
+  "local-exec-spawn": {
+    "type": "code",
+    "kind": "拉起",
+    "title": "本機命令行程由桌面主行程另外拉起，帶世代權杖",
+    "meta": "source/electron-main/local-exec/local-exec-native.ts:35-35",
+    "why": "證明 local-exec 是獨立行程，不是沙箱裡的服務。",
+    "start": 35,
+    "hi": [
+      35
+    ],
+    "lines": [
+      "export async function spawnLocalExecDaemon(args: { readonly logPath: string; readonly env: NodeJS.ProcessEnv; readonly mainPath?: string; readonly spawnImpl?: typeof spawn; readonly generationToken?: string; readonly realpath?: typeof realpathSync; readonly open?: typeof openSync; readonly close?: typeof closeSync }): Promise<SpawnedLocalExecDaemon> { await mkdir(dirname(args.logPath), { recursive: true }); const entryRealpath = resolveLocalExecDaemonEntryRealpath(args.mainPath ?? daemonMainPath(), args.realpath ?? realpathSync); const generationToken = args.generationToken ?? randomUUID(); if (generationToken.length === 0) throw new Error(\"local-exec generation token must not be empty\"); const logFd = (args.open ?? openSync)(args.logPath, \"a\"); try { const child = (args.spawnImpl ?? spawn)(process.execPath, [entryRealpath, `${LOCAL_EXEC_GENERATION_TOKEN_ARG}${generationToken}`], { detached: true, stdio: [\"ignore\", logFd, logFd], env: { ...process.env, ...args.env, [LOCAL_EXEC_GENERATION_TOKEN_ENV]: generationToken } }); const spawnedAt = performance.now(); let spawnSucceeded = false; child.once(\"error\", (error) => reportLocalExecSpawnFailed(error)); child.once(\"spawn\", () => { spawnSucceeded = true; reportLocalExecSpawned(child.pid); }); child.once(\"exit\", (exitCode, signal) => { if (spawnSucceeded) reportLocalExecExited({ ...(child.pid === undefined ? {} : { pid: child.pid }), exitCode, signal, uptimeMs: performance.now() - spawnedAt }); }); child.unref(); return { child, entryRealpath, generationToken }; } finally { (args.close ?? closeSync)(logFd); } }"
+    ]
+  },
+  "local-exec-lane": {
+    "type": "code",
+    "kind": "常駐",
+    "title": "常駐行程收到訊號才收尾，啟動訊息說明角色",
+    "meta": "source/local-exec-daemon/main.ts:56-67",
+    "why": "顯示這個行程獨立於沙箱閘道，只是代跑本機命令。",
+    "start": 56,
+    "hi": [
+      65
+    ],
+    "lines": [
+      "export async function runLocalExecDaemonMain(deps: LocalExecDaemonMainDeps): Promise<{ shutdown(signal: \"SIGTERM\" | \"SIGINT\"): void }> {",
+      "  const processLike = deps.process ?? process; const log = deps.log ?? console.log; const shutdownDeadline = createDeadlinePolicy(realClock, { name: \"local-exec-daemon-shutdown\", timeoutMs: LOCAL_EXEC_DAEMON_SHUTDOWN_TIMEOUT_MS });",
+      "  installInvariantReporter((report) => writeInvariantViolationLog(report)); const guards = installProcessCrashGuards({ scope: \"sand-local-exec-daemon\" }); const reportCrash = deps.initCrashReporter?.(); if (reportCrash !== undefined) guards.setReporter(reportCrash);",
+      "  const lifetime = (deps.holdProcessOpen ?? holdLocalExecDaemonProcessOpen)(); let daemon: { close(): Promise<void> } | undefined; let pendingSignal: \"SIGTERM\" | \"SIGINT\" | undefined; let isShuttingDown = false;",
+      "  const beginShutdown = (signal: \"SIGTERM\" | \"SIGINT\") => { if (isShuttingDown) return; if (daemon === undefined) { pendingSignal ??= signal; log(`[sand-local-exec-daemon] received ${signal} during startup; shutdown queued`); return; } isShuttingDown = true; const runningDaemon = daemon; log(`[sand-local-exec-daemon] received ${signal}, shutting down`); void shutdownDeadline.run(() => runningDaemon.close()).finally(() => { lifetime.release(); processLike.exit(0); }); };",
+      "  processLike.on(\"SIGTERM\", () => beginShutdown(\"SIGTERM\")); processLike.on(\"SIGINT\", () => beginShutdown(\"SIGINT\"));",
+      "  try { daemon = await deps.runDaemon(deps.daemonOptions); }",
+      "  catch (error) { lifetime.release(); throw error; }",
+      "  if (pendingSignal !== undefined) beginShutdown(pendingSignal);",
+      "  else log(`[sand-local-exec-daemon] started (pid ${processLike.pid}); serving local exec over the gateway`);",
+      "  return { shutdown: beginShutdown };",
+      "}"
+    ]
+  },
+  "root-dir": {
+    "type": "code",
+    "kind": "開機",
+    "title": "根目錄判斷順序：env 覆寫、user-data-dir、變體名稱",
+    "meta": "source/host/host-paths.ts:66-72",
+    "why": "證明根目錄不是寫死一條路徑，三種來源依序短路",
+    "start": 66,
+    "lines": [
+      "export function getSandRootDir(homeDir = homedir()): string {",
+      "  const override = resolveSandDataRootOverride();",
+      "  if (override != null) return override;",
+      "  const userDataDir = resolveSandUserDataDir([], process.env);",
+      "  if (userDataDir != null) return join(userDataDir, SAND_DATA_DIRNAME);",
+      "  const variant = getSandVariant();",
+      "  return variant === \"sand\" ? getSandProductionRootDir(homeDir) : join(homeDir, \".cursor\", variant);"
+    ],
+    "hi": [
+      67,
+      69,
+      72
+    ]
+  },
+  "root-override": {
+    "type": "code",
+    "kind": "開機",
+    "title": "SAND_DATA_ROOT 環境變數覆寫根目錄",
+    "meta": "source/host/host-paths.ts:61-64",
+    "why": "路徑解析器檢查環境變數是否給定絕對路徑，以提供覆寫預設儲存根目錄的機制。",
+    "start": 61,
+    "hi": [
+      62,
+      63
+    ],
+    "lines": [
+      "export function resolveSandDataRootOverride(env: NodeJS.ProcessEnv = process.env): string | null {",
+      "  const override = env[SAND_DATA_ROOT_ENV]?.trim();",
+      "  return override != null && override.length > 0 && isAbsolute(override) ? override : null;",
+      "}"
+    ]
+  },
+  "root-files": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "根目錄下的旗標檔清單",
+    "meta": "source/host/host-paths.ts:85-89",
+    "why": "本模組定義了服務探索、主機鎖、密鑰與升級標記等位於根目錄下的標準路徑函式。",
+    "start": 85,
+    "hi": [
+      85,
+      86,
+      87
+    ],
+    "lines": [
+      "export function getGatewayDiscoveryPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"gateway.json\"); }",
+      "export function getHostLockPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"host.lock\"); }",
+      "export function getHostSecretsPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"host-secrets.json\"); }",
+      "export function getHostUpgradeMarkerPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \".sand-host-upgrade.json\"); }",
+      "export function getHostCrashMarkerPath(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \".sand-host-crash.json\"); }"
+    ]
+  },
+  "host-secrets-misnomer": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "host-secrets.json 其實放 machineId，不是憑證",
+    "meta": "source/host/host-secret-store.ts:9-17",
+    "why": "名為密鑰的檔案實質上僅用於持久化機器的唯一識別碼，並非存放金鑰或憑證之處。",
+    "start": 9,
+    "hi": [
+      9,
+      13,
+      14
+    ],
+    "lines": [
+      "export async function getOrCreateHostMachineId(path = getHostSecretsPath()): Promise<string> {",
+      "  if (machineIdCache != null) return machineIdCache;",
+      "  const existing = await readMachineId(path);",
+      "  if (existing != null) { machineIdCache = existing; return existing; }",
+      "  const machineId = randomUUID();",
+      "  await writeMachineId(path, machineId);",
+      "  machineIdCache = machineId;",
+      "  return machineId;",
+      "}"
+    ]
+  },
+  "settings-class": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "SandSettingsStore：load 容錯、persist 原子寫",
+    "meta": "source/shared/node/settings/sand-settings-store.ts:93-107",
+    "why": "證明讀壞退回空設定、寫入是暫存檔加 rename",
+    "start": 93,
+    "lines": [
+      "export class SandSettingsStore {",
+      "  constructor(readonly settingsPath: string) {}",
+      "  load(): SandStoredSettings {",
+      "    if (!existsSync(this.settingsPath)) return emptySettings();",
+      "    try { const parsed = parseSettings(JSON.parse(readFileSync(this.settingsPath, \"utf8\")) as unknown); return parsed == null ? emptySettings() : this.applyPendingMigrations(parsed); }",
+      "    catch { return emptySettings(); }",
+      "  }",
+      "  private applyPendingMigrations(settings: SandStoredSettings): SandStoredSettings {",
+      "    if (settings.settingsMigrations.includes(SAND_DOWNGRADE_MAX_FAST_MIGRATION_ID)) return settings;",
+      "    const migrated = { ...settings, settingsMigrations: [...settings.settingsMigrations, SAND_DOWNGRADE_MAX_FAST_MIGRATION_ID], ...(settings.agentDefaultModel === undefined ? {} : { agentDefaultModel: downgradePersistedFast(settings.agentDefaultModel) }) };",
+      "    try { this.persist(migrated); } catch {}",
+      "    return migrated;",
+      "  }",
+      "  persist(settings: SandStoredSettings): void { mkdirSync(dirname(this.settingsPath), { recursive: true }); const temp = `${this.settingsPath}.${process.pid}.tmp`; writeFileSync(temp, JSON.stringify(settings, null, 2), \"utf8\"); renameSync(temp, this.settingsPath); }",
+      "  private update(mutator: (settings: SandStoredSettings) => SandStoredSettings): void { this.persist(mutator(this.load())); }"
+    ],
+    "hi": [
+      96,
+      97,
+      106
+    ]
+  },
+  "settings-coordinator": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "coordinator 另開一份指向同一支 settings.json",
+    "meta": "source/node-agent-coordinator/inference-router.ts:52-59",
+    "why": "證明 coordinator 跟 host 用同一個類別開同一個檔案",
+    "start": 52,
+    "lines": [
+      "export function createCoordinatorInferenceRouter(options: {",
+      "  readonly dataDir: string;",
+      "  readonly postEvent: (family: string, payload: unknown) => void;",
+      "  readonly dispatchRemote: (method: string, args: unknown) => Promise<unknown>;",
+      "  readonly now?: () => number;",
+      "}) {",
+      "  const settings = new SandSettingsStore(join(options.dataDir, \"settings.json\"));",
+      "  const storePath = join(options.dataDir, \"inference-router-transcript.json\");"
+    ],
+    "hi": [
+      58
+    ]
+  },
+  "agent-dir-guard": {
+    "type": "code",
+    "kind": "權限",
+    "title": "resolveSandAgentDir 驗證 agentId 防止跳出 agents 根目錄",
+    "meta": "source/host/storage/agent-paths.ts:1-2",
+    "why": "路徑解析器透過字元檢驗與相對路徑防護，嚴格限制代理人資料夾不得逸出根目錄。",
+    "start": 1,
+    "hi": [
+      2
+    ],
+    "lines": [
+      "import { homedir } from \"node:os\"; import { isAbsolute, join, relative, sep } from \"node:path\"; import { getSandRootDir } from \"../host-paths.js\"; import { isSafeFolderId } from \"./folder-id.js\";",
+      "export class SandInvalidAgentIdError extends Error {} export function getSandAgentsRootDir(homeDir = homedir()): string { return join(getSandRootDir(homeDir), \"agents\"); } export function assertValidSandAgentId(agentId: string): void { if (!isSafeFolderId(agentId) || agentId !== agentId.trim()) throw new SandInvalidAgentIdError(`Invalid Sand agent id: ${agentId}`); } export function resolveSandAgentDir(agentId: string, homeDir = homedir()): string { assertValidSandAgentId(agentId); const root = getSandAgentsRootDir(homeDir); const target = join(root, agentId); const rel = relative(root, target); if (rel.length === 0 || rel === \"..\" || rel.startsWith(`..${sep}`) || isAbsolute(rel) || rel.includes(sep)) throw new SandInvalidAgentIdError(`Invalid Sand agent id: ${agentId}`); return target; }"
+    ]
+  },
+  "db-checkpoint": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "checkpointSandAgentDb 手動下 wal_checkpoint(TRUNCATE)",
+    "meta": "source/host/storage/store-db.ts:15-15",
+    "why": "資料庫模組提供手動執行截斷檢查點的介面，確保預寫日誌能完整合流至主資料庫。",
+    "start": 15,
+    "hi": [
+      15
+    ],
+    "lines": [
+      "export function checkpointSandAgentDb(dbPath: string, busyTimeoutMs = DB_BUSY_TIMEOUT_MS): boolean { if (!existsSync(dbPath)) return true; let db: DatabaseSync | undefined, result: unknown; try { db = new DatabaseSync(dbPath); db.exec(`PRAGMA busy_timeout = ${busyTimeoutMs}`); result = db.prepare(\"PRAGMA wal_checkpoint(TRUNCATE)\").get(); } catch { return false; } finally { db?.close(); } const folded = walFramesFullyFolded(result); if (folded != null) return folded; try { return statSync(`${dbPath}-wal`).size === 0; } catch (error) { return (error as { code?: unknown }).code === \"ENOENT\"; } }"
+    ]
+  },
+  "checkpoint-clone": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "cloneAgent 複製資料夾前先 checkpointStore",
+    "meta": "source/host/extensions/transcript/agent-lifecycle.ts:250-261",
+    "why": "證明第一個真的呼叫 checkpoint 的時機是複製 agent",
+    "start": 250,
+    "lines": [
+      "    const opened = await this.tm.sessionStore.mintAgent(",
+      "      async (agentId: string) => {",
+      "        cloneAgentDir(",
+      "          this.tm.sessionStore.getAgentDir(sourceId),",
+      "          this.tm.sessionStore.getAgentDir(agentId),",
+      "          agentId,",
+      "          cloneAgentDisplayName(summary.name),",
+      "          {",
+      "            getAutomationsDir: getAgentAutomationsDir,",
+      "            checkpointStore: (dbPath) => {",
+      "              checkpointSandAgentDb(dbPath);",
+      "            },"
+    ],
+    "hi": [
+      259,
+      260
+    ]
+  },
+  "checkpoint-backstop": {
+    "type": "code",
+    "kind": "儲存",
+    "title": "狀態備份讀 db 位元組前先 checkpoint",
+    "meta": "source/host/production-binding-providers.ts:18-23",
+    "why": "證明第二個呼叫 checkpoint 的時機是備份讀檔",
+    "start": 18,
+    "lines": [
+      "export function createProductionStateBackstop():",
+      "  Parameters<typeof createStateBackstopExtension>[0] {",
+      "  return {",
+      "    agentsRootDir: getSandAgentsRootDir(),",
+      "    readDbBytes: dbPath => readStoreDbBytes(dbPath, checkpointSandAgentDb)",
+      "  };"
+    ],
+    "hi": [
+      22
+    ]
+  },
+  "memory-prefix": {
+    "type": "code",
+    "kind": "記憶",
+    "title": "抽取／長篇摘要標記與 episode／note 前綴常數",
+    "meta": "source/host/runner/sand-memory.ts:6-9",
+    "why": "本檔定義了用於提示詞注入抽取標記，以及記憶記錄前綴字串的具名常數清單。",
+    "start": 6,
+    "hi": [
+      6,
+      8,
+      9
+    ],
+    "lines": [
+      "export const MEMORY_EXTRACTION_PROMPT_MARKER = \"<<SAND_MEMORY_EXTRACTION>>\";",
+      "export const MEMORY_EPISODE_PROMPT_MARKER = \"<<SAND_MEMORY_EPISODE>>\";",
+      "export const MEMORY_EPISODE_PREFIX = \"[episode] \";",
+      "export const MEMORY_NOTE_PREFIX = \"[note] \";"
+    ]
+  },
+  "memory-halflife": {
+    "type": "code",
+    "kind": "記憶",
+    "title": "MEMORY_DECAY_HALF_LIFE_DAYS 固定 30 天",
+    "meta": "source/host/runner/sand-memory.ts:18-19",
+    "why": "記憶衰減演算法以三十天為固定半衰期，藉此計算記憶條目隨時間推移的權重衰變。",
+    "start": 18,
+    "hi": [
+      18,
+      19
+    ],
+    "lines": [
+      "export const MEMORY_DECAY_HALF_LIFE_DAYS = 30;",
+      "export const DAY_MS = 86_400_000;"
+    ]
+  },
+  "memory-rank": {
+    "type": "code",
+    "kind": "記憶",
+    "title": "memoryRecallRank 把半衰期換算進排序分數",
+    "meta": "source/host/runner/sand-memory.ts:64-66",
+    "why": "排序函式依據重要性對數加權與半衰期時間遞減，計算記憶檢索時的優先排序評分。",
+    "start": 64,
+    "hi": [
+      64,
+      65
+    ],
+    "lines": [
+      "export function memoryRecallRank(memory: MemoryRecord): number {",
+      "  return Math.log2(memoryImportance(memory.content)) + memory.createdAt / (MEMORY_DECAY_HALF_LIFE_DAYS * DAY_MS);",
+      "}"
+    ]
+  },
+  "memory-frozen": {
+    "type": "code",
+    "kind": "記憶",
+    "title": "resolveFrozenMemoryPrompt 依 compactionEpoch 決定要不要重算",
+    "meta": "source/host/runner/sand-memory.ts:24-38",
+    "why": "證明凍結快照命中時直接回傳，epoch 換了才重新 renderLive",
+    "start": 24,
+    "lines": [
+      "export interface FrozenMemorySnapshot { readonly render: string; readonly compactionEpoch: number }",
+      "",
+      "export function isMemoryFreezeEnabled(env: NodeJS.ProcessEnv = process.env): boolean {",
+      "  return env.SAND_DISABLE_MEMORY_FREEZE !== \"1\";",
+      "}",
+      "",
+      "export function resolveFrozenMemoryPrompt(args: {",
+      "  readonly snapshot?: FrozenMemorySnapshot;",
+      "  readonly compactionEpoch: number;",
+      "  readonly renderLive: () => { readonly render: string; readonly hasFacts: boolean };",
+      "}): { readonly render: string; readonly snapshotToPersist?: FrozenMemorySnapshot } {",
+      "  if (args.snapshot != null && args.snapshot.compactionEpoch === args.compactionEpoch) return { render: args.snapshot.render };",
+      "  const live = args.renderLive();",
+      "  return !live.hasFacts ? { render: live.render } : { render: live.render, snapshotToPersist: { render: live.render, compactionEpoch: args.compactionEpoch } };",
+      "}"
+    ],
+    "hi": [
+      35,
+      37
+    ]
+  },
+  "secrets-box": {
+    "type": "code",
+    "kind": "權限",
+    "title": "getBoxSecretsStorePath 指向 <root>/box-secrets.json",
+    "meta": "source/host/extensions/secrets/secrets-service.ts:2-2",
+    "why": "路徑解析器將沙箱環境機密存儲檔定位於根目錄下的固定名稱檔案中。",
+    "start": 2,
+    "hi": [
+      2
+    ],
+    "lines": [
+      "export class SandBoxSecretsValidationError extends Error {} export const BOX_SECRETS_FILENAME = \"box-secrets.json\"; export const SECRETS_APPLY_WAIT_MS = 5_000; export const SECRETS_RETRY_INITIAL_MS = 1_000; export const SECRETS_RETRY_MAX_MS = 30_000; export function getBoxSecretsStorePath(): string { return join(getSandRootDir(), BOX_SECRETS_FILENAME); }"
+    ]
+  },
+  "secrets-box-persist": {
+    "type": "code",
+    "kind": "權限",
+    "title": "BoxSecretsApplier.persist：暫存檔、mode 0o600、rename",
+    "meta": "source/host/extensions/secrets/secrets-service.ts:4-4",
+    "why": "持久化模組藉由暫存檔、嚴格權限設定與原子重命名，安全寫入沙箱密鑰資料。",
+    "start": 4,
+    "hi": [
+      4
+    ],
+    "lines": [
+      "export class BoxSecretsApplier { private readonly storePath: string; private readonly log: (message: string) => void; private desired: Record<string, string> = {}; private desiredGeneration = 0; private appliedGeneration = 0; private lastAppliedAtMs: number | null = null; private isApplying = false; private isStopped = false; private readonly stopSignal = new AbortController(); private appliedWaiters: Array<() => void> = []; constructor(private readonly options: { readonly applyToBox: (ctx: Context, update: { env: Record<string, string>; replace: true }) => Promise<void>; readonly retryPolicy: RetryPolicy; readonly applyDeadline: DeadlinePolicy; readonly storePath?: string; readonly log?: (message: string) => void; readonly now?: () => number }) { this.storePath = options.storePath ?? getBoxSecretsStorePath(); this.log = options.log ?? ((message) => console.info(`[sand-host] ${message}`)); } async setSecrets(ctx: Context, secrets: Record<string, string>) { const validationError = validateBoxSecrets(secrets); if (validationError != null) throw new SandBoxSecretsValidationError(validationError); this.desired = { ...secrets }; this.desiredGeneration += 1; const generation = this.desiredGeneration; await this.persist(); void this.runApplyLoop(ctx); await this.options.applyDeadline.run((signal) => this.waitForGeneration(generation, signal)).catch((error) => this.log(`box secrets: apply wait ended unconfirmed (${errorLogTag(error)})`)); return this.getStatus(); } async applyPersisted(ctx: Context): Promise<void> { if (this.desiredGeneration > 0) return; const persisted = await this.loadPersisted(); if (persisted == null || this.desiredGeneration > 0 || validateBoxSecrets(persisted) != null) return; this.desired = persisted; this.desiredGeneration += 1; this.log(`applying ${Object.keys(persisted).length} persisted box secret(s) at startup`); await this.runApplyLoop(ctx); } getStatus() { return { keys: Object.keys(this.desired).sort(), isApplied: this.desiredGeneration > 0 && this.appliedGeneration === this.desiredGeneration, lastAppliedAtMs: this.lastAppliedAtMs }; } stop(): void { this.isStopped = true; this.stopSignal.abort(); this.notifyApplied(); } private async runApplyLoop(ctx: Context): Promise<void> { if (this.isApplying || this.isStopped) return; this.isApplying = true; try { let attempt = 0; while (this.appliedGeneration < this.desiredGeneration && !this.isStopped) { const generation = this.desiredGeneration; try { await this.options.applyToBox(ctx, { env: buildBoxSecretsEnv(this.desired), replace: true }); this.appliedGeneration = generation; this.lastAppliedAtMs = (this.options.now ?? Date.now)(); attempt = 0; this.notifyApplied(); } catch (error) { if (error instanceof BoxEnvironmentSyncUnsupportedError) { this.isStopped = true; this.log(\"box secrets: this box has no environment sync; giving up\"); return; } attempt += 1; this.log(`box secrets: apply failed (attempt ${attempt}); retrying`); const retry = this.options.retryPolicy.schedule(attempt, this.stopSignal.signal); try { await retry.elapsed; } catch (retryError) { if (this.isStopped) return; throw retryError; } finally { retry.dispose(); } } } } finally { this.isApplying = false; this.notifyApplied(); } } private notifyApplied(): void { const waiters = this.appliedWaiters; this.appliedWaiters = []; for (const waiter of waiters) waiter(); } private async waitForGeneration(generation: number, signal: AbortSignal): Promise<void> { while (this.appliedGeneration < generation && !this.isStopped) { if (signal.aborted) throw signal.reason; await new Promise<void>((resolve, reject) => { const remove = () => { const index = this.appliedWaiters.indexOf(finish); if (index >= 0) this.appliedWaiters.splice(index, 1); signal.removeEventListener(\"abort\", abort); }; const finish = () => { remove(); resolve(); }; const abort = () => { remove(); reject(signal.reason); }; this.appliedWaiters.push(finish); signal.addEventListener(\"abort\", abort, { once: true }); }); } } private async persist(): Promise<void> { await fs.mkdir(dirname(this.storePath), { recursive: true }); const temporary = `${this.storePath}.${process.pid}.${randomUUID()}.tmp`; await fs.writeFile(temporary, JSON.stringify({ version: 1, secrets: this.desired }), { encoding: \"utf8\", mode: 0o600 }); await fs.rename(temporary, this.storePath); } private async loadPersisted(): Promise<Record<string, string> | null> { try { return parsePersisted(JSON.parse(await fs.readFile(this.storePath, \"utf8\")) as unknown); } catch { return null; } } }"
+    ]
+  },
+  "secrets-user": {
+    "type": "code",
+    "kind": "權限",
+    "title": "getStorePath 指向 Electron userData 下的 sand-secrets.json",
+    "meta": "source/electron-main/secrets/secret-store.ts:135-137",
+    "why": "使用者憑證存放路徑由應用程式的使用者資料目錄與固定檔案名結合而成。",
+    "start": 135,
+    "hi": [
+      135,
+      136
+    ],
+    "lines": [
+      "function getStorePath(): string {",
+      "  return join(electronSecretStorageRuntime().app.getPath(\"userData\"), SECRETS_FILENAME);",
+      "}"
+    ]
+  },
+  "secrets-user-write": {
+    "type": "code",
+    "kind": "權限",
+    "title": "writeAtomic：暫存檔加 rename，未另外指定檔案權限",
+    "meta": "source/electron-main/secrets/secret-store.ts:194-200",
+    "why": "使用者密鑰寫入函式採用暫存檔原子替換，但在寫入時未特別限制權限旗標。",
+    "start": 194,
+    "hi": [
+      194,
+      198,
+      199
+    ],
+    "lines": [
+      "async function writeAtomic(map: Readonly<Record<string, string>>): Promise<void> {",
+      "  const storePath = getStorePath();",
+      "  await fs.mkdir(dirname(storePath), { recursive: true });",
+      "  const temporaryPath = `${storePath}.${process.pid}.${randomUUID()}.tmp`;",
+      "  await fs.writeFile(temporaryPath, JSON.stringify(map, null, 2), \"utf-8\");",
+      "  await fs.rename(temporaryPath, storePath);",
+      "}"
+    ]
+  },
+  "secrets-docker": {
+    "type": "code",
+    "kind": "權限",
+    "title": "persistInferenceCredential：暫存檔、rename、chmod 0o600",
+    "meta": "source/electron-main/box/local-docker-host-connector.ts:50-62",
+    "why": "證明 docker 層憑證檔路徑與原子寫加 chmod",
+    "start": 50,
+    "lines": [
+      "function inferenceCredentialPath(settingsPath: string): string {",
+      "  return join(dirname(settingsPath), \"local-docker-credential\", \"inference.json\");",
+      "}",
+      "",
+      "async function persistInferenceCredential(settingsPath: string, credential: InferenceCredential): Promise<string> {",
+      "  const target = inferenceCredentialPath(settingsPath);",
+      "  const temporary = `${target}.${process.pid}.tmp`;",
+      "  await mkdir(dirname(target), { recursive: true });",
+      "  await writeFile(temporary, `${JSON.stringify({ accessToken: credential.accessToken, expiresAtMs: credential.expiresAtMs })}\\n`, { encoding: \"utf8\", mode: 0o600 });",
+      "  await rename(temporary, target);",
+      "  await chmod(target, 0o600);",
+      "  return target;",
+      "}"
+    ],
+    "hi": [
+      51,
+      58,
+      60
+    ]
+  },
+  "t8-adapter-host": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "host 遙測的 adapter 是 SandStructuredLogTelemetry，跟產品分析同一次建構",
+    "meta": "source/host/extensions/telemetry/host-telemetry-service.ts:166-190",
+    "why": "host 這一路的 adapter 建在哪、跟哪個 sink 綁在一起，是 host-turn 家族的接線事實。",
+    "start": 166,
+    "hi": [
+      168,
+      190
+    ],
+    "lines": [
+      "    this.logs =",
+      "      options.logs ??",
+      "      new SandStructuredLogTelemetry({",
+      "        ...(options.identityTags === undefined",
+      "          ? {}",
+      "          : { identityTags: options.identityTags }),",
+      "        ...(options.flushPolling === undefined",
+      "          ? {}",
+      "          : { flushPolling: options.flushPolling }),",
+      "        ...(options.submitDeadline === undefined",
+      "          ? {}",
+      "          : { submitDeadline: options.submitDeadline }),",
+      "        ...(options.identityHoldExpiry === undefined",
+      "          ? {}",
+      "          : { identityHoldExpiry: options.identityHoldExpiry }),",
+      "        ...(options.createStructuredLogClient === undefined",
+      "          ? {}",
+      "          : { createClient: options.createStructuredLogClient }),",
+      "        getAccessToken: (...args) => options.auth.getAccessToken(...args),",
+      "        getMachineId: () => options.auth.getMachineId(),",
+      "        holdFlushForHostBundleIdentity: true,",
+      "      });",
+      "    this.analytics =",
+      "      options.analytics ??",
+      "      new SandProductAnalytics({"
+    ]
+  },
+  "t8-buffer-const": {
+    "type": "code",
+    "kind": "常數",
+    "title": "host 這條 pipe 的緩衝上限是 1000 筆，跟桌面那條的 64 筆不是同一個數字",
+    "meta": "source/shared/observability/structured-log-transport.ts:6-8",
+    "why": "host 與桌面的緩衝上限不同，讀者需要這個數字才看得出兩條管線不是同一份佇列。",
+    "start": 6,
+    "hi": [
+      6
+    ],
+    "lines": [
+      "export const MAX_BUFFER_SIZE = 1_000;",
+      "export const STRUCTURED_LOG_SUBMIT_DEADLINE_MS = 15_000;",
+      "export const STRUCTURED_LOG_REPLAY_MAX_AGE_MS = 17 * 60 * 60 * 1_000;"
+    ]
+  },
+  "t8-overflow-host": {
+    "type": "code",
+    "kind": "落地",
+    "title": "host 佇列滿了砍最舊的 host/box 心跳日誌，不是砍任意一筆",
+    "meta": "source/shared/observability/structured-log-transport.ts:107-110",
+    "why": "溢位時優先砍哪一種訊息是 host-turn 家族專屬的政策，跟桌面那條的無差別砍最舊不同。",
+    "start": 107,
+    "hi": [
+      108,
+      109
+    ],
+    "lines": [
+      "  private dropBufferOverflow(): void {",
+      "    let overflow = this.buffer.length - MAX_BUFFER_SIZE; if (overflow <= 0) return; const evicted: BufferedStructuredLog[] = [];",
+      "    this.buffer = this.buffer.filter((entry) => { if (overflow > 0 && (entry.message === HOST_LOG_EVENT || entry.message === BOX_LOG_EVENT)) { overflow -= 1; evicted.push(entry); return false; } return true; }); evicted.push(...this.buffer.splice(0, overflow)); this.recordDrop(\"overflow_evicted\", evicted.length); this.settle(evicted, \"dropped\");",
+      "  }"
+    ]
+  },
+  "t8-pipes-full": {
+    "type": "code",
+    "kind": "分流",
+    "title": "desktop-log 家族其實有十三支 pipe，不是舊文件列出的六支",
+    "meta": "source/electron-main/telemetry/telemetry-report-pipes.ts:47-59",
+    "why": "這段列出既有文件沒提到的 sendLatency 到 sentryConversation 共十三支 pipe，是這次重寫的主要新增範圍。",
+    "start": 47,
+    "hi": [
+      50,
+      57,
+      59
+    ],
+    "lines": [
+      "    sendLatency: reportPipe(isValidSendLatencyReport, emit(\"reportSendLatency\", sendLatencyReportToTelemetry)),",
+      "    sendAck: reportPipe(isValidSendAckReport, (report: any) => { emit(\"reportSendAck\", sendAckReportToTelemetry)(report); recordSendAckSpan(report); }),",
+      "    reactionAck: reportPipe(isValidReactionAckReport, emit(\"reportReactionAck\", reactionAckReportToTelemetry)),",
+      "    vncSession: reportPipe(isValidVncSessionReport, (report: any) => { const value = vncSessionToTelemetry(report, report.vncHost === undefined ? undefined : deps.getVncTokenInfo(report.vncHost)); deps.telemetry()?.reportVncSession(value.level, value.metadata); }),",
+      "    vncLiveness: reportPipe(isValidVncLivenessReport, emit(\"reportVncLiveness\", vncLivenessToTelemetry)),",
+      "    openComputer: reportPipe(isValidOpenComputerReport, emit(\"reportOpenComputer\", openComputerToTelemetry)),",
+      "    renderTtfr: reportPipe(isValidRenderTtfrReport, (report: any) => { emit(\"reportRenderTtfr\", renderTtfrReportToTelemetry)(report); if (report.outcome === \"rendered\") recordSendStageSpan({ name: \"render-first-chunk\", traceparent: report.traceparent, ...(report.clientNonce === undefined ? {} : { clientNonce: report.clientNonce }), startEpochMs: report.enterEpochMs, durationMs: report.ttfrMs, attributes: { \"sand.render_ttfr_ms\": Math.round(report.ttfrMs), ...(report.chunkType === undefined ? {} : { \"sand.render_chunk_type\": report.chunkType }), ...(report.conversationId === undefined ? {} : { \"sand.conversation_id\": report.conversationId }) } }); }),",
+      "    renderStream: reportPipe(isValidRenderStreamReport, emit(\"reportRenderStream\", renderStreamReportToTelemetry)),",
+      "    updatePrompt: reportPipe(isValidUpdatePromptReport, emit(\"reportUpdatePrompt\", updatePromptToTelemetry)),",
+      "    signinGate: reportPipe(isValidSigninGateReport, emit(\"reportDesktopSignin\", signinGateToTelemetry)),",
+      "    onboardingStep: reportPipe(isValidOnboardingStepReport, (report) => deps.productAnalytics()?.trackEvent(\"sand.onboarding.step_viewed\", onboardingStepReportToAnalytics(report))),",
+      "    clientFailure: reportPipe(isValidClientFailureReport, (report: any) => deps.telemetry()?.reportClientFailure(clientFailureReportToTelemetry(report))),",
+      "    sentryConversation: reportPipe(isValidSentryConversationReport, (report) => setSandSentryConversation(report.agentId)),"
+    ]
+  },
+  "t8-handoff-wire": {
+    "type": "code",
+    "kind": "接線",
+    "title": "handoff telemetry 建在 production-provider.ts 裡，接的是 ports.telemetry.reportHandoff",
+    "meta": "source/electron-main/coordinator/production-provider.ts:380-382",
+    "why": "wiring 表要指出 coordinator-agg 家族的 adapter 是在哪一行組裝起來的。",
+    "start": 380,
+    "hi": [
+      381
+    ],
+    "lines": [
+      "      const now = () => performance.now();",
+      "      const handoff = createCoordinatorHandoffTelemetry(ports.telemetry.reportHandoff);",
+      "      const connectivity = createElectronDesktopConnectivity({"
+    ]
+  },
+  "t8-box-wire": {
+    "type": "code",
+    "kind": "接線",
+    "title": "box-visibility 的 sink 是每次都重新讀 telemetry?.telemetry，不是固定引用",
+    "meta": "source/electron-main/main-production-services.ts:588-596",
+    "why": "box-visibility 家族的 sink 綁定方式跟其餘 feature-buffered 事件不同，要有原文佐證。",
+    "start": 588,
+    "hi": [
+      588,
+      596
+    ],
+    "lines": [
+      "      boxVisibilityTracker = new SandBoxVisibilityTracker(createBoxVisibilitySink(() => {",
+      "        const sink = telemetry?.telemetry;",
+      "        return sink == null || typeof sink.reportBoxSetupVisible !== \"function\" || typeof sink.reportBoxRecreateVisible !== \"function\" || typeof sink.reportBoxRebuildStage !== \"function\" ? undefined : sink as {",
+      "          reportBoxSetupVisible(level: \"info\" | \"warn\", metadata: Record<string, string | undefined>): void;",
+      "          reportBoxRecreateVisible(level: \"info\" | \"warn\", metadata: Record<string, string | undefined>): void;",
+      "          reportBoxRebuildStage(level: \"info\" | \"warn\", metadata: Record<string, string | undefined>): void;",
+      "        };",
+      "      }));",
+      "      const handleBoxVisibilityReport = createBoxVisibilityReportHandler(() => boxVisibilityTracker);"
+    ]
+  },
+  "t8-lifecycle-wire": {
+    "type": "code",
+    "kind": "接線",
+    "title": "desktopLifecycle 同時包住 local-exec 安裝點，兩者共用一支建構",
+    "meta": "source/electron-main/main-production-services.ts:481-482",
+    "why": "update 與 local-exec 兩個事件表面上分屬不同檔案，接線點卻是同一支 desktopLifecycle。",
+    "start": 481,
+    "hi": [
+      481,
+      482
+    ],
+    "lines": [
+      "  const desktopLifecycle = createDesktopLifecycleReporter();",
+      "  const disposeLocalExecLifecycleReporter = installLocalExecLifecycleReporter(desktopLifecycle.reportDesktopLocalExecLifecycle);"
+    ]
+  },
+  "t8-lifecycle-attach": {
+    "type": "code",
+    "kind": "接線",
+    "title": "desktopLifecycle 要等 telemetry 服務建好才 attach 真正的 sink",
+    "meta": "source/electron-main/main-production-services.ts:790-793",
+    "why": "attach 晚於建構，證實 update/local-exec 那段暫存佇列是為了補這段時間差設計的。",
+    "start": 790,
+    "hi": [
+      793
+    ],
+    "lines": [
+      "      telemetry = track(requireDisposable(await bindings.services.createTelemetry(context), \"telemetry\"));",
+      "      update.attachTelemetry(telemetry.telemetry);",
+      "      bindings.startup.attachTelemetry(telemetry.telemetry);",
+      "      desktopLifecycle.attach(telemetry.telemetry);"
+    ]
+  },
+  "t8-transport-forward": {
+    "type": "code",
+    "kind": "落地",
+    "title": "transport-stage 最終落地是送出追蹤 span，不是結構化日誌",
+    "meta": "source/electron-main/coordinator/coordinator-executors.ts:534-542",
+    "why": "transport-stage 家族的終點是 recordSendStage 這支 span 紀錄，跟其餘家族落地成結構化日誌不同，必須有引文佐證這個分岔。",
+    "start": 534,
+    "hi": [
+      534,
+      536
+    ],
+    "lines": [
+      "    reportTransportStage(report: CoordinatorTransportStageReport) {",
+      "      if (report.traceparent == null) return;",
+      "      dependencies.recordSendStage({",
+      "        name: report.stage,",
+      "        traceparent: report.traceparent,",
+      "        clientNonce: report.clientNonce,",
+      "        startEpochMs: report.startEpochMs,",
+      "        durationMs: report.durationMs,",
+      "        attributes: { \"sand.attempt\": report.attempt },"
+    ]
+  },
+  "tm-field-defaults": {
+    "type": "code",
+    "kind": "預設",
+    "title": "TranscriptManager 的欄位預設值：no-op 物件與 undefined 混用",
+    "meta": "source/host/extensions/transcript/transcript-manager.ts:160-183",
+    "why": "十九個插座對應的欄位在建構時就有值，沒有一個是 null 或會炸掉的空指標；telemetry 一行就示範預設是可呼叫的假物件而不是空值。",
+    "start": 160,
+    "hi": [
+      164,
+      165,
+      166,
+      169,
+      178
+    ],
+    "lines": [
+      "  readonly automationRuntime = new AutomationRuntime(this);",
+      "  readonly workflowCommands = new WorkflowCommands(this);",
+      "  readonly widgetResponses = new WidgetResponses(this);",
+      "",
+      "  memory: any = NO_MEMORY;",
+      "  contentSearch: any = NO_CONTENT_SEARCH;",
+      "  execution: TurnExecutionPort = UNWIRED_TURN_EXECUTION;",
+      "  trayErrors: any = NO_TRAY_ERRORS;",
+      "  attachments: any = NOOP_TRANSCRIPT_ATTACHMENTS;",
+      "  channelDelivery: (...args: any[]) => Promise<any> = async () => {",
+      "    throw new SandChannelDeliveryUnregisteredError();",
+      "  };",
+      "  xuserDelegate: any = null;",
+      "  channelActivity: ((...args: any[]) => unknown) | undefined;",
+      "  channelConfigChanged: (() => unknown) | undefined;",
+      "  automationConfigChanged: (() => unknown) | undefined;",
+      "  shouldEmitAutomations = () => true;",
+      "  disposed = false;",
+      "  telemetry: any = createNoopSandTelemetry();",
+      "  productAnalytics: any = createNoopSandProductAnalytics();",
+      "  traceFlusher = () => {};",
+      "  foreverBox: any = EMPTY_FOREVER_BOX;",
+      "  onAgentForgotten: ((agentId: string) => unknown) | undefined;",
+      "  onListenerConnectCard: ((event: any) => unknown) | undefined;"
+    ]
+  },
+  "tm-unwired-execution": {
+    "type": "code",
+    "kind": "預設",
+    "title": "沒接 setTurnExecution 就是 canExecute 恆假、createRunner 直接丟例外",
+    "meta": "source/host/extensions/transcript/transcript-manager.ts:59-68",
+    "why": "唯一一個能力型插座的預設同時混合兩種手法：讀屬性安全放行為假，真的呼叫 createRunner 才拋錯，逼呼叫端先檢查旗標。",
+    "start": 59,
+    "hi": [
+      60,
+      63,
+      64
+    ],
+    "lines": [
+      "export const UNWIRED_TURN_EXECUTION: TurnExecutionPort = {",
+      "  canExecute: false,",
+      "  canExecuteGroupMember: false,",
+      "  isRunReady: async () => true,",
+      "  createRunner: () => {",
+      "    throw new Error(RUNNER_UNATTACHED_MESSAGE);",
+      "  },",
+      "  createGroupMemberRunner: () => {",
+      "    throw new Error(RUNNER_UNATTACHED_MESSAGE);",
+      "  },"
+    ]
+  },
+  "tm-capability-stubs": {
+    "type": "code",
+    "kind": "預設",
+    "title": "EMPTY_FOREVER_BOX 與 NO_TRAY_ERRORS：沒插時回傳安全假資料",
+    "meta": "source/host/extensions/transcript/transcript-manager.ts:93-105",
+    "why": "這兩個預設都不拋錯，一個假裝機器狀態是 absent，一個把推錯誤的方法變成空函式，插座沒插上時迴圈仍能跑完整輪。",
+    "start": 93,
+    "hi": [
+      93,
+      94,
+      96,
+      102,
+      103
+    ],
+    "lines": [
+      "export const EMPTY_FOREVER_BOX = {",
+      "  getStatus: async ({ id }: { id: string }) => ({",
+      "    agentId: id,",
+      "    state: \"absent\",",
+      "    vncUrl: null,",
+      "  }),",
+      "  captureScreenshot: async () => null,",
+      "};",
+      "",
+      "export const NO_TRAY_ERRORS = {",
+      "  pushError: (_error: unknown) => {},",
+      "  clearForAgent: (_id: string) => {},",
+      "};"
+    ]
+  },
+  "tm-setter-block": {
+    "type": "code",
+    "kind": "介面",
+    "title": "十九個 setXxx：從 set*Observer 到 setXuserDelegate 一次列完",
+    "meta": "source/host/extensions/transcript/transcript-manager.ts:208-269",
+    "why": "每個 setter 都只做一件事，把參數塞進同名欄位；setMemory 多做一步同步進 sessionStore，是十九個裡唯一有副作用的一個。",
+    "start": 208,
+    "hi": [
+      208,
+      223,
+      226,
+      244,
+      251,
+      266
+    ],
+    "lines": [
+      "  setAgentForgottenObserver(observer: (id: string) => unknown): void {",
+      "    this.onAgentForgotten = observer;",
+      "  }",
+      "  setListenerConnectObserver(observer: (event: any) => unknown): void {",
+      "    this.onListenerConnectCard = observer;",
+      "  }",
+      "  setConnectorConnectCardObserver(observer: (event: any) => unknown): void {",
+      "    this.onConnectorConnectCard = observer;",
+      "  }",
+      "  setAgentRunLifecycleObserver(observer: (event: any) => unknown): void {",
+      "    this.agentRunLifecycleObserver = observer;",
+      "  }",
+      "  emitAgentRunLifecycle(event: any): void {",
+      "    this.agentRunLifecycleObserver?.(event);",
+      "  }",
+      "  setTurnExecution(execution: TurnExecutionPort): void {",
+      "    this.execution = execution;",
+      "  }",
+      "  setTelemetry(telemetry: any): void {",
+      "    this.telemetry = telemetry;",
+      "  }",
+      "  setProductAnalytics(analytics: any): void {",
+      "    this.productAnalytics = analytics;",
+      "  }",
+      "  setTraceFlusher(flush: () => void): void {",
+      "    this.traceFlusher = flush;",
+      "  }",
+      "  setForeverBox(foreverBox: any): void {",
+      "    this.foreverBox = foreverBox;",
+      "  }",
+      "  setTrayErrors(trays: any): void {",
+      "    this.trayErrors = trays;",
+      "  }",
+      "  setAttachments(attachments: any): void {",
+      "    this.attachments = attachments;",
+      "  }",
+      "  setMemory(memory: any): void {",
+      "    this.memory = memory;",
+      "    this.sessionStore.setMemory(memory);",
+      "  }",
+      "  setContentSearch(contentSearch: any): void {",
+      "    this.contentSearch = contentSearch;",
+      "  }",
+      "  setChannelDelivery(deliver: (...args: any[]) => Promise<any>): void {",
+      "    this.channelDelivery = deliver;",
+      "  }",
+      "  setChannelActivity(notify: (...args: any[]) => unknown): void {",
+      "    this.channelActivity = notify;",
+      "  }",
+      "  setChannelConfigChanged(onChanged: () => unknown): void {",
+      "    this.channelConfigChanged = onChanged;",
+      "  }",
+      "  setAutomationConfigChanged(onChanged: () => unknown): void {",
+      "    this.automationConfigChanged = onChanged;",
+      "  }",
+      "  setShouldEmitAutomations(shouldEmit: () => boolean): void {",
+      "    this.shouldEmitAutomations = shouldEmit;",
+      "  }",
+      "  setXuserDelegate(delegate: any): void {",
+      "    this.xuserDelegate = delegate;",
+      "  }"
+    ]
+  },
+  "ext-dependencies": {
+    "type": "code",
+    "kind": "接線",
+    "title": "transcriptExtension 的 dependencies：七個先接好才輪到它開機",
+    "meta": "source/host/extensions/transcript/extension.ts:48-56",
+    "why": "這張清單就是開機順序的保證，host 的擴充系統會先把這七個插好，start() 裡才能放心呼叫 deps.telemetry、deps.memory 這些欄位。",
+    "start": 48,
+    "hi": [
+      48,
+      53,
+      55
+    ],
+    "lines": [
+      "  dependencies: [",
+      "    HostExtensions.Attachments,",
+      "    HostExtensions.ContentSearch,",
+      "    HostExtensions.Memory,",
+      "    HostExtensions.Session,",
+      "    HostExtensions.Telemetry,",
+      "    HostExtensions.Trays,",
+      "    HostExtensions.TurnExecution,",
+      "  ],"
+    ]
+  },
+  "ext-wiring-plain": {
+    "type": "code",
+    "kind": "接線",
+    "title": "extension.ts 一口氣插滿七個插座",
+    "meta": "source/host/extensions/transcript/extension.ts:60-73",
+    "why": "manager 剛 new 出來，這七行就把 telemetry、記憶、內容搜尋、附件、tray 錯誤全部插上，跟 dependencies 清單一一對應。",
+    "start": 60,
+    "hi": [
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73
+    ],
+    "lines": [
+      "    const manager = new TranscriptManager(",
+      "      deps.session.store,",
+      "      new SandUpgradeResumeStore(sandRoot),",
+      "      new SandAckObligationStore(sandRoot),",
+      "      new PromptAcceptanceLedger(sandRoot),",
+      "      new SandPendingWakeStore(sandRoot),",
+      "    );",
+      "    manager.setTelemetry(deps.telemetry.brain);",
+      "    manager.setProductAnalytics(deps.telemetry.analytics);",
+      "    manager.setTraceFlusher(deps.telemetry.flushTracing);",
+      "    manager.setMemory(deps.memory);",
+      "    manager.setContentSearch(deps[HostExtensions.ContentSearch]);",
+      "    manager.setAttachments(deps.attachments);",
+      "    manager.setTrayErrors(deps.trays);"
+    ]
+  },
+  "ext-turn-execution": {
+    "type": "code",
+    "kind": "接線",
+    "title": "setTurnExecution 插進去的是一層包住 execution 依賴的轉接器",
+    "meta": "source/host/extensions/transcript/extension.ts:85-97",
+    "why": "插進來的不是原始依賴本身，是一個轉接殼，canExecute 用 getter 即時讀底層旗標，createRunner 原樣轉呼叫，插座接的是介面不是狀態快照。",
+    "start": 85,
+    "hi": [
+      85,
+      86,
+      94,
+      95
+    ],
+    "lines": [
+      "    const execution = deps[HostExtensions.TurnExecution];",
+      "    manager.setTurnExecution({",
+      "      get canExecute() {",
+      "        return execution.canExecute;",
+      "      },",
+      "      get canExecuteGroupMember() {",
+      "        return execution.canExecute;",
+      "      },",
+      "      isRunReady: () => execution.isRunReady(),",
+      "      createRunner: (...args: any[]) => execution.createRunner(...args),",
+      "      createGroupMemberRunner: (...args: any[]) =>",
+      "        execution.createGroupMemberRunner(...args),",
+      "    } satisfies TurnExecutionPort);"
+    ]
+  },
+  "ext-observers": {
+    "type": "code",
+    "kind": "接線",
+    "title": "三個觀察者插座接的都是同一種轉發：包成事件送給 host.events",
+    "meta": "source/host/extensions/transcript/extension.ts:98-116",
+    "why": "automationConfigChanged、listenerConnectObserver、agentRunLifecycleObserver 三個都只做一件事，把迴圈丟出的事件原樣包一層再 emit 出去，插座本身不做業務判斷。",
+    "start": 98,
+    "hi": [
+      98,
+      101,
+      109
+    ],
+    "lines": [
+      "    manager.setAutomationConfigChanged(() => {",
+      "      void context.host.events.emit(\"transcript.automation-config-changed\", {});",
+      "    });",
+      "    manager.setListenerConnectObserver(",
+      "      ({ agentId, platform }: { agentId: string; platform: string }) => {",
+      "        void context.host.events.emit(\"transcript.listener-connect-card\", {",
+      "          agentId,",
+      "          platform,",
+      "        });",
+      "      },",
+      "    );",
+      "    manager.setAgentRunLifecycleObserver(",
+      "      (event: { type: \"started\" | \"ended\"; requestId: string }) => {",
+      "        void context.host.events.emit("
+    ]
+  },
+  "telemetry-brain-wrap": {
+    "type": "code",
+    "kind": "組裝",
+    "title": "deps.telemetry.brain 插進 manager 前先被包一層自動化分析",
+    "meta": "source/host/extensions/telemetry/host-telemetry-service.ts:188-198",
+    "why": "setTelemetry 接到的不是原始 logs 物件，是 withAutomationRunAnalytics 包過的版本，代表插座板收到的東西可能已經被上游裝飾過，不是裸的實作。",
+    "start": 188,
+    "hi": [
+      188,
+      198
+    ],
+    "lines": [
+      "    this.analytics =",
+      "      options.analytics ??",
+      "      new SandProductAnalytics({",
+      "        getAccessToken: (request) => options.auth.getAccessToken(request),",
+      "        getMachineId: () => options.auth.getMachineId(),",
+      "        ...(options.createProductAnalyticsClient === undefined",
+      "          ? {}",
+      "          : { createClient: options.createProductAnalyticsClient }),",
+      "        hostInBox: true,",
+      "      });",
+      "    this.brain = withAutomationRunAnalytics(this.logs, this.analytics);"
+    ]
+  },
+  "tr-telemetry-start": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "迴圈開一輪就先呼叫 telemetry.startTurn",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:416-421",
+    "why": "這是迴圈主動呼叫插進來的 telemetry，不是 telemetry 反過來監看迴圈；沒插時吃到的是 no-op 版，startTurn 回傳的假 turn 物件照樣能被後面呼叫 setModel、finalize。",
+    "start": 416,
+    "hi": [
+      417
+    ],
+    "lines": [
+      "      const startedAtMs = Date.now();",
+      "      const turn = this.tm.telemetry.startTurn({",
+      "        conversationId: session.id,",
+      "        turnType: \"new\",",
+      "      });",
+      "      this.activeTurns.set(session.id, turn);"
+    ]
+  },
+  "tr-tray-errors": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "代理人失敗，迴圈直接呼叫 trayErrors.pushError 攤在畫面上",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:493-505",
+    "why": "trayErrors 是能力型插座，迴圈呼叫它把錯誤推到 UI；沒插時預設是空函式，錯誤被吞掉、畫面上什麼都不會出現，不會讓迴圈本身壞掉。",
+    "start": 493,
+    "hi": [
+      496
+    ],
+    "lines": [
+      "        if (epoch === this.tm.sendPipeline.currentTurnEpoch(session)) {",
+      "          const description = describeAgentRunError(error);",
+      "          const requestId = session.db.getRequestIds().at(-1)?.id;",
+      "          this.tm.trayErrors.pushError({",
+      "            agentId: session.id,",
+      "            title:",
+      "              description.errorKind === \"provider_overloaded\"",
+      "                ? PROVIDER_OVERLOAD_ERROR_TITLE",
+      "                : \"Agent failed to respond\",",
+      "            requestId,",
+      "            ...description,",
+      "          });",
+      "        }"
+    ]
+  },
+  "tr-trace-flusher": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "每輪收尾都呼叫一次 traceFlusher，沒插時就是空函式",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:526-531",
+    "why": "traceFlusher 沒有參數也沒有回傳值可判斷，迴圈每輪 finally 一定呼叫，插上時真的把 tracing 送出去，沒插時預設 () => {} 直接吃掉這次呼叫。",
+    "start": 526,
+    "hi": [
+      530
+    ],
+    "lines": [
+      "    } finally {",
+      "      try {",
+      "        turnTrace?.span.end();",
+      "      } catch {}",
+      "      this.tm.traceFlusher();",
+      "    }"
+    ]
+  },
+  "tr-listener-observer": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "onListenerConnectCard 用 ?. 保護，沒插時整段靜默跳過",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:831-843",
+    "why": "這是觀察者的典型寫法：迴圈通知它、不等回傳值，外面還包一層 try/catch，插座沒插上時 ?.() 直接短路，連例外都不會有。",
+    "start": 831,
+    "hi": [
+      838
+    ],
+    "lines": [
+      "  private notifyListenerConnect(",
+      "    session: LiveTranscriptSession | null,",
+      "    message: SendMessage,",
+      "  ): void {",
+      "    const ownerId = session?.id ?? this.tm.sessions.activeSession?.id;",
+      "    if (ownerId == null) return;",
+      "    try {",
+      "      this.tm.onListenerConnectCard?.({",
+      "        agentId: ownerId,",
+      "        platform: message.platform,",
+      "      });",
+      "    } catch {}",
+      "  }"
+    ]
+  },
+  "tr-connector-observer": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "onConnectorConnectCard 跟前一個觀察者同一種寫法，複製貼上等級的一致",
+    "meta": "source/host/extensions/transcript/turn-runtime.ts:845-857",
+    "why": "跟 notifyListenerConnect 幾乎一模一樣的骨架，同樣 ?. 加 try/catch，證明這一類觀察者插座在迴圈裡是同一套模板，不是各自發明。",
+    "start": 845,
+    "hi": [
+      852
+    ],
+    "lines": [
+      "  private notifyConnectorConnect(",
+      "    session: LiveTranscriptSession | null,",
+      "    message: SendMessage,",
+      "  ): void {",
+      "    const ownerId = session?.id ?? this.tm.sessions.activeSession?.id;",
+      "    if (ownerId == null) return;",
+      "    try {",
+      "      this.tm.onConnectorConnectCard?.({",
+      "        agentId: ownerId,",
+      "        connector: message.connector,",
+      "        ...(message.serverId == null ? {} : { serverId: message.serverId }),",
+      "      });",
+      "    } catch {}"
+    ]
+  },
+  "sand-host-observers": {
+    "type": "code",
+    "kind": "接線",
+    "title": "host-main 不透過 extension 依賴，開機收尾時直接呼叫 setter",
+    "meta": "source/host/sand-host.ts:537-562",
+    "why": "這三個插座不是 transcriptExtension 插的，是 host-main 拿到 transcript 物件後用 optionalMethod 保護著手動呼叫，插線的人不只一個角色。",
+    "start": 537,
+    "hi": [
+      537,
+      548,
+      560
+    ],
+    "lines": [
+      "    optionalMethod(transcript, \"setAgentForgottenObserver\")?.(",
+      "      (agentId: string) => {",
+      "        void optionalMethod(extensions.api(\"box-store-sync\"), \"forgetAgent\")?.(",
+      "          agentId",
+      "        );",
+      "        const reminder = extensions.api(\"forever-box\").diskPressureReminder as",
+      "          | DynamicHostApi",
+      "          | undefined;",
+      "        optionalMethod(reminder ?? {}, \"forgetAgent\")?.(agentId);",
+      "      }",
+      "    );",
+      "    optionalMethod(transcript, \"setShouldEmitAutomations\")?.(",
+      "      () => this.listeners.size > 0",
+      "    );",
+      "",
+      "    this.wireEvents();",
+      "    this.backgroundWorkReady.resolve(undefined);",
+      "",
+      "    optionalMethod(extensions.api(\"host-upgrade\"), \"startSharedUpdateWatch\")?.({",
+      "      isBoxAutoUpdateEnabled: false,",
+      "      runRootUpdateTick: async () => {}",
+      "    });",
+      "    void optionalMethod(extensions.api(\"automations\"), \"reconcileNow\")?.();",
+      "    optionalMethod(transcript, \"setConnectorConnectCardObserver\")?.(",
+      "      (event: unknown) => this.runtime.registerConnectorConnectCard(event)",
+      "    );"
+    ]
+  },
+  "bg-channel-delivery": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "channelDelivery 是唯一沒插就會拋錯的插座，呼叫端自己接住",
+    "meta": "source/host/extensions/transcript/background-wakes.ts:99-106",
+    "why": "跟其他能力型插座都不一樣，channelDelivery 沒插時的預設是真的 throw，這裡用 .catch 把那個例外接住轉成 tray 錯誤，等於呼叫端自己知道這顆插座可能是空的。",
+    "start": 99,
+    "hi": [
+      100,
+      101,
+      105
+    ],
+    "lines": [
+      "    void this.tm",
+      "      .channelDelivery(agentId, addressToken, outbound)",
+      "      .catch((error: unknown) => {",
+      "        const rawDetail =",
+      "          error instanceof Error ? error.message : \"Channel delivery failed\";",
+      "        const reason = humanizeChannelDeliveryFailure(addressToken, rawDetail);",
+      "        this.tm.trayErrors.pushError({",
+      "          agentId,"
+    ]
+  },
+  "box-forever-status": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "foreverBox 沒插時照樣回一份假狀態，不會讓收尾流程掛掉",
+    "meta": "source/host/extensions/transcript/box-handoff-resume.ts:104-109",
+    "why": "呼叫端直接 await getStatus，完全沒有判斷插座是否接上，因為沒插時的預設本來就是可以直接吞下去的假物件，跟 channelDelivery 那種會拋錯的插座是兩個極端。",
+    "start": 104,
+    "hi": [
+      107
+    ],
+    "lines": [
+      "  async emitForeverBoxStatus(agentId: string): Promise<void> {",
+      "    try {",
+      "      const status = this.withBoxHandoff(",
+      "        await this.tm.foreverBox.getStatus({ id: agentId }),",
+      "      );",
+      "      for (const listener of this.foreverBoxListeners) listener(status);"
+    ]
+  },
+  "send-pipeline-execution": {
+    "type": "code",
+    "kind": "迴圈",
+    "title": "送出前第一件事就是檢查 execution.canExecute，不是等到真的呼叫才發現沒插",
+    "meta": "source/host/extensions/transcript/send-pipeline.ts:158-163",
+    "why": "invariant 直接讀插座上的旗標決定要不要往下送，這代表能力型插座沒插時的安全機制不是靠 try/catch 接例外，是靠呼叫端主動先查旗標。",
+    "start": 158,
+    "hi": [
+      161
+    ],
+    "lines": [
+      "        )",
+      "      : [];",
+      "    if (trimmedPrompt.length === 0 && attachmentPaths.length === 0) return;",
+      "    invariant(this.tm.execution.canExecute, RUNNER_UNATTACHED_MESSAGE);",
+      "    const awaitTurn = options.awaitTurn ?? true;",
+      "    const sendTrace = beginSendTrace(options.traceparent);"
+    ]
+  },
+  "ext-ids-object": {
+    "type": "code",
+    "kind": "詞彙",
+    "title": "HostExtensions：三十五個 extension id 集中宣告成一張常數表",
+    "meta": "source/host/extensions/extension-ids.generated.ts:1-12",
+    "why": "每個 extension 的 id 都從這張表拿，不是各自寫字串字面量；後面 dependencies 陣列與 registry.ts 的 HOST_EXTENSION_ORDER 都指回這張表的鍵。",
+    "start": 1,
+    "hi": [
+      1,
+      2,
+      12
+    ],
+    "lines": [
+      "export const HostExtensions = {",
+      "  ActionAudit: \"action-audit\", Attachments: \"attachments\", Auth: \"auth\", AutoReview: \"auto-review\",",
+      "  Automations: \"automations\", BoxLifecycle: \"box-lifecycle\", BoxStoreSync: \"box-store-sync\",",
+      "  BrowserUa: \"browser-ua\", CloudAgents: \"cloud-agents\", CodebaseTelemetry: \"codebase-telemetry\",",
+      "  ContentSearch: \"content-search\", CrossUserSharing: \"cross-user-sharing\", Experiments: \"experiments\",",
+      "  ForeverBox: \"forever-box\", HostUpgrade: \"host-upgrade\", Inference: \"inference\", LocalExec: \"local-exec\",",
+      "  LocalToolPermission: \"local-tool-permission\", ManagedSetup: \"managed-setup\", Mcp: \"mcp\", Memory: \"memory\",",
+      "  Notifications: \"notifications\", NotifyBus: \"notify-bus\", Secrets: \"secrets\", Session: \"session\",",
+      "  Settings: \"settings\", SourceMap: \"source-map\", StateBackstop: \"state-backstop\",",
+      "  TeachRecording: \"teach-recording\", Telemetry: \"telemetry\", Transcript: \"transcript\", Trays: \"trays\",",
+      "  TurnExecution: \"turn-execution\", Wallpaper: \"wallpaper\", WebauthnProxy: \"webauthn-proxy\"",
+      "} as const;"
+    ]
+  },
+  "memory-ext-decl": {
+    "type": "code",
+    "kind": "接線",
+    "title": "memoryExtension：id、dependencies、start 三件事就是完整合約",
+    "meta": "source/host/extensions/memory/extension.ts:11",
+    "why": "全檔案打包成一行，但形狀跟其他三十四個 extension 一致：宣告 id、宣告要先接好的三個依賴、start 拿到已經啟動的那三個依賴的 API 再組裝自己的服務。",
+    "start": 11,
+    "hi": [
+      11
+    ],
+    "lines": [
+      "export const memoryExtension={id:\"memory\",dependencies:[\"experiments\",\"inference\",\"telemetry\"]as const,start(context:MemoryExtensionContext){const service=new MemoryService({sandRoot:context.sandRoot,agentsRootDir:context.agentsRootDir,debounce:context.debounce});context.deps.experiments.pinGateOnAuthenticatedBootstrap(\"sand_memory_dreaming\",(enabled)=>{if(!enabled){context.deps.telemetry.logs.reportMemorySynthesis({outcome:\"skipped_gate\"});return}service.enableMemorySynthesis(context.createSynthesis(service))});context.onStop(()=>service.dispose());return Object.assign(service,{createAgentState:(options:Omit<AgentStateDeps,\"sandRoot\"|\"membership\">&{agentDir:string})=>createSandAgentState({...options,sandRoot:context.sandRoot,membership:new AgentProjectMembership(options.agentDir)})})}};"
+    ]
+  },
+  "telemetry-ext-decl": {
+    "type": "code",
+    "kind": "接線",
+    "title": "telemetryExtension 沒壓成一行，同一個合約讀起來更直接",
+    "meta": "source/host/extensions/telemetry/extension.ts:27-32",
+    "why": "跟 memoryExtension 是同一種形狀，只是這份檔案沒被壓縮：id 指回 HostExtensions 表，dependencies 列出三個先接好的依賴。",
+    "start": 27,
+    "hi": [
+      28,
+      29,
+      30
+    ],
+    "lines": [
+      "type ServiceOptions = ConstructorParameters<typeof HostTelemetryService>[0];",
+      "export const telemetryExtension = defineHostExtension({",
+      "  id: HostExtensions.Telemetry,",
+      "  dependencies: [",
+      "    HostExtensions.Auth,",
+      "    HostExtensions.Experiments,"
+    ]
+  },
+  "host-ext-order": {
+    "type": "code",
+    "kind": "接線",
+    "title": "HOST_EXTENSION_ORDER 列了三十五個 id，但不是真正的開機序",
+    "meta": "source/host/extensions/registry.ts:1-2",
+    "why": "這張表只是「這個 build 裡有哪些 extension」的完整名冊，assembleHostExtensionRegistry 拿它去對 byId 做完整性檢查；真正開機順序是另一個函式算出來的，不是這張表的書寫順序。",
+    "start": 1,
+    "hi": [
+      2
+    ],
+    "lines": [
+      "import { startHostExtensions, type HostExtensionDeclaration } from \"../../internal/host-extensions.js\"; import { HostExtensions, type HostExtensionId } from \"./extension-ids.generated.js\";",
+      "export const HOST_EXTENSION_ORDER: readonly HostExtensionId[] = [HostExtensions.Notifications, HostExtensions.ContentSearch, HostExtensions.Memory, HostExtensions.CrossUserSharing, HostExtensions.StateBackstop, HostExtensions.SourceMap, HostExtensions.Telemetry, HostExtensions.Trays, HostExtensions.Auth, HostExtensions.Experiments, HostExtensions.BrowserUa, HostExtensions.Inference, HostExtensions.LocalExec, HostExtensions.LocalToolPermission, HostExtensions.Attachments, HostExtensions.ForeverBox, HostExtensions.Secrets, HostExtensions.TurnExecution, HostExtensions.Transcript, HostExtensions.Session, HostExtensions.Automations, HostExtensions.Settings, HostExtensions.BoxLifecycle, HostExtensions.ManagedSetup, HostExtensions.Mcp, HostExtensions.BoxStoreSync, HostExtensions.CloudAgents, HostExtensions.ActionAudit, HostExtensions.HostUpgrade, HostExtensions.AutoReview, HostExtensions.CodebaseTelemetry, HostExtensions.TeachRecording, HostExtensions.WebauthnProxy, HostExtensions.NotifyBus, HostExtensions.Wallpaper];"
+    ]
+  },
+  "ext-dep-check": {
+    "type": "code",
+    "kind": "邊界",
+    "title": "resolveHostExtensionBootOrder 才是真正的開機序，缺依賴就丟錯",
+    "meta": "source/internal/host-extensions.ts:57-68",
+    "why": "這裡才真正拓樸排序：每個 extension 只讀自己宣告的 dependencies，缺一個沒在這個 build 裡就直接丟 HostExtensionGraphError，不是靜默跳過或用 undefined 頂著。",
+    "start": 57,
+    "hi": [
+      57,
+      60,
+      65,
+      66
+    ],
+    "lines": [
+      "export function resolveHostExtensionBootOrder<Host = unknown>(extensions: readonly HostExtensionDeclaration<unknown, Host>[]): string[] {",
+      "  const peersOf = new Map<string, Set<string>>();",
+      "  for (const extension of extensions) {",
+      "    if (peersOf.has(extension.id)) throw new HostExtensionGraphError(`two host extensions declare the id \"${extension.id}\"`);",
+      "    peersOf.set(extension.id, new Set(extension.dependencies));",
+      "  }",
+      "  for (const extension of extensions) {",
+      "    for (const dependency of extension.dependencies) {",
+      "      if (dependency === extension.id) throw new HostExtensionGraphError(`host extension \"${extension.id}\" declares itself as a peer`);",
+      "      if (!peersOf.has(dependency)) throw new HostExtensionGraphError(`host extension \"${extension.id}\" requires the peer \"${dependency}\", which is not in this build`);",
+      "    }",
+      "  }"
+    ]
+  },
+  "packages-agent-import": {
+    "type": "code",
+    "kind": "邊界",
+    "title": "host 直接匯入 packages/agent 的具體一行",
+    "meta": "source/host/runner/turn-agent-composition.ts:14-18",
+    "why": "行程根可以匯入 package，這是十五個匯入 packages/agent 的檔案之一；反過來 packages 底下沒有一個檔案匯入 host 或 electron-main，邊界是單向的。",
+    "start": 14,
+    "hi": [
+      16
+    ],
+    "lines": [
+      "import type { Context } from \"../../packages/context/core.js\";",
+      "import { requestIdKey } from \"../../packages/chat-inference-proto/client.js\";",
+      "import { AnysphereAgent } from \"../../packages/agent/index.js\";",
+      "import { SimplePromptToolExecutor } from \"../../packages/agent/tool-stream-executor.js\";",
+      "import { NoopConversationActionReceiver } from \"../../packages/agent-core/conversation-actions/remote.js\";"
+    ]
+  },
+  "t-sentry-port": {
+    "type": "code",
+    "kind": "port",
+    "title": "Sentry 也有 port：no-op 預設加開機安裝點",
+    "meta": "source/electron-main/telemetry/sentry.ts:15-24",
+    "why": "第 15 行是全 no-op 的預設 adapter，第 24 行 installSandSentryAdapter 在開機時換成真的；呼叫端只認這個介面。",
+    "start": 15,
+    "hi": [
+      15,
+      24
+    ],
+    "lines": [
+      "const noopAdapter: SandSentryAdapter = { init: () => undefined, setUser: () => {}, setTag: () => {}, captureMessage: () => {}, captureException: () => {} };",
+      "let adapter: SandSentryAdapter = noopAdapter;",
+      "const gate = new SandSentryPrivacyGate();",
+      "const eventIdRing = new SandSentryEventIdRing(SAND_FEEDBACK_SENTRY_EVENT_ID_MAX_COUNT);",
+      "let privacySync = new SandSentryAccountPrivacySync();",
+      "let ringOwnerUserId: string | undefined;",
+      "let offlineTransport: SandSentryOfflineTransport | undefined;",
+      "let initialOfflineFlushStarted = false;",
+      "",
+      "export function installSandSentryAdapter(next: SandSentryAdapter): void { adapter = next; }"
+    ]
+  },
+  "p9-noop-telemetry": {
+    "type": "code",
+    "kind": "port",
+    "title": "host 遙測 port 的無操作預設",
+    "meta": "source/host/ports/telemetry.ts:17-22",
+    "why": "證明 host 的遙測 port 提供完整 no-op 物件，在未注入真後端時仍可正常呼叫。",
+    "start": 17,
+    "hi": [
+      20,
+      22
+    ],
+    "lines": [
+      "const NOOP_TURN = { setModel: noop, setRequestId: noop, finalize: noop };",
+      "",
+      "/** Exact no-op surface emitted in the shipped host bundle. */",
+      "export function createNoopSandTelemetry() {",
+      "  return {",
+      "    startTurn: () => NOOP_TURN,"
+    ]
+  },
+  "p9-enums-ports": {
+    "type": "code",
+    "kind": "port",
+    "title": "host port 內宣告的十二組常態枚舉",
+    "meta": "source/host/ports/telemetry.ts:2-15",
+    "why": "展示遙測欄位共用的機器生命週期與行程狀態字彙皆集中定義於此檔。",
+    "start": 2,
+    "hi": [
+      2,
+      5,
+      12
+    ],
+    "lines": [
+      "export const SAND_BOX_BOOT_STAGES = [\"entrypoint_started\", \"daemon_listening\", \"desktop_up\", \"ready\"] as const;",
+      "export const SAND_BOX_BOOT_ID_ENV = \"SAND_BOX_BOOT_ID\", SAND_BOX_BOOT_STARTED_AT_MS_ENV = \"SAND_BOX_BOOT_STARTED_AT_MS\", SAND_BOX_AUTH_ID_ENV = \"SAND_BOX_AUTH_ID\", SAND_BOX_TENANT_ID_ENV = \"SAND_BOX_TENANT_ID\", SAND_BOX_STORE_ID_ENV = \"SAND_BOX_STORE_ID\", SAND_BOX_CLUSTER_ENV = \"SAND_BOX_CLUSTER\";",
+      "export function resolveSandBoxIdentityTags(env: NodeJS.ProcessEnv = process.env) { return { auth_id: env[SAND_BOX_AUTH_ID_ENV]?.trim(), tenant_id: env[SAND_BOX_TENANT_ID_ENV]?.trim(), box_store_id: env[SAND_BOX_STORE_ID_ENV]?.trim(), box_boot_id: env[SAND_BOX_BOOT_ID_ENV]?.trim(), cluster: env[SAND_BOX_CLUSTER_ENV]?.trim() }; }",
+      "export const SAND_HOST_LIFECYCLE_PHASES = [\"plugin_graph\", \"identity\", \"log_catchup\", \"transcript_read\", \"ready\"] as const;",
+      "export const SAND_EXEC_DAEMON_RESTART_CAUSES = [\"daemon_exited\", \"startup_listener_timeout\", \"listener_lost\"] as const;",
+      "export const SAND_SUPERVISOR_RESTART_CAUSES = [\"supervisor_exited\", \"startup_status_timeout\", \"status_stale\", \"gave_up\"] as const;",
+      "export const SAND_COOKIE_PERSIST_PHASES = [\"capture\", \"restore\"] as const;",
+      "export const SAND_COOKIE_PERSIST_OUTCOMES = [\"captured\", \"ok\", \"partial\", \"failed\", \"empty\"] as const;",
+      "export const SAND_EGRESS_TUNNEL_OUTCOMES = [\"ready\", \"restart\", \"startup_timeout\", \"listener_lost\", \"stale_port\"] as const;",
+      "export const SAND_BOX_BOOT_FAILURE_STAGES = [\"desktop\"] as const, SAND_BOX_BOOT_FAILURE_REASONS = [\"x_display_timeout\"] as const;",
+      "export const SAND_PROCESS_CRASH_BINARIES = [\"cursor\", \"cursor-nightly\", \"cursor-lab\", \"chrome\", \"node\", \"exec-daemon\", \"xvfb\", \"xfwm4\", \"picom\", \"x11vnc\", \"websockify\", \"plank\", \"thunar\", \"xfce4-terminal\", \"other\"] as const;",
+      "export const SAND_PROCESS_CRASH_SIGNALS = [\"sigill\", \"sigsegv\", \"sigabrt\", \"sigbus\", \"other\"] as const;",
+      "export const SAND_HOST_BOOT_FETCH_OUTCOMES = [\"current\", \"applied\", \"fallback\", \"restore_failed\"] as const;",
+      "export const SAND_HOST_BOOT_FETCH_REASONS = [\"current\", \"applied\", \"pointer_unreachable\", \"pointer_malformed\", \"target_vetoed\", \"download_failed\", \"swap_refused\", \"swap_failed_restored\", \"restore_failed\", \"budget_exceeded\", \"unexpected_error\"] as const;"
+    ]
+  },
+  "p9-product-analytics": {
+    "type": "code",
+    "kind": "port",
+    "title": "產品分析 port 介面與預設工廠",
+    "meta": "source/host/ports/product-analytics.ts:1-2",
+    "why": "確認 host 第二個具備 runnable 預設的 port 介面宣告與無操作實作。",
+    "start": 1,
+    "hi": [
+      1,
+      2
+    ],
+    "lines": [
+      "export interface SandProductAnalytics { trackEvent(name: string, properties?: Readonly<Record<string, unknown>>): void }",
+      "export function createNoopSandProductAnalytics(): SandProductAnalytics { return { trackEvent: () => {} }; }"
+    ]
+  },
+  "p9-transport": {
+    "type": "code",
+    "kind": "port",
+    "title": "傳輸狀態維護工廠",
+    "meta": "source/host/ports/transport.ts:1-2",
+    "why": "證明 transport.ts 僅提供更新介面與狀態記憶工廠，無開箱即用的無操作預設。",
+    "start": 1,
+    "hi": [
+      1,
+      2
+    ],
+    "lines": [
+      "export interface SandUpdate { type: string; [key: string]: unknown }",
+      "export function createSandTransport(ingest: (update: SandUpdate) => string | undefined) {"
+    ]
+  },
+  "p9-user-computer": {
+    "type": "code",
+    "kind": "port",
+    "title": "單使用者電腦工廠與常數",
+    "meta": "source/host/ports/user-computer.ts:1-2",
+    "why": "顯示該檔定義之常數與工廠函式，於全專案皆無呼叫者，屬未啟用程式碼。",
+    "start": 1,
+    "hi": [
+      1,
+      2
+    ],
+    "lines": [
+      "export const DEFAULT_SAND_COMPUTER_ID = \"this-computer\";",
+      "export function createSingleUserComputer<Box>(args: { box: Box; label?: string; isConnected?: () => boolean }) { const id = DEFAULT_SAND_COMPUTER_ID; const label = args.label ?? \"this computer\"; const connected = () => args.isConnected?.() ?? true; return { list: () => [{ id, label, connected: connected() }], resolve: (requestedId?: string) => requestedId !== undefined && requestedId !== id || !connected() ? undefined : { id, label, box: args.box } }; }"
+    ]
+  },
+  "p9-guards": {
+    "type": "code",
+    "kind": "port",
+    "title": "桌面端 adapter 注入檢查守衛",
+    "meta": "source/electron-main/adapters/provider-guards.ts:6-9",
+    "why": "展示桌面行程於啟動時若發現缺失 port 函式，會立刻拋出 TypeError 中斷開機。",
+    "start": 6,
+    "hi": [
+      6,
+      7
+    ],
+    "lines": [
+      "export function requireFunction<T extends (...args: any[]) => unknown>(value: T | null | undefined, name: string): T {",
+      "  if (typeof value !== \"function\") throw new TypeError(`Missing Electron production adapter port: ${name}.`);",
+      "  return value;",
+      "}"
+    ]
+  },
+  "p9-telemetry-ports": {
+    "type": "code",
+    "kind": "port",
+    "title": "桌面遙測 production adapter port 介面",
+    "meta": "source/electron-main/adapters/telemetry.ts:22-25",
+    "why": "定義桌面端遙測所需注入之 resolveOptions 與 attach 兩項必備方法。",
+    "start": 22,
+    "hi": [
+      22,
+      23,
+      24
+    ],
+    "lines": [
+      "export interface ProductionTelemetryPorts {",
+      "  readonly resolveOptions: (context: ProductionServiceContext) => ProductionTelemetryOptions | Promise<ProductionTelemetryOptions>;",
+      "  readonly attach: (telemetry: SandDesktopStructuredLogTelemetry, context: ProductionServiceContext) => ProductionDisposable;",
+      "}"
+    ]
+  },
+  "p9-telemetry-adapter": {
+    "type": "code",
+    "kind": "port",
+    "title": "桌面遙測 adapter 開機強驗證",
+    "meta": "source/electron-main/adapters/telemetry.ts:58-62",
+    "why": "在建立 adapter 前逐一以 requireFunction 檢查 port 欄位，不允許缺漏。",
+    "start": 58,
+    "hi": [
+      61,
+      62
+    ],
+    "lines": [
+      "export function createProductionTelemetryAdapter(",
+      "  ports: ProductionTelemetryPorts,",
+      "): ElectronProductionAdapterBindings[\"telemetry\"] {",
+      "  requireFunction(ports?.resolveOptions, \"telemetry.resolveOptions\");",
+      "  requireFunction(ports?.attach, \"telemetry.attach\");"
+    ]
+  },
+  "p9-service-iface": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "遙測服務在擴充套件層之正式介面",
+    "meta": "source/host/extensions/telemetry/analytics-service.ts:18-22",
+    "why": "顯示三十項遙測回報方法於編譯還原後之型別簽名皆被弱化為 never[] 參數。",
+    "start": 18,
+    "hi": [
+      20,
+      21,
+      22
+    ],
+    "lines": [
+      "",
+      "/** The exact telemetry surface consumed by the host agent runtime. */",
+      "export interface TelemetryService {",
+      "  startTurn: ReportMethod;",
+      "  reportToolCallError: ReportMethod;"
+    ]
+  },
+  "p9-drop-reasons": {
+    "type": "code",
+    "kind": "shared",
+    "title": "跨行程共享之丟棄原因字彙",
+    "meta": "source/shared/observability/telemetry-events.ts:3-5",
+    "why": "展示跨行程傳輸層在丟棄日誌與回報 dropped 事件時所依循之列舉與單位對照。",
+    "start": 3,
+    "hi": [
+      3,
+      5
+    ],
+    "lines": [
+      "export const TELEMETRY_DROP_REASONS = [\"ship_failed\", \"overflow_evicted\", \"replay_expired\", \"backend_dropped\", \"account_rotated\"] as const;",
+      "export type TelemetryDropReason = (typeof TELEMETRY_DROP_REASONS)[number];",
+      "export const TELEMETRY_DROP_UNIT_BY_REASON: Record<TelemetryDropReason, \"attempts\" | \"entries\"> = { ship_failed: \"attempts\", overflow_evicted: \"entries\", replay_expired: \"entries\", backend_dropped: \"entries\", account_rotated: \"entries\" };"
+    ]
+  },
+  "p9-errno-fallback": {
+    "type": "code",
+    "kind": "shared",
+    "title": "錯誤代碼收斂與回退成員",
+    "meta": "source/shared/errors/bounded.ts:44-48",
+    "why": "證明以 E_OTHER 作為封閉枚舉之 fallback，收束未預期的系統錯誤碼。",
+    "start": 44,
+    "hi": [
+      47,
+      48
+    ],
+    "lines": [
+      "  \"EIO\",",
+      "] as const;",
+      "",
+      "export const SAND_ERRNO_FALLBACK = \"E_OTHER\" as const;",
+      "export const brandedErrno = brandedEnumOf(SAND_ERRNO_TAGS, SAND_ERRNO_FALLBACK);"
+    ]
+  },
+  "p9-error-registry": {
+    "type": "code",
+    "kind": "shared",
+    "title": "結構化錯誤定義欄位規範",
+    "meta": "source/shared/errors/registry.ts:1-9",
+    "why": "展示八十八組錯誤代碼共用之定義介面，包含名稱、領域與重試屬性。",
+    "start": 1,
+    "hi": [
+      1,
+      3,
+      4
+    ],
+    "lines": [
+      "export interface SandErrorDefinition {",
+      "  readonly name: string;",
+      "  readonly domain: string;",
+      "  readonly retryable: boolean;",
+      "  readonly summary: string;",
+      "  readonly payload: readonly string[];",
+      "  readonly seededFrom: string;",
+      "}",
+      ""
+    ]
+  },
+  "c10-event-list": {
+    "type": "code",
+    "kind": "shared",
+    "title": "事件名是常數，一個檔集中宣告",
+    "meta": "source/shared/observability/telemetry-events.ts:7-12",
+    "why": "98 個事件名都在這一檔，adapter 與讀表的人看同一份。",
+    "start": 7,
+    "hi": [
+      7
+    ],
+    "lines": [
+      "export const TURN_START_EVENT = \"agent.turn.start\";",
+      "export const TURN_OUTCOME_EVENT = \"agent.turn.outcome\";",
+      "export const TURN_OUTCOME_DETAIL_EVENT = \"sand.turn.outcome_detail\";",
+      "export const TOOL_CALL_ERROR_EVENT = \"sand.tool_call.error\";",
+      "export const TOOL_CALL_STALLED_EVENT = \"sand.tool_call.stalled\";",
+      "export const TOOL_CALL_STARTED_EVENT = \"sand.tool_call.started\";"
+    ]
+  },
+  "c10-usage-tags": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "token 用量展開成六個欄位",
+    "meta": "source/host/extensions/telemetry/turn-telemetry-mappers.ts:25-35",
+    "why": "usageTokenTags 把一個 TokenUsage 攤成六個 key，turn.usage 與 computer_use.usage 共用。",
+    "start": 25,
+    "hi": [
+      28,
+      29,
+      30
+    ],
+    "lines": [
+      "export function usageTokenTags(usage: TokenUsage | null | undefined) {",
+      "  if (usage == null) return {};",
+      "  return {",
+      "    input_tokens: String(usage.inputTokens),",
+      "    output_tokens: String(usage.outputTokens),",
+      "    cache_read_tokens: String(usage.cacheReadTokens),",
+      "    cache_write_tokens: String(usage.cacheWriteTokens),",
+      "    reasoning_tokens:",
+      "      usage.reasoningTokens != null ? String(usage.reasoningTokens) : undefined,",
+      "    total_input_tokens: String(totalInputTokens(usage)),",
+      "  };"
+    ]
+  },
+  "c10-error-tags": {
+    "type": "code",
+    "kind": "shared",
+    "title": "錯誤展開成 code、domain、retryable",
+    "meta": "source/shared/errors/registry.ts:819-826",
+    "why": "sandErrorTags 從 registry 查定義，三個欄位跟著錯誤碼走，呼叫端不用自己填。",
+    "start": 819,
+    "hi": [
+      823,
+      824,
+      825
+    ],
+    "lines": [
+      "export function sandErrorTags(error: SandErrorValue): Record<string, string> {",
+      "  const code = sandErrorWireCode(error);",
+      "  const definition = SAND_ERROR_DEFINITIONS[code];",
+      "  const tags: Record<string, string> = {",
+      "    error_code: code,",
+      "    error_domain: definition.domain,",
+      "    error_retryable: String(definition.retryable),",
+      "  };"
+    ]
+  },
+  "c10-tool-error": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "tool_call.error 的欄位就寫在 adapter 方法裡",
+    "meta": "source/host/extensions/telemetry/structured-log-telemetry.ts:570-578",
+    "why": "每個 report 方法只做一件事：把 report 物件攤成 metadata 後 enqueue。",
+    "start": 570,
+    "hi": [
+      574,
+      575
+    ],
+    "lines": [
+      "  reportToolCallError(r: Fields): void {",
+      "    this.enqueue(\"error\", TOOL_CALL_ERROR_EVENT, {",
+      "      conversation_id: String(r.conversationId),",
+      "      request_id: r.requestId as string | undefined,",
+      "      tool_name: r.toolName as string | undefined,",
+      "      tool_call_id: r.toolCallId as string | undefined,",
+      "      error_class: r.errorClass as string | undefined,",
+      "      duration_ms:",
+      "        r.durationMs !== undefined"
+    ]
+  },
+  "c10-metrics": {
+    "type": "code",
+    "kind": "port",
+    "title": "零件層用 metrics 計數，不走 report 方法",
+    "meta": "source/packages/agent/tool-stream-executor.ts:177-183",
+    "why": "packages/agent 不知道產品的事件名，靠 createCounter 的 label 分組。",
+    "start": 177,
+    "hi": [
+      177
+    ],
+    "lines": [
+      "const toolCallResult = createCounter(\"tool_call.result\", {",
+      "  description: \"Result status of tool call execution\",",
+      "  labelNames: [",
+      "    \"toolName\",",
+      "    \"outcome\",",
+      "    \"team\",",
+      "    \"mcp_version\","
+    ]
+  },
+  "c10-desktop-events": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "桌面行程有自己的一份事件登錄表",
+    "meta": "source/electron-main/telemetry/desktop-structured-log-telemetry.ts:33-35",
+    "why": "桌面事件名集中在這一個物件，跟 host 那份 95 個只有兩個名字重疊，其餘各走各的，改一邊不會動到另一邊。",
+    "start": 33,
+    "hi": [
+      34
+    ],
+    "lines": [
+      "const EVENTS = {",
+      "  agentLoad: \"sand.agent_load\", boxSetupVisible: \"sand.box_setup_visible\", boxRecreateVisible: \"sand.box_recreate_visible\", boxRebuildStage: \"sand.box_rebuild_stage\", boxRebuildEscalation: \"sand.box_rebuild_escalation\", boxRebuildPendingStall: \"sand.box_rebuild_pending_stall\", boxMigrationWatch: \"sand.box_migration_watch\", boxSecretsPush: \"sand.box_secrets.push\", replicaResync: \"sand.replica.resync\", sendJournalRestore: \"sand.send_journal.restore\", resyncCompleted: \"sand.resync.completed\", boxReachability: \"sand.box_reachability\", boxDnsDiagnostic: \"sand.box_dns_diagnostic\", agentsUnreachable: \"sand.agents_unreachable\", accessBlocked: \"sand.access_blocked\", transportStreamDown: \"sand.transport.stream_down\", coordinatorLifecycle: \"sand.desktop.coordinator_lifecycle\", recoveryAction: \"sand.recovery_action\", vncSession: \"sand.vnc_session\", vncLiveness: \"sand.vnc_liveness\", vncAssetFail: \"sand.vnc_asset_fail\", attachmentEdge: \"sand.attachment.edge_failed\", imageEdge: \"sand.image.edge_failed\", mcpEdge: \"sand.mcp.desktop_edge_failed\", connectorAuth: \"sand.connector_auth\", telemetrySinkEdge: \"sand.telemetry.sink_edge_failed\", desktopEdge: \"sand.desktop.edge_failed\", startup: \"sand.desktop.startup\", eventLoop: \"sand.desktop.event_loop\", processCrash: \"sand.desktop.process_crash\", rendererLifecycle: \"sand.desktop.renderer_lifecycle\", coordinatorHandoff: \"sand.desktop.coordinator_handoff\", localExecLifecycle: \"sand.desktop.local_exec_lifecycle\", uncleanExit: \"sand.desktop.unclean_exit\", openComputer: \"sand.open_computer\", send: \"sand.send\", sendAck: \"sand.send_ack\", reactionAck: \"sand.reaction.ack\", renderTtfr: \"sand.render_ttfr\", renderStream: \"sand.render_stream\", updateOutcome: \"sand.update.outcome\", updateCheck: \"sand.update.check\", updatePrompt: \"sand.update.prompt\", updateApply: \"sand.update.apply\", signin: \"sand.desktop.signin\", session: \"sand.desktop.session\",",
+      "} as const;"
+    ]
+  },
+  "c10-desktop-passthrough": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "桌面 adapter 只轉手，不塑形欄位",
+    "meta": "source/electron-main/telemetry/desktop-structured-log-telemetry.ts:112-112",
+    "why": "host 的 report 方法自己把 report 物件攤成 metadata；桌面這支收下已經攤好的 metadata 就直接送，欄位由呼叫端決定。",
+    "start": 112,
+    "hi": [
+      112
+    ],
+    "lines": [
+      "  private report(level: StructuredLogLevel, event: string, metadata: TelemetryMetadata): void { this.enqueue(level, event, metadata); }"
+    ]
+  },
+  "c10-metrics-backend": {
+    "type": "code",
+    "kind": "port",
+    "title": "metrics 的 backend 預設是空實作",
+    "meta": "source/packages/metrics/index.ts:13-20",
+    "why": "createKey 的預設值四個方法都空著，沒有人注入 backend 時每個 counter 都空轉，不會有落點。",
+    "start": 13,
+    "hi": [
+      13,
+      14
+    ],
+    "lines": [
+      "const defaultMetricsBackend: MetricsBackend = { record() {}, increment() {}, gauge() {}, histogram() {} };",
+      "export const metricsKey = createKey(Symbol(\"metricsBackend\"), defaultMetricsBackend);",
+      "export const getMetricsBackend = (context: Context): MetricsBackend => context.get(metricsKey);",
+      "",
+      "function handle(name: string, type: MetricType, options?: { description?: string; labelNames?: readonly string[] }): MetricHandle {",
+      "  // The shipped runtime keeps both optional keys even when their values are undefined.",
+      "  // These assertions erase only the type-level undefined while preserving that object shape.",
+      "  return { name, type, description: options?.description as string, labelNames: options?.labelNames as readonly string[] };"
+    ]
+  },
+  "c10-metrics-decl": {
+    "type": "code",
+    "kind": "port",
+    "title": "counter 與 histogram 在模組頂層宣告",
+    "meta": "source/packages/agent/utils/mcp-metrics.ts:7-16",
+    "why": "名稱、型別、labelNames 一次寫定，呼叫端只帶值與 label，所以整份表可以從宣告處機器抽出。",
+    "start": 7,
+    "hi": [
+      7,
+      11,
+      15
+    ],
+    "lines": [
+      "const getMcpToolsDuration = createHistogram(\"mcp.meta.get_tools_duration_ms\", {",
+      "  description: \"Duration of GetMcpTools calls in milliseconds\",",
+      "  labelNames: [\"mode\"]",
+      "});",
+      "const getMcpToolsSuccess = createCounter(\"mcp.meta.get_tools_success\", {",
+      "  description: \"Successful GetMcpTools calls\",",
+      "  labelNames: [\"mode\"]",
+      "});",
+      "const getMcpToolsError = createCounter(\"mcp.meta.get_tools_error\", {",
+      "  description: \"Failed GetMcpTools calls\","
+    ]
+  },
+  "c10-pkg-log": {
+    "type": "code",
+    "kind": "port",
+    "title": "零件層的結構化日誌沒有事件名常數",
+    "meta": "source/packages/agent/tool-stream-executor.ts:549-556",
+    "why": "packages 的事件名是字面字串，直接寫在 logger 呼叫的第二個參數，沒有集中登錄表可查。",
+    "start": 549,
+    "hi": [
+      551
+    ],
+    "lines": [
+      "  const logToolCallStart = (): void => {",
+      "    didLogStart = true;",
+      "    logger.info(ctx, \"nal.tool_call.start\", {",
+      "      toolCallId: descriptor.toolCallId,",
+      "      toolName: telemetry.loggedToolName,",
+      "      team: getToolOwnerTeam(telemetry.toolIdentifier),",
+      "      ...telemetryLogFields,",
+      "    });"
+    ]
+  },
+  "c10-span": {
+    "type": "code",
+    "kind": "port",
+    "title": "span event 把時間差寫回根 span",
+    "meta": "source/packages/context/otel.ts:142-158",
+    "why": "reportEvent 開一個瞬時 span，再把距離根 span 起點的毫秒數寫成 event.<名稱> 屬性，掛回根 span 上。",
+    "start": 142,
+    "hi": [
+      142,
+      148,
+      156
+    ],
+    "lines": [
+      "export function reportEvent(ctx: Context, name: string): void {",
+      "  try {",
+      "    const tracer = getTracer();",
+      "    const parentSpan = getSpan(ctx);",
+      "    if (!parentSpan) return;",
+      "    const parentContext = trace.setSpan(context.active(), parentSpan);",
+      "    const eventSpan = tracer.startSpan(name, undefined, parentContext);",
+      "    const inherited = ctx.get(INHERITABLE_SPAN_ATTRIBUTES_KEY);",
+      "    for (const key in inherited) eventSpan.setAttribute(key, inherited[key]!);",
+      "    const now = Date.now();",
+      "    const rootStart = ctx.get(ROOT_SPAN_START_MS_KEY);",
+      "    const delta = typeof rootStart === \"number\" ? now - rootStart : 0;",
+      "    const attributeKey = `event.${name}`;",
+      "    const rootSpan = ctx.get(ROOT_SPAN_KEY) ?? parentSpan;",
+      "    rootSpan.setAttribute(attributeKey, delta);",
+      "    eventSpan.setAttribute(attributeKey, delta);",
+      "    eventSpan.end();"
+    ]
+  },
+  "c10-sentry": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "Sentry 也是預設空實作，開機才插入",
+    "meta": "source/electron-main/telemetry/sentry.ts:15-24",
+    "why": "adapter 一開始是 noopAdapter，要等 installSandSentryAdapter 換掉；沒插入時所有 capture 都是空呼叫。",
+    "start": 15,
+    "hi": [
+      15,
+      16,
+      24
+    ],
+    "lines": [
+      "const noopAdapter: SandSentryAdapter = { init: () => undefined, setUser: () => {}, setTag: () => {}, captureMessage: () => {}, captureException: () => {} };",
+      "let adapter: SandSentryAdapter = noopAdapter;",
+      "const gate = new SandSentryPrivacyGate();",
+      "const eventIdRing = new SandSentryEventIdRing(SAND_FEEDBACK_SENTRY_EVENT_ID_MAX_COUNT);",
+      "let privacySync = new SandSentryAccountPrivacySync();",
+      "let ringOwnerUserId: string | undefined;",
+      "let offlineTransport: SandSentryOfflineTransport | undefined;",
+      "let initialOfflineFlushStarted = false;",
+      "",
+      "export function installSandSentryAdapter(next: SandSentryAdapter): void { adapter = next; }"
+    ]
+  },
+  "c10-analytics-indirect": {
+    "type": "code",
+    "kind": "adapter",
+    "title": "同一件事同時進日誌與產品分析",
+    "meta": "source/host/host-runner-composition.ts:925-939",
+    "why": "onBotBlock 先進結構化日誌，再用同一個名字進產品分析，兩條路各自獨立，任一邊沒插實作另一邊照送。",
+    "start": 925,
+    "hi": [
+      926,
+      933
+    ],
+    "lines": [
+      "        onBotBlock(hit, record) {",
+      "          method(telemetry.brain ?? {}, \"reportBotBlock\")?.({",
+      "            conversationId: record.agentId,",
+      "            family: hit.family,",
+      "            confidence: hit.confidence,",
+      "            blockedHost: hit.blockedHost,",
+      "            blockedUrl: hit.blockedUrl",
+      "          });",
+      "          method(analytics ?? {}, \"trackEvent\")?.(\"sand.bot_block\", {",
+      "            agent_id: record.agentId,",
+      "            family: hit.family,",
+      "            confidence: hit.confidence,",
+      "            blocked_host: hit.blockedHost,",
+      "            blocked_url: hit.blockedUrl",
+      "          });"
+    ]
+  },
+  "c10-renderer-reports": {
+    "type": "code",
+    "kind": "shared",
+    "title": "前端的回報是一張 channel 表",
+    "meta": "source/shared/rpc/main.ts:86-104",
+    "why": "畫面不自己落地，每種要觀測的事都是一支 report 方法，經 IPC 交給桌面行程；channel 名在這張表集中宣告，缺一個對應開機就丟錯。",
+    "start": 86,
+    "hi": [
+      86,
+      98
+    ],
+    "lines": [
+      "  reportAgentLoad: { args: \"object\" },",
+      "  reportAccessBlocked: { args: \"object\" },",
+      "  reportAgentsUnreachable: { args: \"object\" },",
+      "  reportRecoveryAction: { args: \"object\" },",
+      "  reportRebuildLifecycle: { args: \"object\" },",
+      "  reportReconciliation: { args: \"object\" },",
+      "  reportBoxVisibility: { args: \"object\" },",
+      "  reportSendLatency: { args: \"object\" },",
+      "  reportSendAck: { args: \"object\" },",
+      "  reportReactionAck: { args: \"object\" },",
+      "  reportRenderTtfr: { args: \"object\" },",
+      "  reportRenderStream: { args: \"object\" },",
+      "  reportVncSession: { args: \"object\" },",
+      "  reportVncLiveness: { args: \"object\" },",
+      "  reportOpenComputer: { args: \"object\" },",
+      "  reportUpdatePrompt: { args: \"object\" },",
+      "  reportSigninGate: { args: \"object\" },",
+      "  reportOnboardingStep: { args: \"object\" },",
+      "  reportClientFailure: { args: \"object\" },"
+    ]
   }
 }

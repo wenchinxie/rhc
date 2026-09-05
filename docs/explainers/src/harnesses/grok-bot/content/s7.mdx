@@ -1,0 +1,147 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s7" n="7">設定共用，記憶跟秘密各自收</H2>
+  <p>
+    重開機後留下來的東西不寫進同一個資料庫，四種東西分四種放法：<code>settings.json</code>
+    是全域共用的一份設定，每個 agent 各自一個資料夾配一個 SQLite，記憶依人、依 agent、依專案分層各收各的，secrets
+    則依照哪個行程能解密分三層放。這四種東西共用同一個根目錄，根目錄怎麼決定跟根目錄下還有哪些旗標檔，7.1 先講；誰真的在讀寫
+    <code>settings.json</code>，7.2 講；每個 agent 的資料夾跟 SQLite 什麼時候折 WAL，7.3
+    講；記憶的前綴跟半衰期，7.4 講；secrets 三層跟共同的原子寫底線，7.5 講。
+  </p>
+  <H3 id="s7-1" n="7.1">根目錄先問環境變數，不是先照預設路徑</H3>
+  <p>
+    根目錄由 <code>getSandRootDir()</code> 決定，判斷順序固定：先看
+    <code>SAND_DATA_ROOT</code> 這個環境變數有沒有給絕對路徑，有就整段短路直接用
+    <Peek snip="root-override">env 覆寫只吃絕對路徑</Peek>；沒有才退回看
+    <code>--user-data-dir</code> 參數或 <code>SAND_USER_DATA_DIR</code>
+    環境變數；兩者都沒有，才照 sand 變體名稱落在使用者家目錄下，正式版落在家目錄下的
+    <code>.grokbot</code>，其他變體落在家目錄下的 <code>.cursor/variant</code>
+    <Peek snip="root-dir">根目錄判斷順序</Peek>。這條根目錄底下不是只有一份設定檔，
+    <code>gateway.json</code>、<code>host.lock</code>、<code>.sand-host-upgrade.json</code>、
+    <code>.sand-host-crash.json</code> 全部平行放在同一層，各自對應閘道發現、單機鎖檔、升級與異常退出標記
+    <Peek snip="root-files">根目錄下的旗標檔</Peek>。同一層還有一支叫
+    <code>host-secrets.json</code> 的檔案，名字容易讓人誤會成憑證，實際內容只有一組開機時隨機產生的
+    machineId，用途是遙測識別，不是任何一層 secrets
+    <Peek snip="host-secrets-misnomer">host-secrets 實為機器 id</Peek>。
+  </p>
+  <H3 id="s7-2" n="7.2"><code>settings.json</code> 全域共用，寫的行程不只一個</H3>
+  <p>
+    host 裡的 <code>SettingsService</code> 是設定畫面走 IPC 改設定時真正用的入口，建構時預設路徑接的就是根目錄下的
+    <code>settings.json</code>，內部包一個 <code>SandSettingsStore</code>
+    <Peek snip="settings-class">store 類別與 persist</Peek>。但同一支類別、同一個路徑，
+    <Term k="coordinator">coordinator</Term> 自己也開了一份：<code>createCoordinatorInferenceRouter()</code>
+    建構時另外 new 一個 <code>SandSettingsStore</code>，指向同一支
+    <code>settings.json</code>，用來讀寫模型供應者選擇跟用量統計
+    <Peek snip="settings-coordinator">另開一份</Peek>。兩邊互不知會，也沒有檔案鎖：
+    <code>persist()</code> 整包讀出、整包改、整包寫進暫存檔再 <code>rename</code>，兩個行程若同時各自讀改寫，後寫的會把先寫的欄位整包覆蓋，沒有合併機制。
+    <code>load()</code> 反而很寬容：檔案不存在或解析失敗，一律退回空設定，不讓呼叫端因設定檔壞掉而中斷。
+  </p>
+  <H3 id="s7-3" n="7.3">一個 agent 一個資料夾，checkpoint 挑時機做</H3>
+  <p>
+    agent 的落腳處是 <code>getSandAgentsRootDir()</code> 底下以 agentId 命名的資料夾，但這個
+    agentId 不是隨便一個字串就能當資料夾名：<code>resolveSandAgentDir()</code>
+    先驗證 id 是安全的資料夾名稱、且跟去除頭尾空白後的自己一致，算出目標路徑之後還會拿相對路徑再驗一次，出現
+    <code>..</code>、絕對路徑或多層路徑一律丟 <code>SandInvalidAgentIdError</code>，防的是拿
+    agentId 跳出 agents 根目錄
+    <Peek snip="agent-dir-guard">agent 目錄防穿越</Peek>。每個資料夾底下的
+    <code>store.db</code> 是一支 <code>node:sqlite</code> 的 <code>DatabaseSync</code>，開著 WAL
+    模式跑，但 WAL checkpoint 不是每次寫入都做，只有在需要一份乾淨、單一檔案版本的當下才手動觸發：
+    <code>checkpointSandAgentDb()</code> 開一個新連線、下
+    <code>PRAGMA wal_checkpoint(TRUNCATE)</code> 把 WAL 折回主檔
+    <Peek snip="db-checkpoint">手動觸發 checkpoint</Peek>。兩個真正會呼叫它的時機，一個是複製
+    agent：<code>cloneAgent()</code> 把來源資料夾複製成新資料夾之前，先對來源的
+    <code>store.db</code> 做一次 checkpoint，確保複製到的是完整資料而不是還卡在 WAL 檔裡的半截紀錄
+    <Peek snip="checkpoint-clone">複製前先折 WAL</Peek>；另一個是狀態備份：讀
+    <code>store.db</code> 位元組組出備份內容之前，同樣先呼叫一次 checkpoint 再讀檔
+    <Peek snip="checkpoint-backstop">備份前先折 WAL</Peek>。平常寫對話這種高頻寫入不碰 checkpoint。
+  </p>
+  <H3 id="s7-4" n="7.4">記憶靠前綴分兩層，凍結靠 epoch 省重算</H3>
+  <p>
+    agent 的記憶存成一行一行帶前綴的紀錄，抽取回合裡模型輸出的每一行先被判斷是
+    <code>profile</code>、<code>log</code>、<code>note</code> 還是
+    <code>remove</code>，寫進去的內容依類別在前面加上
+    <code>[episode] </code> 或 <code>[note] </code> 兩種前綴，抽取與長篇摘要各自有專屬標記字串放在系統提示最前面
+    <Peek snip="memory-prefix">兩種前綴與標記</Peek>。這些紀錄不是永遠同等重要：
+    <code>memoryRecallRank()</code> 把重要性取 log2 之後，再加上建立時間除以半衰期換算出的分數，半衰期常數固定
+    30 天
+    <Peek snip="memory-halflife">半衰期常數</Peek>，時間拉得越久排序分數掉得越低，代表舊紀錄逐漸從每回合都會塞進提示的清單裡淡出，但檔案本身不刪
+    <Peek snip="memory-rank">半衰期進排序公式</Peek>。組提示這件事本身也不是每回合重算：
+    <code>resolveFrozenMemoryPrompt()</code> 收一個 <code>compactionEpoch</code>，只要傳進來的快取快照跟目前的
+    epoch 一致就直接回傳快取字串，epoch 換了才重新組一次、把新結果連同新 epoch 存成快照
+    <Peek snip="memory-frozen">凍結快照對 epoch</Peek>。一個 agent 在同一次壓縮之間不管送出幾輪訊息，記憶這段提示都是同一份字串，代價是新加的記憶要等下一次
+    epoch 才會出現在提示裡。這條記憶鏈跟{" "}
+    <a className="xref" href="#s3">§3</a>{" "}
+    描述的對話紀錄是分開的兩份東西，逐字稿本身由那邊的迴圈負責寫。
+  </p>
+  <H3 id="s7-5" n="7.5">secrets 分三層，原子寫是共同底線</H3>
+  <p>
+    能解密內容的行程不同，secrets 就分開放在不同檔案。第一層是 <code>box-secrets.json</code>，放在根目錄底下，內容是要塞進
+    <Term k="box">沙箱機器</Term> 環境變數的鍵值組，寫入時先寫暫存檔、內容帶
+    <code>mode: 0o600</code>、再 <code>rename</code> 蓋過去
+    <Peek snip="secrets-box">box 層路徑</Peek>
+    <Peek snip="secrets-box-persist">box 層原子寫</Peek>。第二層是
+    <code>sand-secrets.json</code>，放在 Electron 的 <code>userData</code>
+    目錄，管的是 Cursor 存取權杖跟刷新權杖這類使用者層級密鑰，寫入前先用系統的
+    <code>safeStorage</code> 加密成密文，落盤同樣是暫存檔加 <code>rename</code>，但沒有另外指定檔案權限
+    <Peek snip="secrets-user">user 層路徑</Peek>
+    <Peek snip="secrets-user-write">user 層原子寫</Peek>。第三層只在切成本機 Docker 執行時才出現：
+    <code>local-docker-credential/inference.json</code>，放的是打進本機容器的存取權杖跟到期時間，寫入一樣走暫存檔、
+    <code>rename</code>，額外再補一次 <code>chmod 0o600</code>
+    <Peek snip="secrets-docker">docker 層原子寫</Peek>。三層各自對應不同讀者：box
+    層給沙箱環境變數用，user 層給桌面登入狀態用，docker 層只給本機容器的推論閘道用，彼此不共用檔案也不共用金鑰。使用者層的憑證怎麼被各家
+    provider 讀走，是{" "}
+    <a className="xref" href="#s4">§4</a>{" "}
+    的範圍，這裡只管憑證放在哪張碟。
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>狀態種類</th>
+          <th>檔案或表</th>
+          <th>擁有者行程</th>
+          <th>寫入時機</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>全域設定</td>
+          <td><code>settings.json</code></td>
+          <td>host 的 <code>SettingsService</code>，以及 <Term k="coordinator">coordinator</Term> 另開的一份</td>
+          <td>使用者改設定當下，或供應者用量更新時</td>
+        </tr>
+        <tr>
+          <td>agent 對話與狀態</td>
+          <td><code>store.db</code>（SQLite）</td>
+          <td><Term k="sand-host">host-main</Term> 的 agent 運行迴圈</td>
+          <td>每回合寫對話、記憶異動時；WAL 折回主檔只在複製或備份前做</td>
+        </tr>
+        <tr>
+          <td>agent 記憶</td>
+          <td>profile.md、log/*.md</td>
+          <td><Term k="sand-host">host-main</Term> 的記憶抽取步驟</td>
+          <td>判斷這回合值得記才寫，不是每回合</td>
+        </tr>
+        <tr>
+          <td>box secrets</td>
+          <td><code>box-secrets.json</code></td>
+          <td><Term k="sand-host">host-main</Term> 的 <code>BoxSecretsApplier</code></td>
+          <td>使用者改 box 環境變數，或帳號重新登入後重推</td>
+        </tr>
+        <tr>
+          <td>user secrets</td>
+          <td><code>sand-secrets.json</code></td>
+          <td>electron-main 的登入流程</td>
+          <td>拿到新權杖或刷新成功時</td>
+        </tr>
+        <tr>
+          <td>docker 推論憑證</td>
+          <td><code>local-docker-credential/inference.json</code></td>
+          <td>electron-main 的本機 Docker 連接器</td>
+          <td>切到 local-docker 且憑證不存在或過期時</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</>

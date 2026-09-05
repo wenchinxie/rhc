@@ -1,0 +1,344 @@
+{
+  "subject": "grok-bot 0.18 reconstructed (Anysphere Grok Bot 0.18.0, commit a9f633e)",
+  "graph": {
+    "tool": "artifacts-builder scripts/tsgraph.mjs, TypeScript compiler API 5.9.3 against source/tsconfig.json",
+    "files": 1722,
+    "loc": 430267,
+    "functions": 42469,
+    "call_edges": 22829,
+    "import_edges": 5543,
+    "unresolved_call_sites": 30877,
+    "folder_nodes": 41
+  },
+  "method": "chapter = one runtime question answered by one seed tree; folders assigned to the chapter whose tree touches most of them; folders no tree reaches are cross-cutting or listed as not covered",
+  "chapters": [
+    {
+      "n": 0,
+      "id": "s0",
+      "title": "資料夾地圖：41 個節點、120 條匯入邊、每個資料夾歸一章",
+      "question": "整棵樹有哪些資料夾，誰依賴誰，每個資料夾在本文哪一章講",
+      "seeds": ["graph/folders.json"],
+      "folders": ["source/*"],
+      "relevant_files": ["docs/ARCHITECTURE.md", "package.json"]
+    },
+    {
+      "n": 1,
+      "id": "s1",
+      "title": "這份樹是出廠 0.18.0 的重建稿：哪些行為是出廠的、哪些是疊層",
+      "question": "讀者看到一個功能時，怎麼判斷它是 0.18.0 有的還是這份樹加的",
+      "seeds": ["PROVENANCE.md", "tests/reconstructed-updater-guard.test.mjs"],
+      "folders": ["frontend", "scripts", "tests", "manifests", "research-archives", "src/app"],
+      "relevant_files": [
+        "PROVENANCE.md",
+        "docs/ARCHITECTURE.md",
+        "frontend/README.md",
+        "tests/reconstructed-updater-guard.test.mjs",
+        "scripts/lib/build-asar.mjs",
+        "package.json",
+        "src/app/package.json"
+      ],
+      "crossings": ["s4 路由器是疊層", "s6 本機 Docker 是疊層"]
+    },
+    {
+      "n": 2,
+      "id": "s2",
+      "title": "四個行程怎麼開機、怎麼接：桌面主行程、coordinator、host-main、box-exec-daemon",
+      "question": "從按下圖示到 host 的 gateway 可連，經過哪些行程與哪些通道",
+      "seeds": [
+        "source/electron-main/main.ts#startElectronMain@232",
+        "source/electron-main/coordinator/coordinator-launcher.ts",
+        "source/node-agent-coordinator/main.ts#composeCoordinator@66",
+        "source/host/main.ts#main@188",
+        "source/box-exec-daemon/server.ts#startBoxExecDaemon@450"
+      ],
+      "folders": [
+        "source/electron-main/(files)",
+        "source/electron-main/coordinator",
+        "source/electron-main/adapters",
+        "source/electron-main/startup",
+        "source/electron-main/account",
+        "source/electron-preload",
+        "source/node-agent-coordinator",
+        "source/host/(files)",
+        "source/host/box",
+        "source/box-exec-daemon",
+        "source/shared/rpc"
+      ],
+      "relevant_files": [
+        "source/electron-main/main.ts",
+        "source/electron-main/coordinator/production-provider.ts",
+        "source/electron-main/coordinator/coordinator-launcher.ts",
+        "source/electron-main/coordinator/coordinator-runtime.ts",
+        "source/electron-preload/preload.ts",
+        "source/node-agent-coordinator/main.ts",
+        "source/node-agent-coordinator/gateway/gateway-client.ts",
+        "source/node-agent-coordinator/routed-mcp-bridge.ts",
+        "source/node-agent-coordinator/oauth/mcp-oauth-loopback-registry.ts",
+        "source/host/main.ts",
+        "source/host/host-lock.ts",
+        "source/host/gateway-server.ts",
+        "source/host/gateway-config.ts",
+        "source/host/host-gateway-api.ts",
+        "source/host/host-paths.ts",
+        "source/host/box/exec-daemon-process.ts",
+        "source/box-exec-daemon/server.ts",
+        "source/box-exec-daemon/main.ts"
+      ],
+      "crossings": ["s3 gateway 的 sendPrompt 進入 SendPipeline", "s6 box connector 決定 host 住哪", "s8 telemetry port"]
+    },
+    {
+      "n": 3,
+      "id": "s3",
+      "title": "一則送出從進入到結束：SendPipeline、動作處理器、步進迴圈、redaction 包層",
+      "question": "使用者一則送出，到模型答完、工具跑完、回合結算，走過哪些函式",
+      "seeds": [
+        "source/host/extensions/transcript/send-pipeline.ts#sendPrompt@100",
+        "source/packages/agent/actions/user-message-action/user-message-action-handler.ts#handle@328",
+        "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts#runTurnLoop@2548",
+        "source/host/runner/sand-agent-runner.ts"
+      ],
+      "folders": [
+        "source/host/extensions/transcript",
+        "source/host/runner/(files)",
+        "source/packages/agent/(files)",
+        "source/packages/agent/actions",
+        "source/packages/agent/prompts",
+        "source/packages/agent/utils",
+        "source/packages/agent/self-summary",
+        "source/packages/agent/loop-detection",
+        "source/packages/agent-core",
+        "source/packages/agent-summarization",
+        "source/packages/prompt-jsx",
+        "source/packages/redaction",
+        "source/packages/redacted-protos",
+        "source/packages/context",
+        "source/packages/metrics"
+      ],
+      "relevant_files": [
+        "source/host/extensions/transcript/send-pipeline.ts",
+        "source/host/extensions/transcript/prompt-acceptance-ledger.ts",
+        "source/host/extensions/transcript/turn-runtime.ts",
+        "source/host/extensions/transcript/send-turn-dispatch.ts",
+        "source/host/runner/sand-agent-runner.ts",
+        "source/host/runner/turn-agent-composition.ts",
+        "source/packages/agent/index.ts",
+        "source/packages/agent/actions/user-message-action/user-message-action-handler.ts",
+        "source/packages/agent/actions/user-message-action/abstract-user-message-action-handler.ts",
+        "source/packages/agent/tool-stream-executor.ts",
+        "source/packages/agent/tools/core.ts",
+        "source/packages/agent/mode-processing.ts",
+        "source/packages/agent/tool-counting-middleware.ts",
+        "source/packages/redaction/core-message.ts",
+        "source/packages/redaction/factory.ts",
+        "source/packages/redaction/privacy-context.ts",
+        "source/packages/agent-summarization/summarization-handler.ts",
+        "source/packages/agent-summarization/background-summarization.ts",
+        "source/packages/context/otel.ts"
+      ],
+      "tree": "graph/trees/runTurnLoop.json",
+      "crossings": ["s2 gateway 入口", "s4 模型串流由 provider 供", "s5 工具集由 buildTurnTools 組", "s7 transcript 落地", "s8 metrics/otel"]
+    },
+    {
+      "n": 4,
+      "id": "s4",
+      "title": "模型來源預設是 Cursor；Claude Code、Codex、OpenRouter 是重建疊層的路由器",
+      "question": "模型請求最後打到哪裡，由誰決定，憑證放哪",
+      "seeds": [
+        "source/node-agent-coordinator/inference-router.ts",
+        "source/host/extensions/inference/provider-session.ts",
+        "source/shared/node/cursor-backend/cursor-inference.ts#createSandCursorBackendClient@159"
+      ],
+      "folders": [
+        "source/host/extensions/inference",
+        "source/packages/chat-inference",
+        "source/packages/chat-inference-proto",
+        "source/shared/node/cursor-backend",
+        "source/shared/node/experiments"
+      ],
+      "relevant_files": [
+        "source/shared/inference-router.ts",
+        "source/node-agent-coordinator/inference-router.ts",
+        "source/host/extensions/inference/provider-session.ts",
+        "source/host/extensions/inference/codex-direct-responses.ts",
+        "source/shared/node/cursor-backend/cursor-inference.ts",
+        "source/packages/chat-inference/prompt-executor.ts",
+        "source/packages/chat-inference-proto/client.ts",
+        "source/electron-main/box/local-docker-host-connector.ts"
+      ],
+      "crossings": ["s1 疊層判別", "s3 SimplePromptToolExecutor 吃 provider 串流", "s7 憑證檔"]
+    },
+    {
+      "n": 5,
+      "id": "s5",
+      "title": "工具登錄表、auto-review 審核閘、allowlist 預檢：副作用發生前要過幾道門",
+      "question": "模型要跑一個 shell 命令，從工具定義到真的 spawn，中間誰能擋",
+      "seeds": [
+        "source/host/runner/tools/turn-toolset.ts#buildTurnTools@1293",
+        "source/host/runner/auto-review-gate.ts#createAutoReviewGate@28",
+        "source/packages/agent-exec/shell-allowlist-precheck.ts",
+        "source/packages/shell-exec/sandbox/helper-support.ts#spawnWithSandboxHelper@212"
+      ],
+      "folders": [
+        "source/host/runner/tools",
+        "source/packages/agent/tools",
+        "source/packages/agent-exec",
+        "source/packages/shell-exec",
+        "source/packages/hooks",
+        "source/packages/hooks-carriers",
+        "source/packages/hooks-exec",
+        "source/packages/cursor-plugins",
+        "source/packages/mcp-core",
+        "source/packages/mcp-agent-exec",
+        "source/host/extensions/mcp",
+        "source/shared/node/mcp"
+      ],
+      "relevant_files": [
+        "source/host/runner/tools/turn-toolset.ts",
+        "source/host/runner/auto-review-gate.ts",
+        "source/packages/agent/tools/all-tools.ts",
+        "source/packages/agent/tools/common.ts",
+        "source/packages/agent/tools/task.ts",
+        "source/packages/agent-exec/shell-hook-approval.ts",
+        "source/packages/agent-exec/shell-allowlist-precheck.ts",
+        "source/packages/agent-exec/mcp-allowlist-precheck.ts",
+        "source/packages/agent-exec/web-fetch-allowlist-precheck.ts",
+        "source/packages/shell-exec/sandbox/helper-support.ts",
+        "source/packages/shell-exec/sandbox/unsafe-spawn.ts",
+        "source/shared/local-tool-permission.ts",
+        "source/packages/cursor-plugins/loader.ts",
+        "source/packages/hooks/index.ts"
+      ],
+      "tree": "graph/trees/buildTurnTools.json",
+      "crossings": ["s3 工具結果回填", "s6 spawn 在哪台機器發生"]
+    },
+    {
+      "n": 6,
+      "id": "s6",
+      "title": "三條執行通道：遠端沙箱機器是出廠預設，本機 Docker 與 local-exec 怎麼被選上",
+      "question": "命令最後在哪台機器的哪個行程跑，由哪個設定決定",
+      "seeds": [
+        "source/electron-main/box/box-host-connector.ts",
+        "source/electron-main/box/local-docker-host-connector.ts#startLocalDockerBox@218",
+        "source/local-exec-daemon/main.ts#runLocalExecDaemonMain@56",
+        "source/box-exec-daemon/server.ts#spawnShell@408"
+      ],
+      "folders": [
+        "source/electron-main/box",
+        "source/host/local-exec",
+        "source/local-exec-daemon",
+        "source/packages/local-exec",
+        "source/shared/node/egress-tunnel",
+        "source/host/agent-isolation"
+      ],
+      "relevant_files": [
+        "source/electron-main/box/box-host-connector.ts",
+        "source/electron-main/box/local-docker-host-connector.ts",
+        "source/electron-main/box/remote-connector-egress.ts",
+        "source/electron-main/box/egress-tunnel-wiring.ts",
+        "source/electron-main/box/gateway-descriptor-cache.ts",
+        "source/electron-main/main-edge.ts",
+        "source/local-exec-daemon/main.ts",
+        "source/electron-main/local-exec/local-exec-native.ts",
+        "source/host/local-exec",
+        "source/packages/local-exec",
+        "source/box-exec-daemon/server.ts",
+        "source/host/agent-isolation"
+      ],
+      "crossings": ["s2 host-main 在哪開機", "s5 sandbox helper 與 allowlist"]
+    },
+    {
+      "n": 7,
+      "id": "s7",
+      "title": "狀態放哪：settings.json、每個 agent 一個 SQLite、secrets 檔、有半衰期的記憶",
+      "question": "重開機後還在的東西各放在哪個檔，誰寫誰讀",
+      "seeds": [
+        "source/host/host-paths.ts#getSandRootDir@66",
+        "source/shared/node/settings/sand-settings-store.ts",
+        "source/host/storage/store-db.ts",
+        "source/host/runner/sand-memory.ts"
+      ],
+      "folders": [
+        "source/shared/node/settings",
+        "source/host/storage",
+        "source/host/extensions/session",
+        "source/host/extensions/memory",
+        "source/host/extensions/box-store-sync",
+        "source/host/transcript-mirror",
+        "source/packages/agent-kv",
+        "source/packages/agent-store-sync",
+        "source/packages/agent-transcript",
+        "source/host/extensions/secrets",
+        "source/electron-main/secrets",
+        "source/host/extensions/auth",
+        "source/electron-main/account"
+      ],
+      "relevant_files": [
+        "source/host/host-paths.ts",
+        "source/shared/node/settings/sand-settings-store.ts",
+        "source/host/storage/agent-paths.ts",
+        "source/host/storage/store-db.ts",
+        "source/host/runner/sand-memory.ts",
+        "source/host/extensions/memory",
+        "source/host/extensions/secrets/secrets-service.ts",
+        "source/electron-main/secrets/secret-store.ts",
+        "source/electron-main/secrets/user-secrets-store.ts",
+        "source/electron-main/secrets/secrets-ipc.ts",
+        "source/packages/agent-kv",
+        "source/packages/agent-store-sync",
+        "source/host/extensions/box-store-sync"
+      ],
+      "crossings": ["s3 transcript 由迴圈寫", "s4 憑證由 provider 讀"]
+    },
+    {
+      "n": 8,
+      "id": "s8",
+      "title": "遙測管線：從 emit 到落地",
+      "question": "一筆事件從模組 emit 到 sink 落地經過哪些管子，屬於哪個家族",
+      "events": "events.json",
+      "families": [
+        "host-turn",
+        "desktop-log",
+        "coordinator-agg",
+        "transport-stage",
+        "feature-buffered",
+        "sentry-direct",
+        "analytics-direct"
+      ],
+      "folders": [
+        "source/shared/observability",
+        "source/host/ports",
+        "source/host/extensions/telemetry",
+        "source/host/extensions/codebase-telemetry",
+        "source/electron-main/telemetry",
+        "source/electron-main/adapters",
+        "source/electron-main/coordinator",
+        "source/electron-main/box",
+        "source/electron-main/update",
+        "source/electron-main/local-exec",
+        "source/electron-main/process-metrics",
+        "source/node-agent-coordinator/telemetry",
+        "source/packages/analytics-client",
+        "source/packages/agent-analytics"
+      ]
+    }
+  ],
+  "not_covered": [
+    {"folder": "source/packages/proto", "loc": 245398, "why": "protobuf 產生碼，只在被引用處提到"},
+    {"folder": "source/packages/utils", "loc": 3988, "why": "工具函式，各章遇到時點名"},
+    {"folder": "source/packages/constants", "loc": 277, "why": "常數表"},
+    {"folder": "source/shared/(files)", "loc": 1801, "why": "errors、system-errno 等共用小件"},
+    {"folder": "source/shared/media", "loc": 602, "why": "附件媒體處理"},
+    {"folder": "source/host/extensions/automations", "loc": 835, "why": "排程自動化，不在核心路徑"},
+    {"folder": "source/host/extensions/content-search", "loc": 638, "why": "搜尋擴充"},
+    {"folder": "source/host/extensions/attachments", "loc": 502, "why": "附件"},
+    {"folder": "source/host/extensions/cross-user-sharing", "loc": 323, "why": "分享"},
+    {"folder": "source/electron-main/dev", "loc": 866, "why": "開發控制面"},
+    {"folder": "source/electron-main/update", "loc": 345, "why": "更新器，重建包預設關閉"},
+    {"folder": "source/electron-main/mcp", "loc": 303, "why": "MCP 設定 UI 端"},
+    {"folder": "source/electron-dev-controls", "loc": 156, "why": "開發工具視窗"},
+    {"folder": "source/internal", "loc": 394, "why": "內部型別"},
+    {"folder": "source/packages/git-core", "loc": 122, "why": "git 小工具"},
+    {"folder": "source/packages/agent-client", "loc": 221, "why": "沒有任何匯入者"},
+    {"folder": "source/packages/context-rpc", "loc": 236, "why": "context 的 rpc 版"}
+  ]
+}

@@ -1,0 +1,96 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 984" role="img" aria-label="telemetry feature-buffered 家族" aria-describedby="dagcap-s8-feature-buffered">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M260,412 L260,456" marker-end="url(#ar)"/>
+  <path d="M260,520 L260,564" marker-end="url(#ar)"/>
+  <path d="M380.0,603.0 L470,603" marker-end="url(#ar)"/>
+  <path d="M446,603.0 L446,819"/>
+  <path d="M446,675 L470,675" marker-end="url(#ar)"/>
+  <path d="M446,747 L470,747" marker-end="url(#ar)"/>
+  <path d="M446,819 L470,819" marker-end="url(#ar)"/>
+  <path d="M260,642 L260,892.0" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-box-visibility" tabindex="0" role="button" aria-label="box 視窗開關事件，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">box 視窗開關事件</text>
+    <text class="sub" x="94" y="71">setup／recreate 兩類</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">發生</text>
+  <g class="app lay-emit src" data-snip="t-update" tabindex="0" role="button" aria-label="更新流程事件，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">更新流程事件</text>
+    <text class="sub" x="94" y="179">outcome／check／apply 三類</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">發生</text>
+  <g class="app lay-emit src" data-snip="t-local-exec" tabindex="0" role="button" aria-label="本機執行與連接器事件，開啟原文">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">本機執行與連接器事件</text>
+    <text class="sub" x="94" y="287">local-exec 安裝／connector 標籤 兩類</text>
+    <path class="srcfold" d="M431,304 L440,304 L440,295 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="384">發生</text>
+  <g class="app lay-emit src" data-snip="t-unclean-exit" tabindex="0" role="button" aria-label="乾淨退出結算事件，開啟原文">
+    <rect x="80" y="348" width="360" height="64" rx="8"/>
+    <text x="94" y="375">乾淨退出結算事件</text>
+    <text class="sub" x="94" y="395">unclean-exit 一類</text>
+    <path class="srcfold" d="M431,412 L440,412 L440,403 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="492">轉接</text>
+  <g class="app lay-adapter src" data-snip="t8-lifecycle-wire" tabindex="0" role="button" aria-label="各功能模組自帶接線，開啟原文">
+    <rect x="80" y="456" width="360" height="64" rx="8"/>
+    <text x="94" y="483">各功能模組自帶接線</text>
+    <text class="sub" x="94" y="503">三個模組各自一支，不共用一份介面</text>
+    <path class="srcfold" d="M431,520 L440,520 L440,511 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="607">管線</text>
+  <g class="dec lay-pipe">
+    <polygon points="260,564 380.0,603.0 260,642 140.0,603.0"/>
+    <text text-anchor="middle" x="260" y="608.0">這支模組自己的緩衝條件成立？</text>
+  </g>
+  <g class="app lay-pipe src" data-snip="t-box-visibility" tabindex="0" role="button" aria-label="box：視窗還開著就不送，開啟原文">
+    <rect x="470" y="574" width="430" height="58" rx="8"/>
+    <text x="484" y="598">box：視窗還開著就不送</text>
+    <text class="sub" x="484" y="618">真正結束或 abandonAll() 沖銷才算一筆</text>
+    <path class="srcfold" d="M891,632 L900,632 L900,623 z"/>
+  </g>
+  <g class="app lay-pipe src" data-snip="t-update" tabindex="0" role="button" aria-label="update：sink 未接時攢著，開啟原文">
+    <rect x="470" y="646" width="430" height="58" rx="8"/>
+    <text x="484" y="670">update：sink 未接時攢著</text>
+    <text class="sub" x="484" y="690">上限 64 筆，接上才補送，滿了直接丟棄</text>
+    <path class="srcfold" d="M891,704 L900,704 L900,695 z"/>
+  </g>
+  <g class="app lay-pipe src" data-snip="t-local-exec" tabindex="0" role="button" aria-label="local-exec：新的頂替舊的，開啟原文">
+    <rect x="470" y="718" width="430" height="58" rx="8"/>
+    <text x="484" y="742">local-exec：新的頂替舊的</text>
+    <text class="sub" x="484" y="762">模組級單例，卸載只清自己安裝的那支</text>
+    <path class="srcfold" d="M891,776 L900,776 L900,767 z"/>
+  </g>
+  <g class="app lay-pipe src" data-snip="t-unclean-exit" tabindex="0" role="button" aria-label="unclean-exit：分級不排隊，開啟原文">
+    <rect x="470" y="790" width="430" height="58" rx="8"/>
+    <text x="484" y="814">unclean-exit：分級不排隊</text>
+    <text class="sub" x="484" y="834">marker_orphaned 才是 info，其餘一律 warn</text>
+    <path class="srcfold" d="M891,848 L900,848 L900,839 z"/>
+  </g>
+  <text class="elab" x="272" y="874.0">條件不成立，正常送出</text>
+  <text class="lay" text-anchor="end" x="76" y="928">落地</text>
+  <g class="app lay-sink src" data-snip="t8-lifecycle-attach" tabindex="0" role="button" aria-label="attach 之後併入 desktop-log 上傳器，開啟原文">
+    <rect x="80" y="892.0" width="360" height="64" rx="8"/>
+    <text x="94" y="919.0">attach 之後併入 desktop-log 上傳器</text>
+    <text class="sub" x="94" y="939.0">attach 前的暫存不會遺失，接上才補送</text>
+    <path class="srcfold" d="M431,956.0 L440,956.0 L440,947.0 z"/>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-feature-buffered">四個功能模組各自帶一層小緩衝或分級規則（開窗未關、sink 未接、模組單例、結算分級），最終仍併入 desktop-log 家族同一份上傳器；緩衝 policy 各不相同，是這個家族存在的理由。</p>

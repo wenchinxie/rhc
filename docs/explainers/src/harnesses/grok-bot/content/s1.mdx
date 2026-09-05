@@ -1,34 +1,181 @@
-import { Peek } from "../../../mdx-components"
+import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-      <h2 id="s1">
-        <span className="no">1</span>這份複製樹是出廠 0.18.0 的重建稿
-      </h2>
-      <p>
-        顯示名稱是 Grok Bot，內部常數與路徑仍叫 Sand。出廠安裝包釘在{" "}
-        <code>research-archives/original/0.18.0/</code>，macOS DMG SHA-256{" "}
-        <code>a253ccd8…</code>。
-        <Peek snip="product">產品名</Peek>
-        <span className="stamp">PROVENANCE.md</span>
-      </p>
-      <p>
-        <code>source/</code>{" "}
-        重建桌面程式主行程、控制面、遠端接送出行程、與協定。
-        <code>frontend/</code> 是可讀畫面工作區。打包時{" "}
-        <code>npm run bootstrap</code>{" "}
-        先取出廠已經編好的畫面目錄（dist），再把審過的執行時程式寫上去，並打一條窄的模型來源設定補丁；裝進應用程式的畫面仍是出廠那份，不以{" "}
-        <code>frontend/</code> 取代。
-        <Peek snip="arch">ARCHITECTURE</Peek>
-      </p>
-      <div className="penblock">
-        <p>
-          <span className="stamp">重建規則</span>
-          出廠安裝包是規格。畫面上的控件必須能在出廠安裝包對上來源；對不上就不要畫。來源以出廠安裝包與
-          PROVENANCE 記錄為準。
-        </p>
-      </div>
-      <p className="src">
-        <code>README.md</code>、<code>docs/ARCHITECTURE.md</code>、
-        <code>PROVENANCE.md</code>。
-      </p>
-    </>
+  <H2 id="s1" n="1">這棵樹是重建稿，不是出廠殼</H2>
+  <p>
+    這棵樹只有一個 npm 套件，<code>package.json</code> 的名稱是{" "}
+    <code>grok-bot-0.18-reconstructed</code>，不是 monorepo。
+    <Peek snip="repo-name">名稱</Peek>
+    <code>src/app/package.json</code> 才是出廠識別碼，<code>name</code> 是{" "}
+    <code>sand</code>，<code>productName</code> 是 Grok Bot，這份檔案由{" "}
+    <code>npm run bootstrap</code> 灌進來，不是這棵樹自己寫的。
+    <code>rhc</code> 不是這棵樹的分支，是另一個文件庫，寫的是這份解說本身。
+  </p>
+  <H3 id="s1-1" n="1.1">重建的邊界釘在保存的出廠安裝包上</H3>
+  <p>
+    PROVENANCE.md 記錄重建所本的出廠安裝包身分：macOS DMG 的 SHA-256、原始{" "}
+    <code>app.asar</code> 的 SHA-256、下載主機是{" "}
+    <code>downloads.cursor.com/grokbot</code>。
+    <Peek snip="provenance">出廠身分</Peek>
+    對應的 Windows 安裝包一併走 Git LFS 存進{" "}
+    <code>research-archives/</code>。重建規則寫明，行為只能對上這份安裝包或它的可觀察產物才能落筆，沒有對上就留白，不能替出廠猜一個畫面或一顆按鈕。
+  </p>
+  <H3 id="s1-2" n="1.2">疊層看三個記號：路由器、本機容器、三旗標</H3>
+  <p>
+    讀者看到一個功能，先問它是不是下面三種其中一種，是的話就是{" "}
+    <Term k="reconstruction">重建疊層</Term>，不是出廠 0.18.0 本來就有。第一種是可以把推論送去
+    Claude Code、Codex、OpenRouter 的推論路由器，出廠只會走 Cursor 一條路。
+    <Peek snip="router-cursor">路由器</Peek>
+    <a className="xref" href="#s4">§4</a>
+    第二種是可以改連使用者筆電上另開的容器，出廠預設一律連遠端{" "}
+    <Term k="box">沙箱機器</Term>。
+    <Peek snip="docker">本機容器</Peek>
+    <a className="xref" href="#s6">§6</a>
+    第三種是打包時釘進電子主行程的重建更新守衛，把{" "}
+    <code>SAND_DISABLE_UPDATES</code>、<code>SAND_DISABLE_SENTRY</code>、{" "}
+    <code>SAND_DISABLE_TELEMETRY</code> 三個環境變數釘成字串
+    <code>"1"</code>，讓重建版本不去打官方更新或遙測服務。
+    <Peek snip="guard">三旗標</Peek>
+    測試檔斷言這段守衛套用兩次會得到同一個結果，乾淨打包路徑也走同一段守衛，不是各包各的。沒有這三個記號、又能在出廠安裝包裡實際觀察到的行為，才算出廠本來就有。
+  </p>
+  <H3 id="s1-3" n="1.3">source/ 六個行程根各管一段，交給後面各節細看</H3>
+  <p>
+    <code>source/</code> 底下有六個行程根：<code>electron-main</code>{" "}
+    管桌面主行程與開窗，<code>electron-preload</code>{" "}
+    把通道遞進畫面可呼叫的介面，<code>host</code> 在遠端沙箱裡跑一輪一輪的
+    agent 迴圈，<code>node-agent-coordinator</code> 是桌面跟 host
+    中間那個中介行程，<code>local-exec-daemon</code>{" "}
+    負責在使用者電腦上跑本機工具，<code>box-exec-daemon</code>{" "}
+    在<Term k="box">沙箱機器</Term>裡代跑命令。另外還有 <code>shared</code>{" "}
+    放共用型別與常數，<code>packages</code>{" "}
+    是照匯入邊界切開的一批子套件，各自沒有自己的 package.json。
+    <code>source/</code> 是這棵樹的執行時重建，<code>frontend/</code>{" "}
+    才是可讀畫面工作區，兩者分開維護。
+    <Peek snip="arch">架構</Peek>
+    這六個行程根怎麼開機、怎麼互連，見{" "}
+    <a className="xref" href="#s2">§2</a> 之後各節逐一拆開。
+  </p>
+  <H3 id="s1-4" n="1.4">frontend/ 是可讀重建，不是出廠畫面源碼</H3>
+  <p>
+    <code>frontend/</code> 底下分三個子樹：<code>src/recovered</code>{" "}
+    是逐項核對過出廠畫面的重建碼，<code>src/production</code>{" "}
+    是打包時選中裝進應用程式的那份，<code>src/dev</code> 是開發用的路徑。
+    程式裡以 <code>@evidence</code> 開頭的註解指向出廠渲染器裡可以核對的位元組或符號邊界，只是出處標記，不是可執行的匯入。
+    <Peek snip="evidence">註記</Peek>
+    README 也講明這是可編輯的渲染器重建，被選為 macOS 版預設打包內容，另外保留一條保真診斷路徑，接回
+    checksum 釘住的出廠渲染器做對照。
+    <Peek snip="frontend-def">渲染器</Peek>
+    出廠渲染器本身沒有原始碼被追蹤進這棵樹，是<code>npm run bootstrap</code>{" "}
+    之後才灌進被忽略的 <code>src/app/dist</code>，讀者不能把{" "}
+    <code>frontend/</code> 底下的內容當成出廠畫面本來的源碼。
+  </p>
+  <H3 id="s1-5" n="1.5">核對回原始碼，另一份材料不在這裡</H3>
+  <p>
+    本文每個具體行為都用 <code>Peek</code>{" "}
+    指到這棵重建樹裡真正的檔案與行號，讀者要自己核對，就照 <code>Peek</code>
+    附的路徑打開那個檔，不必信任這篇文字轉述的內容。Lauren Tan
+    談 Grok Bot 開發過程的公開分享不放在這一節，去同一個站的{" "}
+    <code>lauren.html</code> 看。
+  </p>
+  <H3 id="s1-6" n="1.6">三種資料夾：extension、packages、shared</H3>
+  <p>
+    上一節把 <code>source/</code> 拆成六個行程根，這裡再往下一層看行程根裡面裝的三種東西。第一種是
+    <code>host/extensions/</code> 底下的三十五個資料夾，每個都是一個功能，id
+    集中宣告在一張常數表裡，三十五個 id 各對一個資料夾。
+    <Peek snip="ext-ids-object">三十五個 id 一次列完</Peek>
+    每個資料夾的 <code>extension.ts</code> 都輸出同一種形狀的物件：<code>id</code>、
+    <code>dependencies</code>（先接好才輪到它開機的其他 extension id 清單）、
+    <code>start(context)</code>（真正組裝出這個功能的地方，<code>context.deps</code>
+    帶著已經啟動的那些依賴的 API）。<code>memory</code> 這個 extension 是最短的範例，三行就把
+    id、依賴、start 全講完。
+    <Peek snip="memory-ext-decl">最短的合約範例</Peek>
+    <code>telemetry</code> 那份沒被壓成一行，讀起來更直接，一樣是同一套形狀。
+    <Peek snip="telemetry-ext-decl">同一套形狀，沒壓縮</Peek>
+    <code>transcript</code> 這個 extension 插進 <code>TranscriptManager</code>
+    的十九個插座，細節在{" "}
+    <a className="xref" href="#s3-5">§3.5</a>
+    那份插座板整理過了，這裡不重複。
+  </p>
+  <p>
+    三十五個 extension 開機的順序不是照哪張表的書寫順序排的。<code>registry.ts</code>
+    裡的 <code>HOST_EXTENSION_ORDER</code> 其實只是一張完整名冊，
+    <code>assembleHostExtensionRegistry</code> 拿它去檢查每個 id 是不是都有對應的實作，缺一個就丟錯。
+    <Peek snip="host-ext-order">名冊不是開機序</Peek>
+    真正決定順序的是 <code>resolveHostExtensionBootOrder</code>
+    ：只讀每個 extension 自己宣告的 <code>dependencies</code>，對整批 extension
+    做拓樸排序，算出一份誰先誰後的順序。如果某個 extension 宣告的依賴不在這個 build
+    裡，或者兩個 extension 互相依賴形成迴圈，這裡會直接丟
+    <code>HostExtensionGraphError</code>，不是靜默跳過、也不是照原樣硬跑下去。
+    <Peek snip="ext-dep-check">缺依賴就丟錯</Peek>
+    開機一節怎麼呼叫這整段見{" "}
+    <a className="xref" href="#s2">§2</a>
+    那份收尾流程。
+  </p>
+  <p>
+    第二種是 <code>packages/</code>，三十一個資料夾，沒有一個有 <code>extension.ts</code>
+    ，也沒有 <code>id</code>、<code>dependencies</code>、<code>start</code>
+    這套生命週期合約，單純是照匯入邊界切開的函式庫：最大的 <code>packages/agent</code>
+    有兩百五十六個 <code>.ts</code> 檔，<code>packages/proto</code>
+    一百五十七個，<code>packages/redacted-protos</code> 八十個，<code>packages/agent-exec</code>
+    六十個，<code>packages/local-exec</code> 三十七個，<code>packages/shell-exec</code>
+    三十四個。行程根可以匯入 package，反過來不行：實測 <code>packages/agent</code>
+    只被 <code>host</code> 匯入，共十五個檔案，<code>electron-main</code>、
+    <code>node-agent-coordinator</code>、<code>shared</code> 一個都沒匯入；
+    <code>packages/proto</code> 則是 <code>host</code> 六十六個、<code>electron-main</code>
+    十三個、<code>shared</code> 六個。
+    <Peek snip="packages-agent-import">host 匯入 packages/agent 的一行</Peek>
+    反過來查 <code>packages/</code> 底下有沒有任何檔案匯入 <code>host/</code> 或{" "}
+    <code>electron-main/</code>，結果是零，邊界確實是單向的。
+  </p>
+  <p>
+    第三種是 <code>shared/</code>，裝的是知道產品長相的詞彙與基本型別：事件名稱、傳輸格式、隱私過濾規則，
+    這些東西認得「這是 Grok Bot」；<code>packages/</code> 裡的函式庫則刻意不認得產品，protobuf
+    編解碼、命令執行、內容遮蔽都可以換一個完全不同的產品繼續用。讀者遇到一段程式碼，先問三個問題：
+    有沒有 <code>id</code>／<code>dependencies</code>／<code>start</code>
+    這套生命週期合約，有就是行程根底下的一個 extension；如果是一批函式，完全不 import
+    任何行程根，就是 package；如果裡面藏著事件名稱、格式、產品專屬規則，那是 shared。
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>有生命週期？</th>
+          <th>可以 import 誰</th>
+          <th>例子</th>
+          <th>檔數</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>行程根</td>
+          <td>有，自己開一個作業系統行程</td>
+          <td>packages、shared、自己底下的 extension</td>
+          <td><code>host</code>、<code>electron-main</code></td>
+          <td>六個行程根</td>
+        </tr>
+        <tr>
+          <td>extension</td>
+          <td>有，<code>id</code>／<code>dependencies</code>／<code>start</code> 合約，靠拓樸排序決定開機順序</td>
+          <td>宣告在 <code>dependencies</code> 裡的其他 extension、packages、shared</td>
+          <td><code>memory</code>、<code>telemetry</code>、<code>transcript</code></td>
+          <td>三十五個資料夾</td>
+        </tr>
+        <tr>
+          <td>package</td>
+          <td>沒有，純函式庫，不參與開機排序</td>
+          <td>其他 package、shared，不 import 任何行程根</td>
+          <td><code>packages/agent</code>（256 檔）、<code>packages/proto</code>（157 檔）</td>
+          <td>三十一個資料夾</td>
+        </tr>
+        <tr>
+          <td>shared</td>
+          <td>沒有，是詞彙與型別，不是可執行的服務</td>
+          <td>不 import 行程根，可以被所有行程根與 packages 匯入</td>
+          <td>事件名稱、傳輸格式、隱私過濾規則</td>
+          <td>單一資料夾</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</>

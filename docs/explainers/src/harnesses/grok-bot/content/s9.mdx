@@ -1,0 +1,313 @@
+import { Peek, Term, H2, H3 } from "../../../mdx-components"
+
+<>
+      <H2 id="s9" n="9">插座清單與狀態字彙</H2>
+      <p>
+        呼叫端與開機時插入的實作之間存在兩種約定。
+        第一種是 port，它規定呼叫端可以呼叫什麼方法，並在未插入真實實作時提供可運行的預設物件。
+        第二種是字彙，它規定欄位可以攜帶什麼值，並在遇到非預期字串時退回預設成員。
+        第八章追蹤了一條遙測管線的落地流程，本章則列出所有 port 資料夾與所有狀態字彙，讓讀者一次看清全貌。
+        <code>TranscriptManager</code> 的十九個 setter 插座已收錄於 <a className="xref" href="#s3-5">§3.5</a>，此處不再重複，請直接參閱該節。
+      </p>
+
+      <H3 id="s9-1" n="9.1">host 的七個 port 檔</H3>
+      <p>
+        在 <Term k="sand-host">host-main</Term> 行程中，共有七個檔案定義在 <code>host/ports</code> 資料夾下。
+        下面這張表列出各檔案的行數、宣告內容、未插入實作時的預設值，以及被幾個檔案引用。
+      </p>
+      <div className="overflow wide">
+        <table>
+          <thead>
+            <tr>
+              <th>檔</th>
+              <th>行</th>
+              <th>宣告什麼</th>
+              <th>沒插時的預設</th>
+              <th>被幾個檔 import</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>telemetry.ts</code></td>
+              <td>55</td>
+              <td>
+                <code>createNoopSandTelemetry()</code> 回傳三十二個不做任何事的報告方法；
+                <code>startTurn</code> 回傳包含 <code>setModel</code>、<code>setRequestId</code> 與 <code>finalize</code> 的回合控制物件；
+                另宣告十二組 <code>as const</code> 字彙、
+                <code>resolveSandBoxIdentityTags(env)</code> 與 <code>sandErrorDetail(error)</code>
+              </td>
+              <td>
+                全 no-op 物件
+                <Peek snip="p9-noop-telemetry">無操作</Peek>
+              </td>
+              <td>16</td>
+            </tr>
+            <tr>
+              <td><code>product-analytics.ts</code></td>
+              <td>2</td>
+              <td>
+                <code>SandProductAnalytics &#123; trackEvent(name, properties?) &#125;</code> 與 <code>createNoopSandProductAnalytics()</code>
+              </td>
+              <td>
+                no-op
+                <Peek snip="p9-product-analytics">分析預設</Peek>
+              </td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><code>box.ts</code></td>
+              <td>7</td>
+              <td>
+                非介面：兩條面向使用者的訊息字串、三個 Error 類別（<code>SandBoxDaemonUnreachableError</code> 帶有 <code>outcome</code> 字串、<code>SandBoxNoMonitorAvailableError</code>、<code>BoxEnvironmentSyncUnsupportedError</code>）、<code>boxNotReadyMessageForError</code>、永遠拋錯的 <code>noMonitorComputerUseExecutor</code>，以及兩個視窗索引常數
+              </td>
+              <td>沒有預設（是錯誤型別，不是可插的介面）</td>
+              <td>12</td>
+            </tr>
+            <tr>
+              <td><code>transport.ts</code></td>
+              <td>5</td>
+              <td>
+                <code>SandUpdate &#123;type: string&#125;</code> 以及會記住 <code>lastSentMessageId</code> 與 <code>lastReactionApplied</code> 的 <code>createSandTransport(ingest)</code>
+                <Peek snip="p9-transport">傳輸工廠</Peek>
+              </td>
+              <td>沒有預設（是工廠）</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><code>mcp-state-executor.ts</code></td>
+              <td>7</td>
+              <td>
+                <code>SandMcpTool</code>、<code>SandMcpProvider &#123; getTools(ctx) &#125;</code>、<code>createSandMcpStateExecutor(provider)</code>
+              </td>
+              <td>沒有預設</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><code>sand-analytics-types.ts</code></td>
+              <td>2</td>
+              <td>
+                <code>sandMessageLengthBucket(length)</code> 分桶函式，將長度切分為 empty、xs、s、m、l、xl（門檻值分別為 0、20、100、500、2000）
+              </td>
+              <td>不適用（純函式）</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><code>user-computer.ts</code></td>
+              <td>2</td>
+              <td>
+                <code>DEFAULT_SAND_COMPUTER_ID = "this-computer"</code>、<code>createSingleUserComputer(args)</code>
+                <Peek snip="p9-user-computer">死碼定義</Peek>
+              </td>
+              <td>沒有預設</td>
+              <td>0（沒有任何檔 import，死碼）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        在上述七個 port 檔中，只有兩個檔案帶有可運行的預設實作。
+        這兩個檔案恰好是在遙測功能關閉時呼叫端仍必須能夠順利呼叫的介面。
+        正式的三十二個方法介面並非定義在 <code>ports</code> 內，而是位於 <code>host/extensions/telemetry/analytics-service.ts</code> 第二十行的 <code>TelemetryService</code>
+        <Peek snip="p9-service-iface">服務介面</Peek>。
+        由於整棵程式碼樹是由編譯後的 bundle 還原重建，參數型別未能留存，因此那裡的每個方法都被宣告為 <code>(...args: never[]) =&gt; unknown</code>。
+        在 <code>TranscriptManager</code> 內部，該 port 則以 <code>telemetry: any = createNoopSandTelemetry()</code> 儲存。
+      </p>
+
+      <H3 id="s9-2" n="9.2">桌面行程的 port：沒有預設，缺了就開機報錯</H3>
+      <p>
+        在 <code>electron-main/adapters</code> 資料夾下，十一個 adapter 檔案各自宣告了一組 <code>*Ports</code> 介面。
+        這些檔案包含 <code>ProductionTelemetryPorts</code>、<code>ProductionMainRpcPorts</code>、<code>ProductionIpcPorts</code>、<code>ProductionAccountOAuthPorts</code>、<code>ProductionAttachmentGatewayPorts</code>、<code>ProductionAvatarImagesPorts</code>、<code>ProductionExperimentsPorts</code>、<code>ProductionMcpOAuthPorts</code>、<code>ElectronCoordinatorNativePorts</code>、<code>ElectronAttachmentGatewayCompositionPorts</code> 以及 <code>ElectronAvatarImageCompositionPorts</code>。
+      </p>
+      <p>
+        開機時的欄位檢查由 <code>electron-main/adapters/provider-guards.ts</code> 中的三個守衛函式執行
+        <Peek snip="p9-guards">守衛檢查</Peek>。
+        這三個函式分別是 <code>requireObject</code>、<code>requireFunction</code> 與 <code>requireDisposable</code>。
+        只要缺少欄位或型別不合，每個函式都會直接拋出 <code>TypeError("Missing Electron production adapter port: &lt;name&gt;.")</code>。
+        各檔案呼叫守衛檢查的次數為：main-rpc 三十次、attachment-gateway 十二次、account-oauth 七次、<code>coordinator-gateway</code> 七次、ipc 七次、<code>coordinator-native</code> 六次、mcp-oauth 五次、telemetry 五次、avatar-images 三次、experiments 三次、production-experiments-binding 兩次，總共八十七次。
+      </p>
+      <p>
+        以遙測為例，<code>ProductionTelemetryPorts</code> 僅定義了兩個欄位：<code>resolveOptions(context)</code> 與 <code>attach(telemetry, context)</code>
+        <Peek snip="p9-telemetry-ports">桌面介面</Peek>。
+        在建立實體之前，<code>createProductionTelemetryAdapter</code> 會在第六十一行與第六十二行分別使用 <code>requireFunction</code> 檢查這兩個欄位
+        <Peek snip="p9-telemetry-adapter">開機驗證</Peek>。
+      </p>
+      <p>
+        <Term k="sand-host">host-main</Term> 的 port 在未插入真實實作時會靜默回退至 no-op 預設，桌面行程的 port 則會在開機時因缺少必要欄位而直接拋出 <code>TypeError</code> 中斷流程。
+        同樣稱為 port，兩者採取了完全相反的處置策略，這取決於該功能是選配還是結構依賴：遙測關閉在業務上完全合法，但遺漏 IPC 橋接實作則代表整個建置遭到破壞。
+      </p>
+
+      <H3 id="s9-3" n="9.3">狀態字彙的三個家</H3>
+      <p>
+        全系統的狀態字彙散佈在三個位置。
+        下表整理了三個存放地點、定義內容、使用者，以及放置該處的設計原因。
+      </p>
+      <div className="overflow wide">
+        <table>
+          <thead>
+            <tr>
+              <th>放哪</th>
+              <th>有什麼</th>
+              <th>誰用</th>
+              <th>為什麼放這</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>host/ports/telemetry.ts</code> 第 2 到 15 行</td>
+              <td>十二組關於代理執行機器與 host 生命週期的執行時期字彙</td>
+              <td>只有 host 讀取</td>
+              <td>放在 ports 是因為呼叫端在型別化呼叫時需要引用這份清單</td>
+            </tr>
+            <tr>
+              <td><code>shared/observability/telemetry-events.ts</code> 第 3 到 5 行</td>
+              <td>
+                <code>TELEMETRY_DROP_REASONS</code> 包含 ship_failed、overflow_evicted、replay_expired、backend_dropped、account_rotated，以及標註各原因計算次數或筆數的 <code>TELEMETRY_DROP_UNIT_BY_REASON</code>
+                <Peek snip="p9-drop-reasons">丟棄字彙</Peek>
+              </td>
+              <td>共用傳輸層在丟棄資料時使用，以及 <code>sand.telemetry.dropped</code> 事件的讀取端使用</td>
+              <td>放在 shared 是因為有兩個行程都會發送日誌</td>
+            </tr>
+            <tr>
+              <td><code>shared/errors/bounded.ts</code> 與 <code>shared/errors/registry.ts</code></td>
+              <td>
+                <code>brandedEnumOf(values, fallback)</code> 強制將字串轉為成員或預設值；<code>SAND_ERRNO_TAGS</code> 收納二十二個 errno 名稱並以 <code>SAND_ERRNO_FALLBACK = "E_OTHER"</code> 為回退；註冊表則登記八十八組 <code>SAND-Exxxx</code> 代碼
+                <Peek snip="p9-errno-fallback">回退定義</Peek>
+                <Peek snip="p9-error-registry">錯誤代碼</Peek>
+              </td>
+              <td>重試邏輯與遙測分類共用</td>
+              <td>錯誤字彙獨立成資料夾是因為重試判斷邏輯也需要讀取</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        在 <code>shared/errors/registry.ts</code> 的八十八組錯誤代碼中，每個代碼都包含 <code>name</code>、<code>domain</code>、<code>retryable</code>、<code>summary</code>、<code>payload</code> 與 <code>seededFrom</code> 六個屬性。
+        其領域分布為：auth 十九個、agent 十四個、transport 十三個、storage 十三個、update 十二個、desktop 十個、rebuild 五個、registry 一個；
+        其中 <code>retryable</code> 為 true 的有五十四個，false 的有三十三個。
+      </p>
+      <p>
+        定義在 <code>host/ports/telemetry.ts</code> 第二至十五行的十二組字彙如下表所示，展示了各枚舉的名稱、具體值與個數
+        <Peek snip="p9-enums-ports">常態枚舉</Peek>。
+      </p>
+      <div className="overflow wide">
+        <table>
+          <thead>
+            <tr>
+              <th>群組</th>
+              <th>枚舉</th>
+              <th>值</th>
+              <th>個數</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_BOX_BOOT_STAGES</code></td>
+              <td><code>"entrypoint_started"</code>、<code>"daemon_listening"</code>、<code>"desktop_up"</code>、<code>"ready"</code></td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_BOX_BOOT_FAILURE_STAGES</code></td>
+              <td><code>"desktop"</code></td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_EXEC_DAEMON_RESTART_CAUSES</code></td>
+              <td><code>"daemon_exited"</code>、<code>"startup_listener_timeout"</code>、<code>"listener_lost"</code></td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_SUPERVISOR_RESTART_CAUSES</code></td>
+              <td><code>"supervisor_exited"</code>、<code>"startup_status_timeout"</code>、<code>"status_stale"</code>、<code>"gave_up"</code></td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_EGRESS_TUNNEL_OUTCOMES</code></td>
+              <td><code>"ready"</code>、<code>"restart"</code>、<code>"startup_timeout"</code>、<code>"listener_lost"</code>、<code>"stale_port"</code></td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_PROCESS_CRASH_BINARIES</code></td>
+              <td><code>"cursor"</code>、<code>"cursor-nightly"</code>、<code>"cursor-lab"</code>、<code>"chrome"</code>、<code>"node"</code>、<code>"exec-daemon"</code>、<code>"xvfb"</code>、<code>"xfwm4"</code>、<code>"picom"</code>、<code>"x11vnc"</code>、<code>"websockify"</code>、<code>"plank"</code>、<code>"thunar"</code>、<code>"xfce4-terminal"</code>、<code>"other"</code></td>
+              <td>15</td>
+            </tr>
+            <tr>
+              <td><Term k="box">沙箱機器</Term>的生命週期，共 7 組</td>
+              <td><code>SAND_PROCESS_CRASH_SIGNALS</code></td>
+              <td><code>"sigill"</code>、<code>"sigsegv"</code>、<code>"sigabrt"</code>、<code>"sigbus"</code>、<code>"other"</code></td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><Term k="sand-host">host-main</Term> 行程生命週期，共 3 組</td>
+              <td><code>SAND_HOST_LIFECYCLE_PHASES</code></td>
+              <td><code>"plugin_graph"</code>、<code>"identity"</code>、<code>"log_catchup"</code>、<code>"transcript_read"</code>、<code>"ready"</code></td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><Term k="sand-host">host-main</Term> 行程生命週期，共 3 組</td>
+              <td><code>SAND_HOST_BOOT_FETCH_OUTCOMES</code></td>
+              <td><code>"current"</code>、<code>"applied"</code>、<code>"fallback"</code>、<code>"restore_failed"</code></td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td><Term k="sand-host">host-main</Term> 行程生命週期，共 3 組</td>
+              <td><code>SAND_HOST_BOOT_FETCH_REASONS</code></td>
+              <td><code>"current"</code>、<code>"applied"</code>、<code>"pointer_unreachable"</code>、<code>"pointer_malformed"</code>、<code>"target_vetoed"</code>、<code>"download_failed"</code>、<code>"swap_refused"</code>、<code>"swap_failed_restored"</code>、<code>"restore_failed"</code>、<code>"budget_exceeded"</code>、<code>"unexpected_error"</code></td>
+              <td>11</td>
+            </tr>
+            <tr>
+              <td>瀏覽器狀態，共 2 組</td>
+              <td><code>SAND_COOKIE_PERSIST_PHASES</code></td>
+              <td><code>"capture"</code>、<code>"restore"</code></td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>瀏覽器狀態，共 2 組</td>
+              <td><code>SAND_COOKIE_PERSIST_OUTCOMES</code></td>
+              <td><code>"captured"</code>、<code>"ok"</code>、<code>"partial"</code>、<code>"failed"</code>、<code>"empty"</code></td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        所有可能遭遇未知字串的清單都會以兜底成員收尾（例如兩組崩潰清單中的 <code>other</code>、<code>SAND_ACCESS_BLOCKED_CAUSES</code> 中的 <code>unknown</code>，以及 errno 中的 <code>E_OTHER</code>），確保資料庫在對該欄位執行 GROUP BY 時群組數量保持有界；成員的多寡取決於儀表板需要多少分組，而非程式碼能辨識出多少種情況。
+      </p>
+
+      <H3 id="s9-4" n="9.4">沒有收攏的字彙</H3>
+      <p>
+        程式碼庫中存在部分未完全收攏的字彙與型別宣告。
+        在 <code>host/extensions/transcript</code> 資料夾下的各個呼叫點，回合結束字彙（delivered、dropped、superseded、settled、lost）皆直接以字串常面值散落於程式碼中，並未統一收納於任何常數檔案。
+        在 <code>TranscriptManager</code> 上宣告的十九個 setter 函式皆直接接收 <code>any</code> 型別，其中唯一具備型別約束的只有 <code>setTurnExecution(execution: TurnExecutionPort)</code>；詳細設定請參閱 <a className="xref" href="#s3-5">§3.5</a>。
+        最後，位於 <code>host/ports/user-computer.ts</code> 的程式碼在整個專案中完全沒有任何引用者。
+      </p>
+
+      <H3 id="s9-5" n="9.5">對一個角色一台機器的執行環境怎麼讀</H3>
+      <p>
+        沙箱分組的狀態字彙能直接映射到實體機開機、容器重啟與工具行程崩潰等環節。
+        丟棄原因字彙則能映射到既有批次寫入元件在三個丟棄點僅記錄日誌的現況。
+        註冊表中的 <code>retryable</code> 標記是讓重試迴圈與遙測分類共用同一份清單的關鍵設計。
+        兩種失敗策略（靜默 no-op 與開機拋出 TypeError）是為每個 port 做出決策的依據：選配功能提供 no-op 預設，結構依賴則在開機時直接失敗。
+      </p>
+
+      <p className="src">
+        <code>source/host/ports/telemetry.ts</code>、
+        <code>source/host/ports/product-analytics.ts</code>、
+        <code>source/host/ports/box.ts</code>、
+        <code>source/host/ports/transport.ts</code>、
+        <code>source/host/ports/mcp-state-executor.ts</code>、
+        <code>source/host/ports/sand-analytics-types.ts</code>、
+        <code>source/host/ports/user-computer.ts</code>、
+        <code>source/electron-main/adapters/provider-guards.ts</code>、
+        <code>source/electron-main/adapters/telemetry.ts</code>、
+        <code>source/host/extensions/telemetry/analytics-service.ts</code>、
+        <code>source/shared/observability/telemetry-events.ts</code>、
+        <code>source/shared/errors/bounded.ts</code>、
+        <code>source/shared/errors/registry.ts</code>。
+      </p>
+    </>

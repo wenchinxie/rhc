@@ -409,8 +409,43 @@
                        border-top: 1px solid var(--line);
                        font-size: var(--fs-xs); line-height: 1.65; color: var(--ink-3); }
   nav.toc .rail-note b { color: var(--ink-2); font-weight: 700; }
-  nav.toc .toc-sub { display: flex; flex-direction: column; margin: 0; padding: 0; }
+  /* ── 目錄可收合。量到 2026-09-03（1600x865）:26 個連結全攤開時 nav.toc 的
+     scrollHeight 1732px、可見高只有 790px,最後一節的九個子節永遠捲不到,而
+     nav.toc 不能開 overflow-y(會在外掛節號旁邊多畫一條捲軸,check_render 讀
+     overflow-y 就紅)。所以有子節的項目收起來,只展開讀者所在的那一節。 ── */
+  nav.toc .toc-group { display: block; position: relative; }
+  nav.toc .toc-group > a { padding-right: 1.7rem; }
+  nav.toc .toc-tg {
+    position: absolute; right: 0; top: .34rem;
+    font: inherit; font-size: var(--fs-rail); line-height: 1;
+    color: var(--ink-3); background: none; border: 0; cursor: pointer;
+    padding: .1em .3em; border-radius: 2px;
+    transition: transform .18s cubic-bezier(.22, 1, .36, 1);
+  }
+  nav.toc .toc-tg:hover { color: var(--pen-ink); }
+  nav.toc .toc-tg[aria-expanded="true"] { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { nav.toc .toc-tg { transition: none; } }
+  /* 節號空白的那一列是資料夾名(codebase 模式),不能與帶編號的子節同一個光學
+     縮排。留著空的 <i> 是因為 nav.toc a 是 1.45em/1fr 兩欄 grid,第一欄沒有元素
+     時純文字會被排成直書;這裡把那一欄收成 0。 */
+  nav.toc .toc-group > a:has(> i:empty) {
+    grid-template-columns: 0 1fr; font-weight: 700;
+    color: var(--ink); letter-spacing: .02em;
+  }
+  nav.toc .toc-group > a:has(> i:empty) i { display: none; }
+  nav.toc .toc-sub { display: none; flex-direction: column; margin: 0; padding: 0; }
+  nav.toc .toc-group.open > .toc-sub { display: flex; }
+  /* fit() 量收合後的高度時暫時掛上這個 class。選擇器要比 .toc-group.open
+     與 body.toc-open 那兩條都specific,否則量到的是展開後的高度。 */
+  nav.toc.measuring .toc-group > .toc-sub { display: none; }
   nav.toc .toc-sub a { padding-left: 1.55rem; }
+  /* 目錄鈕拉出來的那張是滿高面板、本來就可以內捲,所以子節全開:讀者按目錄鈕
+     要的就是一次看到全部結構。 */
+  body.toc-open nav.toc .toc-sub { display: flex; }
+  /* React 路線:body.rail-on 是 grid,兩個格子必須是 nav.toc 與 .doc 本身。React
+     掛在 #root 裡會讓 #root 佔掉左欄那一格、正文被壓成 --rail-w 寬(量到
+     2026-08-31:正文約 200px,而所有 gate 全綠)。 */
+  #root { display: contents; }
   /* 左欄開著時不擠正文:文件只有一個寬度,擠窄就破了那個承諾。放不下就不開
      左欄(下面的探針量),索引改走目錄鈕。 */
   body.rail-on {

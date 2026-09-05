@@ -9,6 +9,11 @@ declare global {
 
 type TocLink = { href: string; n?: string; label: string; children?: TocLink[] };
 
+/** One id per group, derived from the parent href so it is stable across renders. */
+function subId(href: string) {
+  return "sub-" + href.replace(/^#/, "");
+}
+
 function TocAnchor(props: TocLink) {
   return (
     <a href={props.href}>
@@ -50,18 +55,31 @@ export function ExplainerShell(props: {
         </button>
         {props.tocLead}
         {props.kicker ? <div className="t">{props.kicker}</div> : null}
-        {props.toc.map((l) => (
-          <Fragment key={l.href}>
-            <TocAnchor href={l.href} n={l.n} label={l.label} />
-            {l.children && l.children.length > 0 ? (
-              <span className="toc-sub">
+        {props.toc.map((l) =>
+          l.children && l.children.length > 0 ? (
+            <span className="toc-group" key={l.href}>
+              <TocAnchor href={l.href} n={l.n} label={l.label} />
+              <button
+                type="button"
+                className="toc-tg"
+                aria-expanded="false"
+                aria-controls={subId(l.href)}
+                aria-label="展開/收合"
+              >
+                ›
+              </button>
+              <span className="toc-sub" id={subId(l.href)}>
                 {l.children.map((c) => (
                   <TocAnchor key={c.href} href={c.href} n={c.n} label={c.label} />
                 ))}
               </span>
-            ) : null}
-          </Fragment>
-        ))}
+            </span>
+          ) : (
+            <Fragment key={l.href}>
+              <TocAnchor href={l.href} n={l.n} label={l.label} />
+            </Fragment>
+          ),
+        )}
         {props.railNote ? <div className="rail-note">{props.railNote}</div> : null}
       </nav>
       <article className="doc">

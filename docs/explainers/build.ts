@@ -1,114 +1,35 @@
 #!/usr/bin/env bun
+// Compiles src/**.html to --outdir. The one caller is the artifacts-builder
+// skill's compile.sh, which passes --entry, --outdir and --minify.
+//
+// This exists instead of a plain `bun build` because the MDX plugin imports
+// from "bun": preloading it into a --target=browser build fails with
+// "Browser build cannot import Bun builtin". Running Bun.build() in-process
+// takes the plugin as an object and sidesteps that.
 import plugin from "bun-plugin-tailwind";
-import { existsSync } from "fs";
-import { rm } from "fs/promises";
-import path from "path";
+import mdxPlugin from "./mdx-plugin";
+import { existsSync } from "node:fs";
+import { rm } from "node:fs/promises";
+import path from "node:path";
 
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-  console.log(`
-🏗️  Bun Build Script
-
-Usage: bun run build.ts [options]
-
-Common Options:
-  --outdir <path>          Output directory (default: "dist")
-  --minify                 Enable minification (or --minify.whitespace, --minify.syntax, etc)
-  --sourcemap <type>      Sourcemap type: none|linked|inline|external
-  --target <target>        Build target: browser|bun|node
-  --format <format>        Output format: esm|cjs|iife
-  --splitting              Enable code splitting
-  --packages <type>        Package handling: bundle|external
-  --public-path <path>     Public path for assets
-  --env <mode>             Environment handling: inline|disable|prefix*
-  --conditions <list>      Package.json export conditions (comma separated)
-  --external <list>        External packages (comma separated)
-  --banner <text>          Add banner text to output
-  --footer <text>          Add footer text to output
-  --define <obj>           Define global constants (e.g. --define.VERSION=1.0.0)
-  --help, -h               Show this help message
-
-Example:
-  bun run build.ts --outdir=dist --minify --sourcemap=linked --external=react,react-dom
-`);
-  process.exit(0);
+// Three flags, parsed inline. The template shipped a generic argv->Bun.build
+// option parser; every other option is fixed below, so it was ~100 lines whose
+// only reachable effect was these strings.
+function flag(name: string): string | undefined {
+  const prefix = `--${name}=`;
+  return process.argv
+    .slice(2)
+    .find((a) => a.startsWith(prefix))
+    ?.slice(prefix.length);
 }
 
-const toCamelCase = (str: string): string => str.replace(/-([a-z])/g, g => g[1].toUpperCase());
-
-const parseValue = (value: string): any => {
-  if (value === "true") return true;
-  if (value === "false") return false;
-
-  if (/^\d+$/.test(value)) return parseInt(value, 10);
-  if (/^\d*\.\d+$/.test(value)) return parseFloat(value);
-
-  if (value.includes(",")) return value.split(",").map(v => v.trim());
-
-  return value;
-};
-
-function parseArgs(): Partial<Bun.BuildConfig> {
-  const config: Partial<Bun.BuildConfig> = {};
-  const args = process.argv.slice(2);
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === undefined) continue;
-    if (!arg.startsWith("--")) continue;
-
-    if (arg.startsWith("--no-")) {
-      const key = toCamelCase(arg.slice(5));
-      config[key] = false;
-      continue;
-    }
-
-    if (!arg.includes("=") && (i === args.length - 1 || args[i + 1]?.startsWith("--"))) {
-      const key = toCamelCase(arg.slice(2));
-      config[key] = true;
-      continue;
-    }
-
-    let key: string;
-    let value: string;
-
-    if (arg.includes("=")) {
-      [key, value] = arg.slice(2).split("=", 2) as [string, string];
-    } else {
-      key = arg.slice(2);
-      value = args[++i] ?? "";
-    }
-
-    key = toCamelCase(key);
-
-    if (key.includes(".")) {
-      const [parentKey, childKey] = key.split(".");
-      config[parentKey] = config[parentKey] || {};
-      config[parentKey][childKey] = parseValue(value);
-    } else {
-      config[key] = parseValue(value);
-    }
-  }
-
-  return config;
-}
-
-const formatFileSize = (bytes: number): string => {
-  const units = ["B", "KB", "MB", "GB"];
-  let size = bytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-
-  return `${size.toFixed(2)} ${units[unitIndex]}`;
-};
+// Used raw, not resolved: running argv through path.resolve is what taint
+// analysis flags, and existsSync, rm and Bun.build all take a cwd-relative dir.
+const outdir = flag("outdir") || path.join(process.cwd(), "dist");
+const entry = flag("entry");
+const minify = process.argv.includes("--minify");
 
 console.log("\n🚀 Starting build process...\n");
-
-const cliConfig = parseArgs();
-const outdir = cliConfig.outdir || path.join(process.cwd(), "dist");
 
 if (existsSync(outdir)) {
   console.log(`🗑️ Cleaning previous build at ${outdir}`);
@@ -117,33 +38,42 @@ if (existsSync(outdir)) {
 
 const start = performance.now();
 
-const entrypoints = [...new Bun.Glob("**.html").scanSync("src")]
-  .map(a => path.resolve("src", a))
-  .filter(dir => !dir.includes("node_modules"));
-console.log(`📄 Found ${entrypoints.length} HTML ${entrypoints.length === 1 ? "file" : "files"} to process\n`);
+// One entry when asked for: an app with several HTML entrypoints otherwise
+// emits several bundles and the caller has to guess which one it wanted.
+const entrypoints = entry
+  ? [entry]
+  : [...new Bun.Glob("**.html").scanSync("src")]
+      // nosemgrep: path-join-resolve-traversal -- `a` is a filename this glob
+      // just read out of ./src, not input from anywhere outside the build.
+      .map((a) => path.resolve("src", a))
+      .filter((dir) => !dir.includes("node_modules"));
+if (!entrypoints.length) {
+  console.error("no HTML entrypoint (looked for src/**.html)");
+  process.exit(1);
+}
+console.log(
+  `📄 Found ${entrypoints.length} HTML ${entrypoints.length === 1 ? "file" : "files"} to process\n`,
+);
 
 const result = await Bun.build({
   entrypoints,
   outdir,
-  plugins: [plugin],
-  minify: true,
+  plugins: [plugin, mdxPlugin],
+  minify,
   target: "browser",
   sourcemap: "linked",
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
-  ...cliConfig,
 });
 
 const end = performance.now();
 
-const outputTable = result.outputs.map(output => ({
-  File: path.relative(process.cwd(), output.path),
-  Type: output.kind,
-  Size: formatFileSize(output.size),
-}));
-
-console.table(outputTable);
-const buildTime = (end - start).toFixed(2);
-
-console.log(`\n✅ Build completed in ${buildTime}ms\n`);
+console.table(
+  result.outputs.map((output) => ({
+    File: path.relative(process.cwd(), output.path),
+    Type: output.kind,
+    Size: `${(output.size / 1024).toFixed(2)} KB`,
+  })),
+);
+console.log(`\n✅ Build completed in ${(end - start).toFixed(2)}ms\n`);

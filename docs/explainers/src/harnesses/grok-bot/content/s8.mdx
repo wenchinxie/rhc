@@ -1,0 +1,355 @@
+import { Peek, Term, Dag, H2, H3 } from "../../../mdx-components"
+import { TREES } from "../telemetryTrees"
+import { ROUTER } from "../telemetryRouter"
+import { SHAPE } from "../telemetryShape"
+
+<>
+      <H2 id="s8" n="8">遙測管線：從 emit 到落地</H2>
+      <p>
+        遙測不是十個各自獨立的資料夾，是七條各自有落地終點的事件家族。
+        每個家族都走同一種形狀：功能模組呼叫一個具名事件（發生），事件交給該行程自己那份
+        port 介面，port 由一支 adapter 在開機時接上真正的後端（轉接），中間可能經過驗證、緩衝或聚合這類管線（管線），最後在某個行程邊界落地（落地）。
+        <code>events.json</code>
+        依這個形狀從呼叫圖抓出七十筆事件，其中五支 port 方法沒有任何呼叫者，判定死碼。8.1
+        先把這份目錄攤開來看；8.2 到 8.8 逐家族講清楚它怎麼發生、怎麼接線、能不能被丟；8.9
+        把七個家族收進一張接線總表。
+      </p>
+      <p>
+        三條管線共用一個形狀。呼叫端只認 port，port 是型別與方法名的清單，附一份什麼都不做的預設，所以關掉遙測不必改呼叫端；adapter
+        是開機時把 port 接上真後端的工廠，缺欄位當場丟錯，不等第一筆事件；中間有沒有翻譯、緩衝或聚合層，是各管線唯一的差別。下面先畫這個形狀，之後每個家族只講它跟形狀不一樣的地方。
+      </p>
+      <Dag svg={SHAPE} />
+
+      <H3 id="s8-1" n="8.1">事件目錄：七十筆事件、七個家族、五支死碼</H3>
+      <p>
+        這份目錄不是逐資料夾列檔案，是逐呼叫點列事件：每一列是呼叫圖裡一個真的打進某支
+        port 方法的呼叫點，欄位是事件名稱、發生的 <code>file:line</code>、呼叫的 port
+        方法、接手的 adapter、中間經過的管線、落地的 sink、掉點或重試政策，最後標一個所屬家族。
+        <code>events.json</code> 的 <code>families</code> 欄位列出這七個家族的名字，每一筆事件都恰好歸屬其中一個。下面這棵判別樹只看 adapter 欄位就把七十筆分成七種，每個出口寫這一種的 port、管線與落地，怎麼接在各自的工具裡見 8.2 到 8.8。
+      </p>
+      <Dag svg={ROUTER} />
+      <p>
+        這份原始碼複製裡「port」跟「adapter」不是同一件事：port 只是型別與方法名的清單，通常還配一份什麼都不做的
+        no-op 實作，換掉遙測開關就是把整份 port 換成 no-op。
+        <Peek snip="t-noop">no-op port</Peek>
+        adapter 才是真正接後端的那一支，在開機時把 port 接上實體連線，接錯線或設定缺欄位會在這一刻就炸出來，不用等到第一筆事件送不出去才發現。
+        <Peek snip="t-adapter">adapter 建立前檢查</Peek>
+        host 行程自己的 <code>SandTelemetry</code> port 有三十一支具名方法，
+        <code>reportBotBlock</code>、<code>reportBoxBootStage</code>、
+        <code>reportExecDaemonRestart</code>、<code>reportSupervisorRestart</code>、
+        <code>reportJournalOutcome</code> 這五支在整棵樹裡找不到任何呼叫者，是這份<Term k="reconstruction">重建疊層</Term>裡沒人用過的介面，跟出廠行為無關。
+      </p>
+
+      <H3 id="s8-2" n="8.2">host-turn：host 行程的執行期事件</H3>
+      <p>
+        這是最大的一個家族：使用者送出一則訊息之後，
+        <Term k="sand-host">host-main</Term>
+        裡跟 turn、tool-call、佇列、復活、自動化有關的每一步幾乎都會呼叫一次
+        <code>SandTelemetry</code> port，二十六支方法有真的呼叫者，散在
+        <code>transcript</code>、<code>runner</code>、<code>automations</code>、
+        <code>box</code> 四個資料夾裡，不是集中在遙測資料夾。
+      </p>
+      <Dag svg={TREES["host-turn"]} />
+      <p className="dagcap" id="s8-2-cap">
+        turn 生命週期、tool-call 追蹤、訊息與佇列、復活與收尾、自動化、沙箱 daemon ping 六叢事件共用同一份 port 與同一支 adapter；緩衝上限
+        1000 筆，滿了先砍最舊的心跳日誌，送出失敗留底重試。
+      </p>
+      <p>
+        這一路的 adapter 是 <code>SandStructuredLogTelemetry</code>，
+        跟桌面那支結構化日誌 adapter 是兩支不同的類別，各自建在自己的行程裡，不共用同一個緩衝區。
+        <Peek snip="t8-adapter-host">host adapter 建構</Peek>
+        它底下用的是共用的
+        <code>StructuredLogTransport</code>，緩衝上限是一千筆而不是桌面那條的六十四筆，
+        <Peek snip="t8-buffer-const">緩衝上限常數</Peek>
+        滿了不是隨便砍，是優先砍最舊的 host 或 box 心跳日誌，讓真正的錯誤事件留下來。
+        <Peek snip="t8-overflow-host">砍心跳日誌</Peek>
+        送出失敗時整批留著、只丟掉壞掉的 client 重建連線，下一輪對同一批重試，這一點跟桌面那條的
+        <Term k="buffered-transport">BufferedTransport</Term>
+        政策相同，只是兩支互不共用的實作。
+      </p>
+
+      <H3 id="s8-3" n="8.3"><code>desktop-log</code>：桌面十三支 IPC <Term k="report-pipe">report pipe</Term></H3>
+      <p>
+        畫面（renderer／preload）透過 IPC 把報告丟給桌面主行程，主行程用一張
+        channel 對 pipe 的名稱表接住，channel 有名字但 pipe 表裡找不到對應的鍵，開機時就丟型別錯誤，不會拖到執行期才發現對不上。
+        <Peek snip="t-channels">channel 對 pipe 核對</Peek>
+        每支 pipe 是一道很薄的
+        <Term k="report-pipe">report pipe</Term>
+        ：<code>ingest()</code> 先跑 <code>isValid</code>，沒過就整包丟棄，沒有中間佇列。
+        <Peek snip="t-pipe">reportPipe 定義</Peek>
+        既有文件只列出六支 pipe，現在的檔案其實有十三支，從送出延遲、送達回聲到登入閘、更新提示都在同一張表裡。
+        <Peek snip="t8-pipes-full">十三支 pipe 全表</Peek>
+      </p>
+      <Dag svg={TREES["desktop-log"]} />
+      <p className="dagcap" id="s8-3-cap">
+        十三支 pipe 共用同一份 <code>TelemetryUploader</code> port
+        與同一支 adapter；驗證沒過當場丟棄，驗證通過的走
+        <Term k="buffered-transport">BufferedTransport</Term>，滿了砍最舊，斷線整批 spill 落地再續傳。
+      </p>
+      <p>
+        代理人載入
+        <Peek snip="t-agent-load">agent-load 判斷</Peek>
+        、送達回聲
+        <Peek snip="t-send-ack">send-ack 分級</Peek>
+        都在這十三支之列。舊文件提到的 VNC 分級邏輯已經不在
+        <code>vnc-session-telemetry.ts</code>
+        這支獨立檔案裡執行，那支檔案現在沒有任何 import，是死碼；同樣的分級判準改成內嵌在 pipe 表本身裡，連線失敗、非乾淨斷線、對焦沒落地三種情況照舊升級成警告。
+        <Peek snip="t8-pipes-full">VNC 判準內嵌</Peek>
+        最終落地是
+        <code>flushOnce()</code>：送出失敗只丟掉壞掉的 client、留底重試；佇列滿了才砍最舊；斷線整批連同計數器寫成本機
+        spill 檔，帳號重連或程式重開再讀回來續傳。
+        <Peek snip="t-flush-fail">flush 失敗留底</Peek>
+        <Peek snip="t-overflow">佇列滿了才砍最舊</Peek>
+      </p>
+
+      <H3 id="s8-4" n="8.4"><code>coordinator-agg</code>：中介行程先聚合再轉送</H3>
+      <p>
+        十四筆事件不是直接落地，是先經過
+        <Term k="coordinator">coordinator</Term>
+        這一層：可達性、復原與遷移、代理人不可達、交接四階段，全部先在這裡聚合，再轉送回
+        8.3 那份同一支上傳器，不是另一條獨立的落地路徑。這一層是 <code>createCoordinatorTelemetrySinks</code> 做的翻譯，把 report 翻成 level 與 metadata 再呼叫 <code>getUploader()</code> 回來那份 port 的方法；它不接任何後端，依本文詞彙是管線不是 adapter，<code>events.json</code> 的 adapter 欄位把它填在這裡是分類上的權宜。<Peek snip="t-coordinator-agg">翻譯層</Peek>
+      </p>
+      <Dag svg={TREES["aggregate"]} />
+      <p className="dagcap" id="s8-4-cap">
+        四類可達性事件、五類復原與遷移事件、代理人不可達、交接四階段共用同一份聚合物件；三十秒視窗內有沒有最近一次失敗，決定要不要併上斷線原因再轉送。
+      </p>
+      <p>
+        聚合物件在轉送給上傳器之前，先併上這三十秒視窗內最近一次失敗算出的
+        <code>disconnectCause</code>
+        （使用者主動關閉、用戶端離線、host 正在重建、還是未知）。
+        <Peek snip="t-coordinator-agg">協調器算完再轉送</Peek>
+        其中可達性判斷用的是同一支
+        <code>reachabilityReportToTelemetry</code>。
+        <Peek snip="t-gateway-reachability">reachability 分級</Peek>
+        交接另外拆成四階段：requested／adopted 是 info，invoke_failed／timeout
+        各自帶專屬錯誤碼升 warn，接線點在
+        <code>production-provider.ts</code>
+        建構
+        <Term k="coordinator">coordinator</Term>
+        物件的那一段。
+        <Peek snip="t-handoff">交接四階段</Peek>
+        <Peek snip="t8-handoff-wire">交接接線點</Peek>
+        聚合本身不會丟資料，是把「要不要升級成警告」這個判斷做完才轉送；真正的送出失敗仍是
+        8.3 那一層的事，不在這裡重覆處理。
+      </p>
+
+      <H3 id="s8-5" n="8.5">transport-stage：轉發中的送出階段，落地成追蹤 span</H3>
+      <p>
+        送出走過的每個傳輸階段（開始送、閘道回應、SSE
+        回聲）另外記一次時間戳與是否出錯，這支記錄器同時在途上限六十四筆，超過的新報告連
+        dispatch 都不會被呼叫，直接放棄，不進佇列也不計數。
+        <Peek snip="t-transport-cap">轉發中報告的上限</Peek>
+      </p>
+      <Dag svg={TREES["transport-stage"]} />
+      <p className="dagcap" id="s8-5-cap">
+        送出追蹤三階段事件共用同一支記錄器；同時在途超過六十四筆就整筆放棄，不重試、不進佇列；落地終點是一段追蹤
+        span，不是結構化日誌。
+      </p>
+      <p>
+        這是七個家族裡唯一一個落地點不是結構化日誌、而是一段送出追蹤 span
+        的家族：轉發到桌面主行程之後，最終呼叫的是
+        <code>recordSendStage</code>，把階段時間掛進送出追蹤，不會出現在
+        8.3 的 <Term k="buffered-transport">BufferedTransport</Term> 佇列裡，也不會被那份 spill
+        政策保留。
+        <Peek snip="t8-transport-forward">轉發到追蹤 span</Peek>
+      </p>
+
+      <H3 id="s8-6" n="8.6">feature-buffered：各功能模組自帶一層小緩衝</H3>
+      <p>
+        box 視窗開關、更新流程、本機執行、connector 標籤、乾淨退出結算，這五個功能各自帶一層形狀不同的小緩衝或分級規則，不共用同一份驗證閘，但最終仍併入
+        8.3 那份上傳器。
+      </p>
+      <Dag svg={TREES["feature-buffered"]} />
+      <p className="dagcap" id="s8-6-cap">
+        box 視窗、更新流程、本機執行與 connector、乾淨退出結算四叢事件各自帶自己的緩衝條件；條件不成立時正常送出，成立時各走各的政策，最終仍併入
+        desktop-log 家族同一份上傳器。
+      </p>
+      <p>
+        box 視窗只有真正結束或
+        <code>abandonAll()</code>
+        沖銷才算一筆，視窗還開著就不送，避免視窗一直開著遙測卻一直不收工；
+        sink 本身是每次都重新讀一次目前的上傳器，不是固定引用。
+        <Peek snip="t-box-visibility">開著就不送，收工才算</Peek>
+        <Peek snip="t8-box-wire">sink 每次重讀</Peek>
+        更新流程把 sink 接上之前收到的回報先放進上限六十四筆的暫存佇列，接上才補送，滿了直接丟棄，不是報錯也不是阻塞；跟本機執行的安裝點共用同一支
+        <code>desktopLifecycle</code>
+        構造，但要等 telemetry 服務建好才真的 attach 到真正的 sink。
+        <Peek snip="t-update">sink 未接時先攢著</Peek>
+        <Peek snip="t8-lifecycle-wire">desktopLifecycle 同時建構</Peek>
+        <Peek snip="t8-lifecycle-attach">attach 晚於建構</Peek>
+        本機執行服務的回報 sink
+        是模組級單例，安裝新的會頂替舊的，卸載函式只在自己還是目前這支時才清空。
+        <Peek snip="t-local-exec">單例 sink</Peek>
+        connector 授權事件共用一份白名單把連接器名稱正規化，認不得的名稱一律歸
+        <code>other</code>，防止外部連接器名稱把標籤基數撐爆。
+        <Peek snip="t-connector-auth">連接器名稱正規化</Peek>
+        乾淨退出結算只有 <code>marker_orphaned</code> 算 info，其餘一律升
+        warn 並附專屬錯誤碼，沒有排隊層。
+        <Peek snip="t-unclean-exit">結算分級</Peek>
+      </p>
+
+      <H3 id="s8-7" n="8.7">sentry-direct：有 port、沒有佇列</H3>
+      <p>
+        五類事件都呼叫 <code>sentry.ts</code> 包住的兩支方法。這條也有 port：<code>SandSentryAdapter</code> 介面加一份 <code>noopAdapter</code> 預設，開機時 <code>installSandSentryAdapter</code> 換成包住 @sentry/electron 的真實作，跟其他兩條同一個形狀。<Peek snip="t-sentry-port">no-op 預設與安裝點</Peek> 它沒有的是中間佇列，送不出就跳過，不重試也不計數，是全部家族裡承諾最低的一條。<Peek snip="t-sentry">Sentry 只送不排隊</Peek>
+      </p>
+      <Dag svg={TREES["sentry-direct"]} />
+      <p className="dagcap" id="s8-7-cap">
+        錯誤與當機四類、對話情境一類事件都直接呼叫同一支包裝；送不出就跳過，沒有任何重試或計數。
+      </p>
+
+      <H3 id="s8-8" n="8.8">analytics-direct：唯一一條打進產品分析後端的事件</H3>
+      <p>
+        onboarding 步驟事件是全文件唯一一個轉給產品分析後端的家族，adapter 跟
+        8.2 host-turn 的結構化日誌 adapter 是同一支建構式蓋出來的兩個相鄰物件，但彼此不共用緩衝。
+        <Peek snip="t8-adapter-host">同一支建構式蓋兩個 adapter</Peek>
+      </p>
+      <Dag svg={TREES["analytics-direct"]} />
+      <p className="dagcap" id="s8-8-cap">
+        gate 沒開（<code>canRecordEvents()</code> 為否）時整包丟棄，不重試不計數，跟
+        Sentry 一樣沒有佇列層。
+      </p>
+
+      <H3 id="s8-9" n="8.9">接線總表：七個家族各自接在哪</H3>
+      <p>
+        目錄按資料夾看不出誰接誰；下面這張表按家族列出發生的行程、adapter
+        建於哪一行、最終的 sink、掉點政策，每一格只要點名程式碼都掛著可以開原文的
+        Peek。
+      </p>
+      <div className="overflow wide">
+        <table>
+          <thead>
+            <tr>
+              <th>家族</th>
+              <th>發生行程</th>
+              <th>adapter 建於</th>
+              <th>sink</th>
+              <th>掉點／重試政策</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>host-turn</code></td>
+              <td><Term k="sand-host">host-main</Term></td>
+              <td>
+                <code>SandStructuredLogTelemetry</code>
+                <Peek snip="t8-adapter-host">host adapter</Peek>
+              </td>
+              <td>
+                <code>StructuredLogTransport</code> → HTTP submitLogs
+                <Peek snip="t8-buffer-const">緩衝上限</Peek>
+              </td>
+              <td>
+                滿 1000 筆砍最舊心跳
+                <Peek snip="t8-overflow-host">砍心跳日誌</Peek>
+              </td>
+            </tr>
+            <tr>
+              <td><code>desktop-log</code></td>
+              <td>桌面主行程</td>
+              <td>
+                <code>createProductionTelemetryAdapter</code>
+                <Peek snip="t-adapter">adapter 建立前檢查</Peek>
+              </td>
+              <td>
+                <Term k="buffered-transport">BufferedTransport</Term> →
+                flushOnce()
+                <Peek snip="t-flush-fail">flush 失敗留底</Peek>
+              </td>
+              <td>
+                滿了砍最舊，斷線整批 spill
+                <Peek snip="t-overflow">佇列滿了才砍最舊</Peek>
+              </td>
+            </tr>
+            <tr>
+              <td><code>coordinator-agg</code></td>
+              <td><Term k="coordinator">coordinator</Term></td>
+              <td>
+                <code>createCoordinatorTelemetrySinks</code>
+                <Peek snip="t-coordinator-agg">協調器算完再轉送</Peek>
+              </td>
+              <td>
+                同 desktop-log 的上傳器（<code>getUploader()</code>）
+                <Peek snip="t8-handoff-wire">交接接線點</Peek>
+              </td>
+              <td>不丟資料，只決定升不升級成 warn</td>
+            </tr>
+            <tr>
+              <td><code>transport-stage</code></td>
+              <td>轉發代理行程</td>
+              <td>
+                <code>createTransportStageRecorder</code>
+                <Peek snip="t-transport-cap">轉發中報告的上限</Peek>
+              </td>
+              <td>
+                送出追蹤 span（<code>recordSendStage</code>）
+                <Peek snip="t8-transport-forward">轉發到追蹤 span</Peek>
+              </td>
+              <td>同時在途超過 64 筆直接放棄，不重試</td>
+            </tr>
+            <tr>
+              <td><code>feature-buffered</code></td>
+              <td>桌面主行程</td>
+              <td>
+                各功能模組自帶接線
+                <Peek snip="t8-lifecycle-wire">desktopLifecycle 同時建構</Peek>
+              </td>
+              <td>
+                attach 後併入 desktop-log 上傳器
+                <Peek snip="t8-lifecycle-attach">attach 晚於建構</Peek>
+              </td>
+              <td>
+                各自的緩衝／分級規則，見 8.6
+              </td>
+            </tr>
+            <tr>
+              <td><code>sentry-direct</code></td>
+              <td>桌面主行程</td>
+              <td>
+                <code>sentry.ts</code>
+                <Peek snip="t-sentry">Sentry 只送不排隊</Peek>
+              </td>
+              <td>Sentry（captureMessage／captureException）</td>
+              <td>送不出就跳過，無重試無計數</td>
+            </tr>
+            <tr>
+              <td><code>analytics-direct</code></td>
+              <td><Term k="sand-host">host-main</Term></td>
+              <td>
+                <code>SandProductAnalytics</code>
+                <Peek snip="t8-adapter-host">同一支建構式蓋兩個 adapter</Peek>
+              </td>
+              <td>產品分析後端 trackEvent</td>
+              <td>gate 未開直接丟棄，無重試無計數</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="src">
+        <code>events.json</code>；
+        <code>source/host/ports/telemetry.ts</code>、
+        <code>source/shared/observability/telemetry-events.ts</code>、
+        <code>source/host/extensions/telemetry/structured-log-telemetry.ts</code>、
+        <code>source/shared/observability/structured-log-transport.ts</code>、
+        <code>source/electron-main/adapters/telemetry.ts</code>、
+        <code>source/electron-main/telemetry/telemetry-report-sinks.ts</code>、
+        <code>telemetry-report-pipes.ts</code>、
+        <code>desktop-structured-log-telemetry.ts</code>、
+        <code>source/electron-main/coordinator/coordinator-telemetry.ts</code>、
+        <code>coordinator-handoff-telemetry.ts</code>、
+        <code>coordinator-executors.ts</code>、
+        <code>
+          source/node-agent-coordinator/telemetry/transport-stage-recorder.ts
+        </code>
+        、
+        <code>source/electron-main/box/box-visibility-telemetry.ts</code>、
+        <code>source/electron-main/update/update-telemetry.ts</code>、
+        <code>
+          source/electron-main/local-exec/local-exec-lifecycle-telemetry.ts
+        </code>
+        、
+        <code>source/shared/observability/connector-auth-telemetry.ts</code>、
+        <code>desktop-unclean-exit-telemetry.ts</code>、
+        <code>source/electron-main/telemetry/sentry.ts</code>、
+        <code>source/electron-main/main-production-services.ts</code>。
+      </p>
+    </>
