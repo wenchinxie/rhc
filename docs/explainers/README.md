@@ -9,8 +9,8 @@ source ./activate    # cd here, bun install if needed
 ./activate           # same, then bun run dev
 ```
 
-§0 workflow is a `tree_grammar` run tree (not the compact 3-column DAG).
-Rebuild the SVG: `python3 scripts/build_grok_bot_dag.py`.
+§0 of a code explainer is the folder map, rendered from `structure.json`:
+`python3 ~/.claude/skills/artifacts-builder/scripts/structure_to_s0.py <structure.json> <folders.json> <imports.json> src/harnesses/<slug>/content` (graphs from `tsgraph.mjs`, see the skill's `references/codebase-map.md`).
 
-Compile: `bash ~/.grok/skills/artifacts-builder/scripts/compile.sh`
+Compile: `bash ~/.claude/skills/artifacts-builder/scripts/compile.sh`
 then copy `dist/bundle.html` to the matching `docs/<slug>-design.html`.

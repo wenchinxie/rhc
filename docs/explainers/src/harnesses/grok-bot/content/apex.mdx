@@ -1,170 +1,114 @@
 import { Peek, Term } from "../../../mdx-components"
 
 <section className="apex wide">
-      <p>
-        磁碟上有一份 Grok Bot 的原始碼複製：
-        <code>/mnt/e/grok-bot-0.18-reconstructed</code>，commit <code>a9f633e</code>
-        。產品是 Anysphere 的桌面程式 0.18.0，應用程式識別{" "}
-        <code>com.anysphere.sand</code>
-        ，安裝包從 <code>downloads.cursor.com/grokbot</code> 下來。
-        <span className="stamp">PROVENANCE.md</span>
-        。<code>rhc</code> 是全新空倉庫，不是這份樹的分支。
-      </p>
-      <p>
-        若把每個資料夾當成各自獨立的產品來讀，使用者按一次送出會被拆成三條互不相干的故事。這樣讀有三個問題。
-      </p>
-      <ol className="enum">
-        <li>
-          <span className="n">第一</span>
-          <strong>
-            把接下送出、並一步步呼叫模型與工具直到這則送出結束的那個行程（
-            <Term k="sand-host">host-main</Term>
-            ）當成桌面旁邊第三個桌面程式行程。
-          </strong>
-          <span className="d">
-            它住在跟筆電分開、用來跑命令的那台遠端機器裡：開機先寫入鎖檔，再起代跑命令的服務，再起給桌面連線的 HTTP 入口。
-            <Peek snip="host-main">host/main</Peek> 見{" "}
-            <a className="xref" href="#s2">
-              §2
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">第二</span>
-          <strong>
-            把 <code>frontend/</code> 資料夾當成出廠畫面的源碼。
-          </strong>
-          <span className="d">
-            裝進應用程式的是出廠已經編好的畫面；
-            <code>frontend/</code> 只是可讀工作區，不取代那份畫面。見{" "}
-            <a className="xref" href="#s1">
-              §1
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">第三</span>
-          <strong>把可選別家模型的推論路由器當成出廠預設。</strong>
-          <span className="d">
-            設定沒改時，模型來源是 <code>cursor</code>。Claude Code／Codex／OpenRouter
-            屬於
-            <Term k="reconstruction">重建疊層</Term>
-            ：這份複製樹加在出廠行為上面的東西。
-            <Peek snip="router-cursor">cursor 不處理</Peek> 見{" "}
-            <a className="xref" href="#s3">
-              §3
-            </a>
-            、
-            <a className="xref" href="#s6">
-              §6
-            </a>
-            。
-          </span>
-        </li>
-      </ol>
-      <p>
-        <strong>
-          讀這份原始碼複製時，沿一則使用者送出的時間順序走，才不會被資料夾名拆成互不相干的三條故事。
-        </strong>
-        桌面程式（Electron）只開窗，並生出中介行程（控制面）；畫面把送出交給這個行程。接下送出、並一步步呼叫模型與工具直到這則送出結束的那個行程（
-        <Term k="sand-host">host-main</Term>
-        ）住在跟筆電分開、用來跑命令的那台遠端機器（
-        <Term k="box">沙箱機器</Term>
-        ）裡。裝進應用程式的畫面是出廠已經編好的那份，外加一條窄的模型來源設定補丁；
-        <code>frontend/</code> 只是可讀工作區，不取代出廠畫面。設定沒改時模型來源是{" "}
-        <code>cursor</code>
-        ；Claude Code／Codex／OpenRouter 與改連這台電腦上另開的隔離環境（容器），才是這份複製樹加在出廠行為上面的
-        <Term k="reconstruction">重建疊層</Term>。
-      </p>
-      <ol className="enum">
-        <li>
-          <span className="n">一</span>
-          <strong>
-            這份複製樹是出廠 0.18.0 的重建稿，不是官方一次交付的整包原始碼庫。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s1">
-              §1
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">二</span>
-          <strong>
-            桌面程式生出控制面；
-            <Term k="sand-host">host-main</Term> 與代跑命令的服務住在
-            <Term k="box">沙箱機器</Term>
-            ，本機另有一支在使用者電腦跑命令的服務。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s2">
-              §2
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">三</span>
-          <strong>
-            出廠送出的模型來源是 Cursor：控制面把請求交給遠端的 host-main，由
-            <Term k="send-pipeline">SendPipeline</Term>
-            （合併重複送出、寫下使用者那行文字、再排隊跑一回合）接。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s3">
-              §3
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">四</span>
-          <strong>
-            遠端機器上的命令走遠端代跑命令的服務（box-exec）；使用者電腦上的命令走使用者電腦上的命令服務（local-exec），權限預設先問再跑。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s4">
-              §4
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">五</span>
-          <strong>
-            出廠預設連 Cursor 配的遠端
-            <Term k="box">沙箱機器</Term>
-            ；改連這台電腦上另開的隔離環境（容器）是疊層開關。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s5">
-              §5
-            </a>
-            。
-          </span>
-        </li>
-        <li>
-          <span className="n">六</span>
-          <strong>
-            路由器與本機容器標成
-            <Term k="reconstruction">重建疊層</Term>
-            ；設定沒改時仍走 Cursor 與遠端機器。
-          </strong>
-          <span className="d">
-            見{" "}
-            <a className="xref" href="#s6">
-              §6
-            </a>
-            。
-          </span>
-        </li>
-      </ol>
-    </section>
+  <p>
+    手上這份 Grok Bot 原始碼是 Anysphere 桌面程式 0.18.0 的重建稿，commit <code>a9f633e</code>，套件名{" "}
+    <code>grok-bot-0.18-reconstructed</code>。<Peek snip="repo-name">套件名</Peek> 用 TypeScript 編譯器 API 掃過{" "}
+    <code>source/</code> 之後，樹裡有 1,722 個檔、43 萬行、41 個資料夾節點、120 條資料夾之間的匯入邊、22,829 條函式呼叫邊。
+    本文每一章的 Peek 都指向這棵樹的檔與行號，引文由 gate 逐行跟磁碟比對過。
+  </p>
+  <p>
+    按資料夾順序讀這棵樹會被帶偏，原因有三個。
+  </p>
+  <ol className="enum">
+    <li>
+      <span className="n">第一</span>
+      <strong>迴圈不在名字叫 agent 的地方獨立存在。</strong>
+      <span className="d">
+        <code>packages/agent</code> 有 256 個檔，但整棵樹裡只有 <code>host</code> 引用它；模型迴圈住在遠端機器上的
+        <Term k="sand-host">host-main</Term> 行程裡，桌面主行程與 <Term k="coordinator">coordinator</Term> 都碰不到它。
+        見 <a className="xref" href="#s2">§2</a>、<a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">第二</span>
+      <strong>同一個功能在樹裡有出廠版與重建版兩份，不標清楚就會把疊層當原生。</strong>
+      <span className="d">
+        設定沒改時模型來源是 <code>cursor</code>，沙箱是 Cursor 後端配的遠端機器；Claude Code、Codex、OpenRouter 路由器與本機 Docker 容器是這份樹加上去的
+        <Term k="reconstruction">重建疊層</Term>。<Peek snip="router-cursor">cursor 放手</Peek>{" "}
+        見 <a className="xref" href="#s1">§1</a>、<a className="xref" href="#s4">§4</a>、<a className="xref" href="#s6">§6</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">第三</span>
+      <strong>一個常數讀起來像上限，不代表它真的被讀。</strong>
+      <span className="d">
+        <code>MAX_AGENT_STEPS = 1_000</code> 定義在 agent 套件裡，整棵樹沒有人讀它；迴圈真正拿到的是 host 給的 5,000。
+        <Peek snip="dead-1000">沒人讀的一千</Peek> <Peek snip="max-steps">五千</Peek>{" "}
+        見 <a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+  </ol>
+  <p>
+    <strong>
+      所以本文不照資料夾切章，改照「一個執行期問題、一棵呼叫樹」切：每章回答一個問題，走一棵從入口函式展開的樹，樹經過哪個資料夾就在那裡講該資料夾；
+      <a className="xref" href="#s0">§0</a> 的資料夾表把 41 個節點逐一歸到章。
+    </strong>
+    章節順序固定：前提、開機、迴圈、模型、工具、執行環境、狀態、遙測。每章的關鍵結論如下。
+  </p>
+  <ol className="enum">
+    <li>
+      <span className="n">一</span>
+      <strong>這棵樹的邊界釘在保存下來的出廠安裝包上；判斷疊層看三個記號。</strong>
+      <span className="d">
+        路由器、本機容器、三個 <code>SAND_DISABLE_*</code> 旗標。<Peek snip="provenance">安裝包</Peek>{" "}
+        <a className="xref" href="#s1">§1</a>。Lauren Tan 的開發分享另放在同站的 <code>lauren.html</code>，不在本文。
+      </span>
+    </li>
+    <li>
+      <span className="n">二</span>
+      <strong>開機沒有一個主行程管到底：桌面主行程 fork 出 <Term k="coordinator">coordinator</Term>，<Term k="sand-host">host-main</Term> 在遠端機器自己開機，再生出 box-exec-daemon。</strong>
+      <span className="d">
+        三條 MessagePort、一個 loopback HTTP gateway、一次 spawn。<Peek snip="launcher">三埠</Peek> <Peek snip="host-main">host 開機</Peek>{" "}
+        <a className="xref" href="#s2">§2</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">三</span>
+      <strong>一則送出先過 <Term k="send-pipeline">SendPipeline</Term> 去重，再成為十二種動作之一，外層最多五千步，內層工具跟模型輪流開口，沒有工具呼叫那一輪才結束。</strong>
+      <span className="d">
+        <Peek snip="send-prompt">去重</Peek> <Peek snip="step-loop">步進</Peek>{" "}
+        <a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">四</span>
+      <strong>出廠只認 Cursor；路由判斷在 <Term k="coordinator">coordinator</Term> 與 host 兩邊各讀一份 settings.json。</strong>
+      <span className="d">
+        <Peek snip="settings-default">預設值</Peek>{" "}
+        <a className="xref" href="#s4">§4</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">五</span>
+      <strong>工具要過四道關卡才能動手：登錄表、七個 surface 的審核閘、待審核阻擋、allowlist 預檢。</strong>
+      <span className="d">
+        <Peek snip="review-modes">七個 surface</Peek> <Peek snip="pending-approval">待審核</Peek>{" "}
+        <a className="xref" href="#s5">§5</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">六</span>
+      <strong>沙箱在遠端是出廠預設；本機 Docker 是疊層，local-exec 走使用者自己的機器、不算沙箱，選擇點只有 boxRuntime 一個開關。</strong>
+      <span className="d">
+        <Peek snip="remote-box">要遠端機器</Peek> <Peek snip="runtime-switch">開關</Peek>{" "}
+        <a className="xref" href="#s6">§6</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">七</span>
+      <strong>設定全域共用，每個 agent 一個資料夾一個 SQLite，記憶有 30 天半衰期，secrets 分三層但都用原子寫。</strong>
+      <span className="d">
+        <Peek snip="root-dir">根目錄</Peek> <Peek snip="memory-halflife">半衰期</Peek>{" "}
+        <a className="xref" href="#s7">§7</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">八</span>
+      <strong>遙測從各模組 emit，經 adapter、pipe、sink 落地，失敗政策是丟棄不阻塞。</strong>
+      <span className="d">
+        <a className="xref" href="#s8">§8</a>。
+      </span>
+    </li>
+  </ol>
+</section>

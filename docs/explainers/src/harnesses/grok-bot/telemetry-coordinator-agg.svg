@@ -1,0 +1,77 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 886" role="img" aria-label="telemetry 中介行程聚合家族" aria-describedby="dagcap-s8-aggregate">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M260,412 L260,456" marker-end="url(#ar)"/>
+  <path d="M260,520 L260,564" marker-end="url(#ar)"/>
+  <path d="M260,628 L260,672" marker-end="url(#ar)"/>
+  <path d="M380.0,711.0 L470,711" marker-end="url(#ar)"/>
+  <path d="M260,750 L260,794" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">沙箱可達性事件</text>
+    <text class="sub" x="94" y="71">reachability／dns／stream／lifecycle 四類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">發生</text>
+  <g class="app lay-emit src" data-snip="t-reconciliation" tabindex="0" role="button" aria-label="復原與遷移事件，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">復原與遷移事件</text>
+    <text class="sub" x="94" y="179">recovery／migration／rebuild／resync 五類</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">代理人不可達事件</text>
+    <text class="sub" x="94" y="287">agents-unreachable 一類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="384">發生</text>
+  <g class="app lay-emit src" data-snip="t-handoff" tabindex="0" role="button" aria-label="交接四階段事件，開啟原文">
+    <rect x="80" y="348" width="360" height="64" rx="8"/>
+    <text x="94" y="375">交接四階段事件</text>
+    <text class="sub" x="94" y="395">requested／adopted／invoke_failed／timeout</text>
+    <path class="srcfold" d="M431,412 L440,412 L440,403 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="492">port</text>
+  <g class="app lay-port">
+    <rect x="80" y="456" width="360" height="64" rx="8"/>
+    <text x="94" y="483">中介行程遙測聚合 port</text>
+    <text class="sub" x="94" y="503">把十個以上的方法收進同一份介面</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="600">轉接</text>
+  <g class="app lay-adapter src" data-snip="t8-handoff-wire" tabindex="0" role="button" aria-label="交接 telemetry 掛在中介行程接線層，開啟原文">
+    <rect x="80" y="564" width="360" height="64" rx="8"/>
+    <text x="94" y="591">交接 telemetry 掛在中介行程接線層</text>
+    <text class="sub" x="94" y="611">接的接線點是 production-provider</text>
+    <path class="srcfold" d="M431,628 L440,628 L440,619 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="715">管線</text>
+  <g class="dec lay-pipe">
+    <polygon points="260,672 380.0,711.0 260,750 140.0,711.0"/>
+    <text text-anchor="middle" x="260" y="716.0">三十秒內有沒有最近一次失敗？</text>
+  </g>
+  <g class="app lay-pipe">
+    <rect x="470" y="682" width="430" height="58" rx="8"/>
+    <text x="484" y="706">併上 disconnectCause</text>
+    <text class="sub" x="484" y="726">使用者關閉／離線／host 重建／未知，四選一</text>
+  </g>
+  <text class="elab" x="272" y="776.0">沒有，維持原樣</text>
+  <text class="lay" text-anchor="end" x="76" y="830">落地</text>
+  <g class="app lay-sink">
+    <rect x="80" y="794" width="360" height="64" rx="8"/>
+    <text x="94" y="821">同一份 getUploader() 上傳器</text>
+    <text class="sub" x="94" y="841">轉送後落地成結構化日誌，不是另一個終點</text>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-aggregate">十四類事件先在中介行程這層聚合（併上斷線原因或升級成警告），再轉送回 desktop-log 家族的同一份上傳器，不是另一條獨立的落地路徑。</p>

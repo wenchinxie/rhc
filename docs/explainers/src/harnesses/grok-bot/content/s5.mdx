@@ -1,58 +1,150 @@
-import { Peek, Term, Xfer } from "../../../mdx-components"
+import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-      <h2 id="s5">
-        <span className="no">5</span>遠端沙箱機器是出廠預設
-      </h2>
-      <p>
-        主行程用 <code>BrokeredHostConnector.connect</code> 呼叫 Cursor 後端{" "}
-        <code>ensureSandBox</code>
-        ，後端填上入口網址、權杖（通行字）、與遠端畫面連線資訊。
-        <Peek snip="remote-box">ensureSandBox</Peek>{" "}
-        網址為空代表後端故障。後端暫時不給機器時，桌面預設再等 60 秒，上限 15
-        分鐘。
-        <span className="stamp">BOX_BLOCKED_FALLBACK_HOLD_MS</span>
-        改它的成本是重測被擋時畫面要等多久。
-      </p>
-      <p>
-        設定 <code>boxRuntime === "local-docker"</code>{" "}
-        才改連這台電腦上的容器 <code>grok-bot-local-vm</code>，入口{" "}
-        <code>http://127.0.0.1:1340</code>，映像{" "}
-        <code>cursorenvironments/universal:sand-box-latest</code>。
-        <Peek snip="docker">切換</Peek> <Peek snip="docker-port">1340</Peek>{" "}
-        就緒超時 180 秒。
-        <span className="stamp">重建稿常數</span>
-        改埠或映像要重測容器對上控制面。
-      </p>
-      <Xfer
-        title="host 放進遠端機器，不放在桌面旁邊"
-        cells={[
-          {
-            lab: "機制",
-            body: (
-              <>
-                Cursor 後端配一台機器，裡面跑{" "}
-                <Term k="sand-host">host-main</Term>{" "}
-                與代跑命令的服務。桌面只留桌面程式、控制面、本機命令服務。
-              </>
-            ),
-          },
-          {
-            lab: "前提",
-            body: "命令與檔案預設只在遠端機器跑與存放。入口網址必須由後端蓋章。",
-          },
-          {
-            lab: "適配",
-            body: "host/main 的鎖、代跑服務、連線入口都假設自己在遠端機器裡。入口網址（gateway_url）是空的就當成後端故障。",
-          },
-          {
-            lab: "不抄",
-            body: "本機另開的隔離環境（容器）只當疊層開關，預設路徑仍打遠端 ensureSandBox。",
-          },
-        ]}
-      />
-      <p className="src">
-        <code>box-host-connector.ts</code>、
-        <code>local-docker-host-connector.ts</code>。
-      </p>
-    </>
+  <H2 id="s5" n="5">工具要闖四道關卡才能動手</H2>
+  <p>
+    模型想跑一次副作用（跑命令、呼叫 MCP、動滑鼠），要先過登錄表分派、審核閘、
+    待審核卡點、預檢與權限四層，最後才輪到真正的 spawn。
+    這四層分屬不同資料夾：<code>source/packages/agent/tools</code>
+    定義工具與登錄表，<code>source/host/runner/tools</code> 每輪組裝要用哪些工具，
+    <code>source/host/runner</code> 底下的審核閘擋副作用，
+    <code>source/packages/agent-exec</code> 跑預檢，
+    <code>source/packages/cursor-plugins</code> 另外管外掛自己的權限模式。
+    跟上一節（<a className="xref" href="#s3">§3</a>）銜接的地方是：工具呼叫的結果要回填進對話，
+    這裡管的是結果出現之前，命令會不會被擋下來。
+  </p>
+  <H3 id="s5-1" n="5.1">登錄表管歸屬，工具集是每輪重新組出來的</H3>
+  <p>
+    <code>TOOL_OWNER_TEAM_MAP</code> 只是一張名字對團隊的表，
+    把 <code>SHELL</code>、<code>TASK</code>、<code>MCP</code> 這類工具名對到
+    <code>agent-quality</code>、<code>extensibility</code> 等擁有團隊。
+    <Peek snip="tool-owner">登錄表</Peek>
+    查不到名字就退回 <code>agent-quality</code>，<code>unknown</code> 這個特殊值也一樣。
+    <Peek snip="tool-team-fn">預設團隊</Peek>
+    這張表不參與是否放行的判斷，只是把 team 欄位寫進工具呼叫起跑的那筆記錄，
+    供事後查誰的工具在跑什麼用。
+    <Peek snip="team-telemetry">只餵記錄</Peek>
+    真正決定一輪能用哪些工具的是 <code>buildTurnTools</code>，
+    它先看呼叫者是不是子代理、有沒有子代理設定，
+    子代理跑一般任務時直接回一個空的圍籠工具集，
+    不是子代理才會照當輪身分把任務工具、子代理管理工具、MCP 動態工具逐一裝進去。
+    <Peek snip="build-turn-tools">先判圍籠</Peek>
+    換句話說，登錄表回答的是這個工具名字屬於誰，
+    <code>buildTurnTools</code> 回答的是這一輪到底看得到哪些工具，兩件事分開管。
+  </p>
+  <H3 id="s5-2" n="5.2">七個 surface 各自審查，非 enforce 就先過期</H3>
+  <p>
+    審核閘用一個模式物件同時管七個副作用面：
+    <code>hostShell</code>（本機殼）、<code>boxShell</code>
+    （<Term k="box">沙箱機器</Term>殼）、<code>mcp</code>、<code>computer</code>、
+    <code>automationWrite</code>、<code>cloudAgent</code>、<code>subagentLaunch</code>。
+    <Peek snip="review-modes">七個面</Peek>
+    每個面各自可以是 enforce 或非 enforce，
+    只有 enforce 才真的擋；非 enforce 的面在讀模式時直接被丟進一個集合，
+    交給審核控制器把這些面待審核的項目通通過期，
+    也就是說非 enforce 不是放寬審核，而是讓審核根本不存在。
+    <Peek snip="auto-expire">直接過期</Peek>
+    這一步發生在每次讀當下模式的時候，早於任何一次工具真正呼叫。
+  </p>
+  <H3 id="s5-3" n="5.3">待審核一開，任何新副作用都得先讓路</H3>
+  <p>
+    只要控制器手上還有未結案的待審核項目，
+    <code>assertNoPendingApproval</code> 就直接丟出
+    <code>SandAutoReviewPendingApprovalError</code>，
+    不管這次要跑的是 shell 還是 MCP。
+    <Peek snip="pending-approval">丟錯擋下</Peek>
+    這個檢查被包在每一種副作用執行器最外層：本機殼與背景殼的執行器先呼叫它、
+    再寫審計記錄、才呼叫真正會動手的 <code>execute</code>。
+    <Peek snip="shell-gate-wrap">殼先問閘</Peek>
+    MCP 執行器的順序一樣，一進 <code>execute</code> 就先問閘，
+    問完才去量測連線與真的送出呼叫。
+    <Peek snip="mcp-gate-wrap">MCP 也先問</Peek>
+    這代表待審核卡住的不是某一種工具，而是整條輪次裡所有掛了這層包裝的副作用，
+    一個沒審完，其他都得等。
+  </p>
+  <H3 id="s5-4" n="5.4">預檢在審核閘之外，權限分三層各管各的</H3>
+  <p>
+    shell、MCP、web fetch 各自有一個獨立的 allowlist 預檢執行器資源，
+    在真正執行前於各自的通道上把命令或位址過一次名單。
+    <Peek snip="allow-precheck">三種預檢</Peek>
+    這一層跟審核閘是兩件事：審核閘管的是要不要讓使用者先看一眼再放行，
+    預檢管的是這個目標本身在不在允許清單上，兩者可以同時存在。
+    真正落地前還有三層各自獨立的權限：第一層是 hook 可以附一個
+    <code>FORCE_PROMPT</code> 要求，逼這次命令改成先問，
+    蓋掉底下原本可能是一律放行的設定。
+    <Peek snip="force-prompt">hook 強制問</Peek>
+    第二層是本機工具權限本身，只有 always、ask、never 三態，預設 ask。
+    <Peek snip="perm">三態預設</Peek>
+    第三層是外掛的 <code>permissionMode</code>，
+    外掛的 agent 定義自己帶一個 readonly 或 default 的欄位，
+    <Peek snip="plugin-agent-shape">外掛欄位</Peek>
+    解析時只認 readonly 這個字，其他一律退回 default。
+    <Peek snip="plugin-perm-parse">解析退預設</Peek>
+    這三層管的範圍不重疊：hook 管單次命令要不要強制先問，
+    本機工具權限管一般命令的常態放行策略，
+    <code>permissionMode</code> 管外掛自己宣告的 agent 能不能改東西，
+    不是同一道門的三種說法。
+  </p>
+  <H3 id="s5-5" n="5.5">遠端殼與本機殼走的是不同機器上的行程</H3>
+  <p>
+    前面四層審核與權限對遠端殼與本機殼一視同仁，
+    真正分岔的只有誰去 spawn。
+    <Term k="box">沙箱機器</Term>上的命令由 <code>box-exec-daemon</code> 接住，
+    內部用 <code>spawn</code> 加 <code>/bin/sh -lc</code> 直接起行程。
+    <Peek snip="box-shell-spawn">遠端起殼</Peek>
+    本機命令則是先由 Electron 主行程用 <code>spawn</code> 起一支獨立的
+    <code>local-exec-daemon</code>，帶著世代權杖，
+    之後的命令都送進這支常駐行程去執行，不是每次命令都重新起一支。
+    這兩條路共用同一套審核閘、待審核卡點與權限判斷，
+    差別只在於 spawn 這一步發生在哪台機器、哪一支常駐行程裡，
+    跟通道要往哪台機器發（<a className="xref" href="#s6">§6</a>）是同一個問題的另一面。
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>門</th>
+          <th>所在檔</th>
+          <th>擋下時的錯誤或提示</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>登錄表分派、工具集組裝</td>
+          <td><code>all-tools.ts</code>、<code>turn-toolset.ts</code></td>
+          <td>不擋，只決定看不看得到這個工具、記錄裡的 team 是誰</td>
+        </tr>
+        <tr>
+          <td>審核閘（hostShell / boxShell）</td>
+          <td><code>auto-review-gate.ts</code></td>
+          <td>非 enforce 直接過期，不出提示</td>
+        </tr>
+        <tr>
+          <td>待審核卡點</td>
+          <td><code>turn-agent-composition.ts</code></td>
+          <td><code>SandAutoReviewPendingApprovalError</code></td>
+        </tr>
+        <tr>
+          <td>shell allowlist 預檢</td>
+          <td><code>shell-allowlist-precheck.ts</code></td>
+          <td>預檢結果標示命令不在清單上</td>
+        </tr>
+        <tr>
+          <td>hook 強制先問</td>
+          <td><code>shell-hook-approval.ts</code></td>
+          <td><code>FORCE_PROMPT</code>，改走使用者確認</td>
+        </tr>
+        <tr>
+          <td>本機工具三態權限</td>
+          <td><code>local-tool-permission.ts</code></td>
+          <td>never 直接拒絕，ask 等使用者答覆</td>
+        </tr>
+        <tr>
+          <td>spawn 落地</td>
+          <td><code>box-exec-daemon/server.ts</code>、本機 <code>local-exec-daemon</code></td>
+          <td>不再擋，命令真的開始跑</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</>

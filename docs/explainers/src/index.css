@@ -32,7 +32,9 @@ body::before {
 body.rail-on #root {
   display: contents;
 }
+/* No max-height: it capped the box at the viewport while the content stayed
+   taller, so an expanded section's last children painted below the fold with
+   no overflow-y to reach them. shell.js pins the rail's bottom instead. */
 body.rail-on nav.toc {
   align-self: start;
-  max-height: calc(100vh - 4.5rem);
 }
