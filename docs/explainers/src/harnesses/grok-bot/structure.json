@@ -320,6 +320,21 @@
         "source/packages/analytics-client",
         "source/packages/agent-analytics"
       ]
+    },
+    {
+      "n": 11,
+      "id": "s11",
+      "title": "Skill 怎麼進到模型：清單自選是預設，disable-model-invocation 是逐個退出",
+      "question": "模型為什麼會去讀某個 SKILL.md，是它自己挑的、人附加的、還是 harness 注入的",
+      "seeds": [
+        "source/shared/workflow-model.ts#agentSkillsFromWorkflows@22",
+        "source/packages/agent/prompts/user-info-available-skills.ts#buildAvailableSkillsPromptSection@137",
+        "source/packages/agent/tools/core/read/read.ts",
+        "source/host/extensions/transcript/workflow-commands.ts#buildWorkflowRunPrompt"
+      ],
+      "folders": [],
+      "crossings": ["s3", "s5"],
+      "note": "folders stay with s3 (packages/agent/prompts) and s5 (host/extensions/mcp, packages/cursor-plugins); this chapter follows one tree across them"
     }
   ],
   "not_covered": [

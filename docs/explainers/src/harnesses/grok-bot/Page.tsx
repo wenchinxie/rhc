@@ -152,6 +152,18 @@ const TOC = [
       { href: "#s10-19", n: "10.19", label: "沒有落點的資料夾" },
     ],
   },
+  {
+    href: "#s11",
+    n: "11",
+    label: "Skill 怎麼進到模型",
+    children: [
+      { href: "#s11-1", n: "11.1", label: "四種來源一張清單" },
+      { href: "#s11-2", n: "11.2", label: "模型自選去 Read" },
+      { href: "#s11-3", n: "11.3", label: "人工附加與注入" },
+      { href: "#s11-4", n: "11.4", label: "開關只接兩種來源" },
+      { href: "#s11-5", n: "11.5", label: "對照 Lauren" },
+    ],
+  },
 ];
 
 const SRC_MAP_JSON = JSON.stringify(srcMap).replace(/</g, "\\u003c");
