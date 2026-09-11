@@ -4037,9 +4037,517 @@
       "  reportOnboardingStep: { args: \"object\" },",
       "  reportClientFailure: { args: \"object\" },"
     ]
+  },
+  "sk-skill-filename": {
+    "type": "code",
+    "kind": "常數",
+    "title": "WORKFLOW_FILENAME 定死是 SKILL.md，注入上限是 8,000 字",
+    "meta": "source/shared/workflow-model.ts:4-4",
+    "why": "這行常數決定 skill 一律用 SKILL.md 當檔名，也定出 workflow 注入 prompt 時的截斷上限。",
+    "start": 4,
+    "hi": [
+      4
+    ],
+    "lines": [
+      "export const WORKFLOW_FILENAME = \"SKILL.md\"; export const LEGACY_WORKFLOW_FILENAME = \"workflow.md\"; export const AGENT_READABLE_SKILL_DIR_MODE = 0o755; export const AGENT_READABLE_SKILL_FILE_MODE = 0o644; export const WORKFLOW_MAX_NAME_LENGTH = 80; export const WORKFLOW_MAX_DESCRIPTION_LENGTH = 1_536; export const WORKFLOW_MAX_BODY_LENGTH = 100_000; export const WORKFLOW_INJECTED_BODY_LIMIT = 8_000; export const WORKFLOW_UI_LIMIT = 100; export const WORKFLOW_MAX_PER_AGENT = 100;"
+    ]
+  },
+  "sk-workflow-record": {
+    "type": "code",
+    "kind": "型別",
+    "title": "WorkflowRecord 的 source 只有四種值，帶 isEnabledForAgent 與 disableModelInvocation 兩個旗標",
+    "meta": "source/shared/workflow-model.ts:6-6",
+    "why": "後面所有過濾條件都讀這個型別上的欄位，四種 source 與兩個旗標在這裡一次定義。",
+    "start": 6,
+    "hi": [
+      6
+    ],
+    "lines": [
+      "export interface WorkflowRecord { id: string; name: string; description: string; body: string; trigger: WorkflowTrigger | null; source: \"managed\" | \"plugin\" | \"workflow\" | \"automation\"; sourceRef: string | null; pluginId?: string | null; publishedByCurrentUser?: boolean; isEnabledForAgent: boolean; disableModelInvocation?: boolean; scheduleDescription?: string | null; createdAt: number; lastRunAt?: number | null; nextRunAt?: number | null; helperScripts: readonly string[]; runs?: readonly unknown[]; filePath: string }"
+    ]
+  },
+  "sk-list-merge": {
+    "type": "code",
+    "kind": "合併",
+    "title": "listAllFrom 把 managed、plugin、workflow、automation 四路併成一個陣列",
+    "meta": "source/host/workflows/workflow-store.ts:39-39",
+    "why": "這行示範四種來源怎麼合成一張清單，回傳順序是 managed 在前、自動化排最後。",
+    "start": 39,
+    "hi": [
+      39
+    ],
+    "lines": [
+      "  listAllFrom(definitionsOnly: boolean): WorkflowRecord[] { const records = this.library.list(), userIds = new Set(records.map((record) => record.id)), skills = records.map((record) => this.skillToWorkflow(record)), managed = this.managedWorkflows(userIds), claimed = new Set([...userIds, ...managed.map((workflow) => workflow.id)]), plugins = this.pluginWorkflows(claimed), autos = (definitionsOnly ? this.automations.listDefinitions() : this.automations.list()).map(automationToWorkflow); return [...managed, ...plugins, ...skills, ...autos]; }"
+    ]
+  },
+  "sk-list-filter": {
+    "type": "code",
+    "kind": "過濾",
+    "title": "list() 只放行 isEnabledForAgent 為真或本來就是 automation 的紀錄",
+    "meta": "source/host/workflows/workflow-store.ts:40-40",
+    "why": "這是清單送進模型之前的第一層過濾，跟 disable-model-invocation 是不同的兩件事。",
+    "start": 40,
+    "hi": [
+      40
+    ],
+    "lines": [
+      "  list(): WorkflowRecord[] { return this.listAllFrom(true).filter((workflow) => workflow.isEnabledForAgent || workflow.source === \"automation\"); }"
+    ]
+  },
+  "sk-managed-materialize": {
+    "type": "code",
+    "kind": "落地",
+    "title": "materializeManagedSkillFiles 把 managed skill 寫成真正的 SKILL.md 檔案",
+    "meta": "source/host/extensions/managed-setup/managed-skills-cache.ts:7-7",
+    "why": "managed 來源不是純記憶體資料，這行把後端回傳的內容落成磁碟上的檔案再供模型讀取。",
+    "start": 7,
+    "hi": [
+      7
+    ],
+    "lines": [
+      "export function materializeManagedSkillFiles(cacheDir: string, skills: readonly ManagedSkill[]): void { const filesDir = join(cacheDir, MANAGED_SKILL_FILES_DIRNAME); mkdirSync(filesDir, { recursive: true, mode: AGENT_READABLE_SKILL_DIR_MODE }); chmodSync(filesDir, AGENT_READABLE_SKILL_DIR_MODE); const keep = new Set(skills.map((skill) => skill.id)); for (const entry of readdirSync(filesDir, { withFileTypes: true })) if (!keep.has(entry.name)) rmSync(join(filesDir, entry.name), { recursive: true, force: true }); for (const skill of skills) { const skillDir = join(filesDir, skill.id); mkdirSync(skillDir, { recursive: true, mode: AGENT_READABLE_SKILL_DIR_MODE }); chmodSync(skillDir, AGENT_READABLE_SKILL_DIR_MODE); const path = getManagedSkillFilePath(cacheDir, skill.id), temp = `${path}.tmp`; const content = serializeWorkflowFile({ name: skill.name, description: skill.description, body: skill.body, trigger: null }); writeFileSync(temp, content, { encoding: \"utf8\", mode: AGENT_READABLE_SKILL_FILE_MODE }); chmodSync(temp, AGENT_READABLE_SKILL_FILE_MODE); renameSync(temp, path); } }"
+    ]
+  },
+  "sk-plugin-cache-write": {
+    "type": "code",
+    "kind": "快取",
+    "title": "runPass 把 plugin skill 清單寫進 plugin skills 快取",
+    "meta": "source/host/extensions/mcp/plugin-skills.ts:87-87",
+    "why": "plugin 這條來源的落地機制在這行，快取路徑本身由另一支我沒被允許開啟的檔案組出。",
+    "start": 87,
+    "hi": [
+      87
+    ],
+    "lines": [
+      "  private async runPass(trigger:string):Promise<PluginSkillRecord[]>{const started=(this.options.now??Date.now)();try{const loaded=await this.options.load();if(this.disposed)return this.current();const previous=this.currentIndex();let records=pluginContentsToSkillRecords(loaded.plugins,loaded.publisherFacts),listed=new Set(loaded.listedPluginIds),loadedIds=new Set(loaded.plugins.flatMap((plugin)=>plugin.loadError!=null||!plugin.installPath?[]:(id=>id==null?[]:[id])(getPluginDbId(plugin.identifier))));records=[...records,...(previous?.skills??[]).filter((record)=>listed.has(record.pluginId)&&!loadedIds.has(record.pluginId))];writePluginSkillsCache(getPluginSkillsDir(this.options.sandRootDir),{currentUserId:loaded.currentUserId??previous?.currentUserId??null,skills:records,authBlocked:loaded.authBlocked});(this.options.prune??pruneUninstalledPluginDirs)(join(getPluginsRootDir(this.options.sandRootDir),\"cache\"),loaded.listedCacheKeys,records.map((record)=>record.filePath));this.options.reportSync?.({trigger,outcome:\"ok\",changed:previous==null?records.length>0:skillRecordsIdentity(previous.skills)!==skillRecordsIdentity(records),skillCount:records.length,durationMs:(this.options.now??Date.now)()-started});return records}catch(error){this.options.log?.(`[sand:plugin-skills] sync (${trigger}) failed: ${error instanceof Error?error.message:String(error)}`);this.options.reportSync?.({trigger,outcome:\"failed\",errorClass:error instanceof Error?error.name:typeof error,durationMs:(this.options.now??Date.now)()-started});throw error}}"
+    ]
+  },
+  "sk-global-library": {
+    "type": "code",
+    "kind": "說明文字",
+    "title": "renderWorkflowsSystemPrompt 告訴模型使用者的 skill 庫是 GLOBAL、跨所有 assistant 共用",
+    "meta": "source/shared/workflow-model.ts:33-33",
+    "why": "這句話是塞進系統 prompt 的原文，說明使用者自建的 skill 不分 assistant，全域共用一份。",
+    "start": 33,
+    "hi": [
+      33
+    ],
+    "lines": [
+      "export function renderWorkflowsSystemPrompt(location: string | null | undefined): string { return location == null ? \"\" : `Workflows are a GLOBAL, shared library across all of the user's assistants. User-created skills live as files at ${location}: one subfolder per workflow, each holding a SKILL.md. Prefer the update_state tool (target \"workflow\") to save, rewrite, and delete them. Reference workflows as [name](sand-workflow:<id>).`; }"
+    ]
+  },
+  "sk-skill-path-globs": {
+    "type": "code",
+    "kind": "路徑",
+    "title": "SKILL_GLOB_PATTERNS 列出八種會被當成 skill 讀的目錄樣式",
+    "meta": "source/packages/agent/prompts/user-info-rule-helpers.ts:4-13",
+    "why": "這張表決定哪些檔案路徑會走進 legacy CursorRule 那條分類管道，不只四個常見目錄。",
+    "start": 4,
+    "hi": [
+      11
+    ],
+    "lines": [
+      "const SKILL_GLOB_PATTERNS = [",
+      "  \"**/.cursor/skills/**\",",
+      "  \"**/.cursor/skills-cursor/**\",",
+      "  \"**/.claude/skills/**\",",
+      "  \"**/.codex/skills/**\",",
+      "  \"**/.claude/plugins/**\",",
+      "  \"**/.agents/skills/**\",",
+      "  \"**/SKILL.md\",",
+      "  \"**/.cursor/plugins/cache/**/skills/**\",",
+      "];"
+    ]
+  },
+  "sk-request-context-skills": {
+    "type": "code",
+    "kind": "組裝",
+    "title": "SandRequestContextExecutor.execute 呼叫 resolveAgentSkills 塞進 RequestContext.agentSkills",
+    "meta": "source/host/runner/agent-adapters.ts:30-30",
+    "why": "這是每回合把 skill 清單放進送給模型的 RequestContext 的那一行，來源是外部傳入的解析函式。",
+    "start": 30,
+    "hi": [
+      30
+    ],
+    "lines": [
+      "  async execute(_ctx?: unknown, _args?: unknown): Promise<RequestContextResult> { const info = this.requestContext.resolve(), rules = await this.requestContext.resolveRules(); return new RequestContextResult({ result: { case: \"success\", value: new RequestContextSuccess({ requestContext: new RequestContext({ env: new RequestContextEnv({ osVersion: info.osVersion!, shell: info.shell!, timeZone: info.timeZone!, agentTranscriptsFolder: this.includeTranscripts ? info.transcriptsFolder! : undefined!, smartModeClassifierAutoModeEnabled: this.autoReviewEnforceEnabled }), rules: rules ?? [], rulesInfoComplete: rules !== undefined, agentSkills: this.resolveAgentSkills?.() ?? [] }) }) } }); }"
+    ]
+  },
+  "sk-agent-skills-from-workflows": {
+    "type": "code",
+    "kind": "過濾",
+    "title": "agentSkillsFromWorkflows 只放行 trigger 為空、啟用中、沒關模型呼叫的紀錄",
+    "meta": "source/shared/workflow-model.ts:22-22",
+    "why": "這是模型自選清單的第一道門，三個條件同時成立紀錄才會變成 agentSkills 的一筆。",
+    "start": 22,
+    "hi": [
+      22
+    ],
+    "lines": [
+      "export function agentSkillsFromWorkflows(workflows: readonly WorkflowRecord[]): Array<{ fullPath: string; description: string }> { return limitSurfacedWorkflows(workflows).filter((workflow) => workflow.trigger == null && workflow.isEnabledForAgent && workflow.disableModelInvocation !== true && workflow.filePath.length > 0).map((workflow) => ({ fullPath: workflow.filePath, description: workflow.description })); }"
+    ]
+  },
+  "sk-available-skills-filter": {
+    "type": "code",
+    "kind": "過濾",
+    "title": "buildAvailableSkillsPromptSection 在組 prompt 之前又濾一次 disableModelInvocation 與 file-scoped",
+    "meta": "source/packages/agent/prompts/user-info-available-skills.ts:137-152",
+    "why": "同一個旗標在這裡被檢查第二次，跟 workflow-model.ts 的第一道濾網是兩個獨立的檢查點。",
+    "start": 137,
+    "hi": [
+      152
+    ],
+    "lines": [
+      "export function buildAvailableSkillsPromptSection(",
+      "  props: AvailableSkillsPromptProps,",
+      "  overrides?: AvailableSkillsPromptOverrides,",
+      "): {",
+      "  readonly section?: PromptNode;",
+      "  readonly skillCount: number;",
+      "  readonly renderedEstimatedTokens?: number;",
+      "  readonly uncappedEstimatedTokens?: number;",
+      "  readonly omittedSkillCount?: number;",
+      "  readonly strategy?: \"under_budget\" | \"shortened_descriptions\" | \"dropped_descriptions\" | \"omitted_skills\";",
+      "} {",
+      "  const workspacePaths = props.env?.workspacePaths ?? [];",
+      "  const skills = overrides?.skills ?? categorizeCursorRules(props.cursorRules, workspacePaths, props.displayOptions?.agentType).skills;",
+      "  const computerUseSubagentSurface = props.displayOptions?.computerUseSubagentSurface === true;",
+      "  const agentSkillsFromProto = filterByAgentEnvironment(props.agentSkills ?? [], props.displayOptions?.agentType)",
+      "    .filter((skill) => !skill.disableModelInvocation && !isFileScopedSkill(skill, workspacePaths));"
+    ]
+  },
+  "sk-skill-budget-fraction": {
+    "type": "code",
+    "kind": "預算",
+    "title": "INITIAL_SKILL_CATALOG_CONTEXT_FRACTION 把 skill 清單的 prompt 預算釘在 2%",
+    "meta": "source/packages/agent/prompts/skill-catalog-budget.ts:46-46",
+    "why": "清單塞不塞得下、要不要省略描述，都是拿這個比例乘上模型的 token 上限去算。",
+    "start": 46,
+    "hi": [
+      46
+    ],
+    "lines": [
+      "const INITIAL_SKILL_CATALOG_CONTEXT_FRACTION = 0.02;"
+    ]
+  },
+  "sk-protected-skill-names": {
+    "type": "code",
+    "kind": "保護名單",
+    "title": "PROTECTED_SKILL_NAMES 與 LOOP_PROTECTED_SKILL_NAMES 兩張名單不受預算省略",
+    "meta": "source/packages/agent/prompts/skill-catalog-budget.ts:53-54",
+    "why": "canvas、env-setup、loop 三個名字在預算不夠時仍然保留在清單裡，不會被砍描述或省略。",
+    "start": 53,
+    "hi": [
+      53,
+      54
+    ],
+    "lines": [
+      "const PROTECTED_SKILL_NAMES = new Set([\"canvas\", \"env-setup\"]);",
+      "const LOOP_PROTECTED_SKILL_NAMES = new Set([\"loop\"]);"
+    ]
+  },
+  "sk-agent-skills-read-cue": {
+    "type": "code",
+    "kind": "說明文字",
+    "title": "非 GPT-5.6 版說明文字要求模型讀到相關 skill 就立刻讀、立刻照做",
+    "meta": "source/packages/agent/prompts/agent-skills-section.ts:84-84",
+    "why": "這句原文用 IMMEDIATELY 與 NEVER，是舊版 prompt 主動推模型自選的直接證據。",
+    "start": 84,
+    "hi": [
+      84
+    ],
+    "lines": [
+      "            \"When a skill is relevant, read and follow it IMMEDIATELY as your first action. NEVER just announce or mention a skill without actually reading and following it.\","
+    ]
+  },
+  "sk-agent-skills-only-listed": {
+    "type": "code",
+    "kind": "說明文字",
+    "title": "沒有省略清單時非 GPT-5.6 版收尾一句 Only use skills listed below",
+    "meta": "source/packages/agent/prompts/agent-skills-section.ts:90-90",
+    "why": "這是三選一結尾句在沒有省略情境下的版本，圈住模型只能用清單裡列出的 skill。",
+    "start": 90,
+    "hi": [
+      90
+    ],
+    "lines": [
+      "                : \"Only use skills listed below.\","
+    ]
+  },
+  "sk-agent-skills-gpt56-precedence": {
+    "type": "code",
+    "kind": "說明文字",
+    "title": "GPT-5.6 版加一句使用者指示優先於 skill 指引",
+    "meta": "source/packages/agent/prompts/agent-skills-section.ts:61-61",
+    "why": "這句在非 GPT-5.6 版沒有對應，是兩版說明文字語氣差異的關鍵一句。",
+    "start": 61,
+    "hi": [
+      61
+    ],
+    "lines": [
+      "                \"The user's instructions take precedence over skill guidance, and an invoked skill takes precedence over autonomous judgment where they do not conflict.\","
+    ]
+  },
+  "sk-agent-skills-gpt56-explain": {
+    "type": "code",
+    "kind": "說明文字",
+    "title": "GPT-5.6 版要求模型在用沒被指名的 skill 前先簡短說明理由",
+    "meta": "source/packages/agent/prompts/agent-skills-section.ts:66-66",
+    "why": "這句把說明理由寫進說明文字本身，非 GPT-5.6 版沒有對應要求。",
+    "start": 66,
+    "hi": [
+      66
+    ],
+    "lines": [
+      "                \"Tell the user in `commentary` when a skill causes a material action or pause. Before using a skill the user did not name, briefly explain why it is relevant and keep its use within the task's scope. Mention material effects in the final response, but do not cite skills you merely inspected.\","
+    ]
+  },
+  "sk-read-skillmd-check": {
+    "type": "code",
+    "kind": "掛鉤",
+    "title": "Read 工具在結果路徑以 SKILL.md 結尾時另外掛一段記錄邏輯",
+    "meta": "source/packages/agent/tools/core/read/read.ts:426-426",
+    "why": "沒有專門的 Skill tool，模型讀 SKILL.md 走的是一般 Read 工具，判斷點就是這個副檔名比對。",
+    "start": 426,
+    "hi": [
+      426
+    ],
+    "lines": [
+      "      if (resolvedPath.endsWith(\"SKILL.md\")) {"
+    ]
+  },
+  "sk-read-track-record": {
+    "type": "code",
+    "kind": "記錄",
+    "title": "trackSkillUsed 與 recordSkillApplied 記下這次讀取的 entrypoint 是 agent_read",
+    "meta": "source/packages/agent/tools/core/read/read.ts:429-430",
+    "why": "這兩行是模型自己 Read 到 SKILL.md 時留下的遙測記號，entrypoint 這個值後面用來跟人工附加區分。",
+    "start": 429,
+    "hi": [
+      429,
+      430
+    ],
+    "lines": [
+      "        tracker.trackSkillUsed(span.ctx, {});",
+      "        recordSkillApplied(span.ctx, { entrypoint: \"agent_read\", ...(meta.stateHandler === undefined ? {} : { stateHandler: meta.stateHandler }), skillId: skillIdFromPath(resolvedPath), skillSource: getSkillSourceFromPath(resolvedPath), ...(skill?.plugin === undefined ? {} : { plugin: skill.plugin }), ...(skill?.marketplace === undefined ? {} : { marketplace: skill.marketplace }), ...(skill?.pluginId === undefined ? {} : { pluginId: skill.pluginId }), ...(skill?.marketplaceId === undefined ? {} : { marketplaceId: skill.marketplaceId }) });"
+    ]
+  },
+  "sk-read-related-skills": {
+    "type": "code",
+    "kind": "過濾",
+    "title": "relatedSkills 排除 disableModelInvocation 為真的 skill",
+    "meta": "source/packages/agent/tools/core/read/read.ts:424-424",
+    "why": "Read 結果要附上這個檔案相關的 skill 清單時，同一個旗標第三次出現在過濾條件裡。",
+    "start": 424,
+    "hi": [
+      424
+    ],
+    "lines": [
+      "      const relatedSkills = eligibleSkills.filter(skill => skill.disableModelInvocation !== true && skill.parseError === undefined && skill.fullPath !== undefined && normalizeComparablePath(skill.fullPath) === normalizeComparablePath(resolvedPath));"
+    ]
+  },
+  "sk-manual-attach-prefix": {
+    "type": "code",
+    "kind": "前綴",
+    "title": "manually_attached_skills 前綴告訴模型內文已經整份塞進來了",
+    "meta": "source/packages/agent/context-processing-manual-skills.ts:22-25",
+    "why": "這段字面告訴模型不用再去讀檔，skill 全文已經內嵌在這個區塊裡。",
+    "start": 22,
+    "hi": [
+      23,
+      25
+    ],
+    "lines": [
+      "  const prefix = `<manually_attached_skills>",
+      "The user has manually attached the following skills to their message.",
+      "These skills contain specific instructions or workflows that the user wants you to follow for this request.",
+      "Only read the files if needed, the full skill content is inlined here."
+    ]
+  },
+  "sk-manual-attach-bypass": {
+    "type": "code",
+    "kind": "旗標",
+    "title": "entrypoint 是 manually_attached 時 truncation 記成 bypassed",
+    "meta": "source/packages/agent/utils/event-tracking.ts:84-85",
+    "why": "人工附加這條路留下的遙測記號跟模型自選、workflow 注入都不一樣，這裡直接寫死 bypassed。",
+    "start": 84,
+    "hi": [
+      84,
+      85
+    ],
+    "lines": [
+      "  const truncation = input.entrypoint === \"manually_attached\"",
+      "    ? \"bypassed\""
+    ]
+  },
+  "sk-workflow-run-invoked": {
+    "type": "code",
+    "kind": "注入",
+    "title": "使用者手動叫用 workflow 時注入句是 The user invoked 開頭那句",
+    "meta": "source/host/extensions/transcript/workflow-commands.ts:38-38",
+    "why": "這是使用者主動呼叫 workflow 時塞進 prompt 的第一句，跟排程版是兩種不同的措辭。",
+    "start": 38,
+    "hi": [
+      38
+    ],
+    "lines": [
+      "      `The user invoked the \"${workflow.name}\" workflow (${identity}). Run it now.`,"
+    ]
+  },
+  "sk-workflow-run-schedule": {
+    "type": "code",
+    "kind": "注入",
+    "title": "排程觸發時注入句改講這是你自己的排程觸發不是使用者剛打的訊息",
+    "meta": "source/host/extensions/transcript/workflow-commands.ts:28-28",
+    "why": "排程版特別區分不是使用者剛打的訊息，跟人工附加、模型自選都不是同一種語氣。",
+    "start": 28,
+    "hi": [
+      28
+    ],
+    "lines": [
+      "      \"This is your own standing order firing on schedule, not a message the user just typed.\","
+    ]
+  },
+  "sk-workflow-body-limit": {
+    "type": "code",
+    "kind": "截斷",
+    "title": "workflow 內文注入時截到 WORKFLOW_INJECTED_BODY_LIMIT",
+    "meta": "source/host/extensions/transcript/workflow-commands.ts:45-45",
+    "why": "這行說明 workflow 全文不是無限塞進 prompt，仍受同一個常數上限管，只是不看 disableModelInvocation。",
+    "start": 45,
+    "hi": [
+      45
+    ],
+    "lines": [
+      "    workflow.body.trim().slice(0, WORKFLOW_INJECTED_BODY_LIMIT),"
+    ]
+  },
+  "sk-plugin-disable-flag": {
+    "type": "code",
+    "kind": "解析",
+    "title": "readPluginSkillFileFacts 讀 frontmatter 的 disable-model-invocation 是不是 true",
+    "meta": "source/host/workflows/workflow-store.ts:22-22",
+    "why": "plugin 這個來源解析 frontmatter 的地方就在這行，判斷結果會往下傳到 WorkflowRecord。",
+    "start": 22,
+    "hi": [
+      22
+    ],
+    "lines": [
+      "export function readPluginSkillFileFacts(filePath: string): PluginSkillFacts | null { let raw: string; try { raw = readFileSync(filePath, \"utf8\"); } catch { return null; } const parsed = parseWorkflowFile(raw); if (parsed == null || !parsed.body) return null; let helperScripts: string[] = []; try { helperScripts = readdirSync(dirname(filePath), { withFileTypes: true }).filter((entry) => entry.isFile() && entry.name !== \"SKILL.md\").map((entry) => entry.name).sort(); } catch {} return { name: parsed.name, description: parsed.description, body: parsed.body, disableModelInvocation: parsed.data[\"disable-model-invocation\"] === true, helperScripts }; }"
+    ]
+  },
+  "sk-plugin-to-workflow": {
+    "type": "code",
+    "kind": "組裝",
+    "title": "pluginSkillToWorkflow 把 disableModelInvocation 帶到紀錄上",
+    "meta": "source/host/workflows/workflow-store.ts:35-35",
+    "why": "上一行解析出來的旗標在這裡被寫進 WorkflowRecord 的 disableModelInvocation 欄位。",
+    "start": 35,
+    "hi": [
+      35
+    ],
+    "lines": [
+      "  pluginSkillToWorkflow(record: PluginSkillRecord, index: PluginSkillsCache): WorkflowRecord | null { const facts = pluginSkillParseCache.read([record.filePath, dirname(record.filePath)], () => readPluginSkillFileFacts(record.filePath)); if (facts == null) return null; return { id: record.id, name: facts.name || record.name, description: facts.description || record.description, body: facts.body, trigger: null, source: \"plugin\", sourceRef: null, pluginId: record.pluginId, publishedByCurrentUser: record.publisherUserId != null && record.publisherUserId === index.currentUserId, isEnabledForAgent: true, disableModelInvocation: facts.disableModelInvocation, scheduleDescription: null, createdAt: index.fetchedAt, lastRunAt: null, nextRunAt: null, helperScripts: facts.helperScripts, runs: [], filePath: record.filePath }; }"
+    ]
+  },
+  "sk-legacy-has-disable": {
+    "type": "code",
+    "kind": "解析",
+    "title": "hasDisableModelInvocation 用 gray-matter 讀同一個 frontmatter 鍵",
+    "meta": "source/packages/agent/prompts/user-info-rule-helpers.ts:28-38",
+    "why": "legacy 目錄那條路解析同一個 disable-model-invocation 鍵，跟 plugin 那條路各自實作一次。",
+    "start": 28,
+    "hi": [
+      28,
+      34
+    ],
+    "lines": [
+      "export function hasDisableModelInvocation(rule: RuleContent): boolean {",
+      "  if (!rule.content) {",
+      "    return false;",
+      "  }",
+      "  try {",
+      "    const parsed = grayMatter(rule.content);",
+      "    return parsed.data?.[\"disable-model-invocation\"] === true;",
+      "  } catch {",
+      "    return false;",
+      "  }",
+      "}"
+    ]
+  },
+  "sk-legacy-categorize-push": {
+    "type": "code",
+    "kind": "過濾",
+    "title": "categorizeCursorRules 只在 hasDisableModelInvocation 為假時才把規則推進 skills 陣列",
+    "meta": "source/packages/agent/prompts/user-info-rule-categorization.ts:31-32",
+    "why": "legacy 目錄的開關在這裡真正生效，為真就整條被排除在 skills 分類之外。",
+    "start": 31,
+    "hi": [
+      31,
+      32
+    ],
+    "lines": [
+      "      } else if (!hasDisableModelInvocation(rule)) {",
+      "        skills.push(rule);"
+    ]
+  },
+  "sk-user-library-no-flag": {
+    "type": "code",
+    "kind": "缺欄位",
+    "title": "skillToWorkflow 組紀錄時沒有設定 disableModelInvocation 這個欄位",
+    "meta": "source/host/workflows/workflow-store.ts:30-30",
+    "why": "使用者全域 library 寫的 skill 轉成 WorkflowRecord 時這個欄位維持 undefined，等於永遠可選。",
+    "start": 30,
+    "hi": [
+      30
+    ],
+    "lines": [
+      "  skillToWorkflow(record: GlobalWorkflowRecord): WorkflowRecord { return { id: record.id, name: record.name, description: record.description, body: record.body, trigger: null, source: \"workflow\", sourceRef: record.sourceRef, pluginId: null, publishedByCurrentUser: false, isEnabledForAgent: this.enablement.isEnabled(record.id), scheduleDescription: null, createdAt: record.createdAt, lastRunAt: null, nextRunAt: null, helperScripts: record.helperScripts, runs: [], filePath: record.filePath }; }"
+    ]
+  },
+  "sk-managed-no-flag": {
+    "type": "code",
+    "kind": "缺欄位",
+    "title": "managedSkillToWorkflow 同樣沒有設定 disableModelInvocation",
+    "meta": "source/host/workflows/workflow-store.ts:31-31",
+    "why": "managed 來源跟使用者全域 library 一樣沒有這個開關，管理員推的 skill 沒有退出模型自選的旋鈕。",
+    "start": 31,
+    "hi": [
+      31
+    ],
+    "lines": [
+      "  managedSkillToWorkflow(skill: ManagedSkill, fetchedAt: number): WorkflowRecord { const skillFilePath = getManagedSkillFilePath(this.managedDir, skill.id); let hasSkillFile = false; try { hasSkillFile = statSync(skillFilePath).isFile(); } catch {} return { id: skill.id, name: skill.name, description: skill.description, body: skill.body, trigger: null, source: \"managed\", sourceRef: null, pluginId: null, publishedByCurrentUser: false, isEnabledForAgent: true, scheduleDescription: null, createdAt: fetchedAt, lastRunAt: null, nextRunAt: null, helperScripts: [], runs: [], filePath: hasSkillFile ? skillFilePath : getManagedSkillsCachePath(this.managedDir) }; }"
+    ]
+  },
+  "sk-provenance-marker": {
+    "type": "code",
+    "kind": "註記",
+    "title": "skill-catalog-budget.ts 開頭留了 Extracted from 的來源標記",
+    "meta": "source/packages/agent/prompts/skill-catalog-budget.ts:5-5",
+    "why": "這個標記說明這支檔案是從編譯產物反查出來的，agent-skills-section.ts 開頭沒有同款標記可比對。",
+    "start": 5,
+    "hi": [
+      5
+    ],
+    "lines": [
+      "// Extracted from ../packages/agent/dist/prompts/skill-catalog-budget.js."
+    ]
+  },
+  "sk-plugin-cache-path": {
+    "type": "code",
+    "kind": "skill",
+    "title": "plugin skill 快取落在 <sandRoot>/plugin-skills/cache.json",
+    "meta": "source/host/extensions/mcp/plugin-skills-cache.ts:3-3",
+    "why": "getPluginSkillsDir 與 getPluginSkillsCachePath 兩支函式組出快取檔的完整路徑。",
+    "start": 3,
+    "hi": [
+      3
+    ],
+    "lines": [
+      "export function getPluginsRootDir(sandRoot: string): string { return join(sandRoot, \"plugins\"); } export function getPluginSkillsDir(sandRoot: string): string { return join(sandRoot, PLUGIN_SKILLS_DIRNAME); } export function getPluginSkillsCachePath(cacheDir: string): string { return join(cacheDir, PLUGIN_SKILLS_CACHE_FILENAME); } export function isSafePluginSkillId(id: string): boolean { return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id); }"
+    ]
   }
-}
-</script>
+}</script>
     <script>/* Classic script: design-explainer glossary gate looks for `var GLOSS = {…};`. */
 var GLOSS = {
   coordinator: {

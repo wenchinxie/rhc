@@ -1,0 +1,199 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s11" n="11">Skill 怎麼進到模型：清單自選是預設，disable-model-invocation 是逐個退出</H2>
+  <p>
+    一個 <code>SKILL.md</code> 進到模型面前有三條路：模型自己從清單挑了去讀、使用者把整份內容手動附加進訊息、
+    或是 harness 把 workflow 的內文直接注入 prompt。三條路裡只有第一條會看 <code>disable-model-invocation</code>
+    這個開關，而且不是所有來源都能設定它。本章照這三條路的順序講，最後對照 Lauren Tan（poteto）對這個開關的立場。
+  </p>
+  <H3 id="s11-1" n="11.1">四種來源合成一張清單</H3>
+  <p>
+    Grok Bot 內部沒有「skill」這個名字，程式碼一律叫 workflow；檔名固定是 <code>SKILL.md</code>
+    <Peek snip="sk-skill-filename">檔名常數</Peek>。<code>WorkflowRecord</code> 型別的 <code>source</code>
+    欄位只吃四個值：<code>managed</code>、<code>plugin</code>、<code>workflow</code>、<code>automation</code>，
+    另外帶 <code>isEnabledForAgent</code>、<code>disableModelInvocation?</code>、<code>trigger</code> 三個欄位
+    <Peek snip="sk-workflow-record">四種來源</Peek>。
+  </p>
+  <p>
+    四種來源在 <code>FileWorkflowStore.listAllFrom</code> 合併成一個陣列，回傳順序是 managed、plugin、
+    使用者全域 library、automation<Peek snip="sk-list-merge">合併四路</Peek>；再往下傳給模型之前的
+    <code>list()</code> 只放行 <code>isEnabledForAgent</code> 為真、或者本來就是 automation 的紀錄
+    <Peek snip="sk-list-filter">list() 過濾</Peek>。
+  </p>
+  <p>
+    managed 這條路不是純記憶體資料：後端 RPC 回來的內容會被 <code>materializeManagedSkillFiles</code>
+    寫成真正的 <code>SKILL.md</code> 檔案，每個 skill 開一個以它的 id 命名的資料夾
+    <Peek snip="sk-managed-materialize">落成真檔</Peek>。plugin 這條路的快取也落地，<code>runPass</code>
+    同步完會呼叫 <code>writePluginSkillsCache</code> 把結果寫進快取目錄<Peek snip="sk-plugin-cache-write">快取寫入</Peek>；
+    目錄由 <code>getPluginSkillsDir</code> 組成 <code>&lt;sandRoot&gt;/plugin-skills</code>，檔名固定
+    <code>cache.json</code><Peek snip="sk-plugin-cache-path">快取路徑</Peek>。
+  </p>
+  <p>
+    <code>renderWorkflowsSystemPrompt</code> 對模型說的原文是使用者的 workflow 庫是 GLOBAL、跨所有
+    assistant 共用的一份<Peek snip="sk-global-library">GLOBAL 說明</Peek>。
+  </p>
+  <p>
+    另一條路徑不算進 <code>WorkflowRecord</code>：<code>.cursor/skills</code>、<code>.claude/skills</code>、
+    <code>.codex/skills</code>、<code>.agents/skills</code> 這幾個目錄被 <code>isSkillPath</code>
+    當成 CursorRule 的一種特例處理，實際比對的樣式一共八種，還包含 <code>.cursor/skills-cursor</code>、
+    <code>.claude/plugins</code>、<code>.cursor/plugins/cache/**/skills</code>，以及任何路徑結尾是
+    <code>SKILL.md</code> 的檔案<Peek snip="sk-skill-path-globs">八種樣式</Peek>。這條路徑怎麼被讀進 prompt，見{" "}
+    <a className="xref" href="#s3">§3</a>
+    ；plugin 的安裝與快取機制見{" "}
+    <a className="xref" href="#s5">§5</a>
+    。
+  </p>
+  <H3 id="s11-2" n="11.2">模型自選：清單只給路徑加描述，模型自己去 Read</H3>
+  <p>
+    每回合送給模型的 <code>RequestContext</code> 有一個 <code>agentSkills</code> 欄位，由
+    <code>SandRequestContextExecutor.execute</code> 呼叫外部傳入的解析函式填進去
+    <Peek snip="sk-request-context-skills">組裝進 RequestContext</Peek>。這個解析函式的其中一個實作是
+    <code>agentSkillsFromWorkflows</code>，只放行 <code>trigger</code> 為空、<code>isEnabledForAgent</code>
+    為真、<code>disableModelInvocation</code> 不是 true 的紀錄，回傳的東西只有路徑和描述兩個欄位
+    <Peek snip="sk-agent-skills-from-workflows">第一道過濾</Peek>。
+  </p>
+  <p>
+    到了組 prompt 那一層，<code>buildAvailableSkillsPromptSection</code> 對同一批資料又濾了第二次：
+    <code>!skill.disableModelInvocation && !isFileScopedSkill(...)</code>
+    <Peek snip="sk-available-skills-filter">第二道過濾</Peek>。同一個旗標在兩個獨立的檢查點各被讀一次，
+    中間沒有共用同一段程式碼。
+  </p>
+  <p>
+    清單能塞多少描述受預算管控：<code>INITIAL_SKILL_CATALOG_CONTEXT_FRACTION</code> 把可用的 prompt
+    空間釘在模型 token 上限的 2%<Peek snip="sk-skill-budget-fraction">2% 預算</Peek>；<code>canvas</code>、
+    <code>env-setup</code> 兩個名字在 <code>PROTECTED_SKILL_NAMES</code> 裡，<code>loop</code> 在
+    <code>LOOP_PROTECTED_SKILL_NAMES</code> 裡，預算不夠時這三個名字仍然完整列出，不會被砍描述或整條省略
+    <Peek snip="sk-protected-skill-names">保護名單</Peek>。
+  </p>
+  <p>
+    說明文字依模型分兩版。非 GPT-5.6 版寫 <code>When a skill is relevant, read and follow it IMMEDIATELY
+    as your first action. NEVER just announce or mention a skill without actually reading and following
+    it.</code><Peek snip="sk-agent-skills-read-cue">立刻讀立刻做</Peek>，清單沒有被省略時收在
+    <code>Only use skills listed below.</code><Peek snip="sk-agent-skills-only-listed">只能用清單裡的</Peek>。
+    GPT-5.6 版拿掉 IMMEDIATELY，換成 <code>The user's instructions take precedence over skill guidance,
+    and an invoked skill takes precedence over autonomous judgment where they do not conflict.</code>
+    <Peek snip="sk-agent-skills-gpt56-precedence">使用者指示優先</Peek>，並且要求
+    <code>Before using a skill the user did not name, briefly explain why it is relevant and keep its
+    use within the task's scope.</code><Peek snip="sk-agent-skills-gpt56-explain">先說明理由</Peek>。
+  </p>
+  <p>
+    沒有專門的 Skill tool，模型讀 SKILL.md 用的是一般的 Read 工具：<code>resolvedPath.endsWith("SKILL.md")</code>
+    為真才會多做事<Peek snip="sk-read-skillmd-check">副檔名判斷</Peek>，接著 <code>trackSkillUsed</code> 與
+    <code>recordSkillApplied</code> 把這次讀取記成 <code>entrypoint: "agent_read"</code>
+    <Peek snip="sk-read-track-record">記錄一筆</Peek>；同一個 Read 呼叫回傳的 <code>relatedSkills</code>
+    也排除 <code>disableModelInvocation</code> 為真的項目，這是同一個旗標第三次出現在過濾條件裡
+    <Peek snip="sk-read-related-skills">第三道過濾</Peek>。
+  </p>
+  <H3 id="s11-3" n="11.3">人工附加與 workflow 注入：整份內文直接進 prompt</H3>
+  <p>
+    使用者手動把 skill 附加進訊息時，走的是完全不同的一段程式碼：<code>renderManuallyAttachedSkillsSection</code>
+    用 <code>manually_attached_skills</code> 這個標籤包住內容，字面告訴模型內文已經整份塞進來，不用再去讀檔
+    <Peek snip="sk-manual-attach-prefix">前綴</Peek>。
+  </p>
+  <p>
+    這條路留下的遙測記號也不一樣：<code>entrypoint</code> 是 <code>manually_attached</code> 時，
+    <code>truncation</code> 直接記成 <code>bypassed</code><Peek snip="sk-manual-attach-bypass">bypassed</Peek>，
+    跟模型自選讀到的那一筆是不同的分類。
+  </p>
+  <p>
+    workflow 被叫用時走第三段注入邏輯，<code>buildWorkflowRunPrompt</code> 依觸發方式挑不同的開場句：
+    使用者手動叫用時，句子裡帶 workflow 名稱與識別碼，收尾固定是 <code>Run it now.</code>
+    <Peek snip="sk-workflow-run-invoked">手動叫用</Peek>；排程觸發時開場句換成
+    <code>This is your own standing order firing on schedule, not a message the user just typed.</code>
+    <Peek snip="sk-workflow-run-schedule">排程觸發</Peek>，強調這不是使用者剛打的訊息。內文本身截到
+    <code>WORKFLOW_INJECTED_BODY_LIMIT</code>，也就是前面提過的 8,000 字
+    <Peek snip="sk-workflow-body-limit">截斷</Peek>。
+  </p>
+  <p>
+    人工附加與 workflow 注入這兩條路都不檢查 <code>disableModelInvocation</code>；這個旗標只管模型要不要
+    自己主動去挑，管不到使用者主動附加，也管不到 harness 自己排程觸發的注入。
+  </p>
+  <H3 id="s11-4" n="11.4">disable-model-invocation 只接在兩種來源上</H3>
+  <p>
+    開關本身只在其中兩種來源的檔案解析階段被讀出來，其餘三種來源的 <code>WorkflowRecord</code> 組裝函式
+    根本不設這個欄位，或者從一開始就被別的條件排除。下表按來源列出解析 frontmatter 的地方與結果：
+  </p>
+  <div className="overflow wide">
+    <table>
+      <thead>
+        <tr>
+          <th>來源</th>
+          <th>解析 frontmatter 的地方</th>
+          <th>結果</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>plugin</td>
+          <td>
+            <code>readPluginSkillFileFacts</code> 讀 <code>parsed.data["disable-model-invocation"] === true</code>
+            <Peek snip="sk-plugin-disable-flag">解析</Peek>
+          </td>
+          <td>
+            <code>pluginSkillToWorkflow</code> 把結果帶進 <code>disableModelInvocation</code> 欄位
+            <Peek snip="sk-plugin-to-workflow">帶入紀錄</Peek>
+          </td>
+        </tr>
+        <tr>
+          <td>legacy 目錄（<code>.claude/skills</code> 等八種樣式）</td>
+          <td>
+            <code>hasDisableModelInvocation</code> 用 gray-matter 讀同一個鍵
+            <Peek snip="sk-legacy-has-disable">解析</Peek>
+          </td>
+          <td>
+            <code>categorizeCursorRules</code> 只在回傳假的時候才把規則推進 <code>skills</code> 陣列
+            <Peek snip="sk-legacy-categorize-push">才會列入</Peek>
+          </td>
+        </tr>
+        <tr>
+          <td>使用者全域 library</td>
+          <td>不適用</td>
+          <td>
+            <code>skillToWorkflow</code> 組紀錄時不設這個欄位，<code>undefined</code> 視同可自選
+            <Peek snip="sk-user-library-no-flag">不設欄位</Peek>
+          </td>
+        </tr>
+        <tr>
+          <td>managed</td>
+          <td>不適用</td>
+          <td>
+            <code>managedSkillToWorkflow</code> 同樣不設這個欄位
+            <Peek snip="sk-managed-no-flag">不設欄位</Peek>
+          </td>
+        </tr>
+        <tr>
+          <td>automation</td>
+          <td>不適用</td>
+          <td>被 <code>trigger != null</code> 排在第一道過濾就排除，這個開關管不到</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    在 0.18，用 Grok Bot 自家 library 寫 skill 的人和推 managed skill 的管理員，都沒有這個開關可以設定。
+  </p>
+  <H3 id="s11-5" n="11.5">對照 Lauren Tan 的立場</H3>
+  <p>
+    2026-08-28，KingBootoshi 在 X 上寫 <code>the worst part about most agent harnesses is that skills
+    are loaded into the harness for the agent to call themselves</code>。2026-08-29，Lauren Tan（poteto）
+    在 <code>https://x.com/poteto/status/2093535543028269215</code> 回覆：<code>agree! i added
+    disable-model-invocation: true to all my skills in pstack for this reason</code>。
+  </p>
+  <ol>
+    <li>預設方向跟她相反：清單自選是主路，舊版說明文字還主動推模型立刻去讀，見 <a className="xref" href="#s11-2">§11.2</a>。</li>
+    <li>
+      機制在單一 skill 這個層次同意她：同名同義的開關真的存在，人工附加與 workflow 注入這兩條不看這個開關的路，
+      正是這個開關逼出來的效果，但它是作者逐個退出，而且只對 plugin 與 legacy 目錄生效，見 <a className="xref" href="#s11-3">§11.3</a> 與 <a className="xref" href="#s11-4">§11.4</a>。
+    </li>
+    <li>GPT-5.6 版是部分讓步：拿掉 IMMEDIATELY，換成使用者指示優先與先說明理由，動機沒有文件可查。</li>
+  </ol>
+  <p>
+    閘門機制在 <code>WorkflowRecord</code> 的型別定義、快取落地、清單裡兩到三個獨立的過濾點，以及 legacy
+    目錄那條路徑都各自出現一次，彼此不是同一段程式碼互相呼叫，這一點證據算紮實。<code>agent-skills-section.ts</code>
+    開頭沒有 <code>skill-catalog-budget.ts</code><Peek snip="sk-provenance-marker">來源標記</Peek>
+    那樣的 <code>Extracted from</code> 標記，所以說明文字裡逐字引用的那幾句，比較接近很可能是原文，而不是
+    已經比對過原始檔案的原文。重建稿自己的 <code>docs/ARCHITECTURE.md</code> 沒有出現 skill 或 workflow
+    這兩個字，開關為什麼存在，程式碼與文件都沒有留下說明。
+  </p>
+</>
