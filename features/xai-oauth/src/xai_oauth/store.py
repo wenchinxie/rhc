@@ -28,8 +28,6 @@ def default_auth_path() -> Path:
 
 
 class TokenStore:
-    """Sole writer of ~/.rhc/auth.json."""
-
     def __init__(
         self,
         path: Path | None = None,
@@ -53,7 +51,6 @@ class TokenStore:
         except OSError as e:
             raise AuthError(f"cannot read {self.path}") from e
         if not raw.strip():
-            # Empty file is a crash leftover (truncate before replace), not garbage.
             return LoggedOut()
         try:
             data = json.loads(raw)
