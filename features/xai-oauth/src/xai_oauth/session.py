@@ -27,7 +27,7 @@ class DeviceCodeDenied(AuthError):
 
 
 class RefreshRevoked(AuthError):
-    """IdP rejected the refresh token (invalid_grant). Store was cleared."""
+    """IdP rejected the refresh token (invalid_grant)."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -142,8 +142,6 @@ class OAuthSession:
                 return current.bind(store, self._opener, self._sleep)
             if not isinstance(current, OAuthSession) or not current.refresh_token:
                 raise NeedLogin("access token expired; run rhc login")
-            # oidc imports session types; keep this import off the module
-            # graph so TokenStore can import Session without a cycle.
             from xai_oauth.oidc import refresh_grant
 
             try:
