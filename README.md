@@ -8,11 +8,11 @@ Empty start (`chore: start empty`, 2026-08-15). Harness design pages live in
 `docs/explainers/` (one Bun app; per-harness modules under `src/harnesses/`).
 Read them with `source docs/explainers/activate` (bun dev). Do not commit a compiled `docs/<slug>-design.html`.
 
-SuperGrok login lives in `features/xai-oauth/`. It uses xAI device-code OAuth
-(the same public client as Grok Build / OpenClaw) and writes `~/.rhc/auth.json`.
-It does not write `~/.grok/auth.json`.
+SuperGrok login is the `xai-oauth` crate. Device-code OAuth (same public client
+as Grok Build / OpenClaw) writes `~/.rhc/auth.json`. It does not write
+`~/.grok/auth.json`.
 
 ```
-uv run --project features/xai-oauth rhc login
-uv run --project features/xai-oauth rhc whoami
+cargo run -p xai-oauth --bin rhc -- login
+cargo run -p xai-oauth --bin rhc -- whoami
 ```
