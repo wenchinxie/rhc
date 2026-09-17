@@ -1,0 +1,45 @@
+import { Dag, Peek, Term } from "../../../mdx-components"
+import { DECISION_TREE } from "../decisionTree"
+
+<>
+  <p>
+    這棵樹回答你送出一則訊息之後，工作跑在哪。主幹是出廠路徑。菱形往右是例外。
+  </p>
+  <p>
+    樹上有三道門。第一道看有沒有 <code>SAND_HOST_GATEWAY_URL</code>。第二道看指令有沒有 <code>machineId</code>。第三道看有沒有 <code>SAND_AGENT_MOCK_RESPONSE</code>。
+  </p>
+  <Dag svg={DECISION_TREE} />
+  <p>
+    你從畫面送出一則訊息。
+    <Peek snip="s3-nonce">nonce</Peek>
+    未設 gateway URL 時，桌面才呼叫 <code>EnsureSandBox</code> 要一台 <Term k="box">box</Term>。空的 <code>gatewayUrl</code> 就失敗。
+    <Peek snip="remote-box">EnsureSandBox</Peek>
+    <Term k="sand-host">host</Term> 接受這則送出，回 <code>accepted: true</code>。那不是模型答完。
+    <Peek snip="s3-accepted">接受</Peek>
+  </p>
+  <p>
+    指令沒帶 <code>machineId</code> 時，<code>Shell</code> 在 box 裡跑。box 內的 daemon 聽 1337。
+    <Peek snip="box-exec">1337</Peek>
+    沒設 mock 時，host 打 Cursor Stream。
+    <Peek snip="s4-stream">Stream token</Peek>
+  </p>
+  <p>各步驟所在的行程如下。</p>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>EnsureSandBox</td><td>筆電 Electron main</td></tr>
+  <tr><td>送出與回合</td><td>box 內 host</td></tr>
+  <tr><td>預設 spawn</td><td>box 內 daemon，聽 1337</td></tr>
+  <tr><td>本機指令</td><td>筆電 local-exec-daemon</td></tr>
+  <tr><td>模型請求</td><td>api2.cursor.sh</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p>
+    你設了 <code>SAND_HOST_GATEWAY_URL</code> 時，桌面直連該 URL，不會呼叫 <code>EnsureSandBox</code>。
+    產品對你說「我的電腦」時，指的是 box。工程上 box 不是這台筆電。
+    0.18 的分流 router 在這份樹是空檔。
+    <Peek snip="s4-router-absent">stub</Peek>
+  </p>
+</>

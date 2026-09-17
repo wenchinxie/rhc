@@ -1,14 +1,13 @@
-import { Peek, Term, H2, H3 } from "../../../mdx-components"
+import { Peek, Term, H3 } from "../../../mdx-components"
 
 <>
-      <H2 id="s10" n="10">觀測了什麼：事件與欄位總表</H2>
       <p>
-        第 8 章講事件怎麼送到落點，第 9 章講 port 與字彙；這一章把每個事件帶哪些欄位攤開。事件名共 95 個，其中 67 個在 emit 點設了自己的 metadata，其餘只有信封。
+        事件名共 95 個，其中 67 個在 emit 點設了自己的 metadata，其餘只有信封。
         事件名全部集中在一個檔 <Peek snip="c10-event-list">宣告處</Peek>；欄位由 adapter 的 report 方法或各領域的 mapper 函式攤出來 <Peek snip="c10-tool-error">範例</Peek>。
         下面的表由腳本從原始碼抓出，不是手抄；一格裡的 <code>…usageTokenTags</code> 表示該事件展開了那一組共用欄位。
       </p>
 
-      <H3 id="s10-0" n="10.0">每筆都有的信封與共用欄位組</H3>
+      <H3 id="s10-0" n="8.1">每筆都有的信封與共用欄位組</H3>
       <p>
         信封分三層：平台標籤 <code>client</code>、<code>client_version</code>、<code>app_version</code>、<code>arch</code>、<code>platform</code>；
         身分標籤從環境變數讀 <code>auth_id</code>、<code>tenant_id</code>、<code>box_store_id</code>；
@@ -42,7 +41,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         token 用量 <Peek snip="c10-usage-tags">六個欄位</Peek> 與錯誤三欄 <Peek snip="c10-error-tags">查表展開</Peek> 是兩組被多個事件重用的展開函式；改一處，所有事件同步。
       </p>
 
-      <H3 id="s10-1" n="10.1">turn：一輪對話：11 個事件</H3>
+      <H3 id="s10-1" n="8.2">turn：一輪對話：11 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -100,7 +99,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-2" n="10.2">tool_call 與子代理：4 個事件</H3>
+      <H3 id="s10-2" n="8.3">tool_call 與子代理：4 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -134,7 +133,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         <code>tool_call.result</code> 依 tool 名與結果分組、<code>agent.tool_call.input_tokens</code> 直方圖、<code>agent.duplicate_inbound_tool_call_id</code>。
       </p>
 
-      <H3 id="s10-3" n="10.3">agent 錯誤與封鎖：5 個事件</H3>
+      <H3 id="s10-3" n="8.4">agent 錯誤與封鎖：5 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -168,7 +167,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-4" n="10.4">訊息、佇列、送達：6 個事件</H3>
+      <H3 id="s10-4" n="8.5">訊息、佇列、送達：6 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -206,7 +205,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-5" n="10.5">修復：2 個事件</H3>
+      <H3 id="s10-5" n="8.6">修復：2 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -228,7 +227,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-6" n="10.6">遠端機器：21 個事件</H3>
+      <H3 id="s10-6" n="8.7">遠端機器：21 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -329,7 +328,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         這一組是遠端 <Term k="box">沙箱機器</Term> 的生命週期，對一角色一台機器的執行環境就是機器層遙測。
       </p>
 
-      <H3 id="s10-7" n="10.7">host 行程與遙測自己：15 個事件</H3>
+      <H3 id="s10-7" n="8.8">host 行程與遙測自己：15 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -403,7 +402,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-8" n="10.8">session 與狀態：10 個事件</H3>
+      <H3 id="s10-8" n="8.9">session 與狀態：10 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -457,7 +456,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-9" n="10.9">排程自動化：5 個事件</H3>
+      <H3 id="s10-9" n="8.10">排程自動化：5 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -491,7 +490,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-10" n="10.10">整合與憑證：16 個事件</H3>
+      <H3 id="s10-10" n="8.11">整合與憑證：16 個事件</H3>
       <div className="overflow wide">
         <table>
           <thead>
@@ -569,7 +568,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-12" n="10.12">第二個落點：產品分析的 23 個事件</H3>
+      <H3 id="s10-12" n="8.12">第二個落點：產品分析的 23 個事件</H3>
       <p>
         走 <code>trackEvent</code>，不進結構化日誌。看使用者行為，不看系統狀態；其中 <code>sand.automation.run</code> 與 <code>sand.computer_use.usage</code> 兩邊都送。
         這一輪把落點掃完整，這張表從 13 筆補到 23 筆：新增的 10 筆有 8 筆在 <code>host/host-gateway-api.ts</code> 與 <code>host/host-runner-composition.ts</code>，
@@ -681,7 +680,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-13" n="10.13">桌面行程自己的 50 個結構化事件</H3>
+      <H3 id="s10-13" n="8.13">桌面行程自己的 50 個結構化事件</H3>
       <p>
         前面 95 個事件全部出自 <code>host/extensions/telemetry</code>。桌面行程另有一份完全獨立的登錄表 <Peek snip="c10-desktop-events">另一份表</Peek>，
         52 個名字裡只有 <code>sand.client_resource</code>、<code>sand.connector_auth</code> 這 2 個跟 host 那份同名，其餘 50 個是這一輪才補進目錄的。
@@ -954,7 +953,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-14" n="10.14">前端的 19 支回報，經 IPC 交出去</H3>
+      <H3 id="s10-14" n="8.14">前端的 19 支回報，經 IPC 交出去</H3>
       <p>
         畫面自己不落地。每一種要觀測的事都是一支 <code>report</code> 方法，經 IPC 交給桌面行程，由桌面那邊決定進哪個落點；
         channel 名集中在一張表 <Peek snip="c10-renderer-reports">channel 表</Peek>，少一個對應開機就丟錯。
@@ -1049,7 +1048,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-15" n="10.15">packages 的 metrics 全表：185 個宣告</H3>
+      <H3 id="s10-15" n="8.15">packages 的 metrics 全表：185 個宣告</H3>
       <p>
         零件層不知道產品的事件名，它數數字。<code>packages</code> 底下共 185 處宣告、184 個唯一名稱
         （<code>agent.background_summarization.discarded</code> 在兩個檔各宣告一次）；型別分布是 <code>counter</code> 71 個、
@@ -2373,7 +2372,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-16" n="10.16">packages 的結構化日誌：32 個事件</H3>
+      <H3 id="s10-16" n="8.16">packages 的結構化日誌：32 個事件</H3>
       <p>
         零件層除了數數字，也寫結構化日誌，但沒有集中的事件名常數：名字是字面字串，就寫在 logger 呼叫的第二個參數
         <Peek snip="c10-pkg-log">寫在呼叫處</Peek>。所以這 32 個名字既不在 host 的登錄表，也不在桌面那份，只能從呼叫處掃。
@@ -2553,7 +2552,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-17" n="10.17">span：74 個追蹤名稱與四個行程的根 span</H3>
+      <H3 id="s10-17" n="8.17">span：74 個追蹤名稱與四個行程的根 span</H3>
       <p>
         第四種訊號。<code>packages</code> 底下有 74 個 span 名，都用 <code>withName</code> 命名；
         另外有一種 span event，開一個瞬時 span 並把距離根 span 起點的毫秒數寫回根 span <Peek snip="c10-span">寫回根 span</Peek>。
@@ -2957,7 +2956,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-18" n="10.18">Sentry 側通道：5 個捕捉函式</H3>
+      <H3 id="s10-18" n="8.18">Sentry 側通道：5 個捕捉函式</H3>
       <p>
         Sentry 不走結構化日誌那條佇列，也沒有事件名，只有函式與固定標籤。
         它同樣預設是空實作，開機才插入真的 adapter <Peek snip="c10-sentry">預設空實作</Peek>，所以沒插入時所有捕捉都是空呼叫。
@@ -3008,7 +3007,7 @@ import { Peek, Term, H2, H3 } from "../../../mdx-components"
         </table>
       </div>
 
-      <H3 id="s10-19" n="10.19">掃過但沒有自己的落點的資料夾</H3>
+      <H3 id="s10-19" n="8.19">掃過但沒有自己的落點的資料夾</H3>
       <p>
         為了確認這章收完，每個頂層資料夾都掃過 <code>enqueue</code>、<code>trackEvent</code>、<code>createCounter</code>、
         <code>startSpan</code>、<code>withName</code>、<code>captureSandSentry</code> 這幾種形狀。下面這些掃過，沒有自己的落點，

@@ -24,6 +24,22 @@
     /* 決策樹的寫回迴圈，與 --pen 的紅色重試迴圈分開語意。
        出處：17media/data-pipeline realtime_fifo 的 --lp-* teal。 */
     --loop: oklch(0.55 0.10 200);
+    /* Archify classic component fills (tt-a1i/archify assets/template.html
+       light, mixed onto --paper so node faces stay opaque and cover edges). */
+    --t-frontend-fill: color-mix(in srgb, var(--paper) 82%, #22d3ee 18%);
+    --t-frontend-stroke: #0891b2;
+    --t-backend-fill: color-mix(in srgb, var(--paper) 80%, #34d399 20%);
+    --t-backend-stroke: #059669;
+    --t-cloud-fill: color-mix(in srgb, var(--paper) 82%, #fbbf24 18%);
+    --t-cloud-stroke: #d97706;
+    --t-external-fill: color-mix(in srgb, var(--paper) 82%, #94a3b8 18%);
+    --t-external-stroke: #64748b;
+    --t-database-fill: color-mix(in srgb, var(--paper) 82%, #a78bfa 18%);
+    --t-database-stroke: #7c3aed;
+    --t-security-fill: color-mix(in srgb, var(--paper) 82%, #fb7185 18%);
+    --t-security-stroke: #e11d48;
+    --t-messagebus-fill: color-mix(in srgb, var(--paper) 82%, #fb923c 18%);
+    --t-messagebus-stroke: #ea580c;
     --rail-w: 15rem; --rail-gap: 3rem;
     /* 正文 78ch ≈ 39 個中文字一行。中文一字佔 2ch,72ch 只有 36 字,
        在寬螢幕上把版面憋窄卻換不到可讀性 */
@@ -58,6 +74,13 @@
       --pen-tint: oklch(0.672 0.131 38.8 / 0.13);
       --pen-line: oklch(0.672 0.131 38.8 / 0.42);
       --loop: oklch(0.70 0.10 200);
+      --t-frontend-stroke: #22d3ee;
+      --t-backend-stroke: #34d399;
+      --t-cloud-stroke: #fbbf24;
+      --t-external-stroke: #94a3b8;
+      --t-database-stroke: #a78bfa;
+      --t-security-stroke: #fb7185;
+      --t-messagebus-stroke: #fb923c;
     }
   }
   * { box-sizing: border-box; }
@@ -79,6 +102,53 @@
     --side-w: 19rem; --side-gap: 3.5rem;
     max-width: var(--prose); margin-inline: auto;
     padding: clamp(1.2rem, 4vw, 3rem) 1.2rem 6rem;
+  }
+  .harness-index .aspect-group {
+    margin-top: 2rem;
+  }
+  .harness-index .aspect-group .k {
+    font-family: var(--mono);
+    font-size: var(--fs-2xs);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+  .harness-index .aspect-group h2 {
+    margin: 0.15rem 0 0.7rem;
+    font-size: var(--fs-h3);
+    font-weight: 600;
+  }
+  .harness-index .harness-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .harness-index .harness-list a {
+    display: block;
+    margin: 0 0 0.8rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+  .harness-index .harness-list a:hover {
+    border-color: var(--pen-line);
+    background: var(--pen-tint);
+  }
+  .harness-index .harness-list .k {
+    font-family: var(--mono);
+    font-size: var(--fs-2xs);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+  .harness-index .harness-list strong {
+    display: block;
+    margin: 0.2rem 0 0.35rem;
+    font-size: var(--fs-h3);
+    font-weight: 600;
+  }
+  .harness-index .harness-list p {
+    margin: 0;
+    color: var(--ink-2);
   }
   @media (min-width: 1120px) {
     .doc {
@@ -559,10 +629,23 @@
   .dag line, .dag path { stroke: var(--ink-3); stroke-width: 1.4; fill: none; }
   .dag .split { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 4 4; }
   .dag .broken { stroke: var(--pen); stroke-dasharray: 5 4; stroke-width: 1.6; }
+  .dag path.emph { stroke: var(--ink); stroke-width: 2.2; }
+  .dag g.wrap > rect { fill: none; stroke: var(--ink-3); stroke-width: 1;
+                       stroke-dasharray: 6 4; }
+  .dag g.wrap text { fill: var(--ink-3); font-size: 10.5px; font-weight: 700;
+                     letter-spacing: .04em; }
   .dag rect { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1; }
   .dag .app rect { fill: var(--paper-2); }
   .dag .kern rect { stroke: var(--ink); stroke-width: 2; }
   .dag .none rect { fill: var(--pen-tint); stroke: var(--pen-line); stroke-width: 1.4; }
+  .dag g.t-frontend > rect { fill: var(--t-frontend-fill); stroke: var(--t-frontend-stroke); }
+  .dag g.t-backend > rect { fill: var(--t-backend-fill); stroke: var(--t-backend-stroke); }
+  .dag g.t-cloud > rect { fill: var(--t-cloud-fill); stroke: var(--t-cloud-stroke); }
+  .dag g.t-external > rect { fill: var(--t-external-fill); stroke: var(--t-external-stroke); }
+  .dag g.t-database > rect { fill: var(--t-database-fill); stroke: var(--t-database-stroke); }
+  .dag g.t-security > rect { fill: var(--t-security-fill); stroke: var(--t-security-stroke); }
+  .dag g.t-messagebus > rect { fill: var(--t-messagebus-fill); stroke: var(--t-messagebus-stroke); }
+  .dag g.elabg > rect { fill: var(--paper); stroke: var(--line); stroke-width: 0.8; }
   .dag text { fill: var(--ink); font-size: 13.5px; font-weight: 600; }
   .dag .sub { fill: var(--ink-2); font-size: 11.5px; font-weight: 400; }
   .dag .phase { fill: var(--ink-3); font-size: 12.5px; font-weight: 700; letter-spacing: .04em; }
@@ -582,8 +665,16 @@
   .daglegend i.br { border-top: 2px dashed var(--pen); }
   /* 圖例要指的是「框的底色」而不是一條線時用 i.fill:.none 那一格的填色與框線,
      legend 只有線條樣式時,讀者會把底色的意義當成沒有標示。 */
-  .daglegend i.fill { height: .8rem; border: 1px solid var(--pen-line);
-                      background: var(--pen-tint); border-top-width: 1px; }
+  .daglegend i.fill { width: 1.15rem; height: 1.15rem; border: 1.5px solid var(--pen-line);
+                      background: var(--pen-tint); border-top-width: 1.5px;
+                      border-radius: 3px; }
+  .daglegend i.fill.t-frontend { background: var(--t-frontend-stroke); border-color: var(--t-frontend-stroke); }
+  .daglegend i.fill.t-backend { background: var(--t-backend-stroke); border-color: var(--t-backend-stroke); }
+  .daglegend i.fill.t-cloud { background: var(--t-cloud-stroke); border-color: var(--t-cloud-stroke); }
+  .daglegend i.fill.t-external { background: var(--t-external-stroke); border-color: var(--t-external-stroke); }
+  .daglegend i.fill.t-database { background: var(--t-database-stroke); border-color: var(--t-database-stroke); }
+  .daglegend i.fill.t-security { background: var(--t-security-stroke); border-color: var(--t-security-stroke); }
+  .daglegend i.fill.t-messagebus { background: var(--t-messagebus-stroke); border-color: var(--t-messagebus-stroke); }
 
   /* ── 決策流程：guard clause 逐條，序號掛在外面 ── */
   ol.dflow { list-style: none; margin: 1rem 0 0; padding: 0; counter-reset: df; }

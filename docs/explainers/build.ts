@@ -67,6 +67,14 @@ const result = await Bun.build({
   },
 });
 
+if (!result.success) {
+  console.error("Bun.build failed (compile lint):");
+  for (const log of result.logs) {
+    console.error(String(log));
+  }
+  process.exit(1);
+}
+
 const end = performance.now();
 
 console.table(

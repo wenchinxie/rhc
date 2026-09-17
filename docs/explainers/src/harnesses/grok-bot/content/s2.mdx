@@ -1,102 +1,66 @@
 import { H2, H3, Peek, Term } from "../../../mdx-components"
 
 <>
-  <H2 id="s2" n="2">開機沒有一個主行程管到底</H2>
+  <H2 id="s2" n="2">開機與行程</H2>
   <p>
-    桌面主行程等 Electron 的<code>whenReady</code>觸發後才動手，先起帳號等服務，再裝選單，最後才開主視窗；整段流程沒有一步在跑模型迴圈。
-    <Peek snip="e-main">whenReady</Peek>
-    帳號就緒後，主行程才用<code>ports.utilityProcess.fork</code>生出<Term k="coordinator">coordinator</Term>子行程，服務名固定是<code>sand-node-agent-coordinator</code>。
-    <Peek snip="fork">fork</Peek>
-    fork 的同時建三條<code>MessageChannelMain</code>：控制通道給主行程下指令與收事件，畫面資料通道轉交給視窗，主行程資料通道留給主行程自己用。三條全部連著<code>bootstrap.processConfig</code>，經<code>child.postMessage</code>一次送進子行程。
+    點 Grok Bot 圖示只啟動 laptop Electron。<code>package.json</code> 的 <code>main</code> 是 <code>dist/electron-main/main.cjs</code>。
+    該檔是 stub，在同一個 main process 裡用 <code>vm.Script</code> 載 <code>main-core.cjs</code> 再 <code>main-app.cjs</code>。
+    <Peek snip="s2-stub">stub</Peek>
+    in-box <Term k="sand-host">host-main</Term> 不在 0.47 laptop asar。Gateway 可連，是 box 內 <code>listen</code> 且 <code>writeGatewayDiscovery</code>，加上 laptop 持有非空 <code>gatewayUrl</code>。
+    <Peek snip="s2-listen">listen</Peek>
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s2-k" n="2.0">關鍵概念</H3>
+  <p>
+    行程根：Electron main（stub 加 core 加 app，同行程）；renderer 加 preload；coordinator <code>utilityProcess</code>（服務名 <code>sand-node-agent-coordinator</code>）；in-box host（VM zip）；<code>box-exec</code> 在這份 asar 與凍結清單裡 ABSENT。
+    <code>dune-rpc</code> 是 <code>window.desktop</code>，用來要 coordinator port，不送 prompt 本文。
+    <Peek snip="dune-rpc">dune-rpc</Peek>
+    Prompt 走移交過來的 MessagePort，IPC 名仍是 <code>sand:coordinator-port</code>。
+    <Peek snip="coord-port-047">埠名</Peek>
+  </p>
+  <H3 id="s2-1" n="2.1">主行程只起殼</H3>
+  <p>
+    stub 先載 <code>main-core</code>，等 <code>remainderDue</code>，再載 <code>main-app</code>。三個 cjs 不是三個 OS process。
+    主行程 fork 出 coordinator 之後，自己的責任是轉發。模型迴圈不在桌面 main。
+  </p>
+  <H3 id="s2-2" n="2.2">畫面靠 preload 轉手</H3>
+  <p>
+    Preload 暴露 <code>desktop</code> 與 <code>coordinatorPort</code>，並聽 <code>sand:coordinator-port</code>。
+    畫面呼叫 <code>invoke("sand:coordinator-port-request")</code>。main 把 <code>event.ports[0]</code> 交回去。畫面看不到 gateway 位址。
+  </p>
+  <H3 id="s2-3" n="2.3">host-main 在 box 內 listen</H3>
+  <p>
+    Laptop 連 box：<code>resolveGatewayConnection</code> → <code>GrokBotService.EnsureSandBox</code>，除非已設 <code>SAND_HOST_GATEWAY_URL</code>。空 URL throw。這段實作在 freeze 未列的 <code>main-app.cjs</code>，見 ARCHITECTURE。
+    Box 內 <code>runHostMain</code>：<code>acquireHostLock</code> → <code>SandHost.start</code> → <code>startGatewayServer</code> → <code>listen(port ?? 0)</code> → <code>writeGatewayDiscovery</code>。
+    <code>--box-copy-in</code> 在開頭 <code>process.exit</code>，不開 gateway。
+  </p>
+  <H3 id="s2-4" n="2.4">box-exec 不在這份 asar</H3>
+  <p>
+    0.47 laptop asar 沒有 <code>dist/host/</code>，也沒有 box-exec 啟動碼。<code>runHostMain</code> 不 spawn box-exec。ARCHITECTURE 把它畫在 VM 旁。不能把 0.18「host 生 box-exec」當成這份安裝包的事實。
+  </p>
+  <H3 id="s2-5" n="2.5">coordinator 用 fork 起，三條 MessagePort</H3>
+  <p>
+    <code>launchCoordinator</code> 以服務名 <code>sand-node-agent-coordinator</code> 做 <code>fork</code>，建 control、rendererData、mainData 三條 channel，一次 <code>postMessage</code> 進子行程。
     <Peek snip="launcher">三埠</Peek>
+    之後 coordinator 對 gateway 做 <code>POST /api/sendPrompt</code>。
   </p>
-  <H3 id="s2-1" n="2.1">主行程只起殼，不跑模型迴圈</H3>
-  <p>
-    主行程 fork 出<Term k="coordinator">coordinator</Term>之後，自己的責任就只剩轉發：畫面的每一次操作都經它才碰得到子行程，模型迴圈、送出排程全部發生在子行程與更遠端的機器裡，桌面主行程手上沒有一行處理送出的邏輯。
-  </p>
-  <H3 id="s2-2" n="2.2">畫面靠 preload 轉手，連不到 host</H3>
-  <p>
-    畫面沒有辦法自己去要<Term k="coordinator">coordinator</Term>的通道，得先靠 preload 腳本把兩個全域掛進頁面：<code>desktop</code>與<code>coordinatorPort</code>。
-    <Peek snip="preload-port">preload</Peek>
-    頁面要用通道時呼叫<code>ipcRenderer.invoke("sand:coordinator-port-request")</code>，主行程收到後把畫面資料埠連著一個<code>MessagePort</code>，經<code>ipcRenderer.on("sand:coordinator-port", …)</code>送回去。
-    <Peek snip="coord-ipc">IPC 名</Peek>
-    這兩個 channel 名字寫死在<code>coordinator-runtime.ts</code>裡，渲染器行程完全看不到 host 或 gateway 的位址，只認得主行程轉手給它的那個 port，連不上就是連不上，沒有備援路徑。
-  </p>
-  <H3 id="s2-3" n="2.3"><Term k="sand-host">host-main</Term> 開機三步：鎖、box-exec、gateway</H3>
-  <p>
-    <Term k="sand-host">host-main</Term>住在<Term k="box">沙箱機器</Term>裡，不是桌面上的第三個行程；哪一台<Term k="box">沙箱機器</Term>由 box connector 決定，這裡只管開機的三步驟。
-    <a className="xref" href="#s6">§6</a>
-    第一步搶<code>host.lock</code>，鎖被活著的舊<Term k="sand-host">host-main</Term>佔住時，先送 SIGTERM 等 3 秒，還活著才 SIGKILL，最多重試 5 次。
-    <Peek snip="host-lock">搶鎖</Peek>
-    第二步起 box-exec-daemon，第三步才起 gateway。
-    <Peek snip="host-main">順序</Peek>
-    gateway 只綁<code>127.0.0.1</code>，埠由<code>SAND_HOST_PORT</code>決定，沒指定就讓系統挑一個；離開 loopback、或環境變數<code>SAND_GATEWAY_REQUIRE_AUTH</code>開著、或釘了<code>SAND_GATEWAY_TOKEN</code>，才強制帶 bearer token，否則本機連線可以不帶。
-    <Peek snip="gateway-bind">token 規則</Peek>
-    server 真正<code>listen</code>那行把 host、port、close 一次打包回傳。
-    <Peek snip="gateway-listen">bind</Peek>
-    啟動完後把 port、pid、啟動時間寫進<code>gateway.json</code>，鎖檔叫<code>host.lock</code>，崩潰標記叫<code>.sand-host-crash.json</code>，三個檔都放在 sand 根目錄，桌面靠這幾個數字才找得到這台 host。
-    <Peek snip="discovery-paths">discovery</Peek>
-    <Term k="coordinator">coordinator</Term>連上 gateway 後呼叫的<code>sendPrompt</code>，進<Term k="send-pipeline">SendPipeline</Term>續處理。
-    見 <a className="xref" href="#s3">§3</a>。
-  </p>
-  <H3 id="s2-4" n="2.4">box-exec-daemon 是 <Term k="sand-host">host-main</Term> 生的殼子</H3>
-  <p>
-    box-exec-daemon 不是<Term k="box">沙箱機器</Term>自己開機時起的，是<Term k="sand-host">host-main</Term>在起 gateway 之前用<code>spawn</code>生出來的子行程，入口檔是<code>box-exec-daemon/main.ts</code>。
-    <Peek snip="exec-spawn">spawn</Peek>
-    它聽<code>127.0.0.1:1337</code>，固定埠，不吃<code>SAND_HOST_PORT</code>那套設定。
-    <Peek snip="box-exec">聽埠</Peek>
-    <Term k="sand-host">host-main</Term>送進來的每個 shell 指令，box-exec-daemon 最後都靠<code>spawn</code>呼叫<code>/bin/sh -lc</code>把它變成一個真正的 shell 行程，自己不解析指令內容。
-    <Peek snip="box-exec-run">/bin/sh</Peek>
-  </p>
-  <H3 id="s2-5" n="2.5"><Term k="coordinator">coordinator</Term> 自己另開兩個 loopback 服務</H3>
-  <p>
-    <Term k="coordinator">coordinator</Term>除了轉發送出以外，自己另外開兩個 loopback HTTP 伺服器，兩個都跟 gateway 無關。第一個是 MCP OAuth 的回跳收件匣：某個 MCP 外掛要做 OAuth，<Term k="coordinator">coordinator</Term>就照 redirect_uri 裡的埠，在<code>127.0.0.1</code>（或<code>localhost</code>對應的位址）上開一個臨時伺服器接授權碼，用完就關掉。
-    <Peek snip="oauth-loopback">OAuth 回跳</Peek>
-    第二個是 routed MCP bridge，給外部工具走 MCP 協定呼叫<Term k="coordinator">coordinator</Term>已經路由好的工具，埠交給作業系統挑，每次開機網址都不一樣，靠一段隨機密鑰擋掉亂猜。
-    <Peek snip="routed-mcp">routed-mcp</Peek>
-    本機命令服務另有自己專屬的遙測回報通道。
-    <a className="xref" href="#s8">§8</a>
-  </p>
-  <p>四個行程各自的開機者與傳輸，列表如下。</p>
+  <H3 id="s2-6" n="2.6">東西在哪</H3>
   <div className="overflow wide">
-    <table>
-      <thead>
-        <tr>
-          <th>行程</th>
-          <th>誰啟動它</th>
-          <th>跟上游用什麼傳輸</th>
-          <th>程式入口檔</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>桌面主行程</td>
-          <td>Electron 自己，<code>app.whenReady</code></td>
-          <td>無，是根行程</td>
-          <td><code>electron-main/main.ts</code></td>
-        </tr>
-        <tr>
-          <td><Term k="coordinator">coordinator</Term></td>
-          <td>桌面主行程 <code>utilityProcess.fork</code></td>
-          <td>三條 <code>MessagePort</code></td>
-          <td><code>node-agent-coordinator/main.ts</code></td>
-        </tr>
-        <tr>
-          <td><Term k="sand-host">host-main</Term></td>
-          <td><Term k="box">沙箱機器</Term>開機流程（機器由誰決定見 <a className="xref" href="#s6">§6</a>）</td>
-          <td>HTTP，經 gateway loopback，可能帶 bearer token</td>
-          <td><code>host/main.ts</code></td>
-        </tr>
-        <tr>
-          <td>box-exec-daemon</td>
-          <td><Term k="sand-host">host-main</Term> 用 <code>spawn</code></td>
-          <td>HTTP，聽 <code>127.0.0.1:1337</code></td>
-          <td><code>box-exec-daemon/main.ts</code></td>
-        </tr>
-      </tbody>
-    </table>
+  <table>
+  <thead><tr><th>東西</th><th>0.47 位置</th></tr></thead>
+  <tbody>
+  <tr><td>圖示啟動的 main</td><td><code>extracted/electron-main/main.cjs</code></td></tr>
+  <tr><td>真正 desktop 邏輯</td><td><code>main-core.cjs</code> / <code>main-app.cjs</code>（freeze 未列；ARCHITECTURE 描述）</td></tr>
+  <tr><td>preload / dune-rpc</td><td><code>extracted/electron-preload/preload.cjs</code></td></tr>
+  <tr><td>coordinator fork</td><td><code>source/electron-main/coordinator/coordinator-launcher.ts</code></td></tr>
+  <tr><td>HTTP client</td><td><code>source/node-agent-coordinator/gateway/gateway-client.ts</code></td></tr>
+  <tr><td>Host listen</td><td><code>source/host/main.ts</code>（VM zip，非 asar）</td></tr>
+  <tr><td>box-exec</td><td>ABSENT from asar</td></tr>
+  </tbody>
+  </table>
   </div>
-  <p className="src">
-    <code>electron-main/main.ts</code>、<code>coordinator-launcher.ts</code>、<code>coordinator-runtime.ts</code>、<code>preload.ts</code>、<code>host/main.ts</code>、<code>host-lock.ts</code>、<code>gateway-server.ts</code>、<code>gateway-config.ts</code>、<code>host-paths.ts</code>、<code>exec-daemon-process.ts</code>、<code>box-exec-daemon/server.ts</code>、<code>mcp-oauth-loopback-registry.ts</code>、<code>routed-mcp-bridge.ts</code>。
+  <H3 id="s2-7" n="2.7">容易踩的</H3>
+  <p>
+    不要把 stub、main-core、main-app 當成三個行程。不要把 <code>dune-rpc</code> 當成 sendPrompt 通道。不要假設 0.47 laptop 帶 <code>dist/host/host-main.cjs</code>。回 <code>accepted: true</code> 不是模型回覆。
   </p>
 </>

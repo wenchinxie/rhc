@@ -1,0 +1,3502 @@
+{
+  "files": [
+    {
+      "path": "source/box-exec-daemon/artifactUploads.ts",
+      "loc": 1605
+    },
+    {
+      "path": "source/box-exec-daemon/bundledToolPath.ts",
+      "loc": 68
+    },
+    {
+      "path": "source/box-exec-daemon/comma-separated-names.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/box-exec-daemon/git.ts",
+      "loc": 1607
+    },
+    {
+      "path": "source/box-exec-daemon/index.ts",
+      "loc": 358
+    },
+    {
+      "path": "source/box-exec-daemon/logger.ts",
+      "loc": 88
+    },
+    {
+      "path": "source/box-exec-daemon/managed-environment.ts",
+      "loc": 96
+    },
+    {
+      "path": "source/box-exec-daemon/mcp-token-storage.ts",
+      "loc": 103
+    },
+    {
+      "path": "source/box-exec-daemon/refresh-git-token.ts",
+      "loc": 14
+    },
+    {
+      "path": "source/box-exec-daemon/request-context-disk-cache.ts",
+      "loc": 183
+    },
+    {
+      "path": "source/box-exec-daemon/secretRedaction.ts",
+      "loc": 190
+    },
+    {
+      "path": "source/box-exec-daemon/serveCommand.ts",
+      "loc": 123
+    },
+    {
+      "path": "source/box-exec-daemon/server.ts",
+      "loc": 3994
+    },
+    {
+      "path": "source/box-exec-daemon/setup.ts",
+      "loc": 18975
+    },
+    {
+      "path": "source/box-exec-daemon/startup-traceparent.ts",
+      "loc": 49
+    },
+    {
+      "path": "source/box-exec-daemon/tmux-session-manager.ts",
+      "loc": 608
+    },
+    {
+      "path": "source/box-exec-daemon/tracing.ts",
+      "loc": 335
+    },
+    {
+      "path": "source/box-exec-daemon/workspace-discovery.ts",
+      "loc": 86
+    },
+    {
+      "path": "source/electron-dev-controls/index.ts",
+      "loc": 2
+    },
+    {
+      "path": "source/electron-main/desktop-edge-failures.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/devtools-gate.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/ensure-sandbox.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/host-process-name.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/electron-main/launch-coordinator.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/electron-main/main-entry.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/electron-main/production-adapters.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/window-broadcast.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/window-chrome.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/window-shortcuts.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/account/account-authorization.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/account/cursor-machine-id.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/account/cursor-pr-review.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/adapters/account-edge.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/adapters/coordinator-gateway.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/adapters/index.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/adapters/production-experiments-binding.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/attachments/attachments.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/auth/auth-callback-registration.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/box-host-connector.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/electron-main/box/box-recovery.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/box-recreate-commands.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/box-visibility-sink.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/box-visibility-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/egress-tunnel-wiring.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/gateway-descriptor-cache.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/box/remote-connector-egress.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/coordinator/account-revoke.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/coordinator/account-transition-cleanup.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/coordinator/coordinator-launcher.ts",
+      "loc": 87
+    },
+    {
+      "path": "source/electron-main/coordinator/coordinator-resync.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/coordinator/desktop-connectivity.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/deep-link/deep-link-controller.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-controls-gate.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-gateway-offline.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-host-token-handoff.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-host-upgrade-poke.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-network-latency.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/dev/dev-wiring.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/downloads/download-path.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/experiments/experiments-ipc.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/local-exec/local-exec-lifecycle-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/mcp/mcp-desktop.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/mcp/mcp-oauth-loopback-provider.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/mcp/mcp-runtime.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/mcp/mcp-team-popularity.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/media/media-protocol.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/models/cursor-model-catalog.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/notifications/dock-badge-manager.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/notifications/dock-badge.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/notifications/os-notification-manager.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/onepassword/onepassword-cli-dev-controls.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/onepassword/onepassword-op-executor.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/onepassword/onepassword-provisioning-contract.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/prefs/settings-ipc.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/prefs/theme-controller.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/cursor-client-numeric-metrics.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/native-scan.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/redaction.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/sampler.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/transport.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/process-metrics/wiring.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/secrets/secrets-ipc-guard.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/startup/host-lock.ts",
+      "loc": 29
+    },
+    {
+      "path": "source/electron-main/telemetry/access-blocked-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/agent-load-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/agents-unreachable-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/desktop-error-tags.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/desktop-event-loop-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/desktop-startup-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/gateway-reachability-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/onboarding-analytics.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/quit-telemetry-flush.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/reaction-ack-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/rebuild-lifecycle-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/recovery-action-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/render-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/send-ack-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/send-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/sentry-conversation.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/telemetry/transport-stream-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/update/idle-relaunch-apply.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/update/release-metadata.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/update/safe-relaunch-gate.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/update/update-download.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-main/vnc/vnc-session-telemetry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/box-vnc-clipboard-paste.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/box-vnc-visibility-gate.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/coordinator-port-bridge.ts",
+      "loc": 34
+    },
+    {
+      "path": "source/electron-preload/dune-rpc.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/electron-preload/expose.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/electron-preload/main-rpc-runtime.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/passkey-stall.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/preload-dev-controls.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/preload-webview.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/preload.ts",
+      "loc": 21
+    },
+    {
+      "path": "source/electron-preload/rpc-edge-runtime.ts",
+      "loc": 90
+    },
+    {
+      "path": "source/electron-preload/runtime/dev-controls.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/runtime/primary.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/runtime/vnc.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/electron-preload/runtime/webview.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/host/durable-file-policy.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/fallback-diagnostics.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/host/gateway-command-error.ts",
+      "loc": 82
+    },
+    {
+      "path": "source/host/gateway-config.ts",
+      "loc": 235
+    },
+    {
+      "path": "source/host/gateway-protocol.ts",
+      "loc": 280
+    },
+    {
+      "path": "source/host/gateway-server.ts",
+      "loc": 524
+    },
+    {
+      "path": "source/host/host-boot.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/host/host-crash-marker.ts",
+      "loc": 344
+    },
+    {
+      "path": "source/host/host-discovery.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/host-environment.ts",
+      "loc": 153
+    },
+    {
+      "path": "source/host/host-event-bus.ts",
+      "loc": 44
+    },
+    {
+      "path": "source/host/host-gateway-api.ts",
+      "loc": 1264
+    },
+    {
+      "path": "source/host/host-initial-transcript-load.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/host/host-lock.ts",
+      "loc": 131
+    },
+    {
+      "path": "source/host/host-request-context.ts",
+      "loc": 37
+    },
+    {
+      "path": "source/host/host-roster-bookkeeping.ts",
+      "loc": 47
+    },
+    {
+      "path": "source/host/host-runner-composition.ts",
+      "loc": 1661
+    },
+    {
+      "path": "source/host/host-secret-store.ts",
+      "loc": 37
+    },
+    {
+      "path": "source/host/i18n.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/host/main.ts",
+      "loc": 438
+    },
+    {
+      "path": "source/host/notify-drain-gate.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/host/sand-host.ts",
+      "loc": 492
+    },
+    {
+      "path": "source/host/scheduling.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/host/transcript-mutation-events.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/host/watched-directory.ts",
+      "loc": 67
+    },
+    {
+      "path": "source/host/agent-isolation/agent-worker-pool.ts",
+      "loc": 436
+    },
+    {
+      "path": "source/host/agent-isolation/transcript-mirror-offload.ts",
+      "loc": 243
+    },
+    {
+      "path": "source/host/agent-isolation/worker-blob-store.ts",
+      "loc": 29
+    },
+    {
+      "path": "source/host/agents/agent-avatar.ts",
+      "loc": 136
+    },
+    {
+      "path": "source/host/agents/agent-profile.ts",
+      "loc": 102
+    },
+    {
+      "path": "source/host/agents/runtime-capability-retry.ts",
+      "loc": 12
+    },
+    {
+      "path": "source/host/agents/settings-file.ts",
+      "loc": 27
+    },
+    {
+      "path": "source/host/automations/automation-store.ts",
+      "loc": 426
+    },
+    {
+      "path": "source/host/box/box-env.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/host/box/box-factory.ts",
+      "loc": 20
+    },
+    {
+      "path": "source/host/box/box-file-transfer.ts",
+      "loc": 135
+    },
+    {
+      "path": "source/host/box/box-mcp.ts",
+      "loc": 60
+    },
+    {
+      "path": "source/host/box/box-remote-accessor.ts",
+      "loc": 96
+    },
+    {
+      "path": "source/host/box/box-store-backend-policy.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/host/box/loopback-sand-box.ts",
+      "loc": 1045
+    },
+    {
+      "path": "source/host/box/protected-path-guard.ts",
+      "loc": 46
+    },
+    {
+      "path": "source/host/connectors/channel-attachment.ts",
+      "loc": 73
+    },
+    {
+      "path": "source/host/extensions/extension-ids.generated.ts",
+      "loc": 59
+    },
+    {
+      "path": "source/host/extensions/registry.ts",
+      "loc": 76
+    },
+    {
+      "path": "source/host/extensions/action-audit/action-audit-backend.ts",
+      "loc": 104
+    },
+    {
+      "path": "source/host/extensions/action-audit/action-audit-service.ts",
+      "loc": 225
+    },
+    {
+      "path": "source/host/extensions/action-audit/extension.ts",
+      "loc": 30
+    },
+    {
+      "path": "source/host/extensions/agent-identity/agent-identity-capabilities.ts",
+      "loc": 24
+    },
+    {
+      "path": "source/host/extensions/agent-identity/agent-identity-service.ts",
+      "loc": 837
+    },
+    {
+      "path": "source/host/extensions/agent-identity/extension.ts",
+      "loc": 596
+    },
+    {
+      "path": "source/host/extensions/agent-identity/generated-room-name-stamps.ts",
+      "loc": 34
+    },
+    {
+      "path": "source/host/extensions/agent-identity/identity-backfill.ts",
+      "loc": 173
+    },
+    {
+      "path": "source/host/extensions/attachments/attachments-service.ts",
+      "loc": 479
+    },
+    {
+      "path": "source/host/extensions/attachments/avatar-image-service.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/host/extensions/attachments/extension.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/host/extensions/attachments/generate-image-resource-accessor.ts",
+      "loc": 3444
+    },
+    {
+      "path": "source/host/extensions/attachments/generate-image-service.ts",
+      "loc": 40
+    },
+    {
+      "path": "source/host/extensions/attachments/video-playback-rendition.ts",
+      "loc": 223
+    },
+    {
+      "path": "source/host/extensions/auth/auth-service.ts",
+      "loc": 128
+    },
+    {
+      "path": "source/host/extensions/auth/credential-renewer.ts",
+      "loc": 207
+    },
+    {
+      "path": "source/host/extensions/auth/extension.ts",
+      "loc": 101
+    },
+    {
+      "path": "source/host/extensions/auth/identity-mint-client.ts",
+      "loc": 108
+    },
+    {
+      "path": "source/host/extensions/auth/identity-socket-server.ts",
+      "loc": 372
+    },
+    {
+      "path": "source/host/extensions/auth/selected-team-reader.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/host/extensions/auth/user-full-name-service.ts",
+      "loc": 85
+    },
+    {
+      "path": "source/host/extensions/auto-review/auto-review-service.ts",
+      "loc": 111802
+    },
+    {
+      "path": "source/host/extensions/auto-review/extension.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/host/extensions/auto-review/sand-auto-review-awaiting.ts",
+      "loc": 70
+    },
+    {
+      "path": "source/host/extensions/auto-review/sand-backend-smart-mode-classifier-exec.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/host/extensions/automations/backend-relay-source.ts",
+      "loc": 526
+    },
+    {
+      "path": "source/host/extensions/automations/extension.ts",
+      "loc": 8243
+    },
+    {
+      "path": "source/host/extensions/automations/listener-connect-watcher.ts",
+      "loc": 163
+    },
+    {
+      "path": "source/host/extensions/automations/listener-integrations.ts",
+      "loc": 995
+    },
+    {
+      "path": "source/host/extensions/automations/sand-automation-cloud-sync.ts",
+      "loc": 395
+    },
+    {
+      "path": "source/host/extensions/automations/sand-automation-fire-consumer.ts",
+      "loc": 726
+    },
+    {
+      "path": "source/host/extensions/automations/sand-automation-run-now.ts",
+      "loc": 39
+    },
+    {
+      "path": "source/host/extensions/automations/sand-trigger-hub.ts",
+      "loc": 138
+    },
+    {
+      "path": "source/host/extensions/automations/webhook-credential-service.ts",
+      "loc": 147
+    },
+    {
+      "path": "source/host/extensions/bot-template-share/bot-template-share-service.ts",
+      "loc": 149
+    },
+    {
+      "path": "source/host/extensions/bot-template-share/bot-template-store.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/host/extensions/bot-template-share/extension.ts",
+      "loc": 29
+    },
+    {
+      "path": "source/host/extensions/bot-template-share/grok-bot-template-store.ts",
+      "loc": 195
+    },
+    {
+      "path": "source/host/extensions/box-lifecycle/box-lifecycle-service.ts",
+      "loc": 46
+    },
+    {
+      "path": "source/host/extensions/box-lifecycle/extension.ts",
+      "loc": 25
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/agent-store-sand-files.ts",
+      "loc": 360
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-copy-in-failure.ts",
+      "loc": 132
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-copy-in.ts",
+      "loc": 14774
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-object-store.ts",
+      "loc": 237
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-diagnostics.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-download.ts",
+      "loc": 945
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-hydration.ts",
+      "loc": 66
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-manifest-format.ts",
+      "loc": 69
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-manifest.ts",
+      "loc": 643
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-pack-pipeline.ts",
+      "loc": 361
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-pack.ts",
+      "loc": 281
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-sync-error.ts",
+      "loc": 24
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-sync-service.ts",
+      "loc": 375
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-sync.ts",
+      "loc": 614
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/box-store-transfer.ts",
+      "loc": 621
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/chrome-session-stage.ts",
+      "loc": 142
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/chrome-session-watcher.ts",
+      "loc": 100
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/claim-set.ts",
+      "loc": 30
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/conditional-put.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/extension.ts",
+      "loc": 64
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/object-store-port.ts",
+      "loc": 23
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/request-coalescer.ts",
+      "loc": 79
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/sand-box-store-files.ts",
+      "loc": 485
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/sqlite-snapshot.ts",
+      "loc": 156
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/store-db-bundle-capture.ts",
+      "loc": 313
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/store-db-capture.ts",
+      "loc": 446
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/store-db-snapshot-upload.ts",
+      "loc": 210
+    },
+    {
+      "path": "source/host/extensions/box-store-sync/workspace-ignore.ts",
+      "loc": 171
+    },
+    {
+      "path": "source/host/extensions/browser-ua/extension.ts",
+      "loc": 61
+    },
+    {
+      "path": "source/host/extensions/browser-ua/fingerprint-spoof-service.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/host/extensions/browser-ua/ua-owner-stamp-service.ts",
+      "loc": 30
+    },
+    {
+      "path": "source/host/extensions/browser-ua/ua-token-kill-switch-service.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/host/extensions/browser-ua/web-bot-auth-marker-service.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/host/extensions/chrome-cookie-import/chrome-cookie-import-service.ts",
+      "loc": 101
+    },
+    {
+      "path": "source/host/extensions/chrome-cookie-import/extension.ts",
+      "loc": 24
+    },
+    {
+      "path": "source/host/extensions/cloud-agents/cloud-agent-artifact-cache.ts",
+      "loc": 88
+    },
+    {
+      "path": "source/host/extensions/cloud-agents/cloud-agent-poll-loop.ts",
+      "loc": 159
+    },
+    {
+      "path": "source/host/extensions/cloud-agents/cloud-agents-service.ts",
+      "loc": 28871
+    },
+    {
+      "path": "source/host/extensions/cloud-agents/extension.ts",
+      "loc": 1441
+    },
+    {
+      "path": "source/host/extensions/cloud-agents/model-catalog-fetch.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/codebase-snapshot-trigger.ts",
+      "loc": 56
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/codebase-telemetry-adapter.ts",
+      "loc": 279
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/codebase-telemetry-host.ts",
+      "loc": 166
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/codebase-telemetry-service.ts",
+      "loc": 125
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/csnaps-process.ts",
+      "loc": 379
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/csnaps-protocol.ts",
+      "loc": 205
+    },
+    {
+      "path": "source/host/extensions/codebase-telemetry/extension.ts",
+      "loc": 2068
+    },
+    {
+      "path": "source/host/extensions/content-search/agent-content-search.ts",
+      "loc": 60
+    },
+    {
+      "path": "source/host/extensions/content-search/extension.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/host/extensions/content-search/search-index-db.ts",
+      "loc": 321
+    },
+    {
+      "path": "source/host/extensions/content-search/search-index-service.ts",
+      "loc": 377
+    },
+    {
+      "path": "source/host/extensions/cookie-origin-approval/cookie-origin-approval-bridge.ts",
+      "loc": 296
+    },
+    {
+      "path": "source/host/extensions/cookie-origin-approval/cookie-origin-approval-service.ts",
+      "loc": 101
+    },
+    {
+      "path": "source/host/extensions/cookie-origin-approval/extension.ts",
+      "loc": 53
+    },
+    {
+      "path": "source/host/extensions/credential-fill/credential-fill-executor.ts",
+      "loc": 949
+    },
+    {
+      "path": "source/host/extensions/credential-fill/extension.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/host/extensions/credential-provider/browser-credential-filler.ts",
+      "loc": 903
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-audit.ts",
+      "loc": 93
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-autofill-login-resolver.ts",
+      "loc": 148
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-autofill-watcher.ts",
+      "loc": 221
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-coordinator.ts",
+      "loc": 163
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-provider-directory-reader.ts",
+      "loc": 99
+    },
+    {
+      "path": "source/host/extensions/credential-provider/credential-provider-status-reader.ts",
+      "loc": 71
+    },
+    {
+      "path": "source/host/extensions/credential-provider/extension.ts",
+      "loc": 102
+    },
+    {
+      "path": "source/host/extensions/experiments/extension.ts",
+      "loc": 75
+    },
+    {
+      "path": "source/host/extensions/feedback/extension.ts",
+      "loc": 67
+    },
+    {
+      "path": "source/host/extensions/feedback/feedback-sampler.ts",
+      "loc": 30
+    },
+    {
+      "path": "source/host/extensions/feedback/feedback-service.ts",
+      "loc": 70
+    },
+    {
+      "path": "source/host/extensions/feedback/product-feedback.ts",
+      "loc": 95
+    },
+    {
+      "path": "source/host/extensions/feedback/sand-feedback-prompt-store.ts",
+      "loc": 63
+    },
+    {
+      "path": "source/host/extensions/forever-box/disk-pressure-guard.ts",
+      "loc": 137
+    },
+    {
+      "path": "source/host/extensions/forever-box/disk-pressure.ts",
+      "loc": 216
+    },
+    {
+      "path": "source/host/extensions/forever-box/extension.ts",
+      "loc": 679
+    },
+    {
+      "path": "source/host/extensions/forever-box/forever-box-service.ts",
+      "loc": 371
+    },
+    {
+      "path": "source/host/extensions/forever-box/host-box.ts",
+      "loc": 205
+    },
+    {
+      "path": "source/host/extensions/host-upgrade/extension.ts",
+      "loc": 100
+    },
+    {
+      "path": "source/host/extensions/host-upgrade/host-bundle-source.ts",
+      "loc": 90
+    },
+    {
+      "path": "source/host/extensions/host-upgrade/host-bundle-upgrade.ts",
+      "loc": 169
+    },
+    {
+      "path": "source/host/extensions/host-upgrade/host-upgrade-marker.ts",
+      "loc": 87
+    },
+    {
+      "path": "source/host/extensions/host-upgrade/host-upgrade-service.ts",
+      "loc": 345
+    },
+    {
+      "path": "source/host/extensions/inference/cursor-session.ts",
+      "loc": 144
+    },
+    {
+      "path": "source/host/extensions/inference/cursor-web-tools.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/host/extensions/inference/extension.ts",
+      "loc": 46
+    },
+    {
+      "path": "source/host/extensions/inference/inference-service.ts",
+      "loc": 3672
+    },
+    {
+      "path": "source/host/extensions/inference/sand-labeling.ts",
+      "loc": 86
+    },
+    {
+      "path": "source/host/extensions/inference/transcribe-service.ts",
+      "loc": 50
+    },
+    {
+      "path": "source/host/extensions/inference/voice-preview-service.ts",
+      "loc": 43
+    },
+    {
+      "path": "source/host/extensions/local-exec/extension.ts",
+      "loc": 120
+    },
+    {
+      "path": "source/host/extensions/local-exec/gateway-local-exec-sand-box.ts",
+      "loc": 276
+    },
+    {
+      "path": "source/host/extensions/local-exec/local-exec-bridge.ts",
+      "loc": 369
+    },
+    {
+      "path": "source/host/extensions/local-exec/local-exec-error.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/host/extensions/local-exec/preferring-user-computer.ts",
+      "loc": 51
+    },
+    {
+      "path": "source/host/extensions/local-exec/server-local-exec-sand-box.ts",
+      "loc": 480
+    },
+    {
+      "path": "source/host/extensions/local-tool-permission/extension.ts",
+      "loc": 64
+    },
+    {
+      "path": "source/host/extensions/local-tool-permission/local-tool-permission-controller.ts",
+      "loc": 494
+    },
+    {
+      "path": "source/host/extensions/local-tool-permission/local-tool-permission-resolution.ts",
+      "loc": 55
+    },
+    {
+      "path": "source/host/extensions/managed-setup/cursor-skills-marketplace.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/host/extensions/managed-setup/extension.ts",
+      "loc": 131
+    },
+    {
+      "path": "source/host/extensions/managed-setup/managed-setup-service.ts",
+      "loc": 264
+    },
+    {
+      "path": "source/host/extensions/managed-setup/managed-skills-service.ts",
+      "loc": 95
+    },
+    {
+      "path": "source/host/extensions/managed-setup/sand-managed-setup-client.ts",
+      "loc": 68
+    },
+    {
+      "path": "source/host/extensions/managed-setup/sand-managed-skills.ts",
+      "loc": 9
+    },
+    {
+      "path": "source/host/extensions/managed-setup/team-rules.ts",
+      "loc": 115
+    },
+    {
+      "path": "source/host/extensions/mcp/extension.ts",
+      "loc": 132
+    },
+    {
+      "path": "source/host/extensions/mcp/legacy-live-references.ts",
+      "loc": 162
+    },
+    {
+      "path": "source/host/extensions/mcp/mcp-service.ts",
+      "loc": 160
+    },
+    {
+      "path": "source/host/extensions/mcp/plugin-skills.ts",
+      "loc": 341
+    },
+    {
+      "path": "source/host/extensions/mcp/skill-publish.ts",
+      "loc": 312
+    },
+    {
+      "path": "source/host/extensions/memory/agent-state.ts",
+      "loc": 1084
+    },
+    {
+      "path": "source/host/extensions/memory/extension.ts",
+      "loc": 116
+    },
+    {
+      "path": "source/host/extensions/memory/memory-service.ts",
+      "loc": 687
+    },
+    {
+      "path": "source/host/extensions/memory/memory-synthesis-service.ts",
+      "loc": 474
+    },
+    {
+      "path": "source/host/extensions/memory/project-membership.ts",
+      "loc": 74
+    },
+    {
+      "path": "source/host/extensions/memory/server-shard-sync.ts",
+      "loc": 81
+    },
+    {
+      "path": "source/host/extensions/messages-grants/extension.ts",
+      "loc": 165
+    },
+    {
+      "path": "source/host/extensions/notifications/extension.ts",
+      "loc": 44
+    },
+    {
+      "path": "source/host/extensions/notifications/mobile-push-notifier.ts",
+      "loc": 96
+    },
+    {
+      "path": "source/host/extensions/notify-bus/extension.ts",
+      "loc": 97
+    },
+    {
+      "path": "source/host/extensions/notify-bus/notify-bus-client.ts",
+      "loc": 165
+    },
+    {
+      "path": "source/host/extensions/privacy-mode/extension.ts",
+      "loc": 59
+    },
+    {
+      "path": "source/host/extensions/privacy-mode/privacy-mode-service.ts",
+      "loc": 149
+    },
+    {
+      "path": "source/host/extensions/remote-agent-messaging/extension.ts",
+      "loc": 94
+    },
+    {
+      "path": "source/host/extensions/remote-agent-messaging/remote-agent-messaging-capabilities.ts",
+      "loc": 184
+    },
+    {
+      "path": "source/host/extensions/remote-agent-messaging/remote-agent-messaging-service.ts",
+      "loc": 130
+    },
+    {
+      "path": "source/host/extensions/remote-agent-messaging/temporal-member-turns.ts",
+      "loc": 187
+    },
+    {
+      "path": "source/host/extensions/resume-ownership/applied-migration-barrier.ts",
+      "loc": 80
+    },
+    {
+      "path": "source/host/extensions/resume-ownership/extension.ts",
+      "loc": 158
+    },
+    {
+      "path": "source/host/extensions/resume-ownership/resume-ownership-service.ts",
+      "loc": 302
+    },
+    {
+      "path": "source/host/extensions/secrets/extension.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/host/extensions/secrets/secrets-service.ts",
+      "loc": 211
+    },
+    {
+      "path": "source/host/extensions/server-agent-proxy/extension.ts",
+      "loc": 49
+    },
+    {
+      "path": "source/host/extensions/server-agent-proxy/idle-destroying-agent.ts",
+      "loc": 47
+    },
+    {
+      "path": "source/host/extensions/server-agent-proxy/server-agent-proxy.ts",
+      "loc": 378
+    },
+    {
+      "path": "source/host/extensions/server-agent-proxy/voice-call-server-receipt.ts",
+      "loc": 32
+    },
+    {
+      "path": "source/host/extensions/session/agent-clone.ts",
+      "loc": 112
+    },
+    {
+      "path": "source/host/extensions/session/agent-db-recovery.ts",
+      "loc": 186
+    },
+    {
+      "path": "source/host/extensions/session/agent-db-schema.ts",
+      "loc": 164
+    },
+    {
+      "path": "source/host/extensions/session/agent-db-serde.ts",
+      "loc": 238
+    },
+    {
+      "path": "source/host/extensions/session/agent-db-transcript-pages.ts",
+      "loc": 68
+    },
+    {
+      "path": "source/host/extensions/session/agent-db.ts",
+      "loc": 1183
+    },
+    {
+      "path": "source/host/extensions/session/agent-session.ts",
+      "loc": 692
+    },
+    {
+      "path": "source/host/extensions/session/box-handoff-service.ts",
+      "loc": 180
+    },
+    {
+      "path": "source/host/extensions/session/channel-store.ts",
+      "loc": 105
+    },
+    {
+      "path": "source/host/extensions/session/connector-secret-store.ts",
+      "loc": 52
+    },
+    {
+      "path": "source/host/extensions/session/conversation-recovery.ts",
+      "loc": 94
+    },
+    {
+      "path": "source/host/extensions/session/conversation-size-limits.ts",
+      "loc": 177
+    },
+    {
+      "path": "source/host/extensions/session/draft-send-sweep.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/host/extensions/session/extension.ts",
+      "loc": 109
+    },
+    {
+      "path": "source/host/extensions/session/pending-card-sweeps.ts",
+      "loc": 313
+    },
+    {
+      "path": "source/host/extensions/session/session-conversation-state.ts",
+      "loc": 88
+    },
+    {
+      "path": "source/host/extensions/session/session-diagnostics.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/host/extensions/session/session-maintenance.ts",
+      "loc": 284
+    },
+    {
+      "path": "source/host/extensions/session/session-materialization.ts",
+      "loc": 223
+    },
+    {
+      "path": "source/host/extensions/session/session-mutations.ts",
+      "loc": 68
+    },
+    {
+      "path": "source/host/extensions/session/session-paths.ts",
+      "loc": 45
+    },
+    {
+      "path": "source/host/extensions/session/session-profile-files.ts",
+      "loc": 85
+    },
+    {
+      "path": "source/host/extensions/session/session-projection.ts",
+      "loc": 188
+    },
+    {
+      "path": "source/host/extensions/session/session-recovery.ts",
+      "loc": 72
+    },
+    {
+      "path": "source/host/extensions/session/session-roster.ts",
+      "loc": 122
+    },
+    {
+      "path": "source/host/extensions/session/session-store-factories.ts",
+      "loc": 48
+    },
+    {
+      "path": "source/host/extensions/session/session-summaries.ts",
+      "loc": 212
+    },
+    {
+      "path": "source/host/extensions/session/user-form-service.ts",
+      "loc": 527
+    },
+    {
+      "path": "source/host/extensions/session/virtual-card-service.ts",
+      "loc": 80
+    },
+    {
+      "path": "source/host/extensions/settings/extension.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/host/extensions/settings/settings-service.ts",
+      "loc": 270
+    },
+    {
+      "path": "source/host/extensions/source-map/extension.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/host/extensions/source-map/source-map-service.ts",
+      "loc": 827
+    },
+    {
+      "path": "source/host/extensions/state-backstop/extension.ts",
+      "loc": 40
+    },
+    {
+      "path": "source/host/extensions/state-backstop/state-backstop-service.ts",
+      "loc": 79
+    },
+    {
+      "path": "source/host/extensions/teach-recording/extension.ts",
+      "loc": 173
+    },
+    {
+      "path": "source/host/extensions/teach-recording/teach-recording-service.ts",
+      "loc": 709
+    },
+    {
+      "path": "source/host/extensions/team-admin-policy/extension.ts",
+      "loc": 39
+    },
+    {
+      "path": "source/host/extensions/team-admin-policy/team-admin-policy-service.ts",
+      "loc": 148
+    },
+    {
+      "path": "source/host/extensions/telemetry/analytics-service.ts",
+      "loc": 82
+    },
+    {
+      "path": "source/host/extensions/telemetry/auto-review-approval-telemetry.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/extensions/telemetry/automation-fire-telemetry.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/host/extensions/telemetry/automation-shadow-prune-telemetry.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/extensions/telemetry/box-log-ship-telemetry.ts",
+      "loc": 39
+    },
+    {
+      "path": "source/host/extensions/telemetry/box-log-shipper.ts",
+      "loc": 574
+    },
+    {
+      "path": "source/host/extensions/telemetry/conversation-gc-telemetry.ts",
+      "loc": 159
+    },
+    {
+      "path": "source/host/extensions/telemetry/cookie-origin-approval-telemetry.ts",
+      "loc": 74
+    },
+    {
+      "path": "source/host/extensions/telemetry/desktop-health-forwarder.ts",
+      "loc": 186
+    },
+    {
+      "path": "source/host/extensions/telemetry/disk-pressure-telemetry.ts",
+      "loc": 25
+    },
+    {
+      "path": "source/host/extensions/telemetry/egress-ip-telemetry.ts",
+      "loc": 178
+    },
+    {
+      "path": "source/host/extensions/telemetry/event-loop-telemetry.ts",
+      "loc": 74
+    },
+    {
+      "path": "source/host/extensions/telemetry/experiments-diagnostic-telemetry.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/host/extensions/telemetry/extension.ts",
+      "loc": 90
+    },
+    {
+      "path": "source/host/extensions/telemetry/grok-bot-metrics-backend.ts",
+      "loc": 183
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-crash-marker-forward.ts",
+      "loc": 59
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-diagnostic-telemetry.ts",
+      "loc": 58
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-event-bus-telemetry.ts",
+      "loc": 17
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-extension-diagnostic-telemetry.ts",
+      "loc": 72
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-lifecycle-progress.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-telemetry-service.ts",
+      "loc": 554
+    },
+    {
+      "path": "source/host/extensions/telemetry/host-tracing.ts",
+      "loc": 156
+    },
+    {
+      "path": "source/host/extensions/telemetry/journal-outcome-telemetry.ts",
+      "loc": 30
+    },
+    {
+      "path": "source/host/extensions/telemetry/lifecycle-telemetry.ts",
+      "loc": 186
+    },
+    {
+      "path": "source/host/extensions/telemetry/local-exec-telemetry.ts",
+      "loc": 76
+    },
+    {
+      "path": "source/host/extensions/telemetry/memory-synthesis-telemetry.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/host/extensions/telemetry/model-experiment-exposure.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/host/extensions/telemetry/pressure-cpu-profiler.ts",
+      "loc": 156
+    },
+    {
+      "path": "source/host/extensions/telemetry/queue-telemetry-mappers.ts",
+      "loc": 103
+    },
+    {
+      "path": "source/host/extensions/telemetry/revival-telemetry-mappers.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/host/extensions/telemetry/search-index-health-telemetry.ts",
+      "loc": 23
+    },
+    {
+      "path": "source/host/extensions/telemetry/send-trace-sampler.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/host/extensions/telemetry/session-diagnostic-telemetry.ts",
+      "loc": 52
+    },
+    {
+      "path": "source/host/extensions/telemetry/structured-log-telemetry.ts",
+      "loc": 921
+    },
+    {
+      "path": "source/host/extensions/telemetry/turn-empty-delivery-telemetry.ts",
+      "loc": 62
+    },
+    {
+      "path": "source/host/extensions/telemetry/turn-telemetry-mappers.ts",
+      "loc": 189
+    },
+    {
+      "path": "source/host/extensions/telemetry/webauthn-proxy-telemetry.ts",
+      "loc": 85
+    },
+    {
+      "path": "source/host/extensions/telemetry/working-state-export-telemetry.ts",
+      "loc": 73
+    },
+    {
+      "path": "source/host/extensions/transcript/ack-obligations.ts",
+      "loc": 243
+    },
+    {
+      "path": "source/host/extensions/transcript/agent-lifecycle.ts",
+      "loc": 650
+    },
+    {
+      "path": "source/host/extensions/transcript/agent-run-error.ts",
+      "loc": 312
+    },
+    {
+      "path": "source/host/extensions/transcript/agent-to-agent-messaging.ts",
+      "loc": 395
+    },
+    {
+      "path": "source/host/extensions/transcript/async-task-union.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/host/extensions/transcript/automation-event-fires.ts",
+      "loc": 189
+    },
+    {
+      "path": "source/host/extensions/transcript/automation-run-path.ts",
+      "loc": 630
+    },
+    {
+      "path": "source/host/extensions/transcript/automation-runtime.ts",
+      "loc": 592
+    },
+    {
+      "path": "source/host/extensions/transcript/automation-snapshot.ts",
+      "loc": 23
+    },
+    {
+      "path": "source/host/extensions/transcript/automation-spend-guard-runtime.ts",
+      "loc": 234
+    },
+    {
+      "path": "source/host/extensions/transcript/background-wakes.ts",
+      "loc": 499
+    },
+    {
+      "path": "source/host/extensions/transcript/box-handoff-resume.ts",
+      "loc": 169
+    },
+    {
+      "path": "source/host/extensions/transcript/box-request-entries.ts",
+      "loc": 62
+    },
+    {
+      "path": "source/host/extensions/transcript/channel-delivery-unregistered-error.ts",
+      "loc": 320
+    },
+    {
+      "path": "source/host/extensions/transcript/completion-revivals.ts",
+      "loc": 371
+    },
+    {
+      "path": "source/host/extensions/transcript/extension.ts",
+      "loc": 231
+    },
+    {
+      "path": "source/host/extensions/transcript/feedback-entries.ts",
+      "loc": 53
+    },
+    {
+      "path": "source/host/extensions/transcript/group-chat-glue.ts",
+      "loc": 780
+    },
+    {
+      "path": "source/host/extensions/transcript/pending-wake-rearm.ts",
+      "loc": 245
+    },
+    {
+      "path": "source/host/extensions/transcript/profile-watch.ts",
+      "loc": 143
+    },
+    {
+      "path": "source/host/extensions/transcript/prompt-acceptance-ledger.ts",
+      "loc": 383
+    },
+    {
+      "path": "source/host/extensions/transcript/replica-writer.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/host/extensions/transcript/roster-emit.ts",
+      "loc": 207
+    },
+    {
+      "path": "source/host/extensions/transcript/roster-projection.ts",
+      "loc": 481
+    },
+    {
+      "path": "source/host/extensions/transcript/roster-search.ts",
+      "loc": 81
+    },
+    {
+      "path": "source/host/extensions/transcript/run-lifecycle.ts",
+      "loc": 652
+    },
+    {
+      "path": "source/host/extensions/transcript/run-scheduler.ts",
+      "loc": 310
+    },
+    {
+      "path": "source/host/extensions/transcript/runner-registry.ts",
+      "loc": 199
+    },
+    {
+      "path": "source/host/extensions/transcript/sand-ack-obligation-store.ts",
+      "loc": 121
+    },
+    {
+      "path": "source/host/extensions/transcript/sand-automation-failure.ts",
+      "loc": 20
+    },
+    {
+      "path": "source/host/extensions/transcript/sand-automation-spend-guard.ts",
+      "loc": 110
+    },
+    {
+      "path": "source/host/extensions/transcript/sand-pending-wake-store.ts",
+      "loc": 169
+    },
+    {
+      "path": "source/host/extensions/transcript/sand-upgrade-resume-store.ts",
+      "loc": 92
+    },
+    {
+      "path": "source/host/extensions/transcript/send-acceptance.ts",
+      "loc": 139
+    },
+    {
+      "path": "source/host/extensions/transcript/send-group-fanout.ts",
+      "loc": 49
+    },
+    {
+      "path": "source/host/extensions/transcript/send-message-shaping.ts",
+      "loc": 401
+    },
+    {
+      "path": "source/host/extensions/transcript/send-not-persisted-error.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/host/extensions/transcript/send-pipeline.ts",
+      "loc": 412
+    },
+    {
+      "path": "source/host/extensions/transcript/send-thread-stamping.ts",
+      "loc": 32
+    },
+    {
+      "path": "source/host/extensions/transcript/send-turn-dispatch.ts",
+      "loc": 127
+    },
+    {
+      "path": "source/host/extensions/transcript/session-runtime.ts",
+      "loc": 476
+    },
+    {
+      "path": "source/host/extensions/transcript/skill-commands.ts",
+      "loc": 244
+    },
+    {
+      "path": "source/host/extensions/transcript/transcript-entry-ids.ts",
+      "loc": 79
+    },
+    {
+      "path": "source/host/extensions/transcript/transcript-hub.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/host/extensions/transcript/transcript-manager.ts",
+      "loc": 892
+    },
+    {
+      "path": "source/host/extensions/transcript/transcript-store.ts",
+      "loc": 64
+    },
+    {
+      "path": "source/host/extensions/transcript/turn-runtime.ts",
+      "loc": 1712
+    },
+    {
+      "path": "source/host/extensions/transcript/upgrade-recreate-resume.ts",
+      "loc": 471
+    },
+    {
+      "path": "source/host/extensions/transcript/user-form-responses.ts",
+      "loc": 333
+    },
+    {
+      "path": "source/host/extensions/transcript/voice-call-runtime.ts",
+      "loc": 1876
+    },
+    {
+      "path": "source/host/extensions/transcript/widget-responses.ts",
+      "loc": 838
+    },
+    {
+      "path": "source/host/extensions/transcript/channels/inbound-entries.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/host/extensions/transcript/drafts/draft-send-calls.ts",
+      "loc": 66
+    },
+    {
+      "path": "source/host/extensions/transcript/drafts/draft-send-mcp-adapter.ts",
+      "loc": 107
+    },
+    {
+      "path": "source/host/extensions/transcript/drafts/draft-sends.ts",
+      "loc": 546
+    },
+    {
+      "path": "source/host/extensions/transcript/spend/record-initiation.ts",
+      "loc": 78
+    },
+    {
+      "path": "source/host/extensions/transcript/subagents/ownership.ts",
+      "loc": 76
+    },
+    {
+      "path": "source/host/extensions/transcript/voice-call/final-word.ts",
+      "loc": 64
+    },
+    {
+      "path": "source/host/extensions/transcript-publish/extension.ts",
+      "loc": 116
+    },
+    {
+      "path": "source/host/extensions/transcript-publish/transcript-entry-publisher.ts",
+      "loc": 477
+    },
+    {
+      "path": "source/host/extensions/trays/extension.ts",
+      "loc": 23
+    },
+    {
+      "path": "source/host/extensions/trays/trays-service.ts",
+      "loc": 177
+    },
+    {
+      "path": "source/host/extensions/turn-execution/extension.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/host/extensions/turn-execution/turn-execution-service.ts",
+      "loc": 40
+    },
+    {
+      "path": "source/host/extensions/user-form-vault/extension.ts",
+      "loc": 77
+    },
+    {
+      "path": "source/host/extensions/user-form-vault/user-form-vault-service.ts",
+      "loc": 110
+    },
+    {
+      "path": "source/host/extensions/user-form-vault/vault-logic.ts",
+      "loc": 228
+    },
+    {
+      "path": "source/host/extensions/user-skills-cache/extension.ts",
+      "loc": 40
+    },
+    {
+      "path": "source/host/extensions/user-skills-cache/user-skills-cache-service.ts",
+      "loc": 73
+    },
+    {
+      "path": "source/host/extensions/user-skills-cache/user-skills-files.ts",
+      "loc": 86
+    },
+    {
+      "path": "source/host/extensions/wallpaper/box-wallpaper-commands.ts",
+      "loc": 82
+    },
+    {
+      "path": "source/host/extensions/wallpaper/extension.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/host/extensions/wallpaper/wallpaper-service.ts",
+      "loc": 85
+    },
+    {
+      "path": "source/host/extensions/webauthn-proxy/extension.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/host/extensions/webauthn-proxy/webauthn-proxy-bridge.ts",
+      "loc": 250
+    },
+    {
+      "path": "source/host/extensions/webauthn-proxy/webauthn-proxy-marker.ts",
+      "loc": 29
+    },
+    {
+      "path": "source/host/extensions/working-state-export/extension.ts",
+      "loc": 115
+    },
+    {
+      "path": "source/host/extensions/working-state-export/working-state-export-service.ts",
+      "loc": 307
+    },
+    {
+      "path": "source/host/extensions/working-state-export/working-state-export-telemetry.ts",
+      "loc": 127
+    },
+    {
+      "path": "source/host/extensions/working-state-export/working-state-warm-eligibility.ts",
+      "loc": 21
+    },
+    {
+      "path": "source/host/extensions/working-state-export/working-state-warmer.ts",
+      "loc": 152
+    },
+    {
+      "path": "source/host/groups/group-store.ts",
+      "loc": 63
+    },
+    {
+      "path": "source/host/locales/en/messages.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/host/mcp-auth/host-mcp-auth-completion.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/host/mcp-auth/mcp-auth-wait-registry.ts",
+      "loc": 57
+    },
+    {
+      "path": "source/host/ports/product-analytics.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/host/ports/sand-analytics-types.ts",
+      "loc": 14
+    },
+    {
+      "path": "source/host/runner/box-runner-gates.ts",
+      "loc": 48
+    },
+    {
+      "path": "source/host/skills/direct-canvas-skill.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/host/skills/managed-skills-cache.ts",
+      "loc": 80
+    },
+    {
+      "path": "source/host/skills/plugin-skills-cache.ts",
+      "loc": 76
+    },
+    {
+      "path": "source/host/skills/skill-library.ts",
+      "loc": 191
+    },
+    {
+      "path": "source/host/skills/skill-store.ts",
+      "loc": 445
+    },
+    {
+      "path": "source/host/skills/stat-keyed-parse-cache.ts",
+      "loc": 58
+    },
+    {
+      "path": "source/host/storage/agent-paths.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/host/storage/sqlite-busy.ts",
+      "loc": 67
+    },
+    {
+      "path": "source/host/storage/sqlite-recovery.ts",
+      "loc": 190
+    },
+    {
+      "path": "source/host/storage/store-db.ts",
+      "loc": 79
+    },
+    {
+      "path": "source/host/transcript-mirror/legacy-transcript-mirror.ts",
+      "loc": 95
+    },
+    {
+      "path": "source/host/transcript-mirror/transcript-journal-codec.ts",
+      "loc": 139
+    },
+    {
+      "path": "source/host/transcript-mirror/transcript-mirror-router.ts",
+      "loc": 109
+    },
+    {
+      "path": "source/host/transcript-mirror/transcript-mirror.ts",
+      "loc": 724
+    },
+    {
+      "path": "source/local-exec-daemon/executor-registry.ts",
+      "loc": 26
+    },
+    {
+      "path": "source/node-agent-coordinator/client-side-tool-v2-relay.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/node-agent-coordinator/send-prompt.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/node-agent-coordinator/gateway/box-vnc-proxy.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/node-agent-coordinator/gateway/gateway-client.ts",
+      "loc": 77
+    },
+    {
+      "path": "source/node-agent-coordinator/gateway/gateway-errors.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/node-agent-coordinator/oauth/mcp-oauth-callback-listener.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/node-agent-coordinator/oauth/mcp-oauth-forwarder.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/node-agent-coordinator/oauth/mcp-oauth-loopback-registry.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/packages/agent-core/cloud-agent-artifact-paths.ts",
+      "loc": 212
+    },
+    {
+      "path": "source/packages/agent-exec/index.ts",
+      "loc": 3384
+    },
+    {
+      "path": "source/packages/constants/agent-store-fuse.ts",
+      "loc": 9
+    },
+    {
+      "path": "source/packages/context/core.ts",
+      "loc": 187
+    },
+    {
+      "path": "source/packages/context/logger.ts",
+      "loc": 436
+    },
+    {
+      "path": "source/packages/context/otel.ts",
+      "loc": 333
+    },
+    {
+      "path": "source/packages/cursor-plugins/index.ts",
+      "loc": 13866
+    },
+    {
+      "path": "source/packages/git-core/generated-file-detection.ts",
+      "loc": 893
+    },
+    {
+      "path": "source/packages/git-core/git-exec.ts",
+      "loc": 162
+    },
+    {
+      "path": "source/packages/hooks/index.ts",
+      "loc": 1753
+    },
+    {
+      "path": "source/packages/local-exec/index.ts",
+      "loc": 40794
+    },
+    {
+      "path": "source/packages/mcp-agent-exec/index.ts",
+      "loc": 17111
+    },
+    {
+      "path": "source/packages/mcp-agent-exec/mcp-sandbox-policy.ts",
+      "loc": 14
+    },
+    {
+      "path": "source/packages/mcp-core/index.ts",
+      "loc": 21852
+    },
+    {
+      "path": "source/packages/metrics/index.ts",
+      "loc": 141
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/adopt_tool_pb.ts",
+      "loc": 135
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/agent_pb.ts",
+      "loc": 26546
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/agent_skills_pb.ts",
+      "loc": 181
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/agent_store_conflict_exec_pb.ts",
+      "loc": 231
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/background_shell_exec_pb.ts",
+      "loc": 319
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/canvas_diagnostics_exec_pb.ts",
+      "loc": 139
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/computer_use_tool_pb.ts",
+      "loc": 705
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/control_service_pb.ts",
+      "loc": 2524
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/conversation_search_exec_pb.ts",
+      "loc": 215
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/cursor_rules_pb.ts",
+      "loc": 257
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/delete_exec_pb.ts",
+      "loc": 326
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/diagnostics_exec_pb.ts",
+      "loc": 327
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/exec_pb.ts",
+      "loc": 1394
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/fetch_exec_pb.ts",
+      "loc": 149
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/grep_exec_pb.ts",
+      "loc": 529
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/hook_additional_context_pb.ts",
+      "loc": 42
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/ls_exec_pb.ts",
+      "loc": 362
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/mcp_allowlist_precheck_exec_pb.ts",
+      "loc": 69
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/mcp_exec_pb.ts",
+      "loc": 1087
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/mcp_pb.ts",
+      "loc": 282
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_bash_exec_pb.ts",
+      "loc": 129
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_common_pb.ts",
+      "loc": 65
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_edit_exec_pb.ts",
+      "loc": 171
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_edit_tool_pb.ts",
+      "loc": 233
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_find_exec_pb.ts",
+      "loc": 128
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_grep_exec_pb.ts",
+      "loc": 137
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_ls_exec_pb.ts",
+      "loc": 123
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_read_exec_pb.ts",
+      "loc": 127
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pi_write_exec_pb.ts",
+      "loc": 160
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/pty_host_service_pb.ts",
+      "loc": 605
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/read_exec_pb.ts",
+      "loc": 305
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/record_screen_exec_pb.ts",
+      "loc": 257
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/request_context_exec_pb.ts",
+      "loc": 1579
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/sandbox_pb.ts",
+      "loc": 261
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/selected_context_pb.ts",
+      "loc": 2227
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/shell_allowlist_precheck_exec_pb.ts",
+      "loc": 71
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/shell_exec_pb.ts",
+      "loc": 1358
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/subagents_pb.ts",
+      "loc": 517
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/system_prompt_pb.ts",
+      "loc": 34
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/tmux_session_service_pb.ts",
+      "loc": 360
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/utils_pb.ts",
+      "loc": 146
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/web_fetch_allowlist_precheck_exec_pb.ts",
+      "loc": 64
+    },
+    {
+      "path": "source/packages/proto/generated/agent/v1/write_exec_pb.ts",
+      "loc": 284
+    },
+    {
+      "path": "source/packages/proto/generated/aiserver/v1/utils_pb.ts",
+      "loc": 4454
+    },
+    {
+      "path": "source/packages/secrets-exec/index.ts",
+      "loc": 494
+    },
+    {
+      "path": "source/packages/shell-exec/index.ts",
+      "loc": 6411
+    },
+    {
+      "path": "source/packages/utils/encoding.ts",
+      "loc": 902
+    },
+    {
+      "path": "source/packages/utils/find-executable.ts",
+      "loc": 102
+    },
+    {
+      "path": "source/packages/utils/gray-matter.ts",
+      "loc": 33
+    },
+    {
+      "path": "source/packages/utils/lru-cache.ts",
+      "loc": 1518
+    },
+    {
+      "path": "source/packages/utils/oom-score-adj.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/packages/utils/path-matchers.ts",
+      "loc": 134
+    },
+    {
+      "path": "source/packages/utils/path-utils.ts",
+      "loc": 189
+    },
+    {
+      "path": "source/packages/utils/promise-extras.ts",
+      "loc": 272
+    },
+    {
+      "path": "source/packages/utils/repo-url.ts",
+      "loc": 433
+    },
+    {
+      "path": "source/packages/utils/workspace-paths.ts",
+      "loc": 47
+    },
+    {
+      "path": "source/packages/utils/writable-iterable.ts",
+      "loc": 196
+    },
+    {
+      "path": "source/sand-eval-runner/environment.ts",
+      "loc": 190305
+    },
+    {
+      "path": "source/sand-eval-runner/inference.ts",
+      "loc": 32
+    },
+    {
+      "path": "source/sand-eval-runner/local-mcp.ts",
+      "loc": 148750
+    },
+    {
+      "path": "source/sand-eval-runner/main.ts",
+      "loc": 698
+    },
+    {
+      "path": "source/sand-eval-runner/prompt.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/sand-eval-runner/protocol.ts",
+      "loc": 259
+    },
+    {
+      "path": "source/sand-eval-runner/run.ts",
+      "loc": 139
+    },
+    {
+      "path": "source/shared/auth.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/automation-schedule.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/box-migration.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/box-runtime.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/channel-messaging.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/connect-errors.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/deep-link.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/desktop.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/env-file.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/errors.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/external-url-policy.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/feedback.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/forever-box.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/host-settings-field.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/host-settings.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/inference-router.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/invariant.ts",
+      "loc": 301018
+    },
+    {
+      "path": "source/shared/json-value-equality.ts",
+      "loc": 26
+    },
+    {
+      "path": "source/shared/link-preview-policy.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/local-exec-process-identity.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/local-tool-permission.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/mcp.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/message-reference.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/ordering.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/os-notification.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/persistence.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/pr-review.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/product-name.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/proto.ts",
+      "loc": 1080
+    },
+    {
+      "path": "source/shared/push-message-content.ts",
+      "loc": 50
+    },
+    {
+      "path": "source/shared/retry-after.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/sand-auto-review-instructions.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/sand-auto-review-redact.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/sand-spotlight.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/sand-text.ts",
+      "loc": 20
+    },
+    {
+      "path": "source/shared/sand-widgets.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/sidebar-sections.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/system-errno.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/team-rules.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/timezone.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/transcript-threads.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/transcript.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/transport-types.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/update-track.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/update.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/vnc-liveness.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/webauthn-proxy-availability.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/window-chrome.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/workflow-model.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/workflows.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/write-epoch.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/account/auth.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/account/dev-login.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/shared/agents/agent-activity.ts",
+      "loc": 76
+    },
+    {
+      "path": "source/shared/agents/agent-model.ts",
+      "loc": 21
+    },
+    {
+      "path": "source/shared/agents/agent-summaries.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/agents/agent-tool-names.ts",
+      "loc": 63
+    },
+    {
+      "path": "source/shared/agents/agents.ts",
+      "loc": 372
+    },
+    {
+      "path": "source/shared/agents/async-task-fallbacks.ts",
+      "loc": 3658
+    },
+    {
+      "path": "source/shared/agents/bot-templates.ts",
+      "loc": 68
+    },
+    {
+      "path": "source/shared/agents/cloud-agents.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/shared/agents/conversation-name.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/shared/agents/disk-saver.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/agents/memory.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/agents/model-catalog.ts",
+      "loc": 130
+    },
+    {
+      "path": "source/shared/agents/onboarding.ts",
+      "loc": 9
+    },
+    {
+      "path": "source/shared/agents/sand-agent-model.ts",
+      "loc": 47
+    },
+    {
+      "path": "source/shared/agents/session-preview-fallbacks.ts",
+      "loc": 196
+    },
+    {
+      "path": "source/shared/agents/sharing.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/agents/subagents.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/shared/agents/teach-recording.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/shared/agents/grok-bot-mark-deal/index.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/shared/auto-review/sand-auto-review-copy-types.ts",
+      "loc": 61
+    },
+    {
+      "path": "source/shared/auto-review/sand-auto-review-instructions.ts",
+      "loc": 368
+    },
+    {
+      "path": "source/shared/auto-review/sand-auto-review-redact.ts",
+      "loc": 3501
+    },
+    {
+      "path": "source/shared/automations/automation-schedule.ts",
+      "loc": 2182
+    },
+    {
+      "path": "source/shared/automations/automations.ts",
+      "loc": 271
+    },
+    {
+      "path": "source/shared/automations/listener-integrations.ts",
+      "loc": 46
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-automations.ts",
+      "loc": 253
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-import.ts",
+      "loc": 51
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-link.ts",
+      "loc": 14
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-memories.ts",
+      "loc": 50
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-plugins.ts",
+      "loc": 48
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-recipe.ts",
+      "loc": 277
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-share-capability.ts",
+      "loc": 9
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-share-id.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-user-skills.ts",
+      "loc": 91
+    },
+    {
+      "path": "source/shared/bot-templates/bot-template-visibility.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/shared/box/box-contract.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/shared/box/box-secrets.ts",
+      "loc": 71
+    },
+    {
+      "path": "source/shared/box/forever-box.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/shared/canvas/canvas-source-path.ts",
+      "loc": 90
+    },
+    {
+      "path": "source/shared/channels/channel-messaging.ts",
+      "loc": 216
+    },
+    {
+      "path": "source/shared/channels/channel-prompt-lines.ts",
+      "loc": 23
+    },
+    {
+      "path": "source/shared/channels/channels.ts",
+      "loc": 69
+    },
+    {
+      "path": "source/shared/chrome-import/chrome-import.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/shared/chrome-import/cookie-origin-approval-frames.ts",
+      "loc": 37
+    },
+    {
+      "path": "source/shared/chrome-import/cookie-origin-approval-gateway.ts",
+      "loc": 133
+    },
+    {
+      "path": "source/shared/chrome-import/cookie-origin-approval-transcript.ts",
+      "loc": 3182
+    },
+    {
+      "path": "source/shared/chrome-import/cookie-origin-approval.ts",
+      "loc": 28
+    },
+    {
+      "path": "source/shared/chrome-import/cookie-origin-grant.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/shared/desktop/deep-link.ts",
+      "loc": 91
+    },
+    {
+      "path": "source/shared/desktop/desktop.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/desktop/external-url-policy.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/shared/desktop/notification-sound.ts",
+      "loc": 17
+    },
+    {
+      "path": "source/shared/desktop/os-notification.ts",
+      "loc": 183
+    },
+    {
+      "path": "source/shared/desktop/settings-anchors.ts",
+      "loc": 43
+    },
+    {
+      "path": "source/shared/desktop/sidebar-targets.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/errors/bounded.ts",
+      "loc": 4200
+    },
+    {
+      "path": "source/shared/errors/connect-errors.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/shared/errors/errors.ts",
+      "loc": 28
+    },
+    {
+      "path": "source/shared/errors/registry.ts",
+      "loc": 946
+    },
+    {
+      "path": "source/shared/errors/system-errno.ts",
+      "loc": 26
+    },
+    {
+      "path": "source/shared/experiments/experiments.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/gateway/gateway-wire.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/shared/grok-bot/sessions.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/shared/local-exec/local-exec-failure-classifier.ts",
+      "loc": 25
+    },
+    {
+      "path": "source/shared/local-exec/local-exec-file-bytes.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/local-exec/local-exec-gateway.ts",
+      "loc": 441
+    },
+    {
+      "path": "source/shared/local-exec/messages-error-code.ts",
+      "loc": 7635
+    },
+    {
+      "path": "source/shared/local-exec/messages-op.ts",
+      "loc": 27
+    },
+    {
+      "path": "source/shared/locale/locale.ts",
+      "loc": 89726
+    },
+    {
+      "path": "source/shared/locale/timezone.ts",
+      "loc": 38
+    },
+    {
+      "path": "source/shared/mcp/mcp-config-failure.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/mcp/mcp-custom-instructions.ts",
+      "loc": 48
+    },
+    {
+      "path": "source/shared/mcp/mcp.ts",
+      "loc": 130
+    },
+    {
+      "path": "source/shared/media/attachment-limits.ts",
+      "loc": 32
+    },
+    {
+      "path": "source/shared/media/attachment-open-policy.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/shared/media/attachment-preview.ts",
+      "loc": 108
+    },
+    {
+      "path": "source/shared/media/attachment-summary.ts",
+      "loc": 120
+    },
+    {
+      "path": "source/shared/media/attachments.ts",
+      "loc": 59
+    },
+    {
+      "path": "source/shared/media/avatar-image.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/media/box-file-path.ts",
+      "loc": 50
+    },
+    {
+      "path": "source/shared/media/file-preview-kind.ts",
+      "loc": 34
+    },
+    {
+      "path": "source/shared/media/image-dimensions.ts",
+      "loc": 261
+    },
+    {
+      "path": "source/shared/media/image-mime.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/media/inline-formatting-tags.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/media/markdown-preview.ts",
+      "loc": 184
+    },
+    {
+      "path": "source/shared/media/media-extensions.ts",
+      "loc": 55
+    },
+    {
+      "path": "source/shared/media/transcribe-language.ts",
+      "loc": 69
+    },
+    {
+      "path": "source/shared/media/video-dimensions.ts",
+      "loc": 111
+    },
+    {
+      "path": "source/shared/media/voice-preview.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/media/voice-transcription.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/messages/permissions.ts",
+      "loc": 48
+    },
+    {
+      "path": "source/shared/node/async.ts",
+      "loc": 27
+    },
+    {
+      "path": "source/shared/node/atomic-write.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/cursor-token.ts",
+      "loc": 82
+    },
+    {
+      "path": "source/shared/node/host-process-probe.ts",
+      "loc": 26
+    },
+    {
+      "path": "source/shared/node/http-image.ts",
+      "loc": 43
+    },
+    {
+      "path": "source/shared/node/inference-router-local.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/paths.ts",
+      "loc": 60
+    },
+    {
+      "path": "source/shared/node/sand-client-metadata.ts",
+      "loc": 34670
+    },
+    {
+      "path": "source/shared/node/sand-variant.ts",
+      "loc": 146
+    },
+    {
+      "path": "source/shared/node/analytics/product-analytics.ts",
+      "loc": 135
+    },
+    {
+      "path": "source/shared/node/cursor-backend/account-mcp.ts",
+      "loc": 325
+    },
+    {
+      "path": "source/shared/node/cursor-backend/backend-mcp-exec.ts",
+      "loc": 244
+    },
+    {
+      "path": "source/shared/node/cursor-backend/cursor-generate-image.ts",
+      "loc": 51
+    },
+    {
+      "path": "source/shared/node/cursor-backend/cursor-inference.ts",
+      "loc": 329
+    },
+    {
+      "path": "source/shared/node/cursor-backend/process-environment.ts",
+      "loc": 88
+    },
+    {
+      "path": "source/shared/node/cursor-backend/rpc-tracing.ts",
+      "loc": 107
+    },
+    {
+      "path": "source/shared/node/egress-tunnel/box-connection.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/egress-tunnel/env-config.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/node/egress-tunnel/websocket-client.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/egress-tunnel/ws.d.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/experiments/cursor-experiments.ts",
+      "loc": 788
+    },
+    {
+      "path": "source/shared/node/experiments/experiment-config.gen.ts",
+      "loc": 9173
+    },
+    {
+      "path": "source/shared/node/experiments/experiment-registry.ts",
+      "loc": 72
+    },
+    {
+      "path": "source/shared/node/experiments/experiments-diagnostics.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/shared/node/experiments/feature-flag-overrides.ts",
+      "loc": 131
+    },
+    {
+      "path": "source/shared/node/experiments/gate-overrides.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/shared/node/experiments/gate-property.ts",
+      "loc": 40
+    },
+    {
+      "path": "source/shared/node/experiments/sand-model-config.ts",
+      "loc": 61
+    },
+    {
+      "path": "source/shared/node/experiments/sand-model-experiment.ts",
+      "loc": 47
+    },
+    {
+      "path": "source/shared/node/experiments/statsig-bootstrap.ts",
+      "loc": 143
+    },
+    {
+      "path": "source/shared/node/marketplace/cursor-marketplace-client.ts",
+      "loc": 55
+    },
+    {
+      "path": "source/shared/node/marketplace/cursor-marketplace-logo-registry.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/node/mcp/account-display-cache.ts",
+      "loc": 24
+    },
+    {
+      "path": "source/shared/node/mcp/builtin-mcp.ts",
+      "loc": 73
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-account-slot-lifecycle.ts",
+      "loc": 134
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-auth-cleanup.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-auth-watch-lifecycle.ts",
+      "loc": 472
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-auth-watch.ts",
+      "loc": 12
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-catalog-cache.ts",
+      "loc": 31
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-catalog-flow.ts",
+      "loc": 129
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-config-error.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-definition-source.ts",
+      "loc": 129
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-diagnostics.ts",
+      "loc": 1641
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-display-runtime.ts",
+      "loc": 46
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-image-assets.ts",
+      "loc": 52
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-instructions-and-toggles.ts",
+      "loc": 107
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-listing-summaries.ts",
+      "loc": 162
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-manager.ts",
+      "loc": 567
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-marketplace-logo.ts",
+      "loc": 69
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-marketplace.ts",
+      "loc": 18157
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-plugin-variables.ts",
+      "loc": 123
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-result-factory.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-server-id.ts",
+      "loc": 24
+    },
+    {
+      "path": "source/shared/node/mcp/mcp-validation.ts",
+      "loc": 43
+    },
+    {
+      "path": "source/shared/node/mcp/tools-discovery.ts",
+      "loc": 582
+    },
+    {
+      "path": "source/shared/node/scheduling/scheduling.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/shared/node/server-transcript/server-agent-action-core.ts",
+      "loc": 805
+    },
+    {
+      "path": "source/shared/node/server-transcript/server-agent-activity.ts",
+      "loc": 334
+    },
+    {
+      "path": "source/shared/node/server-transcript/server-transcript-client.ts",
+      "loc": 132
+    },
+    {
+      "path": "source/shared/node/server-transcript/server-transcript-tail-phase.ts",
+      "loc": 98
+    },
+    {
+      "path": "source/shared/node/server-transcript/server-transcript-tail.ts",
+      "loc": 1058
+    },
+    {
+      "path": "source/shared/node/settings/sand-settings-store.ts",
+      "loc": 1119
+    },
+    {
+      "path": "source/shared/observability/buffered-reporter-pin.ts",
+      "loc": 41
+    },
+    {
+      "path": "source/shared/observability/connector-auth-telemetry.ts",
+      "loc": 86
+    },
+    {
+      "path": "source/shared/observability/heap-metrics.ts",
+      "loc": 44
+    },
+    {
+      "path": "source/shared/observability/log-ship-cadence.ts",
+      "loc": 75
+    },
+    {
+      "path": "source/shared/observability/policy-stop-pin.ts",
+      "loc": 21
+    },
+    {
+      "path": "source/shared/observability/policy-stop-telemetry.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/observability/request-lineage.ts",
+      "loc": 7845
+    },
+    {
+      "path": "source/shared/observability/send-trace.ts",
+      "loc": 200
+    },
+    {
+      "path": "source/shared/observability/sentry-privacy-mode.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/observability/structured-log-spill.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/observability/structured-log-transport.ts",
+      "loc": 499
+    },
+    {
+      "path": "source/shared/observability/telemetry-events.ts",
+      "loc": 162
+    },
+    {
+      "path": "source/shared/observability/telemetry.ts",
+      "loc": 27
+    },
+    {
+      "path": "source/shared/parse/env-file.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/parse/key-of.ts",
+      "loc": 9
+    },
+    {
+      "path": "source/shared/parse/retry-after.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/parse/unknown-record.ts",
+      "loc": 12297
+    },
+    {
+      "path": "source/shared/parse/zod-wire.ts",
+      "loc": 18
+    },
+    {
+      "path": "source/shared/permissions/local-tool-permission-machinery.ts",
+      "loc": 98
+    },
+    {
+      "path": "source/shared/permissions/local-tool-permission.ts",
+      "loc": 61
+    },
+    {
+      "path": "source/shared/product/product-name.ts",
+      "loc": 86
+    },
+    {
+      "path": "source/shared/rpc/client-side-tool-v2-transport.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/rpc/coordinator-main.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/rpc/dev-controls.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/rpc/gateway.ts",
+      "loc": 907
+    },
+    {
+      "path": "source/shared/rpc/main.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/rpc/payload-validators.ts",
+      "loc": 83
+    },
+    {
+      "path": "source/shared/rpc/vnc.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/rules/team-rules.ts",
+      "loc": 62
+    },
+    {
+      "path": "source/shared/search/search.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/shared/send/send-acceptance.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/send/send.ts",
+      "loc": 19
+    },
+    {
+      "path": "source/shared/settings/host-settings.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/shared/settings/sidebar-sections.ts",
+      "loc": 91
+    },
+    {
+      "path": "source/shared/skills/skill-model.ts",
+      "loc": 376
+    },
+    {
+      "path": "source/shared/skills/skills.ts",
+      "loc": 341
+    },
+    {
+      "path": "source/shared/spotlight/sand-spotlight.ts",
+      "loc": 2346
+    },
+    {
+      "path": "source/shared/streams/ordering.ts",
+      "loc": 11
+    },
+    {
+      "path": "source/shared/streams/transport-types.ts",
+      "loc": 14
+    },
+    {
+      "path": "source/shared/transcript/conversation-outline.ts",
+      "loc": 27
+    },
+    {
+      "path": "source/shared/transcript/host-transcript-copy.ts",
+      "loc": 16
+    },
+    {
+      "path": "source/shared/transcript/main-transcript-page.ts",
+      "loc": 17
+    },
+    {
+      "path": "source/shared/transcript/message-reference.ts",
+      "loc": 10
+    },
+    {
+      "path": "source/shared/transcript/requests.ts",
+      "loc": 22
+    },
+    {
+      "path": "source/shared/transcript/sand-timeline-events.ts",
+      "loc": 35
+    },
+    {
+      "path": "source/shared/transcript/spend-initiation.ts",
+      "loc": 44
+    },
+    {
+      "path": "source/shared/transcript/transcript-entry-serde.ts",
+      "loc": 84
+    },
+    {
+      "path": "source/shared/transcript/transcript-threads.ts",
+      "loc": 36
+    },
+    {
+      "path": "source/shared/transcript/transcript.ts",
+      "loc": 252
+    },
+    {
+      "path": "source/shared/trays/agent-run-error-title-copy.ts",
+      "loc": 197
+    },
+    {
+      "path": "source/shared/trays/tray-title-fallbacks.ts",
+      "loc": 25
+    },
+    {
+      "path": "source/shared/trays/trays.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/update/update-track.ts",
+      "loc": 13
+    },
+    {
+      "path": "source/shared/update/update.ts",
+      "loc": 8
+    },
+    {
+      "path": "source/shared/user-form-vault/vault-types.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/voice-call/receipt-entry.ts",
+      "loc": 15
+    },
+    {
+      "path": "source/shared/voice-call/record.ts",
+      "loc": 119
+    },
+    {
+      "path": "source/shared/voice-call/voice-settings-capability.ts",
+      "loc": 7
+    },
+    {
+      "path": "source/shared/voice-call/voices.ts",
+      "loc": 448
+    },
+    {
+      "path": "source/shared/webauthn/webauthn-gateway.ts",
+      "loc": 101
+    },
+    {
+      "path": "source/shared/widgets/sand-widgets.ts",
+      "loc": 3136
+    },
+    {
+      "path": "source/shared/widgets/widget-answers.ts",
+      "loc": 33
+    }
+  ],
+  "edges": [],
+  "external": {}
+}
