@@ -1,0 +1,106 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 1224" role="img" aria-label="telemetry host-turn 家族" aria-describedby="dagcap-s8-host-turn">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M260,412 L260,456" marker-end="url(#ar)"/>
+  <path d="M260,520 L260,564" marker-end="url(#ar)"/>
+  <path d="M260,628 L260,672" marker-end="url(#ar)"/>
+  <path d="M260,736 L260,780" marker-end="url(#ar)"/>
+  <path d="M260,844 L260,888" marker-end="url(#ar)"/>
+  <path d="M380.0,927.0 L470,927" marker-end="url(#ar)"/>
+  <path d="M260,966 L260,1010" marker-end="url(#ar)"/>
+  <path d="M380.0,1113.0 L470,1113" marker-end="url(#ar)"/>
+  <path d="M260,1152 L260,1196" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">turn 生命週期事件</text>
+    <text class="sub" x="94" y="71">共七類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">tool-call 追蹤事件</text>
+    <text class="sub" x="94" y="179">共三類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">訊息與佇列事件</text>
+    <text class="sub" x="94" y="287">共九類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="384">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="348" width="360" height="64" rx="8"/>
+    <text x="94" y="375">復活與收尾事件</text>
+    <text class="sub" x="94" y="395">共三類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="492">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="456" width="360" height="64" rx="8"/>
+    <text x="94" y="483">自動化事件</text>
+    <text class="sub" x="94" y="503">共三類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="600">發生</text>
+  <g class="app lay-emit src" data-snip="t-noop" tabindex="0" role="button" aria-label="沙箱 daemon ping 事件，開啟原文">
+    <rect x="80" y="564" width="360" height="64" rx="8"/>
+    <text x="94" y="591">沙箱 daemon ping 事件</text>
+    <text class="sub" x="94" y="611">共一類</text>
+    <path class="srcfold" d="M431,628 L440,628 L440,619 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="708">port</text>
+  <g class="app lay-port src" data-snip="t-noop" tabindex="0" role="button" aria-label="SandTelemetry port，開啟原文">
+    <rect x="80" y="672" width="360" height="64" rx="8"/>
+    <text x="94" y="699">SandTelemetry port</text>
+    <text class="sub" x="94" y="719">31 支具名方法，5 支無人呼叫</text>
+    <path class="srcfold" d="M431,736 L440,736 L440,727 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="816">轉接</text>
+  <g class="app lay-adapter src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="SandStructuredLogTelemetry，開啟原文">
+    <rect x="80" y="780" width="360" height="64" rx="8"/>
+    <text x="94" y="807">SandStructuredLogTelemetry</text>
+    <text class="sub" x="94" y="827">host 行程自己的 adapter，跟桌面那支不同檔</text>
+    <path class="srcfold" d="M431,844 L440,844 L440,835 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="931">管線</text>
+  <g class="dec lay-pipe src" data-snip="t8-buffer-const" tabindex="0" role="button" aria-label="緩衝區超過 1000 筆？，開啟原文">
+    <polygon points="260,888 380.0,927.0 260,966 140.0,927.0"/>
+    <text text-anchor="middle" x="260" y="932.0">緩衝區超過 1000 筆？</text>
+    <circle class="srcdot" cx="260" cy="949" r="4"/>
+  </g>
+  <g class="app lay-pipe src" data-snip="t8-overflow-host" tabindex="0" role="button" aria-label="砍最舊的 host／box 心跳日誌，開啟原文">
+    <rect x="470" y="898" width="430" height="58" rx="8"/>
+    <text x="484" y="922">砍最舊的 host／box 心跳日誌</text>
+    <text class="sub" x="484" y="942">overflow_evicted，不動其餘訊息</text>
+    <path class="srcfold" d="M891,956 L900,956 L900,947 z"/>
+  </g>
+  <text class="elab" x="272" y="992.0">未超過</text>
+  <text class="lay" text-anchor="end" x="76" y="1046">落地</text>
+  <g class="app lay-sink">
+    <rect x="80" y="1010" width="360" height="64" rx="8"/>
+    <text x="94" y="1037">StructuredLogTransport 送出</text>
+    <text class="sub" x="94" y="1057">HTTP submitLogs 到 Cursor 後端</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="1117">落地</text>
+  <g class="dec lay-sink">
+    <polygon points="260,1074 380.0,1113.0 260,1152 140.0,1113.0"/>
+    <text text-anchor="middle" x="260" y="1118.0">這次送出失敗？</text>
+  </g>
+  <g class="app lay-sink">
+    <rect x="470" y="1084" width="430" height="58" rx="8"/>
+    <text x="484" y="1108">留底重試</text>
+    <text class="sub" x="484" y="1128">buffer 原封不動，下一輪同一批再送</text>
+  </g>
+  <text class="elab" x="272" y="1178.0">成功</text>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-host-turn">host 行程 26 類執行期事件共用同一份 SandTelemetry port 與同一支 adapter；緩衝上限 1000 筆，滿了先砍心跳日誌，送出失敗留底重試。</p>

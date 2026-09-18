@@ -1,6 +1,8 @@
 import { serve } from "bun";
 import index from "./index.html";
 import grokBot from "./grok-bot.html";
+import grokBot047 from "./grok-bot-047.html";
+import grokBotEvolution from "./grok-bot-evolution.html";
 import lauren from "./lauren.html";
 import laurenEn from "./lauren-en.html";
 
@@ -11,6 +13,10 @@ const server = serve({
     "/index.html": index,
     "/grok-bot": grokBot,
     "/grok-bot.html": grokBot,
+    "/grok-bot-047": grokBot047,
+    "/grok-bot-047.html": grokBot047,
+    "/grok-bot-evolution": grokBotEvolution,
+    "/grok-bot-evolution.html": grokBotEvolution,
     "/lauren": lauren,
     "/lauren.html": lauren,
     "/lauren-en": laurenEn,

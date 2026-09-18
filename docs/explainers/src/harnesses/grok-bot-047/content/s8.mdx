@@ -1,0 +1,25 @@
+import { Peek, H2 } from "../../../mdx-components"
+
+<>
+      <H2 id="s8" n="8">觀測</H2>
+      <p>
+        呼叫端不直接打上傳器。它呼叫一份 port 上的方法名。
+        沒接真後端時，那份 port 是 <code>createNoopSandTelemetry()</code>。
+        <Peek snip="t-noop-047">noop</Peek>
+        <code>TranscriptManager</code> 的欄位預設就是這份 noop，外加
+        <code>createNoopSandProductAnalytics()</code>。
+        <Peek snip="t-tm-047">預設插入</Peek>
+        host 開機時 <code>telemetry</code> extension 才 <code>new HostTelemetryService</code>。
+        <Peek snip="t-ext-047">extension</Peek>
+        那 38 個檔在 <code>source/host/extensions/telemetry/</code>，bytes 來自 VM host，不是筆電 asar。
+        <span className="stamp">2026-09-12</span>
+      </p>
+      <p>
+        筆電側另有一套 leftover 模組，走 IPC 與 coordinator。
+        畫面經 preload 把 <code>window.desktop</code> 暴露成 <code>dune-rpc</code>，coordinator 的 MessagePort 仍叫
+        <code>sand:coordinator-port</code>。
+        <Peek snip="dune-rpc">dune-rpc</Peek>
+        <Peek snip="coord-port-047">coordinator 埠</Peek>
+        0.18 解說數過 95 個事件名。本文沒有重數 0.47。家族怎麼送到落點仍見 8.20，那張形狀（port → adapter → 管線 → sink）在 leftover 字串裡還對得上。
+      </p>
+</>

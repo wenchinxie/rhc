@@ -6,7 +6,7 @@ export function IndexPage() {
       <header>
         <h1>Explainers</h1>
         <p className="mast-note">
-          這份索引按切面排。觀測、port、開機各進一節，不是按文件名掃。
+          0.18 與 0.47 分開讀。演進頁只講兩者差在哪。
         </p>
       </header>
       {GROUPS.map((group) => (

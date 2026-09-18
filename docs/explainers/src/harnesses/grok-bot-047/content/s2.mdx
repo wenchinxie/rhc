@@ -1,0 +1,66 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s2" n="2">開機與行程</H2>
+  <p>
+    點 Grok Bot 圖示只啟動 laptop Electron。<code>package.json</code> 的 <code>main</code> 是 <code>dist/electron-main/main.cjs</code>。
+    該檔是 stub，在同一個 main process 裡用 <code>vm.Script</code> 載 <code>main-core.cjs</code> 再 <code>main-app.cjs</code>。
+    <Peek snip="s2-stub">stub</Peek>
+    in-box <Term k="sand-host">host-main</Term> 不在 0.47 laptop asar。Gateway 可連，是 box 內 <code>listen</code> 且 <code>writeGatewayDiscovery</code>，加上 laptop 持有非空 <code>gatewayUrl</code>。
+    <Peek snip="s2-listen">listen</Peek>
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s2-k" n="2.0">關鍵概念</H3>
+  <p>
+    行程根：Electron main（stub 加 core 加 app，同行程）；renderer 加 preload；coordinator <code>utilityProcess</code>（服務名 <code>sand-node-agent-coordinator</code>）；in-box host（VM zip）；<code>box-exec</code> 在這份 asar 與凍結清單裡 ABSENT。
+    <code>dune-rpc</code> 是 <code>window.desktop</code>，用來要 coordinator port，不送 prompt 本文。
+    <Peek snip="dune-rpc">dune-rpc</Peek>
+    Prompt 走移交過來的 MessagePort，IPC 名仍是 <code>sand:coordinator-port</code>。
+    <Peek snip="coord-port-047">埠名</Peek>
+  </p>
+  <H3 id="s2-1" n="2.1">主行程只起殼</H3>
+  <p>
+    stub 先載 <code>main-core</code>，等 <code>remainderDue</code>，再載 <code>main-app</code>。三個 cjs 不是三個 OS process。
+    主行程 fork 出 coordinator 之後，自己的責任是轉發。模型迴圈不在桌面 main。
+  </p>
+  <H3 id="s2-2" n="2.2">畫面靠 preload 轉手</H3>
+  <p>
+    Preload 暴露 <code>desktop</code> 與 <code>coordinatorPort</code>，並聽 <code>sand:coordinator-port</code>。
+    畫面呼叫 <code>invoke("sand:coordinator-port-request")</code>。main 把 <code>event.ports[0]</code> 交回去。畫面看不到 gateway 位址。
+  </p>
+  <H3 id="s2-3" n="2.3">host-main 在 box 內 listen</H3>
+  <p>
+    Laptop 連 box：<code>resolveGatewayConnection</code> → <code>GrokBotService.EnsureSandBox</code>，除非已設 <code>SAND_HOST_GATEWAY_URL</code>。空 URL throw。這段實作在 freeze 未列的 <code>main-app.cjs</code>，見 ARCHITECTURE。
+    Box 內 <code>runHostMain</code>：<code>acquireHostLock</code> → <code>SandHost.start</code> → <code>startGatewayServer</code> → <code>listen(port ?? 0)</code> → <code>writeGatewayDiscovery</code>。
+    <code>--box-copy-in</code> 在開頭 <code>process.exit</code>，不開 gateway。
+  </p>
+  <H3 id="s2-4" n="2.4">box-exec 不在這份 asar</H3>
+  <p>
+    0.47 laptop asar 沒有 <code>dist/host/</code>，也沒有 box-exec 啟動碼。<code>runHostMain</code> 不 spawn box-exec。ARCHITECTURE 把它畫在 VM 旁。不能把 0.18「host 生 box-exec」當成這份安裝包的事實。
+  </p>
+  <H3 id="s2-5" n="2.5">coordinator 用 fork 起，三條 MessagePort</H3>
+  <p>
+    <code>launchCoordinator</code> 以服務名 <code>sand-node-agent-coordinator</code> 做 <code>fork</code>，建 control、rendererData、mainData 三條 channel，一次 <code>postMessage</code> 進子行程。
+    <Peek snip="launcher">三埠</Peek>
+    之後 coordinator 對 gateway 做 <code>POST /api/sendPrompt</code>。
+  </p>
+  <H3 id="s2-6" n="2.6">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>0.47 位置</th></tr></thead>
+  <tbody>
+  <tr><td>圖示啟動的 main</td><td><code>extracted/electron-main/main.cjs</code></td></tr>
+  <tr><td>真正 desktop 邏輯</td><td><code>main-core.cjs</code> / <code>main-app.cjs</code>（freeze 未列；ARCHITECTURE 描述）</td></tr>
+  <tr><td>preload / dune-rpc</td><td><code>extracted/electron-preload/preload.cjs</code></td></tr>
+  <tr><td>coordinator fork</td><td><code>source/electron-main/coordinator/coordinator-launcher.ts</code></td></tr>
+  <tr><td>HTTP client</td><td><code>source/node-agent-coordinator/gateway/gateway-client.ts</code></td></tr>
+  <tr><td>Host listen</td><td><code>source/host/main.ts</code>（VM zip，非 asar）</td></tr>
+  <tr><td>box-exec</td><td>ABSENT from asar</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s2-7" n="2.7">容易踩的</H3>
+  <p>
+    不要把 stub、main-core、main-app 當成三個行程。不要把 <code>dune-rpc</code> 當成 sendPrompt 通道。不要假設 0.47 laptop 帶 <code>dist/host/host-main.cjs</code>。回 <code>accepted: true</code> 不是模型回覆。
+  </p>
+</>

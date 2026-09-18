@@ -2,7 +2,113 @@ import { Peek, Term } from "../../../mdx-components"
 
 <section className="apex wide">
   <p>
-    Grok Bot 是桌面 agent。你在 laptop 畫面送出一則訊息。回合迴圈跑在遠端 box 裡的 <Term k="sand-host">host-main</Term>。一則送出之後，底下這棵樹的三道門決定工作跑在哪。本文讀 0.47.0 Windows asar 的反編譯稿，加上 VM zip 拆出的 host。<Peek snip="p047">0.47 asar</Peek> 語料見 <a className="xref" href="#s1">§1</a>。觀測見 <a className="xref" href="#s8">§8</a>。port 見 <a className="xref" href="#s9">§9</a>。<span className="stamp">2026-09-16</span>
+    手上這份 Grok Bot 原始碼是 Anysphere 桌面程式 0.18.0 的重建稿，commit <code>a9f633e</code>，套件名{" "}
+    <code>grok-bot-0.18-reconstructed</code>。<Peek snip="repo-name">套件名</Peek> 用 TypeScript 編譯器 API 掃過{" "}
+    <code>source/</code> 之後，樹裡有 1,722 個檔、43 萬行、41 個資料夾節點、120 條資料夾之間的匯入邊、22,829 條函式呼叫邊。
+    本文每一章的 Peek 都指向這棵樹的檔與行號，引文由 gate 逐行跟磁碟比對過。
   </p>
+  <p>
+    按資料夾順序讀這棵樹會被帶偏，原因有三個。
+  </p>
+  <ol className="enum">
+    <li>
+      <span className="n">第一</span>
+      <strong>迴圈不在名字叫 agent 的地方獨立存在。</strong>
+      <span className="d">
+        <code>packages/agent</code> 有 256 個檔，但整棵樹裡只有 <code>host</code> 引用它；模型迴圈住在遠端機器上的
+        <Term k="sand-host">host-main</Term> 行程裡，桌面主行程與 <Term k="coordinator">coordinator</Term> 都碰不到它。
+        見 <a className="xref" href="#s2">§2</a>、<a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">第二</span>
+      <strong>同一個功能在樹裡有出廠版與重建版兩份，不標清楚就會把疊層當原生。</strong>
+      <span className="d">
+        設定沒改時模型來源是 <code>cursor</code>，沙箱是 Cursor 後端配的遠端機器；Claude Code、Codex、OpenRouter 路由器與本機 Docker 容器是這份樹加上去的
+        <Term k="reconstruction">重建疊層</Term>。<Peek snip="router-cursor">cursor 放手</Peek>{" "}
+        見 <a className="xref" href="#s1">§1</a>、<a className="xref" href="#s4">§4</a>、<a className="xref" href="#s6">§6</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">第三</span>
+      <strong>一個常數讀起來像上限，不代表它真的被讀。</strong>
+      <span className="d">
+        <code>MAX_AGENT_STEPS = 1_000</code> 定義在 agent 套件裡，整棵樹沒有人讀它；迴圈真正拿到的是 host 給的 5,000。
+        <Peek snip="dead-1000">沒人讀的一千</Peek> <Peek snip="max-steps">五千</Peek>{" "}
+        見 <a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+  </ol>
+  <p>
+    <strong>
+      所以本文不照資料夾切章，改照「一個執行期問題、一棵呼叫樹」切：每章回答一個問題，走一棵從入口函式展開的樹，樹經過哪個資料夾就在那裡講該資料夾；
+      <a className="xref" href="#s0">§0</a> 的資料夾表把 41 個節點逐一歸到章。
+    </strong>
+    章節順序固定：前提、開機、迴圈、模型、工具、執行環境、狀態、遙測。每章的關鍵結論如下。
+  </p>
+  <ol className="enum">
+    <li>
+      <span className="n">一</span>
+      <strong>這棵樹的邊界釘在保存下來的出廠安裝包上；判斷疊層看三個記號。</strong>
+      <span className="d">
+        路由器、本機容器、三個 <code>SAND_DISABLE_*</code> 旗標。<Peek snip="provenance">安裝包</Peek>{" "}
+        <a className="xref" href="#s1">§1</a>。Lauren Tan 的開發分享另放在同站的 <code>lauren.html</code>，不在本文。
+      </span>
+    </li>
+    <li>
+      <span className="n">二</span>
+      <strong>開機沒有一個主行程管到底：桌面主行程 fork 出 <Term k="coordinator">coordinator</Term>，<Term k="sand-host">host-main</Term> 在遠端機器自己開機，再生出 box-exec-daemon。</strong>
+      <span className="d">
+        三條 MessagePort、一個 loopback HTTP gateway、一次 spawn。<Peek snip="launcher">三埠</Peek> <Peek snip="host-main">host 開機</Peek>{" "}
+        <a className="xref" href="#s2">§2</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">三</span>
+      <strong>一則送出先過 <Term k="send-pipeline">SendPipeline</Term> 去重，再成為十二種動作之一，外層最多五千步，內層工具跟模型輪流開口，沒有工具呼叫那一輪才結束。</strong>
+      <span className="d">
+        <Peek snip="send-prompt">去重</Peek> <Peek snip="step-loop">步進</Peek>{" "}
+        <a className="xref" href="#s3">§3</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">四</span>
+      <strong>出廠只認 Cursor；路由判斷在 <Term k="coordinator">coordinator</Term> 與 host 兩邊各讀一份 settings.json。</strong>
+      <span className="d">
+        <Peek snip="settings-default">預設值</Peek>{" "}
+        <a className="xref" href="#s4">§4</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">五</span>
+      <strong>工具要過四道關卡才能動手：登錄表、七個 surface 的審核閘、待審核阻擋、allowlist 預檢。</strong>
+      <span className="d">
+        <Peek snip="review-modes">七個 surface</Peek> <Peek snip="pending-approval">待審核</Peek>{" "}
+        <a className="xref" href="#s5">§5</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">六</span>
+      <strong>沙箱在遠端是出廠預設；本機 Docker 是疊層，local-exec 走使用者自己的機器、不算沙箱，選擇點只有 boxRuntime 一個開關。</strong>
+      <span className="d">
+        <Peek snip="remote-box">要遠端機器</Peek> <Peek snip="runtime-switch">開關</Peek>{" "}
+        <a className="xref" href="#s6">§6</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">七</span>
+      <strong>設定全域共用，每個 agent 一個資料夾一個 SQLite，記憶有 30 天半衰期，secrets 分三層但都用原子寫。</strong>
+      <span className="d">
+        <Peek snip="root-dir">根目錄</Peek> <Peek snip="memory-halflife">半衰期</Peek>{" "}
+        <a className="xref" href="#s7">§7</a>。
+      </span>
+    </li>
+    <li>
+      <span className="n">八</span>
+      <strong>遙測從各模組 emit，經 adapter、pipe、sink 落地，失敗政策是丟棄不阻塞。</strong>
+      <span className="d">
+        <a className="xref" href="#s8">§8</a>。
+      </span>
+    </li>
+  </ol>
 </section>
-

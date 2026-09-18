@@ -1,0 +1,50 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 498" role="img" aria-label="telemetry sentry-direct 家族" aria-describedby="dagcap-s8-sentry-direct">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M380.0,387.0 L470,387" marker-end="url(#ar)"/>
+  <path d="M260,426 L260,470" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-sentry" tabindex="0" role="button" aria-label="錯誤與當機事件，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">錯誤與當機事件</text>
+    <text class="sub" x="94" y="71">warning／crash／startup-failure／invariant 四類</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">發生</text>
+  <g class="app lay-emit src" data-snip="t8-pipes-full" tabindex="0" role="button" aria-label="對話情境事件，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">對話情境事件</text>
+    <text class="sub" x="94" y="179">sentryConversation 一類</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">轉接</text>
+  <g class="app lay-adapter src" data-snip="t-sentry" tabindex="0" role="button" aria-label="sentry.ts 包住 @sentry/electron，開啟原文">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">sentry.ts 包住 @sentry/electron</text>
+    <text class="sub" x="94" y="287">captureMessage／captureException 兩支方法</text>
+    <path class="srcfold" d="M431,304 L440,304 L440,295 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="391">落地</text>
+  <g class="dec lay-sink">
+    <polygon points="260,348 380.0,387.0 260,426 140.0,387.0"/>
+    <text text-anchor="middle" x="260" y="392.0">Sentry 這次送得出去？</text>
+  </g>
+  <g class="app lay-sink">
+    <rect x="470" y="358" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="382">送不出就跳過</text>
+    <text class="sub" x="484" y="402">不重試也不計數，沒有排隊層</text>
+  </g>
+  <text class="elab" x="272" y="452.0">送出</text>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-sentry-direct">五類事件都直接呼叫 sentry.ts 的包裝方法；有 SandSentryAdapter port 與 no-op 預設，沒有中間佇列，送不出就跳過。</p>

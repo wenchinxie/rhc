@@ -1,0 +1,54 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s7" n="7">狀態</H2>
+  <p>
+    重開機後還在的狀態幾乎都在 sand root 一棵樹上。正式版是家目錄下的 <code>.grokbot</code>。
+    沒有獨立的 <code>host-paths.ts</code>。根目錄解析嵌在 <code>sand-variant.ts</code>。
+    <Peek snip="s7-root">sand root</Peek>
+    對話在每個 agent 資料夾的 SQLite。雲端 agent-store 是整顆 box 的備份艙，不是那份 SQLite 本身。
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s7-k" n="7.0">關鍵概念</H3>
+  <p>
+    Sand root 是所有 host 檔案的根。Agent 資料夾是 <code>agents/id/</code>。兩種 agent store：本地 <code>store.db</code> 與雲端快照後端。兩次重開機：host 行程死掉同一顆 disk 還在；box VM 換掉要靠 copy-in。
+  </p>
+  <H3 id="s7-1" n="7.1">根目錄先問環境變數</H3>
+  <p>
+    <code>getSandRootDir</code>：優先 <code>SAND_DATA_ROOT</code> → 否則 user-data-dir 加 <code>sand-data/</code> → 否則 packaged <code>~/.grokbot</code>。Box 內別名 <code>/home/box/sand-data</code>。
+  </p>
+  <H3 id="s7-2" n="7.2">settings.json 在 sand root</H3>
+  <p>
+    Host 根 <code>settings.json</code> 由 <code>SandSettingsStore</code> 原子寫。另有 <code>agents/id/settings.json</code> 是那個 bot 的 UI 旗標。不要混。
+  </p>
+  <H3 id="s7-3" n="7.3">一個 agent 一個資料夾</H3>
+  <p>
+    <code>agents/id/store.db</code> 是對話帳本。blobs 在 isolation worker 的 <code>conversation-blobs.db</code>。profile、memory、automations、channels 都住旁邊。
+  </p>
+  <H3 id="s7-4" n="7.4">記憶是檔案不是 SQLite</H3>
+  <p>
+    <code>FileMemoryStore</code> 寫 markdown：<code>agents/id/memory/</code>、<code>user-memory/by-agent/</code>、專案底下 by-agent。可選 server shard 同步。
+  </p>
+  <H3 id="s7-5" n="7.5">secrets 分兩棵樹</H3>
+  <p>
+    Box 內 <code>box-secrets.json</code>。桌面 <code>userData/user-secrets.json</code>。推論短票不落盤。machineId 在 <code>host-secrets.json</code>。只抄一邊，另一邊重開會缺。
+  </p>
+  <H3 id="s7-6" n="7.6">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>檔</th><th>誰寫</th></tr></thead>
+  <tbody>
+  <tr><td><code>settings.json</code></td><td>SettingsService</td></tr>
+  <tr><td><code>box-secrets.json</code></td><td>BoxSecretsApplier</td></tr>
+  <tr><td><code>host-secrets.json</code></td><td>getOrCreateHostMachineId</td></tr>
+  <tr><td><code>agents/id/store.db</code></td><td>SandAgentDb / session</td></tr>
+  <tr><td>雲端 agent-store</td><td>BoxStoreSync（要 SAND_BOX_STORE_SYNC）</td></tr>
+  <tr><td>laptop user-secrets.json</td><td>Electron user-secrets-store</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s7-7" n="7.7">容易踩的</H3>
+  <p>
+    Box-store 預設只出不進。host.lock 與 gateway.json 故意不進快照。兩個 settings.json 不要混。程式裡 agent store 一詞兩用。
+  </p>
+</>
