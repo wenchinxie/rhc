@@ -1,6 +1,8 @@
 node_modules/
 docs/explainers/dist/
+docs/explainers/.lint-out/
 docs/explainers/.bun-out/
+docs/explainers/src/harnesses/grok-bot/graph/calls.json
 docs/explainers/scip-send/node_modules/
 docs/explainers/scip-send/index.scip
 *.tgz

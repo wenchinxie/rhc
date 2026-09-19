@@ -1,9 +1,11 @@
 import { Fragment, useEffect, type ReactNode } from "react";
+import "./explainer.js";
 
 declare global {
   interface Window {
     GLOSS?: Record<string, { t: string; d: string; avoid?: string[] }>;
     initExplainerShell?: () => void;
+    __explainerShellOn?: boolean;
   }
 }
 
@@ -40,8 +42,10 @@ export function ExplainerShell(props: {
   const tocLabel = props.tocLabel ?? "目錄";
   useEffect(() => {
     window.GLOSS = props.gloss;
+    const el = document.getElementById("SRC_MAP");
+    if (el) el.textContent = props.srcMapJson;
     window.initExplainerShell?.();
-  }, [props.gloss]);
+  }, [props.gloss, props.srcMapJson]);
 
   return (
     <>
@@ -93,6 +97,32 @@ export function ExplainerShell(props: {
         </header>
         {props.children}
       </article>
+      <script
+        type="application/json"
+        id="SRC_MAP"
+        dangerouslySetInnerHTML={{ __html: props.srcMapJson }}
+      />
+      <div id="gloss-backdrop" />
+      <div id="gloss-card" role="dialog" aria-modal="false">
+        <div id="gloss-card-title" />
+        <div id="gloss-card-text" />
+      </div>
+      <div id="srcscrim" aria-hidden="true" />
+      <aside
+        id="srcpane"
+        tabIndex={-1}
+        aria-label="原文對照"
+        aria-hidden="true"
+      >
+        <button id="srcclose" type="button" aria-label="關閉對照面板">
+          ×
+        </button>
+        <p id="src-kind" />
+        <h2 id="src-title" />
+        <p id="src-meta" />
+        <div id="src-why" />
+        <div id="src-body" />
+      </aside>
     </>
   );
 }

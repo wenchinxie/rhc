@@ -1,0 +1,57 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s3" n="3">送出與回合</H2>
+  <p>
+    一則使用者訊息進 box host 後，先寫進該 agent 的 transcript 並標成已接受，再排進該 agent 的獨佔 turn 佇列。
+    Gateway 多數情況在接受後就回 <code>accepted: true</code>。
+    <Peek snip="s3-accepted">接受</Peek>
+    模型與工具在 <code>SandAgentRunner</code> 裡跑。可見回覆來自 <code>SendToUser</code>，經 <code>handleAgentUpdate</code> 落盤。
+    0.47 沒有獨立 <code>packages/agent</code> 資料夾。
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s3-k" n="3.0">關鍵概念</H3>
+  <p>
+    <code>clientNonce</code> 是同一則送出的去重鍵。飛行中合併 Promise。落地後同 digest 當 no-op。
+    <Peek snip="s3-nonce">nonce</Peek>
+    接受不是答完。turn epoch 每次 send 加一。同一 agent 一次只跑一個 exclusive run。maxSteps 是 agent 內部步數（box 設 5000）。Host 另有最多 3 次 delivery nudge。
+  </p>
+  <H3 id="s3-1" n="3.1">SendPipeline 收斂重複</H3>
+  <p>
+    <code>TranscriptManager.sendPrompt</code> 進 <code>SendPipeline.sendPrompt</code>。無 nonce 就 <code>sendPromptOnce</code>。同 nonce 還在 <code>inFlightSends</code> 就回同一個 Promise。<code>admitSend</code> 見過且同 digest 當 idempotent。同 nonce 不同 digest 丟 <code>PromptAcceptanceDigestMismatchError</code>。
+  </p>
+  <H3 id="s3-2" n="3.2">接受之後才派工</H3>
+  <p>
+    <code>sendPromptOnce</code> 寫 user echo、<code>emitSendAck</code>、1:1 記 ack obligation。然後 <code>dispatchUserTurn</code>：展開 skill、interrupt 舊 run、<code>enqueueExclusiveRun</code> 進 <code>TurnRuntime.runTurn</code>。Gateway 路徑通常不等 turn。
+  </p>
+  <H3 id="s3-3" n="3.3">外層五千步在 agent dump</H3>
+  <p>
+    Host 組裝 <code>SandAgentRunner</code>。步迴圈不在 frozen host 小檔，而在 harness dump：<code>AnysphereAgent.runTurnLoop</code>，<code>maxSteps</code> box 覆寫成 5000。Agent 建構預設 512。不要混這兩個常數。
+  </p>
+  <H3 id="s3-4" n="3.4">沒有 SendToUser 就還沒送到人</H3>
+  <p>
+    <code>handleAgentUpdate</code> 把 <code>send-message</code> 當可見回覆。plain assistant text 不當畫面答案。沒送到人時 host 最多 nudge 3 次，必要時再 closing-send nudge。
+  </p>
+  <H3 id="s3-5" n="3.5">TranscriptManager 的插座</H3>
+  <p>
+    telemetry 與 productAnalytics 預設 noop。turn execution 在 boot 由 registry bind。遠端 room 走 <code>wrapGatewayApiWithServerAgentProxy</code>。
+  </p>
+  <H3 id="s3-6" n="3.6">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>階段</th><th>路徑</th></tr></thead>
+  <tbody>
+  <tr><td>HTTP</td><td><code>source/host/gateway-server.ts</code></td></tr>
+  <tr><td>Gateway send</td><td><code>source/host/host-gateway-api.ts</code></td></tr>
+  <tr><td>Nonce / echo</td><td><code>send-pipeline.ts</code>、<code>prompt-acceptance-ledger.ts</code></td></tr>
+  <tr><td>派工</td><td><code>send-turn-dispatch.ts</code></td></tr>
+  <tr><td>Turn 外殼</td><td><code>turn-runtime.ts</code></td></tr>
+  <tr><td>Agent loop dump</td><td><code>source/host/extensions/auto-review/auto-review-service.ts</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s3-7" n="3.7">容易踩的</H3>
+  <p>
+    回 <code>accepted: true</code> 不代表模型或工具跑完。重送同一 nonce 且內容變了會 digest mismatch。新訊息會砍正在跑的 turn。不要在 frozen host 小檔找 maxSteps 迴圈。
+  </p>
+</>

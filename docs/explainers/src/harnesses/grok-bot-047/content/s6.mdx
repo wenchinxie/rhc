@@ -1,0 +1,51 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s6" n="6">沙箱與執行</H2>
+  <p>
+    指令預設在遠端 box 跑。筆電只負責連上那台機器的 gateway，以及模型明確指定 <code>machineId</code> 時在使用者磁碟上執行。
+    出廠用 Cursor <code>EnsureSandBox</code> 配一台遠端 box。本機 Docker 是 unpackaged 加 loopback 的開發例外。
+    <Peek snip="remote-box">EnsureSandBox</Peek>
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s6-k" n="6.0">關鍵概念</H3>
+  <p>
+    Box 是所有 agent 共用的 Linux 機。Host 與 box-exec-daemon 都在這台機器裡。
+    有 <code>SAND_HOST_GATEWAY_URL</code> 就不要問後端，直連該 URL。
+    工具 JSON 有 <code>machineId</code> 才走使用者電腦。沒有就走 box。
+  </p>
+  <H3 id="s6-1" n="6.1">遠端通道靠後端要機器</H3>
+  <p>
+    沒設 <code>SAND_HOST_GATEWAY_URL</code> 就呼叫 <code>EnsureSandBox</code>，拿到 <code>gatewayUrl</code>。空字串就失敗。Coordinator 把 prompt POST 進那個 gateway。
+  </p>
+  <H3 id="s6-2" n="6.2">本機 Docker 只包 recreate</H3>
+  <p>
+    Unpackaged 且 gateway 指 127.0.0.1 時，Docker 控制面只負責重建容器。connect 仍是底下那個 connector。包裝過的 app 走遠端 box。
+    <code>local-docker-host-connector.recovered.cjs</code> 在 0.47 樹上是 leftover slice，不是 0.18 overlay 殘件。
+  </p>
+  <H3 id="s6-3" n="6.3">local-exec 要 machineId</H3>
+  <p>
+    沒有 <code>machineId</code> 的 Shell 不是在筆電跑。有 <code>machineId</code> 才走 <code>local-exec</code>：先問後端這台使用者電腦在不在，不在才走 gateway SSE。筆電端 Electron 拉起 <code>local-exec-daemon/main.cjs</code>。
+  </p>
+  <H3 id="s6-4" n="6.4">選擇點在 connector 與工具參數</H3>
+  <p>
+    哪台機器當 box，由 Electron connector 決定。指令在 box 還是筆電，由工具參數有沒有 <code>machineId</code> 決定。LoopbackSandBox 永遠打同容器 1337。
+  </p>
+  <H3 id="s6-5" n="6.5">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>EnsureSandBox</td><td>筆電 Electron main</td></tr>
+  <tr><td>Prompt 進 gateway</td><td>筆電 coordinator</td></tr>
+  <tr><td>排 Shell vs machineId</td><td>box 內 host-main</td></tr>
+  <tr><td>預設指令的 OS 行程</td><td>box 內 box-exec-daemon（VM，非 laptop asar）</td></tr>
+  <tr><td>使用者磁碟指令</td><td>筆電 local-exec-daemon</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s6-6" n="6.6">容易踩的</H3>
+  <p>
+    沒 <code>machineId</code> 的 Shell 不是在筆電跑。設了 <code>SAND_HOST_GATEWAY_URL</code> 就不會打 EnsureSandBox。對使用者說「我的電腦」指 box。
+  </p>
+</>

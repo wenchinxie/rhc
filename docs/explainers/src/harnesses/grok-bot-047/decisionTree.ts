@@ -1,0 +1,118 @@
+export const DECISION_TREE: string = `
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 914" role="img" aria-label="一則送出之後誰決定工作跑在哪" aria-describedby="dagcap-how-decide">
+  <defs>
+    <marker id="dtar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="dtbr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="dtlp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#dtar)"/>
+  <path d="M380.0,171.0 L470,171" marker-end="url(#dtar)"/>
+  <path d="M260,210 L260,254" marker-end="url(#dtar)"/>
+  <path d="M260,318 L260,362" marker-end="url(#dtar)"/>
+  <path d="M260,426 L260,470" marker-end="url(#dtar)"/>
+  <path d="M380.0,509.0 L470,509" marker-end="url(#dtar)"/>
+  <path d="M260,548 L260,592" marker-end="url(#dtar)"/>
+  <path d="M260,656 L260,700" marker-end="url(#dtar)"/>
+  <path d="M380.0,739.0 L470,739" marker-end="url(#dtar)"/>
+  <path d="M260,778 L260,822" marker-end="url(#dtar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">畫面</text>
+  <a class="xref" href="#s3">
+  <g class="app lay-ui src" data-snip="s3-nonce" tabindex="0" role="button" aria-label="使用者送出一則訊息，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">使用者送出一則訊息</text>
+    <text class="sub" x="94" y="71">畫面經 MessagePort 進中介</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="175">調度</text>
+  <a class="xref" href="#s6">
+  <g class="dec lay-desk">
+    <polygon points="260,132 380.0,171.0 260,210 140.0,171.0"/>
+    <text text-anchor="middle" x="260" y="176.0">已設 gateway URL？</text>
+  </g>
+  </a>
+  <a class="xref" href="#s6">
+  <g class="app lay-desk">
+    <rect x="470" y="142" width="430" height="58" rx="8"/>
+    <text x="484" y="166">直連該 URL</text>
+    <text class="sub" x="484" y="186">跳過 EnsureSandBox</text>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="163.0">已設</text>
+  <text class="elab" x="272" y="236.0">未設</text>
+  <text class="lay" text-anchor="end" x="76" y="290">調度</text>
+  <a class="xref" href="#s6">
+  <g class="app lay-desk src" data-snip="remote-box" tabindex="0" role="button" aria-label="EnsureSandBox 要一台 box，開啟原文">
+    <rect x="80" y="254" width="360" height="64" rx="8"/>
+    <text x="94" y="281">EnsureSandBox 要一台 box</text>
+    <text class="sub" x="94" y="301">空 gatewayUrl 就失敗</text>
+    <path class="srcfold" d="M431,318 L440,318 L440,309 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="398">接納</text>
+  <a class="xref" href="#s3">
+  <g class="app lay-admit src" data-snip="s3-accepted" tabindex="0" role="button" aria-label="host 接受這則送出，開啟原文">
+    <rect x="80" y="362" width="360" height="64" rx="8"/>
+    <text x="94" y="389">host 接受這則送出</text>
+    <text class="sub" x="94" y="409">回 accepted，不是答完</text>
+    <path class="srcfold" d="M431,426 L440,426 L440,417 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="513">目錄</text>
+  <a class="xref" href="#s5">
+  <g class="dec lay-tools">
+    <polygon points="260,470 380.0,509.0 260,548 140.0,509.0"/>
+    <text text-anchor="middle" x="260" y="514.0">指令帶 machineId？</text>
+  </g>
+  </a>
+  <a class="xref" href="#s6">
+  <g class="app lay-tools src" data-snip="local-exec-spawn" tabindex="0" role="button" aria-label="本機 local-exec，開啟原文">
+    <rect x="470" y="480" width="430" height="58" rx="8"/>
+    <text x="484" y="504">本機 local-exec</text>
+    <text class="sub" x="484" y="524">使用者磁碟上的 daemon</text>
+    <path class="srcfold" d="M891,538 L900,538 L900,529 z"/>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="501.0">帶了</text>
+  <text class="elab" x="272" y="574.0">沒有</text>
+  <text class="lay" text-anchor="end" x="76" y="628">目錄</text>
+  <a class="xref" href="#s5">
+  <g class="app lay-tools src" data-snip="box-exec" tabindex="0" role="button" aria-label="box 裡 spawn 指令，開啟原文">
+    <rect x="80" y="592" width="360" height="64" rx="8"/>
+    <text x="94" y="619">box 裡 spawn 指令</text>
+    <text class="sub" x="94" y="639">daemon 聽 1337</text>
+    <path class="srcfold" d="M431,656 L440,656 L440,647 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="743">執行</text>
+  <a class="xref" href="#s4">
+  <g class="dec lay-exec">
+    <polygon points="260,700 380.0,739.0 260,778 140.0,739.0"/>
+    <text text-anchor="middle" x="260" y="744.0">設了 mock 回覆？</text>
+  </g>
+  </a>
+  <a class="xref" href="#s4">
+  <g class="app lay-exec">
+    <rect x="470" y="710" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="734">不打網路</text>
+    <text class="sub" x="484" y="754">SAND_AGENT_MOCK_RESPONSE</text>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="731.0">設了</text>
+  <text class="elab" x="272" y="804.0">沒有</text>
+  <text class="lay" text-anchor="end" x="76" y="858">執行</text>
+  <a class="xref" href="#s4">
+  <g class="app lay-exec src" data-snip="s4-stream" tabindex="0" role="button" aria-label="Cursor Stream 問模型，開啟原文">
+    <rect x="80" y="822" width="360" height="64" rx="8"/>
+    <text x="94" y="849">Cursor Stream 問模型</text>
+    <text class="sub" x="94" y="869">api2.cursor.sh，短票在記憶體</text>
+    <path class="srcfold" d="M431,886 L440,886 L440,877 z"/>
+  </g>
+  </a>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-how-decide">主幹是出廠路徑。菱形往右是例外。未設 gateway URL 才問後端要 box。指令沒帶 machineId 才在 box 裡跑。沒設 mock 才打 Cursor Stream。</p>`;

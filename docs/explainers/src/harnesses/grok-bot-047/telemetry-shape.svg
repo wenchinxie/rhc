@@ -1,0 +1,84 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 806" role="img" aria-label="telemetry 管線共同形狀" aria-describedby="dagcap-s8-shape">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M380.0,171.0 L470,171" marker-end="url(#ar)"/>
+  <path d="M260,210 L260,254" marker-end="url(#ar)"/>
+  <path d="M260,318 L260,362" marker-end="url(#ar)"/>
+  <path d="M380.0,401.0 L470,401" marker-end="url(#ar)"/>
+  <path d="M260,440 L260,484" marker-end="url(#ar)"/>
+  <path d="M260,548 L260,592" marker-end="url(#ar)"/>
+  <path d="M380.0,631.0 L470,631" marker-end="url(#ar)"/>
+  <path d="M260,670 L260,714" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-events" tabindex="0" role="button" aria-label="功能模組呼叫一支具名方法，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">功能模組呼叫一支具名方法</text>
+    <text class="sub" x="94" y="71">例如 turn-runtime 叫 startTurn；只認方法名不知去向</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="175">port</text>
+  <g class="dec lay-port">
+    <polygon points="260,132 380.0,171.0 260,210 140.0,171.0"/>
+    <text text-anchor="middle" x="260" y="176.0">遙測開關關著？</text>
+  </g>
+  <g class="app lay-port src" data-snip="t-noop" tabindex="0" role="button" aria-label="no-op 預設塞子，開啟原文">
+    <rect x="470" y="142" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="166">no-op 預設塞子</text>
+    <text class="sub" x="484" y="186">host 用 createNoopSandTelemetry 空實作；桌面缺席用 ?. 跳過</text>
+    <path class="srcfold" d="M891,200 L900,200 L900,191 z"/>
+  </g>
+  <text class="elab" x="272" y="236.0">開著</text>
+  <text class="lay" text-anchor="end" x="76" y="290">port</text>
+  <g class="app lay-port src" data-snip="t-noop" tabindex="0" role="button" aria-label="port：型別與方法名的清單，開啟原文">
+    <rect x="80" y="254" width="360" height="64" rx="8"/>
+    <text x="94" y="281">port：型別與方法名的清單</text>
+    <text class="sub" x="94" y="301">host 在 ports/telemetry.ts；桌面版沒有 export</text>
+    <path class="srcfold" d="M431,318 L440,318 L440,309 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="405">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,362 380.0,401.0 260,440 140.0,401.0"/>
+    <text text-anchor="middle" x="260" y="406.0">開機接線時 port 缺欄位？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t-adapter" tabindex="0" role="button" aria-label="當場丟 TypeError，開啟原文">
+    <rect x="470" y="372" width="430" height="58" rx="8"/>
+    <text x="484" y="396">當場丟 TypeError</text>
+    <text class="sub" x="484" y="416">Missing Electron production adapter port，不等第一筆事件</text>
+    <path class="srcfold" d="M891,430 L900,430 L900,421 z"/>
+  </g>
+  <text class="elab" x="272" y="466.0">齊全</text>
+  <text class="lay" text-anchor="end" x="76" y="520">轉接</text>
+  <g class="app lay-adapter src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="adapter：工廠把 port 接上真後端，開啟原文">
+    <rect x="80" y="484" width="360" height="64" rx="8"/>
+    <text x="94" y="511">adapter：工廠把 port 接上真後端</text>
+    <text class="sub" x="94" y="531">createProductionTelemetryAdapter 等工廠函式</text>
+    <path class="srcfold" d="M431,548 L440,548 L440,539 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="635">管線</text>
+  <g class="dec lay-pipe">
+    <polygon points="260,592 380.0,631.0 260,670 140.0,631.0"/>
+    <text text-anchor="middle" x="260" y="636.0">中間有翻譯、緩衝或聚合層？</text>
+  </g>
+  <g class="app lay-pipe">
+    <rect x="470" y="602" width="430" height="58" rx="8"/>
+    <text x="484" y="626">翻譯、緩衝或聚合</text>
+    <text class="sub" x="484" y="646">有的管線有，有的直送；各管線小節只講這一段的差別</text>
+  </g>
+  <text class="elab" x="272" y="696.0">直送</text>
+  <text class="lay" text-anchor="end" x="76" y="750">落地</text>
+  <g class="app lay-sink">
+    <rect x="80" y="714" width="360" height="64" rx="8"/>
+    <text x="94" y="741">落地</text>
+    <text class="sub" x="94" y="761">HTTP、佇列與 Sentry，外加 span 和產品分析旁路</text>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-shape">三條管線都是同一個形狀：呼叫端只認 port，port 有 no-op 預設所以關遙測不改呼叫端，adapter 在開機接線時驗證，差別只在中間那層和落地。</p>

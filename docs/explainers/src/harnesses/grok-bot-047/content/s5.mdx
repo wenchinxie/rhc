@@ -1,0 +1,59 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s5" n="5">工具</H2>
+  <p>
+    模型要跑指令，先拿到名為 <code>Shell</code> 的工具。沒帶 <code>machineId</code> 就在 box 上跑；帶了就打到使用者電腦。
+    從 schema 到 spawn，box 主要靠 auto-review 和 hooks；使用者電腦還要再過 local-tool。
+    最後起行程的是 <code>shell-exec</code>，不是 host 自己 spawn。
+    <code>packages/agent/tools</code> 這層目錄在 0.47 不存在。
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s5-k" n="5.0">關鍵概念</H3>
+  <p>
+    兩台機器、同一把工具名。分流在 <code>createMachineRoutedTool</code>。
+    Local-tool 是使用者電腦的總開關（never、ask、always），預設 ask。
+    Auto-review 是這條指令危不危險。skipApproval 跳過本機 allowlist 提示，跳不過 admin denylist。
+    grok-bot 關掉 smart-mode allowlist precheck。box 預設 <code>insecure_none</code>，通常裸 spawn。
+  </p>
+  <H3 id="s5-1" n="5.1">工具表決定看不看得到</H3>
+  <p>
+    <code>buildTurnTools</code> 在 dump 檔 <code>messages-error-code.ts</code>。媒體 review subagent 給空表。box 不在線就沒有 box 那把 Shell。
+    名字多數是 <code>Shell</code>，常數 <code>SAND_BOX_SHELL_TOOL_NAME</code>。
+  </p>
+  <H3 id="s5-2" n="5.2">auto-review 只在 enforce 擋</H3>
+  <p>
+    settings 關則全 off。沒 override 時 gate 開是 enforce，否則 shadow。shadow 與 off 分類失敗也不擋。
+    reject 直接死。block 出人批卡。群組成員回合 <code>approvalsResolvable: false</code> 會直接拒。
+  </p>
+  <H3 id="s5-3" n="5.3">local-tool 只擋有 machineId 的那條</H3>
+  <p>
+    Box 路徑零次 local-tool。Host 那條 enforce 時會查兩次：auto-review 前 <code>awaitDesktopStandingDecision</code>，再 gateway <code>authorizeLocalToolAction</code>。
+    活的型別在 <code>shared/permissions/local-tool-permission.ts</code>。<code>shared/local-tool-permission.ts</code> 是空 stub。
+  </p>
+  <H3 id="s5-4" n="5.4">hooks 與 denylist 在 spawn 前</H3>
+  <p>
+    box-exec-daemon：preToolUse 與 beforeShellExecution 能否決。daemon 上 beforeShellExecution 的 ask 不會跳出視窗。
+    <code>adminCommandDenylist</code> 在 stream executor，skipApproval 也擋。Box 上 DaemonPermissionsService 幾乎全放行。
+  </p>
+  <H3 id="s5-5" n="5.5">真 spawn 在 shell-exec</H3>
+  <p>
+    <code>spawnWithSignal</code> → <code>spawnInSandbox</code> 或裸 <code>child_process.spawn</code>。要沙箱但 helper 不在就 <code>SandboxUnsupportedError</code>。grok-bot createShellTool 沒傳 sandboxEnabled。
+  </p>
+  <H3 id="s5-6" n="5.6">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>你要找的</th><th>實際 dump</th></tr></thead>
+  <tbody>
+  <tr><td>工具表</td><td><code>shared/local-exec/messages-error-code.ts</code></td></tr>
+  <tr><td>Shell 本體</td><td><code>host/extensions/auto-review/auto-review-service.ts</code></td></tr>
+  <tr><td>使用者電腦許可</td><td><code>host/extensions/local-tool-permission/</code></td></tr>
+  <tr><td>真 spawn</td><td><code>packages/shell-exec/index.ts</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s5-7" n="5.7">容易踩的</H3>
+  <p>
+    拆包檔名會騙你。Shell 執行跟 auto-review 業務擠在同一檔。預設 local-tool 是 ask。box 預設不沙箱。不要把 Cursor IDE 的 seatbelt 當成 grok-bot box 的預設。
+  </p>
+</>

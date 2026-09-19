@@ -1,32 +1,26 @@
 import { serve } from "bun";
 import index from "./index.html";
+import grokBot from "./grok-bot.html";
+import grokBot047 from "./grok-bot-047.html";
+import grokBotEvolution from "./grok-bot-evolution.html";
+import lauren from "./lauren.html";
+import laurenEn from "./lauren-en.html";
 
 const server = serve({
+  port: Number(process.env.PORT) || 3010,
   routes: {
-    // Serve index.html for all unmatched routes.
-    "/*": index,
-
-    "/api/hello": {
-      async GET(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "GET",
-        });
-      },
-      async PUT(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "PUT",
-        });
-      },
-    },
-
-    "/api/hello/:name": async req => {
-      const name = req.params.name;
-      return Response.json({
-        message: `Hello, ${name}!`,
-      });
-    },
+    "/": index,
+    "/index.html": index,
+    "/grok-bot": grokBot,
+    "/grok-bot.html": grokBot,
+    "/grok-bot-047": grokBot047,
+    "/grok-bot-047.html": grokBot047,
+    "/grok-bot-evolution": grokBotEvolution,
+    "/grok-bot-evolution.html": grokBotEvolution,
+    "/lauren": lauren,
+    "/lauren.html": lauren,
+    "/lauren-en": laurenEn,
+    "/lauren-en.html": laurenEn,
   },
 
   development: process.env.NODE_ENV !== "production" && {
@@ -38,4 +32,4 @@ const server = serve({
   },
 });
 
-console.log(`🚀 Server running at ${server.url}`);
+console.log(`Server running at ${server.url}`);

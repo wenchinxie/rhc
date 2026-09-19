@@ -1,0 +1,44 @@
+[
+  {
+    "file": "source/electron-preload/preload.ts",
+    "line": 17,
+    "pattern": "contextBridge.exposeInMainWorld(",
+    "enclosingFunction": "source/electron-preload/preload.ts#exposePreloadBridges@12"
+  },
+  {
+    "file": "source/electron-preload/preload.ts",
+    "line": 18,
+    "pattern": "contextBridge.exposeInMainWorld(",
+    "enclosingFunction": "source/electron-preload/preload.ts#exposePreloadBridges@12"
+  },
+  {
+    "file": "source/host/main.ts",
+    "line": 1,
+    "pattern": "basename:main.ts",
+    "enclosingFunction": null
+  },
+  {
+    "file": "source/packages/shell-exec/index.ts",
+    "line": 522,
+    "pattern": "spawn(",
+    "enclosingFunction": "source/packages/shell-exec/index.ts#spawnPromise@520"
+  },
+  {
+    "file": "source/packages/shell-exec/index.ts",
+    "line": 524,
+    "pattern": "spawn(",
+    "enclosingFunction": "source/packages/shell-exec/index.ts#spawnPromise@520"
+  },
+  {
+    "file": "source/sand-eval-runner/main.ts",
+    "line": 1,
+    "pattern": "basename:main.ts",
+    "enclosingFunction": null
+  },
+  {
+    "file": "source/shared/rpc/main.ts",
+    "line": 1,
+    "pattern": "basename:main.ts",
+    "enclosingFunction": null
+  }
+]

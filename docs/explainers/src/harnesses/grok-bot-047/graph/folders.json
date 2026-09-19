@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "key": "source/box-exec-daemon",
+      "files": 18,
+      "loc": 28501
+    },
+    {
+      "key": "source/electron-dev-controls",
+      "files": 1,
+      "loc": 2
+    },
+    {
+      "key": "source/electron-main",
+      "files": 87,
+      "loc": 862
+    },
+    {
+      "key": "source/electron-preload",
+      "files": 15,
+      "loc": 254
+    },
+    {
+      "key": "source/host",
+      "files": 397,
+      "loc": 252268
+    },
+    {
+      "key": "source/local-exec-daemon",
+      "files": 1,
+      "loc": 26
+    },
+    {
+      "key": "source/node-agent-coordinator",
+      "files": 8,
+      "loc": 143
+    },
+    {
+      "key": "source/packages/agent-core",
+      "files": 1,
+      "loc": 212
+    },
+    {
+      "key": "source/packages/agent-exec",
+      "files": 1,
+      "loc": 3384
+    },
+    {
+      "key": "source/packages/constants",
+      "files": 1,
+      "loc": 9
+    },
+    {
+      "key": "source/packages/context",
+      "files": 3,
+      "loc": 956
+    },
+    {
+      "key": "source/packages/cursor-plugins",
+      "files": 1,
+      "loc": 13866
+    },
+    {
+      "key": "source/packages/git-core",
+      "files": 2,
+      "loc": 1055
+    },
+    {
+      "key": "source/packages/hooks",
+      "files": 1,
+      "loc": 1753
+    },
+    {
+      "key": "source/packages/local-exec",
+      "files": 1,
+      "loc": 40794
+    },
+    {
+      "key": "source/packages/mcp-agent-exec",
+      "files": 2,
+      "loc": 17125
+    },
+    {
+      "key": "source/packages/mcp-core",
+      "files": 1,
+      "loc": 21852
+    },
+    {
+      "key": "source/packages/metrics",
+      "files": 1,
+      "loc": 141
+    },
+    {
+      "key": "source/packages/proto",
+      "files": 44,
+      "loc": 49614
+    },
+    {
+      "key": "source/packages/secrets-exec",
+      "files": 1,
+      "loc": 494
+    },
+    {
+      "key": "source/packages/shell-exec",
+      "files": 1,
+      "loc": 6411
+    },
+    {
+      "key": "source/packages/utils",
+      "files": 11,
+      "loc": 3844
+    },
+    {
+      "key": "source/sand-eval-runner",
+      "files": 7,
+      "loc": 340190
+    },
+    {
+      "key": "source/shared",
+      "files": 268,
+      "loc": 527348
+    }
+  ],
+  "edges": []
+}

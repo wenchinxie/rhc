@@ -7,7 +7,8 @@
     "dev": "bun --hot --preload ./mdx-plugin.ts src/index.ts",
     "vite": "vite",
     "start": "NODE_ENV=production bun src/index.ts",
-    "build": "bun run build.ts"
+    "build": "bun run build.ts",
+    "lint": "bun run build.ts --outdir=.lint-out"
   },
   "dependencies": {
     "@mdx-js/mdx": "^3.1.1",
@@ -32,6 +33,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "tailwindcss": "^4.1.11",
     "tw-animate-css": "^1.4.0",
+    "typescript": "5.9.3",
     "vite": "^8.2.2"
   }
 }
