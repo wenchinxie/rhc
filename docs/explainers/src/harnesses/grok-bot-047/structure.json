@@ -59,7 +59,8 @@
       "crossings": [
         "s4 路由器是疊層",
         "s6 本機 Docker 是疊層"
-      ]
+      ],
+      "status": "how-shaped 2026-09-19; classifier for asar / VM host / leftover stub"
     },
     {
       "n": 2,

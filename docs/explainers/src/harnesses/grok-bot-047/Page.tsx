@@ -20,11 +20,13 @@ const TOC = [
     n: "1",
     label: "這份樹",
     children: [
-      { href: "#s1-1", n: "1.1", label: "邊界釘在 Windows asar" },
-      { href: "#s1-2", n: "1.2", label: "筆電 asar 與 VM host" },
-      { href: "#s1-3", n: "1.3", label: "行程根在，畫面原始碼不在" },
-      { href: "#s1-4", n: "1.4", label: "frontend/ 是路徑 stub" },
-      { href: "#s1-5", n: "1.5", label: "§2 到 §7 仍帶 0.18 章形" },
+      { href: "#s1-k", n: "1.0", label: "關鍵概念" },
+      { href: "#s1-1", n: "1.1", label: "先看前綴與標記" },
+      { href: "#s1-2", n: "1.2", label: "extracted 與 readable-ts 是 asar" },
+      { href: "#s1-3", n: "1.3", label: "source/host 是 VM zip" },
+      { href: "#s1-4", n: "1.4", label: "leftover 長怎樣" },
+      { href: "#s1-5", n: "1.5", label: "東西在哪" },
+      { href: "#s1-6", n: "1.6", label: "容易踩的" },
     ],
   },
   {

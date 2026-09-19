@@ -3,51 +3,70 @@ import { H2, H3, Peek, Term } from "../../../mdx-components"
 <>
   <H2 id="s1" n="1">這棵樹是 0.47 反編譯稿</H2>
   <p>
-    套件名在 asar 裡仍是 <code>sand</code>，產品名是 Grok Bot，版號 0.47.0，軌道
-    <code>sandTrack: "stable"</code>。
-    這份目錄不是 monorepo，也不是 0.18 那棵可編譯的重建稿。
+    看到路徑先分三類。第一類是從這份 Windows 安裝包的 <code>app.asar</code> 抽出、還對得上檔案的碼。第二類是 VM zip 拆出來的 host。第三類是 asar 裡只剩字串、被砌成空檔或切片的 leftover。
+    0.18 那份可編譯樹只拿來對名字，不拿來當 0.47 的 bytes。
     <Peek snip="p047">0.47 asar</Peek>
-    <code>rhc</code> 是這份解說，不是 Grok Bot 的分支。
-    <span className="stamp">2026-09-12</span>
+    <span className="stamp">2026-09-19</span>
   </p>
-  <H3 id="s1-1" n="1.1">邊界釘在本機 Windows 安裝包</H3>
+  <H3 id="s1-k" n="1.0">關鍵概念</H3>
   <p>
-    <code>PROVENANCE.md</code> 記錄安裝路徑
-    <code>/mnt/c/Users/USER/AppData/Local/Programs/Grok Bot/</code>，以及
-    <code>app.asar</code> SHA-256。
+    asar 抽出：<code>extracted/</code> 是 pretty-print 的 first-party CJS，區域名仍 minify；<code>readable-ts/</code> 是同一份 asar 裡 preload 與 coordinator 的 pin 過 TS。
+    VM host：<code>source/host/</code>，檔裡有 <code>// src/host/</code> 標記，version <code>cb0ed63</code>。
+    leftover：從 asar 字串切的 <code>.recovered.cjs</code>、空 stub，以及 <code>frontend/</code> 用 lazy-import key 砌的空檔。
+  </p>
+  <H3 id="s1-1" n="1.1">先看前綴與標記</H3>
+  <p>
+    只採用這份 Windows 安裝包的 <code>app.asar</code>。
+    <code>PROVENANCE.md</code> 記產品 Grok Bot、版號 0.47.0、套件名 <code>sand</code>、<code>main</code> 是 <code>dist/electron-main/main.cjs</code>、安裝路徑與 asar SHA-256。
     抽出目錄在 <code>/mnt/e/eval-workspace/grok-bot-047/asar</code>。
-    沒有對上這份 asar 或 VM zip 的行為，本文不寫成出廠事實。
+    對得上這份 asar 或 VM zip 的行為，才寫成出廠事實。
+    判斷從路徑前綴開始，再看檔裡有沒有 <code>// src/host/</code>，或是 <code>export &#123;&#125;</code>。
   </p>
-  <H3 id="s1-2" n="1.2">兩份 bytes：筆電 asar 與 VM host</H3>
+  <H3 id="s1-2" n="1.2"><code>extracted/</code> 與 <code>readable-ts/</code> 是 asar</H3>
   <p>
+    前綴 <code>extracted/</code> 或 <code>readable-ts/</code>，bytes 來自筆電 asar。
+    筆電 CJS 被 minify，沒有 <code>// src/host/</code> 那種檔界。
+  </p>
+  <H3 id="s1-3" n="1.3"><code>source/host/</code> 是 VM zip</H3>
+  <p>
+    前綴 <code>source/host/</code>，來自 VM <code>studio-base-host-main.zip</code>。
     筆電 asar 沒有 <code>dist/host/</code>。
-    <code>source/host/</code> 來自 VM <code>studio-base-host-main.zip</code>，
-    <code>sand-host/version</code> 是 <code>cb0ed63</code>，用 <code>// src/host/</code> 標記拆檔。
-    筆電 CJS 被 minify，沒有那些標記，所以 electron-main 一側只留下 leftover 切片。
-    0.18 重建稿當名字字典用，不當 0.47 的 bytes。
+    <code>source/host/ports/</code> 只收回 <code>product-analytics.ts</code> 與 <code>sand-analytics-types.ts</code>。
+    telemetry 38 檔在 <code>source/host/extensions/telemetry/</code>。
   </p>
-  <H3 id="s1-3" n="1.3">行程根還在，renderer 原始碼不在</H3>
+  <H3 id="s1-4" n="1.4">leftover 長怎樣</H3>
   <p>
-    <code>source/</code> 仍按六個行程根擺：<code>electron-main</code>、
-    <code>electron-preload</code>、<code>host</code>、
-    <code>node-agent-coordinator</code>、<code>local-exec-daemon</code>、
-    <code>box-exec-daemon</code>。
-    後者在這兩份 zip 裡都缺。
-    畫面原始碼不在 asar。出廠裝的是 Vite 編譯結果，
-    <code>dist/renderer/assets/index-BhQ89Enc.js</code> 這類 hash chunk，沒有 <code>.map</code>。
+    <code>source/electron-main</code>、<code>source/electron-preload</code>、<code>source/node-agent-coordinator</code>、<code>source/local-exec-daemon</code> 是 leftover：199 個 <code>.recovered.cjs</code> 加空 stub。
+    <code>frontend/</code> 是 81 條 <code>/src/electron-renderer/features/</code> 字串，對上 renderer 的 <code>chunk-view</code> hash chunk，檔裡寫 <code>export &#123;&#125;</code>。
+    <code>catalog/</code> 是從 asar 抽出的 RPC 名、proto、feature path，不是執行碼。
+    <code>source/box-exec-daemon/</code> 兩份 zip 都沒有。asar <code>dist/renderer/</code> 是 Vite minify chunk，沒有 <code>.map</code>，未拆進這份解說。
   </p>
-  <H3 id="s1-4" n="1.4"><code>frontend/</code> 是 leftover 路徑 stub</H3>
+  <H3 id="s1-5" n="1.5">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>出廠身分</td><td><code>PROVENANCE.md</code></td></tr>
+  <tr><td>安裝包</td><td><code>/mnt/c/Users/USER/AppData/Local/Programs/Grok Bot/</code></td></tr>
+  <tr><td>asar 抽出</td><td><code>/mnt/e/eval-workspace/grok-bot-047/asar</code></td></tr>
+  <tr><td>筆電 first-party CJS</td><td><code>extracted/</code></td></tr>
+  <tr><td>preload／coordinator 可讀 TS</td><td><code>readable-ts/</code></td></tr>
+  <tr><td>VM host</td><td><code>source/host/</code>（<code>studio-base-host-main.zip</code>，<code>cb0ed63</code>）</td></tr>
+  <tr><td>leftover 切片</td><td><code>source/electron-main</code>、<code>source/electron-preload</code>、<code>source/node-agent-coordinator</code>、<code>source/local-exec-daemon</code> 的 <code>.recovered.cjs</code></td></tr>
+  <tr><td>路徑 stub</td><td><code>frontend/</code>（81 條空模組）</td></tr>
+  <tr><td>字串目錄</td><td><code>catalog/</code></td></tr>
+  <tr><td>renderer 原始碼</td><td>asar <code>dist/renderer/</code>，不在這份解說</td></tr>
+  <tr><td>box-exec-daemon</td><td>ABSENT（兩份 zip 都沒有）</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s1-6" n="1.6">容易踩的</H3>
   <p>
-    81 條 <code>/src/electron-renderer/features/...</code> 字串是 lazy-import 的 key，對上
-    <code>chunk-view-*.js</code>。
-    重建稿用這些路徑砌空檔，寫 <code>export &#123;&#125;</code>。
-    那不是 0.18 那種可編輯的 Vite／React 重建。
-  </p>
-  <H3 id="s1-5" n="1.5">§2 到 §7 仍帶 0.18 章形，host 要對 VM 再引一次</H3>
-  <p>
-    送出、工具、沙箱、狀態那些章是從 0.18 解說搬來的。
-    host 行為以 VM <code>cb0ed63</code> 為準。筆電側前綴已改成
-    <code>dune-rpc</code>，見 <a className="xref" href="#s9">§9</a>。
-    0.18 的「重建疊層」（Claude 路由器、本機 Docker、三支 DISABLE 旗標）不是這份 0.47 asar 的故事。
+    leftover 的 dump 路徑是切開後的名字，不是出廠檔名。<code>frontend/</code> 檔裡是空模組。
+    筆電 asar 沒有 <code>dist/host/</code>。<code>source/</code> 仍按六個行程根擺資料夾，六個不都有 bytes。
+    <code>source/box-exec-daemon/</code> 目錄還在，裡面沒有程式。
+    0.18 的<Term k="reconstruction">重建疊層</Term>（Claude 路由器、本機 Docker、三支 <code>SAND_DISABLE_UPDATES</code>／<code>SAND_DISABLE_SENTRY</code>／<code>SAND_DISABLE_TELEMETRY</code> 旗標）這份 asar 沒有。
+    <code>rhc</code> 是這份解說庫。
+    後面 <a className="xref" href="#s2">§2</a> 到 <a className="xref" href="#s7">§7</a> 仍照 0.18 那樣切章，host 行為以 VM <code>cb0ed63</code> 為準。
   </p>
 </>
