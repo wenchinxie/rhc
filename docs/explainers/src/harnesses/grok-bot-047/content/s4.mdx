@@ -1,0 +1,56 @@
+import { H2, H3, Peek, Term } from "../../../mdx-components"
+
+<>
+  <H2 id="s4" n="4">推論</H2>
+  <p>
+    畫面把一句話交給筆電 coordinator。coordinator 只負責丟進箱子裡的 host。真正問模型的是箱內 host，用 Cursor Connect 客戶端打 <code>api2.cursor.sh</code> 上的 <code>InferenceService.Stream</code>。
+    客戶端不自己選 OpenRouter，也不直連 Claude、Codex、xAI。
+    0.18 那條分流 router 在 0.47 是空檔。
+    <Peek snip="s4-router-absent">stub</Peek>
+    <span className="stamp">2026-09-16</span>
+  </p>
+  <H3 id="s4-k" n="4.0">關鍵概念</H3>
+  <p>
+    <code>requested_model</code> 是 host 寫進 protobuf 的「我想用哪個」，預設 <code>grok-4.5</code>。
+    <code>backendUrl</code> 開機讀 env 就釘死，預設 <code>https://api2.cursor.sh</code>。
+    兩枚短 JWT：<code>accessToken</code> 給大多數 Cursor RPC；<code>grokBotToken</code> 只蓋在 Stream 的 Authorization。
+    <Peek snip="s4-stream">Stream token</Peek>
+    長憑證是箱 env <code>SAND_INFERENCE_RENEWAL_CREDENTIAL</code>。短票只在記憶體。
+  </p>
+  <H3 id="s4-1" n="4.1">預設值在 resolveSandRequestedModel</H3>
+  <p>
+    優先序：mock → Statsig <code>sand_model_selection</code> → session modelId → <code>SAND_AGENT_MODEL</code> → settings <code>agentDefaultModel</code> → 硬編碼 <code>grok-4.5</code>。
+    <code>host-runner-composition.ts</code> 的 <code>DEFAULT_SAND_MODEL = "gpt-5.5-high-fast"</code> 只當 web-search fallback，不是聊天預設。
+  </p>
+  <H3 id="s4-2" n="4.2">0.18 三條重建線在這份樹是 stub</H3>
+  <p>
+    <code>source/shared/inference-router.ts</code> 是空的。coordinator 的 <code>inference-router.recovered.cjs</code> 切錯片，不是路由器。不要把 Claude、Codex、OpenRouter 分流寫進 0.47 工廠圖。
+  </p>
+  <H3 id="s4-3" n="4.3">最後 hop 是 Cursor Stream</H3>
+  <p>
+    <code>createSandCursorBackendClient(InferenceService)</code> 然後 <code>this.client.stream</code>。interceptor 在 Stream 上把 Authorization 換成 <code>grokBotToken</code>。HTTP/1.1 Connect 打 <code>backend.backendUrl</code>。
+    實驗臂出現 <code>claude-opus-4-8</code> 仍走同一 Cursor backend。
+  </p>
+  <H3 id="s4-4" n="4.4">憑證不在桌面 login 檔</H3>
+  <p>
+    短 JWT 在 host 行程記憶體 <code>InferenceCredentialStore</code>。長憑證在箱 env。桌面 leftover <code>cursor-access-token</code> 給 EnsureSandBox，不是 Stream。
+    <code>host-secrets.json</code> 只有 machineId。沒有 renewal 憑證時推論起不來。
+  </p>
+  <H3 id="s4-5" n="4.5">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>後端 URL</td><td>env <code>SAND_BACKEND_URL</code> / <code>CURSOR_API_BASE_URL</code>，否則 api2.cursor.sh</td></tr>
+  <tr><td>長憑證</td><td>箱 env <code>SAND_INFERENCE_RENEWAL_CREDENTIAL</code></td></tr>
+  <tr><td>短 JWT</td><td>host 記憶體</td></tr>
+  <tr><td>使用者預設模型</td><td>sand root <code>settings.json</code> 的 <code>agentDefaultModel</code></td></tr>
+  <tr><td>筆電 Cursor 登入</td><td>leftover，EnsureSandBox 用</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="s4-6" n="4.6">容易踩的</H3>
+  <p>
+    不要把 0.18 分流 router 畫進 0.47。不要把 <code>gpt-5.5-high-fast</code> 當成聊天預設。沒有箱內 renewal 憑證時 host 會空轉。
+  </p>
+</>

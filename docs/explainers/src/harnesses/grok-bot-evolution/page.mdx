@@ -1,0 +1,44 @@
+import { H2, H3 } from "../../mdx-components"
+
+<>
+  <H2 id="e0" n="0">0.18 到 0.47 改了什麼</H2>
+  <p>
+    產品還是桌面 agent。一則送出仍進遠端 box 的 host，模型仍打 Cursor Stream。
+    變的是你手上的 bytes。0.18 那份是可讀的重建稿。0.47 是 Windows asar 反編譯稿加 VM host zip。
+    下面只列對執行期有差的項。沒列的切面當沒變，直到 0.47 頁證明相反。
+    <span className="stamp">2026-09-18</span>
+  </p>
+  <H3 id="e0-1" n="0.1">還一樣</H3>
+  <p>
+    畫面把送出交給 coordinator 的 MessagePort。IPC 名仍是 <code>sand:coordinator-port</code>。
+    host 接受後回 <code>accepted: true</code>。沒帶 <code>machineId</code> 的 Shell 在 box 跑。
+    host 用 <code>ControlService.Ping</code> 探 exec-daemon 活著沒有。推論預設仍是 Cursor Connect，不是直連 xAI。
+  </p>
+  <H3 id="e0-2" n="0.2">改了</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>項</th><th>0.18</th><th>0.47</th></tr></thead>
+  <tbody>
+  <tr><td>語料</td><td>重建 TS，有 <code>// src/</code> 檔界</td><td>筆電 CJS minify，沒有檔界。host 來自 VM zip <code>cb0ed63</code></td></tr>
+  <tr><td>產品版</td><td>0.18.0</td><td>0.47.0，<code>sandTrack: stable</code></td></tr>
+  <tr><td>桌面 RPC</td><td><code>sand-rpc:</code></td><td><code>dune-rpc:</code></td></tr>
+  <tr><td>laptop asar 的 host</td><td>重建稿有 <code>source/host/</code></td><td>沒有 <code>dist/host/</code></td></tr>
+  <tr><td>host/ports</td><td>七個檔，含 <code>telemetry.ts</code></td><td>只收回 <code>product-analytics.ts</code> 與 <code>sand-analytics-types.ts</code></td></tr>
+  <tr><td>noop telemetry</td><td><code>ports/telemetry.ts</code></td><td>內聯在 <code>box-copy-in.ts</code></td></tr>
+  <tr><td>frontend</td><td>可編輯的 Vite／React 重建</td><td>81 條 leftover 路徑 stub。asar 裡是 Vite chunk，沒有 <code>.map</code></td></tr>
+  <tr><td>推論分流</td><td>重建疊層有 Claude／Codex／OpenRouter 路由器</td><td><code>shared/inference-router.ts</code> 是空檔。Stream 仍打 <code>api2.cursor.sh</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <H3 id="e0-3" n="0.3">0.47 這份樹沒有</H3>
+  <p>
+    laptop asar 沒有 box-exec 啟動碼。<code>electron-dev-controls</code> 沒有。
+    原 TS 檔名與區域變數名沒有。Cursor 後端沒有。
+  </p>
+  <H3 id="e0-4" n="0.4">怎麼讀這兩份</H3>
+  <p>
+    問 0.18 出廠加重建疊層，開 <a href="/grok-bot.html">Grok Bot 0.18</a>。那份有呼叫圖與 §11 skill。
+    問 0.47 安裝包實際出了什麼，開 <a href="/grok-bot-047.html">Grok Bot 0.47</a>。那份從 asar 與 VM host 對。
+    不要用 0.18 的檔名當 0.47 的 bytes。0.18 只當名字字典。
+  </p>
+</>

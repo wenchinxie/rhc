@@ -1,0 +1,113 @@
+export const ROUTER: string = `
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 956" role="img" aria-label="telemetry 事件種類判別樹" aria-describedby="dagcap-s8-router">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M380.0,171.0 L470,171" marker-end="url(#ar)"/>
+  <path d="M260,210 L260,254" marker-end="url(#ar)"/>
+  <path d="M380.0,293.0 L470,293" marker-end="url(#ar)"/>
+  <path d="M260,332 L260,376" marker-end="url(#ar)"/>
+  <path d="M380.0,415.0 L470,415" marker-end="url(#ar)"/>
+  <path d="M260,454 L260,498" marker-end="url(#ar)"/>
+  <path d="M380.0,537.0 L470,537" marker-end="url(#ar)"/>
+  <path d="M260,576 L260,620" marker-end="url(#ar)"/>
+  <path d="M380.0,659.0 L470,659" marker-end="url(#ar)"/>
+  <path d="M260,698 L260,742" marker-end="url(#ar)"/>
+  <path d="M380.0,781.0 L470,781" marker-end="url(#ar)"/>
+  <path d="M260,820 L260,864" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-events" tabindex="0" role="button" aria-label="一筆遙測事件產生，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">一筆遙測事件產生</text>
+    <text class="sub" x="94" y="71">呼叫圖裡 70 個打進 port 方法的呼叫點</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="175">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,132 380.0,171.0 260,210 140.0,171.0"/>
+    <text text-anchor="middle" x="260" y="176.0">接 host 結構化日誌 adapter？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="host-turn：26 筆，開啟原文">
+    <rect x="470" y="142" width="430" height="58" rx="8"/>
+    <text x="484" y="166">host-turn：26 筆</text>
+    <text class="sub" x="484" y="186">SandTelemetry port，緩衝滿 1000 筆砍心跳，送失敗留底重試</text>
+    <path class="srcfold" d="M891,200 L900,200 L900,191 z"/>
+  </g>
+  <text class="elab" x="272" y="236.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="297">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,254 380.0,293.0 260,332 140.0,293.0"/>
+    <text text-anchor="middle" x="260" y="298.0">@sentry/electron 直接 capture？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t-sentry" tabindex="0" role="button" aria-label="sentry-direct：5 筆，開啟原文">
+    <rect x="470" y="264" width="430" height="58" rx="8"/>
+    <text x="484" y="288">sentry-direct：5 筆</text>
+    <text class="sub" x="484" y="308">有 port 與 no-op 預設，沒有佇列，送不出就跳過</text>
+    <path class="srcfold" d="M891,322 L900,322 L900,313 z"/>
+  </g>
+  <text class="elab" x="272" y="358.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="419">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,376 380.0,415.0 260,454 140.0,415.0"/>
+    <text text-anchor="middle" x="260" y="420.0">打進產品分析 trackEvent？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t8-adapter-host" tabindex="0" role="button" aria-label="analytics-direct：1 筆，開啟原文">
+    <rect x="470" y="386" width="430" height="58" rx="8"/>
+    <text x="484" y="410">analytics-direct：1 筆</text>
+    <text class="sub" x="484" y="430">ProductAnalytics port，gate 沒開整包丟棄</text>
+    <path class="srcfold" d="M891,444 L900,444 L900,435 z"/>
+  </g>
+  <text class="elab" x="272" y="480.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="541">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,498 380.0,537.0 260,576 140.0,537.0"/>
+    <text text-anchor="middle" x="260" y="542.0">送出追蹤的階段記錄器接手？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t-transport-cap" tabindex="0" role="button" aria-label="transport-stage：3 筆，開啟原文">
+    <rect x="470" y="508" width="430" height="58" rx="8"/>
+    <text x="484" y="532">transport-stage：3 筆</text>
+    <text class="sub" x="484" y="552">TransportStageEgress → recordSendStage，滿了直接放棄</text>
+    <path class="srcfold" d="M891,566 L900,566 L900,557 z"/>
+  </g>
+  <text class="elab" x="272" y="602.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="663">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,620 380.0,659.0 260,698 140.0,659.0"/>
+    <text text-anchor="middle" x="260" y="664.0">先過中介行程的翻譯層再進上傳器？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t-coordinator-agg" tabindex="0" role="button" aria-label="中介行程聚合：14 筆，開啟原文">
+    <rect x="470" y="630" width="430" height="58" rx="8"/>
+    <text x="484" y="654">中介行程聚合：14 筆</text>
+    <text class="sub" x="484" y="674">翻譯層不是 adapter，併上斷線原因後交同一份上傳器</text>
+    <path class="srcfold" d="M891,688 L900,688 L900,679 z"/>
+  </g>
+  <text class="elab" x="272" y="724.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="785">轉接</text>
+  <g class="dec lay-adapter">
+    <polygon points="260,742 380.0,781.0 260,820 140.0,781.0"/>
+    <text text-anchor="middle" x="260" y="786.0">桌面主行程的正式 adapter 接手？</text>
+  </g>
+  <g class="app lay-adapter src" data-snip="t8-pipes-full" tabindex="0" role="button" aria-label="desktop-log：13 筆，開啟原文">
+    <rect x="470" y="752" width="430" height="58" rx="8"/>
+    <text x="484" y="776">desktop-log：13 筆</text>
+    <text class="sub" x="484" y="796">TelemetryUploader port → 驗證 → 緩衝佇列 → flushOnce</text>
+    <path class="srcfold" d="M891,810 L900,810 L900,801 z"/>
+  </g>
+  <text class="elab" x="272" y="846.0">否</text>
+  <text class="lay" text-anchor="end" x="76" y="900">落地</text>
+  <g class="app lay-sink src" data-snip="t8-lifecycle-wire" tabindex="0" role="button" aria-label="feature-buffered：8 筆，開啟原文">
+    <rect x="80" y="864" width="360" height="64" rx="8"/>
+    <text x="94" y="891">feature-buffered：8 筆</text>
+    <text class="sub" x="94" y="911">模組自帶 reporter，sink 未接前暫存 64 筆，滿了丟棄</text>
+    <path class="srcfold" d="M431,928 L440,928 L440,919 z"/>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-router">七十筆事件靠 adapter 欄位分成七種；每個出口寫這一種的 port、管線與落地，細節見各家族小節。</p>`;

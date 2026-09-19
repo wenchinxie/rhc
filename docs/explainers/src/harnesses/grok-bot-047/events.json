@@ -1,0 +1,863 @@
+{
+  "families": [
+    "host-turn",
+    "desktop-log",
+    "coordinator-agg",
+    "transport-stage",
+    "feature-buffered",
+    "sentry-direct",
+    "analytics-direct"
+  ],
+  "events": [
+    {
+      "event": "start-turn",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:395",
+      "port_method": "SandTelemetry.startTurn",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "tool-call-started",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:667",
+      "port_method": "SandTelemetry.reportToolCallStarted",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "tool-call-stalled",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:320",
+      "port_method": "SandTelemetry.reportToolCallStalled",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "tool-call-error",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:306",
+      "port_method": "SandTelemetry.reportToolCallError",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "turn-empty-delivery",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:458",
+      "port_method": "SandTelemetry.reportTurnEmptyDelivery",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "closing-send-nudge",
+      "origin": "source/host/extensions/transcript/turn-runtime.ts:588",
+      "port_method": "SandTelemetry.reportClosingSendNudge",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "turn-interrupt",
+      "origin": "source/host/extensions/transcript/agent-lifecycle.ts:485",
+      "port_method": "SandTelemetry.reportTurnInterrupt",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "agent-error",
+      "origin": "source/host/extensions/transcript/agent-lifecycle.ts:161",
+      "port_method": "SandTelemetry.reportAgentError",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "turn-await",
+      "origin": "source/host/extensions/transcript/runner-registry.ts:192",
+      "port_method": "SandTelemetry.reportTurnAwait",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "computer-use-usage",
+      "origin": "source/host/extensions/transcript/runner-registry.ts:174",
+      "port_method": "SandTelemetry.reportComputerUseUsage",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "ttft",
+      "origin": "source/host/extensions/transcript/runner-registry.ts:198",
+      "port_method": "SandTelemetry.reportTtft",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "send-dispatch",
+      "origin": "source/host/extensions/transcript/runner-registry.ts:204",
+      "port_method": "SandTelemetry.reportSendDispatch",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "turn-retry",
+      "origin": "source/host/runner/stream-attempt.ts:71",
+      "port_method": "SandTelemetry.reportTurnRetry",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "turn-usage",
+      "origin": "source/host/extensions/transcript/run-lifecycle.ts:141",
+      "port_method": "SandTelemetry.reportTurnUsage",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "queue-accepted",
+      "origin": "source/host/extensions/transcript/run-lifecycle.ts:60",
+      "port_method": "SandTelemetry.reportQueueAccepted",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "queue-dequeued",
+      "origin": "source/host/extensions/transcript/run-lifecycle.ts:71",
+      "port_method": "SandTelemetry.reportQueueDequeued",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "queue-watchdog",
+      "origin": "source/host/extensions/transcript/run-lifecycle.ts:90",
+      "port_method": "SandTelemetry.reportQueueWatchdog",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "ack-obligation",
+      "origin": "source/host/extensions/transcript/ack-obligations.ts:25",
+      "port_method": "SandTelemetry.reportAckObligation",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "pending-wake",
+      "origin": "source/host/extensions/transcript/pending-wake-rearm.ts:47",
+      "port_method": "SandTelemetry.reportPendingWake",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "subagent-revival",
+      "origin": "source/host/extensions/transcript/completion-revivals.ts:101",
+      "port_method": "SandTelemetry.reportSubagentRevival",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "shell-revival",
+      "origin": "source/host/extensions/transcript/completion-revivals.ts:228",
+      "port_method": "SandTelemetry.reportShellRevival",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "automation-run",
+      "origin": "source/host/extensions/transcript/automation-run-path.ts:320",
+      "port_method": "SandTelemetry.reportAutomationRun",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "automation-fire-dropped",
+      "origin": "source/host/extensions/transcript/automation-event-fires.ts:163",
+      "port_method": "SandTelemetry.reportAutomationFireDropped",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "automation-lifecycle",
+      "origin": "source/host/extensions/transcript/automation-runtime.ts:301",
+      "port_method": "SandTelemetry.reportAutomationLifecycle",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "daemon-ping",
+      "origin": "source/host/box/loopback-sand-box.ts:49",
+      "port_method": "SandTelemetry.reportDaemonPing",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "auto-review-expire-sweep-failed",
+      "origin": "source/host/extensions/transcript/widget-responses.ts:152",
+      "port_method": "SandTelemetry.reportAutoReviewExpireSweepFailed",
+      "adapter": "source/host/extensions/telemetry/structured-log-telemetry.ts (SandStructuredLogTelemetry)",
+      "pipes": [
+        "source/shared/observability/structured-log-transport.ts (buffer<=1000, retry on ship_failed)"
+      ],
+      "sink": "StructuredLogTransport -> StructuredLogClient.submitLogs (HTTP to Cursor backend)",
+      "policy": "flush 失敗留底重試；緩衝區滿 1000 筆時砍最舊的 host/box 心跳日誌（overflow_evicted）",
+      "family": "host-turn"
+    },
+    {
+      "event": "agent-load",
+      "origin": "source/electron-main/telemetry/agent-load-telemetry.ts (agentLoadReportToTelemetry)",
+      "port_method": "TelemetryUploader.reportAgentLoad",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "access-blocked",
+      "origin": "source/electron-main/telemetry/access-blocked-telemetry.ts",
+      "port_method": "TelemetryUploader.reportAccessBlocked",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "send-latency",
+      "origin": "source/electron-main/telemetry/send-telemetry.ts",
+      "port_method": "TelemetryUploader.reportSendLatency",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "send-ack",
+      "origin": "source/electron-main/telemetry/send-ack-telemetry.ts:1-4",
+      "port_method": "TelemetryUploader.reportSendAck",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "reaction-ack",
+      "origin": "source/electron-main/telemetry/reaction-ack-telemetry.ts",
+      "port_method": "TelemetryUploader.reportReactionAck",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "vnc-session",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:28-30",
+      "port_method": "TelemetryUploader.reportVncSession",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "vnc-liveness",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:30",
+      "port_method": "TelemetryUploader.reportVncLiveness",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "open-computer",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:31-32",
+      "port_method": "TelemetryUploader.reportOpenComputer",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "render-ttfr",
+      "origin": "source/electron-main/telemetry/render-telemetry.ts",
+      "port_method": "TelemetryUploader.reportRenderTtfr",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "render-stream",
+      "origin": "source/electron-main/telemetry/render-telemetry.ts",
+      "port_method": "TelemetryUploader.reportRenderStream",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "update-prompt",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:33-34",
+      "port_method": "TelemetryUploader.reportUpdatePrompt",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "signin-gate",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:35-36",
+      "port_method": "TelemetryUploader.reportDesktopSignin",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "client-failure",
+      "origin": "source/electron-main/telemetry/client-failure-telemetry.ts",
+      "port_method": "TelemetryUploader.reportClientFailure",
+      "adapter": "source/electron-main/adapters/telemetry.ts#createProductionTelemetryAdapter (SandDesktopStructuredLogTelemetry)",
+      "pipes": [
+        "source/electron-main/telemetry/telemetry-report-sinks.ts (validate-then-emit reportPipe)"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "flush 失敗留底重試；佇列滿了才砍最舊；斷線整批 spill 到本機檔案，重連或重開再續傳",
+      "family": "desktop-log"
+    },
+    {
+      "event": "box-reachability",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.reportBoxReachability",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "box-dns-diagnostic",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.reportBoxDnsDiagnostic",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "transport-stream-down",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.transportStream",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "coordinator-lifecycle",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.coordinatorLifecycle",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "recovery-action",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.recoveryAction",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "box-migration-watch",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.boxMigrationWatch",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "rebuild-lifecycle",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.rebuildLifecycle",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "reconciliation",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.reconciliation",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "resync-completed",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.resyncCompleted",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "agents-unreachable",
+      "origin": "source/electron-main/coordinator/coordinator-telemetry.ts:7-8",
+      "port_method": "CoordinatorTelemetry.agentsUnreachable",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "handoff-requested",
+      "origin": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts:4-10",
+      "port_method": "CoordinatorTelemetry.handoff.requested",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "handoff-adopted",
+      "origin": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts:4-10",
+      "port_method": "CoordinatorTelemetry.handoff.adopted",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "handoff-invoke-failed",
+      "origin": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts:4-10",
+      "port_method": "CoordinatorTelemetry.handoff.invokeFailed",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "handoff-timeout",
+      "origin": "source/electron-main/coordinator/coordinator-handoff-telemetry.ts:4-10",
+      "port_method": "CoordinatorTelemetry.handoff.exitTimeout",
+      "adapter": "source/electron-main/coordinator/coordinator-telemetry.ts#createCoordinatorTelemetrySinks + coordinator-handoff-telemetry.ts#createCoordinatorHandoffTelemetry",
+      "pipes": [
+        "disconnectCause 三十秒視窗聚合（coordinator-telemetry.ts）"
+      ],
+      "sink": "同一份 TelemetryUploader（getUploader()）-> BufferedTransport",
+      "policy": "聚合本身不丟資料，只決定升不升級成 warn；真正的送出失敗仍是 desktop-log 那層的事",
+      "family": "coordinator-agg"
+    },
+    {
+      "event": "transport-stage-start",
+      "origin": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts",
+      "port_method": "TransportStageEgress.forward(dispatch)",
+      "adapter": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts#createTransportStageRecorder",
+      "pipes": [
+        "同時在途上限 64 筆，超過直接不 dispatch（transport-stage-recorder.ts:39-48）"
+      ],
+      "sink": "source/electron-main/coordinator/coordinator-executors.ts:534 reportTransportStage -> recordSendStage（送出追蹤 span，不是結構化日誌）",
+      "policy": "佇列滿了不排隊、不重試，新的一筆直接放棄",
+      "family": "transport-stage"
+    },
+    {
+      "event": "transport-stage-gateway-response",
+      "origin": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts",
+      "port_method": "TransportStageEgress.forward(dispatch)",
+      "adapter": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts#createTransportStageRecorder",
+      "pipes": [
+        "同時在途上限 64 筆，超過直接不 dispatch（transport-stage-recorder.ts:39-48）"
+      ],
+      "sink": "source/electron-main/coordinator/coordinator-executors.ts:534 reportTransportStage -> recordSendStage（送出追蹤 span，不是結構化日誌）",
+      "policy": "佇列滿了不排隊、不重試，新的一筆直接放棄",
+      "family": "transport-stage"
+    },
+    {
+      "event": "transport-stage-sse-echo",
+      "origin": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts",
+      "port_method": "TransportStageEgress.forward(dispatch)",
+      "adapter": "source/node-agent-coordinator/telemetry/transport-stage-recorder.ts#createTransportStageRecorder",
+      "pipes": [
+        "同時在途上限 64 筆，超過直接不 dispatch（transport-stage-recorder.ts:39-48）"
+      ],
+      "sink": "source/electron-main/coordinator/coordinator-executors.ts:534 reportTransportStage -> recordSendStage（送出追蹤 span，不是結構化日誌）",
+      "policy": "佇列滿了不排隊、不重試，新的一筆直接放棄",
+      "family": "transport-stage"
+    },
+    {
+      "event": "box-visibility-setup",
+      "origin": "source/electron-main/box/box-visibility-telemetry.ts:24-26",
+      "port_method": "sink.emit(\"setup\")",
+      "adapter": "source/electron-main/main-production-services.ts:588-596（SandBoxVisibilityTracker 構造）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "視窗開著就不送，真正結束或 abandonAll() 沖銷才算一筆",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "box-visibility-recreate",
+      "origin": "source/electron-main/box/box-visibility-telemetry.ts:24-26",
+      "port_method": "sink.emit(\"recreate\")",
+      "adapter": "source/electron-main/main-production-services.ts:588-596（SandBoxVisibilityTracker 構造）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "同上；recreate 視窗另外追蹤 heartbeat／stage 兩支子事件",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "update-outcome",
+      "origin": "source/electron-main/update/update-telemetry.ts:22",
+      "port_method": "relay.reportOutcome",
+      "adapter": "source/electron-main/main-production-services.ts:481-482,793（createDesktopLifecycleReporter + attach）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "sink 未接時放進上限 64 筆的暫存佇列，接上才補送，滿了直接丟棄",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "update-check",
+      "origin": "source/electron-main/update/update-telemetry.ts:22",
+      "port_method": "relay.reportCheck",
+      "adapter": "source/electron-main/main-production-services.ts:481-482,793（createDesktopLifecycleReporter + attach）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "同 update-outcome",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "update-apply",
+      "origin": "source/electron-main/update/update-telemetry.ts:22",
+      "port_method": "relay.reportApply",
+      "adapter": "source/electron-main/main-production-services.ts:481-482,793（createDesktopLifecycleReporter + attach）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "同 update-outcome",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "local-exec-lifecycle",
+      "origin": "source/electron-main/local-exec/local-exec-lifecycle-telemetry.ts:5-6",
+      "port_method": "installLocalExecLifecycleReporter",
+      "adapter": "source/electron-main/main-production-services.ts:481-482（installLocalExecLifecycleReporter 呼叫點）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "模組級單例：安裝新的頂替舊的，卸載函式只在自己還是目前這支時才清空",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "connector-auth-tag",
+      "origin": "source/shared/observability/connector-auth-telemetry.ts:7-11",
+      "port_method": "boundedConnectorTag",
+      "adapter": "source/host/runner/turn-agent-composition.ts:1275（呼叫點）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "併入呼叫端所在的那筆報告一起送出",
+      "policy": "認不得的連接器名稱一律歸 other，防止標籤基數撐爆",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "unclean-exit",
+      "origin": "source/electron-main/telemetry/desktop-unclean-exit-telemetry.ts:28-31",
+      "port_method": "uncleanExitReport",
+      "adapter": "source/electron-main/main-production-services.ts:536（wireDesktopUncleanExitSettlement 呼叫點）",
+      "pipes": [
+        "各功能模組自帶的小型緩衝／去重層，不共用同一份 reportPipe 驗證閘"
+      ],
+      "sink": "BufferedTransport -> flushOnce() HTTP submit；斷線時整批 spill 落地",
+      "policy": "marker_orphaned 才算 info，其餘一律 warn 並附錯誤碼",
+      "family": "feature-buffered"
+    },
+    {
+      "event": "sentry-warning",
+      "origin": "source/electron-main/telemetry/sentry.ts:54-57",
+      "port_method": "captureSandSentryWarning",
+      "adapter": "source/electron-main/telemetry/sentry.ts（包住 @sentry/electron 的 adapter.captureMessage／captureException）",
+      "pipes": [],
+      "sink": "Sentry（captureMessage／captureException），無排隊無重試",
+      "policy": "送不出就跳過，不重試也不計數",
+      "family": "sentry-direct"
+    },
+    {
+      "event": "sentry-desktop-crash",
+      "origin": "source/electron-main/telemetry/sentry.ts:54-57",
+      "port_method": "captureSandDesktopCrash",
+      "adapter": "source/electron-main/telemetry/sentry.ts（包住 @sentry/electron 的 adapter.captureMessage／captureException）",
+      "pipes": [],
+      "sink": "Sentry（captureMessage／captureException），無排隊無重試",
+      "policy": "送不出就跳過，不重試也不計數",
+      "family": "sentry-direct"
+    },
+    {
+      "event": "sentry-startup-failure",
+      "origin": "source/electron-main/telemetry/sentry.ts:54-57",
+      "port_method": "captureSandDesktopStartupFailure",
+      "adapter": "source/electron-main/telemetry/sentry.ts（包住 @sentry/electron 的 adapter.captureMessage／captureException）",
+      "pipes": [],
+      "sink": "Sentry（captureMessage／captureException），無排隊無重試",
+      "policy": "送不出就跳過，不重試也不計數",
+      "family": "sentry-direct"
+    },
+    {
+      "event": "sentry-invariant-violation",
+      "origin": "source/electron-main/telemetry/sentry.ts:54-57",
+      "port_method": "reportSandSentryInvariantViolation",
+      "adapter": "source/electron-main/telemetry/sentry.ts（包住 @sentry/electron 的 adapter.captureMessage／captureException）",
+      "pipes": [],
+      "sink": "Sentry（captureMessage／captureException），無排隊無重試",
+      "policy": "送不出就跳過，不重試也不計數",
+      "family": "sentry-direct"
+    },
+    {
+      "event": "sentry-conversation-context",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:59",
+      "port_method": "setSandSentryConversation",
+      "adapter": "source/electron-main/telemetry/sentry.ts（包住 @sentry/electron 的 adapter.captureMessage／captureException）",
+      "pipes": [],
+      "sink": "Sentry（captureMessage／captureException），無排隊無重試",
+      "policy": "送不出就跳過，不重試也不計數",
+      "family": "sentry-direct"
+    },
+    {
+      "event": "onboarding-step-viewed",
+      "origin": "source/electron-main/telemetry/telemetry-report-pipes.ts:57",
+      "port_method": "ProductAnalytics.trackEvent",
+      "adapter": "source/host/extensions/telemetry/host-telemetry-service.ts:188-190（SandProductAnalytics 構造）",
+      "pipes": [],
+      "sink": "產品分析後端 trackEvent，無排隊",
+      "policy": "canRecordEvents() 為否或分析未 activate 時直接丟棄，不重試也不計數",
+      "family": "analytics-direct"
+    }
+  ],
+  "unused": [
+    {
+      "port_method": "SandTelemetry.reportBotBlock",
+      "port": "source/host/ports/telemetry.ts:20-51"
+    },
+    {
+      "port_method": "SandTelemetry.reportBoxBootStage",
+      "port": "source/host/ports/telemetry.ts:20-51"
+    },
+    {
+      "port_method": "SandTelemetry.reportExecDaemonRestart",
+      "port": "source/host/ports/telemetry.ts:20-51"
+    },
+    {
+      "port_method": "SandTelemetry.reportSupervisorRestart",
+      "port": "source/host/ports/telemetry.ts:20-51"
+    },
+    {
+      "port_method": "SandTelemetry.reportJournalOutcome",
+      "port": "source/host/ports/telemetry.ts:20-51"
+    }
+  ]
+}

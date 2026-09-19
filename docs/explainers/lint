@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Compile lint for an explainer app. Same Bun.build the reader bundle uses.
+# Copy to the app root as `lint` (chmod +x), or run from the app:
+#   bun run lint
+set -euo pipefail
+
+_ab_src="${BASH_SOURCE[0]:-$0}"
+_ab_root="$(cd "$(dirname "$_ab_src")" && pwd)"
+cd "$_ab_root" || exit 1
+
+if [[ -z "${BUN_INSTALL:-}" ]]; then
+  export BUN_INSTALL="${HOME}/.bun"
+fi
+case ":$PATH:" in
+  *":${BUN_INSTALL}/bin:"*) ;;
+  *) export PATH="${BUN_INSTALL}/bin:$PATH" ;;
+esac
+
+if [[ ! -f package.json ]]; then
+  echo "lint: no package.json (copy this file to the app root as ./lint)" >&2
+  exit 1
+fi
+if [[ ! -f build.ts ]]; then
+  echo "lint: no build.ts in $_ab_root" >&2
+  exit 1
+fi
+if ! grep -q '"lint"' package.json; then
+  bun -e '
+    const p = await Bun.file("package.json").json();
+    p.scripts = p.scripts || {};
+    p.scripts.lint = "bun run build.ts --outdir=.lint-out";
+    await Bun.write("package.json", JSON.stringify(p, null, 2) + "\n");
+  '
+fi
+
+bun run lint
+
+# Word/box: Bun.build cannot see viewBox text.
+_ab_layout=""
+if [[ -f "$_ab_root/check_dag_layout.py" ]]; then
+  _ab_layout="$_ab_root/check_dag_layout.py"
+elif [[ -f "${HOME}/.grok/skills/artifacts-builder/scripts/check_dag_layout.py" ]]; then
+  _ab_layout="${HOME}/.grok/skills/artifacts-builder/scripts/check_dag_layout.py"
+elif [[ -f "${HOME}/.claude/skills/artifacts-builder/scripts/check_dag_layout.py" ]]; then
+  _ab_layout="${HOME}/.claude/skills/artifacts-builder/scripts/check_dag_layout.py"
+fi
+if [[ -z "$_ab_layout" ]]; then
+  echo "lint: check_dag_layout.py not found" >&2
+  exit 1
+fi
+python3 "$_ab_layout" "$_ab_root/src"

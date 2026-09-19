@@ -40,6 +40,17 @@ if [[ ! -d node_modules ]]; then
   bun install
 fi
 
+# Same toolchain as compile: Bun.build logs are the React/MDX lint.
+if ! grep -q '"lint"' package.json; then
+  bun -e '
+    const p = await Bun.file("package.json").json();
+    p.scripts = p.scripts || {};
+    p.scripts.lint = "bun run build.ts --outdir=.lint-out";
+    await Bun.write("package.json", JSON.stringify(p, null, 2) + "\n");
+  '
+  echo "activate: added scripts.lint (bun run lint = Bun.build; fails on compile logs)"
+fi
+
 unset _ab_src
 if [[ "$_ab_sourced" -eq 1 ]]; then
   unset _ab_root _ab_sourced

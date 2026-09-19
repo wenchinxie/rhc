@@ -1,0 +1,43 @@
+import { H2, H3, Term } from "../../../mdx-components"
+import { Dag } from "../../../mdx-components"
+import { DAG_SVG } from "../dagMarkup"
+
+<>
+<H2 id="s0" n="0">這份 0.47 樹從哪來、章怎麼切</H2>
+<p>
+  章仍按 runtime 問題切：誰起行程、一則送出、模型、工具、沙箱、狀態、觀測、port。
+  0.47 沒有 0.18 那份 1722 檔的 TypeScript 呼叫圖。下面這張表列的是反編譯稿裡實際有的語料，不是出廠資料夾樹。
+  <span className="stamp">2026-09-12</span>
+</p>
+<H3 id="s0-1" n="0.1">語料分五塊，各歸後面哪一章</H3>
+<p>
+  怎麼認一條路徑是筆電 asar、VM host，還是 leftover stub，見 <a className="xref" href="#s1">§1</a>。
+  下表只寫各塊歸哪一章。
+</p>
+<div className="overflow wide">
+<table>
+<thead><tr>
+<th>路徑</th><th>章</th><th>是什麼</th><th>bytes 從哪來</th>
+</tr></thead>
+<tbody>
+<tr><td><code>extracted/</code></td><td><a className="xref" href="#s2">§2</a></td><td>筆電 asar 的 first-party CJS，pretty-print，區域名仍 minify</td><td>Windows 0.47.0 asar</td></tr>
+<tr><td><code>readable-ts/</code></td><td><a className="xref" href="#s2">§2</a></td><td>preload 與 coordinator 的 pin 過 TS 改寫</td><td>同一份 asar</td></tr>
+<tr><td><code>source/electron-*</code>、<code>source/node-agent-coordinator</code>、<code>source/local-exec-daemon</code></td><td><a className="xref" href="#s2">§2</a> <a className="xref" href="#s8">§8</a></td><td>leftover 字串切出的 199 個 <code>.recovered.cjs</code>，加上空 stub</td><td>筆電 asar</td></tr>
+<tr><td><code>source/host/</code></td><td><a className="xref" href="#s2">§2</a> <a className="xref" href="#s3">§3</a> <a className="xref" href="#s8">§8</a></td><td>有 <code>// src/host/</code> 標記，最像 0.18 的那塊</td><td>VM <code>studio-base-host-main.zip</code>，version <code>cb0ed63</code></td></tr>
+<tr><td><code>source/host/ports/</code></td><td><a className="xref" href="#s9">§9</a></td><td>只收回兩檔：<code>product-analytics.ts</code>、<code>sand-analytics-types.ts</code></td><td>同一份 VM host</td></tr>
+<tr><td><code>source/host/extensions/telemetry/</code></td><td><a className="xref" href="#s8">§8</a></td><td>38 個檔，host 行程的遙測機器</td><td>同一份 VM host</td></tr>
+<tr><td><code>frontend/</code></td><td><a className="xref" href="#s1">§1</a></td><td>81 條 leftover 路徑，檔裡是空模組</td><td>renderer chunk 裡的 lazy-import key</td></tr>
+<tr><td><code>catalog/</code></td><td><a className="xref" href="#s1">§1</a></td><td>RPC 名、proto、feature path</td><td>從 asar 抽出的字串</td></tr>
+<tr><td>asar <code>dist/renderer/</code></td><td>不涵蓋</td><td>Vite minify chunk，沒有 <code>.map</code></td><td>筆電 asar，未拆進這份 harness</td></tr>
+<tr><td><code>source/box-exec-daemon/</code></td><td>不涵蓋</td><td>這兩份 zip 都沒有</td><td>無</td></tr>
+</tbody>
+</table>
+</div>
+<H3 id="s0-2" n="0.2">行程拓樸總覽</H3>
+<Dag svg={DAG_SVG} />
+<p className="dagcap" id="s0-dagcap">
+  筆電 asar 裡有桌面主行程、preload、coordinator、local-exec-daemon。
+  <Term k="sand-host">host-main</Term> 不在這份 asar 的 <code>dist/host/</code>。圖上的 host 與 box-exec 來自 VM zip，細節見 <a className="xref" href="#s2">§2</a>。
+  畫面經 <code>dune-rpc</code> 打 <code>window.desktop</code>，送出另走 coordinator 的 MessagePort。
+</p>
+</>

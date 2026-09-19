@@ -1,0 +1,95 @@
+<div class="overflow dagbox">
+<svg class="dag" viewBox="0 0 920 1008" role="img" aria-label="telemetry desktop-log 家族" aria-describedby="dagcap-s8-desktop-log">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ar)"/>
+  <path d="M260,196 L260,240" marker-end="url(#ar)"/>
+  <path d="M260,304 L260,348" marker-end="url(#ar)"/>
+  <path d="M260,412 L260,456" marker-end="url(#ar)"/>
+  <path d="M260,520 L260,564" marker-end="url(#ar)"/>
+  <path d="M260,628 L260,672" marker-end="url(#ar)"/>
+  <path d="M380.0,711.0 L470,711" marker-end="url(#ar)"/>
+  <path d="M260,750 L260,794" marker-end="url(#ar)"/>
+  <path d="M380.0,833.0 L470,833" marker-end="url(#ar)"/>
+  <path d="M260,872 L260,916" marker-end="url(#ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">發生</text>
+  <g class="app lay-emit src" data-snip="t-send-ack" tabindex="0" role="button" aria-label="送達與延遲事件，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">送達與延遲事件</text>
+    <text class="sub" x="94" y="71">send-latency／send-ack／reaction-ack／render 等五類</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="168">發生</text>
+  <g class="app lay-emit src" data-snip="t-agent-load" tabindex="0" role="button" aria-label="代理人載入與擋阻事件，開啟原文">
+    <rect x="80" y="132" width="360" height="64" rx="8"/>
+    <text x="94" y="159">代理人載入與擋阻事件</text>
+    <text class="sub" x="94" y="179">agent-load／access-blocked／client-failure 三類</text>
+    <path class="srcfold" d="M431,196 L440,196 L440,187 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="276">發生</text>
+  <g class="app lay-emit src" data-snip="t8-pipes-full" tabindex="0" role="button" aria-label="視訊與電腦操作事件，開啟原文">
+    <rect x="80" y="240" width="360" height="64" rx="8"/>
+    <text x="94" y="267">視訊與電腦操作事件</text>
+    <text class="sub" x="94" y="287">vnc-session／vnc-liveness／open-computer 三類</text>
+    <path class="srcfold" d="M431,304 L440,304 L440,295 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="384">發生</text>
+  <g class="app lay-emit">
+    <rect x="80" y="348" width="360" height="64" rx="8"/>
+    <text x="94" y="375">更新提示與登入閘事件</text>
+    <text class="sub" x="94" y="395">update-prompt／signin-gate 兩類</text>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="492">port</text>
+  <g class="app lay-port src" data-snip="t8-pipes-full" tabindex="0" role="button" aria-label="TelemetryUploader port，開啟原文">
+    <rect x="80" y="456" width="360" height="64" rx="8"/>
+    <text x="94" y="483">TelemetryUploader port</text>
+    <text class="sub" x="94" y="503">13 支報告管子共用同一份介面</text>
+    <path class="srcfold" d="M431,520 L440,520 L440,511 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="600">轉接</text>
+  <g class="app lay-adapter src" data-snip="t-adapter" tabindex="0" role="button" aria-label="createProductionTelemetryAdapter，開啟原文">
+    <rect x="80" y="564" width="360" height="64" rx="8"/>
+    <text x="94" y="591">createProductionTelemetryAdapter</text>
+    <text class="sub" x="94" y="611">組出 SandDesktopStructuredLogTelemetry</text>
+    <path class="srcfold" d="M431,628 L440,628 L440,619 z"/>
+  </g>
+  <text class="lay" text-anchor="end" x="76" y="715">管線</text>
+  <g class="dec lay-pipe src" data-snip="t-pipe" tabindex="0" role="button" aria-label="isValid 驗證通過？，開啟原文">
+    <polygon points="260,672 380.0,711.0 260,750 140.0,711.0"/>
+    <text text-anchor="middle" x="260" y="716.0">isValid 驗證通過？</text>
+    <circle class="srcdot" cx="260" cy="733" r="4"/>
+  </g>
+  <g class="app lay-pipe">
+    <rect x="470" y="682" width="430" height="58" rx="8"/>
+    <text x="484" y="706">整包丟棄</text>
+    <text class="sub" x="484" y="726">沒有中間佇列，當場結束</text>
+  </g>
+  <text class="elab" x="272" y="776.0">通過</text>
+  <text class="lay" text-anchor="end" x="76" y="837">管線</text>
+  <g class="dec lay-pipe">
+    <polygon points="260,794 380.0,833.0 260,872 140.0,833.0"/>
+    <text text-anchor="middle" x="260" y="838.0">緩衝傳輸佇列滿了？</text>
+  </g>
+  <g class="app lay-pipe src" data-snip="t-overflow" tabindex="0" role="button" aria-label="砍最舊那幾筆，開啟原文">
+    <rect x="470" y="804" width="430" height="58" rx="8"/>
+    <text x="484" y="828">砍最舊那幾筆</text>
+    <text class="sub" x="484" y="848">overflow_evicted</text>
+    <path class="srcfold" d="M891,862 L900,862 L900,853 z"/>
+  </g>
+  <text class="elab" x="272" y="898.0">未滿</text>
+  <text class="lay" text-anchor="end" x="76" y="952">落地</text>
+  <g class="app lay-sink src" data-snip="t-flush-fail" tabindex="0" role="button" aria-label="flushOnce() 送出，開啟原文">
+    <rect x="80" y="916" width="360" height="64" rx="8"/>
+    <text x="94" y="943">flushOnce() 送出</text>
+    <text class="sub" x="94" y="963">送不出留底重試，斷線整批 spill 落地</text>
+    <path class="srcfold" d="M431,980 L440,980 L440,971 z"/>
+  </g>
+</svg>
+</div>
+<p class="dagcap" id="dagcap-s8-desktop-log">renderer／preload 經 IPC 交十三支報告管子，驗證沒過當場丟棄；驗證通過的走緩衝傳輸佇列，滿了砍最舊，斷線整批 spill 到本機檔案再續傳。</p>
