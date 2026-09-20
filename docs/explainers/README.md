@@ -1,23 +1,19 @@
 # rhc explainers
 
-One Bun + React app for harness design pages. Shared ivory shell in `src/`.
-`/` is the catalog. Each document is `src/harnesses/<slug>/` plus a sibling
-HTML entry (`src/<slug>.html`). Read via bun dev. Compile to `dist/` on
-demand. Do not commit a `docs/<slug>-design.html` snapshot.
+One Bun + React app. Shared ivory shell in `src/`. Each document is
+`src/harnesses/<slug>/page.mdx`. React mounts that Markdown. Edit MDX, then
+`bun run dev`. The only HTML file is the Bun SPA shell `src/index.html`.
 
 ```bash
 source ./activate    # cd here, bun install if needed
 ./activate           # same, then bun run dev
 ```
 
-Dev server is `http://127.0.0.1:3010` (`PORT` overrides). Routes: `/` catalog,
-`/grok-bot.html`, `/lauren.html`, `/lauren-en.html`.
-The catalog at `/` lists aspects, not document names. A new grok-bot
-aspect is a row in `src/harnesses/index/catalog.ts` pointing at a
-section or a future harness HTML.
+Dev server is `http://127.0.0.1:3010`. `/` is the catalog (`harnesses/index/page.mdx`).
+Document paths (`/grok-bot`, `/grok-bot-047`, `/lauren`, …) serve the same
+shell; `App.tsx` picks the harness from the path.
 
 §0 of a code explainer is the folder map, rendered from `structure.json`:
 `python3 ~/.claude/skills/artifacts-builder/scripts/structure_to_s0.py <structure.json> <folders.json> <imports.json> src/harnesses/<slug>/content` (graphs from `tsgraph.mjs`, see the skill's `references/codebase-map.md`).
 
-Compile if you need a single file: `bash ~/.claude/skills/artifacts-builder/scripts/compile.sh`.
-The output stays in `dist/`. Do not copy it into `docs/`.
+Compile a shareable file on demand with artifacts-builder `compile.sh src/index.html`. Do not commit `dist/` or a `docs/<slug>-design.html` snapshot.
