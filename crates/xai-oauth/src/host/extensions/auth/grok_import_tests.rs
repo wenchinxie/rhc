@@ -1,8 +1,8 @@
 use serde_json::json;
 
-use crate::client::AuthClient;
-use crate::constants::GROK_SCOPE_KEY;
-use crate::session::Session;
+use crate::host::extensions::auth::client::AuthClient;
+use crate::host::extensions::auth::constants::GROK_SCOPE_KEY;
+use crate::host::extensions::auth::session::Session;
 
 #[test]
 fn from_grok_copies_key_not_refresh() {

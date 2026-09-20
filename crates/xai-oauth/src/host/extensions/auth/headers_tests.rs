@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::TOKEN_AUTH_VALUE;
+use crate::host::extensions::auth::constants::TOKEN_AUTH_VALUE;
 
 #[test]
 fn oauth_headers() {

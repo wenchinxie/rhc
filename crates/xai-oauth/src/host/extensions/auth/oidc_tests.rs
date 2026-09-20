@@ -4,10 +4,12 @@ use std::time::Duration;
 
 use serde_json::json;
 
-use crate::client::AuthClient;
-use crate::constants::{CLIENT_ID, DEVICE_GRANT_TYPE, ISSUER, REFERRER, SCOPES};
-use crate::error::AuthError;
-use crate::session::{OAuthSession, Session};
+use crate::host::extensions::auth::client::AuthClient;
+use crate::host::extensions::auth::constants::{
+    CLIENT_ID, DEVICE_GRANT_TYPE, ISSUER, REFERRER, SCOPES,
+};
+use crate::host::extensions::auth::error::AuthError;
+use crate::host::extensions::auth::session::{OAuthSession, Session};
 use crate::test_support::ScriptedHttp;
 use chrono::{Duration as ChronoDuration, Utc};
 
@@ -83,7 +85,7 @@ fn logged_out_proxy_headers_need_login() {
 #[test]
 fn refresh_if_needed_noop_when_fresh() {
     let dir = tempfile::tempdir().unwrap();
-    let store = crate::store::TokenStore::new(dir.path().join("auth.json"));
+    let store = crate::host::extensions::auth::store::TokenStore::new(dir.path().join("auth.json"));
     let session = OAuthSession {
         access_token: "at".into(),
         refresh_token: Some("rt".into()),
@@ -108,7 +110,7 @@ fn refresh_invalid_grant_clears_store() {
         vec![(400, json!({"error": "invalid_grant"}))],
     )])));
     let dir = tempfile::tempdir().unwrap();
-    let store = crate::store::TokenStore::new(dir.path().join("auth.json"));
+    let store = crate::host::extensions::auth::store::TokenStore::new(dir.path().join("auth.json"));
     store
         .save(&OAuthSession {
             access_token: "old".into(),

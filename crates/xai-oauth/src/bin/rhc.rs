@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use xai_oauth::{AuthClient, AuthError, Session};
+use xai_oauth::{AuthError, Session, start};
 
 #[derive(Parser)]
 #[command(name = "rhc", about = "rhc SuperGrok OAuth client")]
@@ -31,7 +31,7 @@ fn main() {
 }
 
 fn run(cli: Cli) -> Result<(), AuthError> {
-    let client = AuthClient::default();
+    let client = start();
     match cli.cmd {
         Cmd::Login { from_grok } => {
             let session = if from_grok {

@@ -4,13 +4,13 @@ use std::time::{Duration, Instant};
 use chrono::{Duration as ChronoDuration, Utc};
 use serde_json::Value;
 
-use crate::constants::{
+use super::constants::{
     CLIENT_ID, DEFAULT_EXPIRES_IN_SECS, DEFAULT_POLL_INTERVAL_SECS, DEVICE_CODE_URL,
     DEVICE_GRANT_TYPE, ISSUER, REFERRER, SCOPES, SLOW_DOWN_INCREMENT_SECS, TOKEN_URL,
 };
-use crate::error::AuthError;
-use crate::http::FormPoster;
-use crate::session::{OAuthSession, claims_from_jwt};
+use super::error::AuthError;
+use super::http::FormPoster;
+use super::session::{OAuthSession, claims_from_jwt};
 
 pub(crate) struct TokenGrant {
     pub access_token: String,

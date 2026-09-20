@@ -1,6 +1,6 @@
-use crate::client::AuthClient;
-use crate::error::AuthError;
-use crate::session::Session;
+use crate::host::extensions::auth::client::AuthClient;
+use crate::host::extensions::auth::error::AuthError;
+use crate::host::extensions::auth::session::Session;
 
 #[test]
 fn whoami_logged_out() {
@@ -20,16 +20,16 @@ fn logout_when_logged_out_ok() {
 #[test]
 fn need_login_when_expired_without_refresh() {
     let dir = tempfile::tempdir().unwrap();
-    let store = crate::store::TokenStore::new(dir.path().join("auth.json"));
+    let store = crate::host::extensions::auth::store::TokenStore::new(dir.path().join("auth.json"));
     store
-        .save(&crate::session::OAuthSession {
+        .save(&crate::host::extensions::auth::session::OAuthSession {
             access_token: "old".into(),
             refresh_token: None,
             expires_at: chrono::Utc::now() - chrono::Duration::hours(1),
             subject: "s".into(),
             email: None,
-            issuer: crate::constants::ISSUER.into(),
-            client_id: crate::constants::CLIENT_ID.into(),
+            issuer: crate::host::extensions::auth::constants::ISSUER.into(),
+            client_id: crate::host::extensions::auth::constants::CLIENT_ID.into(),
         })
         .unwrap();
     let client = AuthClient::new(dir.path().join("auth.json"));

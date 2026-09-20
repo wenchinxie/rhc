@@ -5,12 +5,12 @@ use std::time::Duration;
 
 use chrono::Utc;
 
-use crate::error::AuthError;
-use crate::grok_import::import_oauth_from_grok;
-use crate::http::{FormPoster, UreqPoster};
-use crate::oidc::{refresh_grant, run_device_code_flow};
-use crate::session::{OAuthSession, Session};
-use crate::store::TokenStore;
+use super::error::AuthError;
+use super::grok_import::import_oauth_from_grok;
+use super::http::{FormPoster, UreqPoster};
+use super::oidc::{refresh_grant, run_device_code_flow};
+use super::session::{OAuthSession, Session};
+use super::store::TokenStore;
 
 pub struct AuthClient {
     store: TokenStore,

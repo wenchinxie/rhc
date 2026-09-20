@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::constants::{TOKEN_AUTH_VALUE, client_identity};
+use super::constants::{TOKEN_AUTH_VALUE, client_identity};
 
 pub fn proxy_header_map(access_token: &str) -> BTreeMap<String, String> {
     let identity = client_identity();

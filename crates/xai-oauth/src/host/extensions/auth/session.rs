@@ -4,9 +4,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::constants::{CLIENT_ID, FRESHNESS_SKEW_SECS, ISSUER};
-use crate::error::AuthError;
-use crate::headers::proxy_header_map;
+use super::constants::{CLIENT_ID, FRESHNESS_SKEW_SECS, ISSUER};
+use super::error::AuthError;
+use super::headers::proxy_header_map;
 
 #[derive(Debug, Clone)]
 pub enum Session {

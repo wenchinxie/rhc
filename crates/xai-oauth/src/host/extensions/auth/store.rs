@@ -8,9 +8,9 @@ use fs4::fs_std::FileExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::constants::{CLIENT_ID, ISSUER, STORE_VERSION};
-use crate::error::AuthError;
-use crate::session::{OAuthSession, Session};
+use super::constants::{CLIENT_ID, ISSUER, STORE_VERSION};
+use super::error::AuthError;
+use super::session::{OAuthSession, Session};
 
 #[derive(Serialize, Deserialize)]
 struct StoreFile {
@@ -30,11 +30,11 @@ struct CredentialWire {
     client_id: String,
 }
 
-pub struct TokenStore {
+pub(crate) struct TokenStore {
     path: PathBuf,
 }
 
-pub struct AuthFileLock {
+pub(crate) struct AuthFileLock {
     _file: File,
 }
 
