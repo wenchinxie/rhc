@@ -3,9 +3,9 @@ use std::os::unix::fs::PermissionsExt;
 use chrono::{TimeZone, Utc};
 
 use super::*;
-use crate::constants::{CLIENT_ID, ISSUER};
-use crate::error::AuthError;
-use crate::session::{OAuthSession, Session};
+use crate::host::extensions::auth::constants::{CLIENT_ID, ISSUER};
+use crate::host::extensions::auth::error::AuthError;
+use crate::host::extensions::auth::session::{OAuthSession, Session};
 
 fn sample() -> OAuthSession {
     OAuthSession {

@@ -3,8 +3,8 @@ use std::sync::Mutex;
 
 use serde_json::Value;
 
-use crate::error::AuthError;
-use crate::http::FormPoster;
+use crate::AuthError;
+use crate::host::extensions::auth::http::FormPoster;
 
 type FormFields = Vec<(String, String)>;
 type RouteQueue = VecDeque<(u16, Value)>;
