@@ -1,33 +1,27 @@
 import { serve } from "bun";
 import index from "./index.html";
-import grokBot from "./grok-bot.html";
-import grokBot047 from "./grok-bot-047.html";
-import grokBotEvolution from "./grok-bot-evolution.html";
-import lauren from "./lauren.html";
-import laurenEn from "./lauren-en.html";
+
+const DOC_PATHS = [
+  "/",
+  "/index.html",
+  "/grok-bot",
+  "/grok-bot.html",
+  "/grok-bot-047",
+  "/grok-bot-047.html",
+  "/grok-bot-evolution",
+  "/grok-bot-evolution.html",
+  "/lauren",
+  "/lauren.html",
+  "/lauren-en",
+  "/lauren-en.html",
+];
 
 const server = serve({
   port: Number(process.env.PORT) || 3010,
-  routes: {
-    "/": index,
-    "/index.html": index,
-    "/grok-bot": grokBot,
-    "/grok-bot.html": grokBot,
-    "/grok-bot-047": grokBot047,
-    "/grok-bot-047.html": grokBot047,
-    "/grok-bot-evolution": grokBotEvolution,
-    "/grok-bot-evolution.html": grokBotEvolution,
-    "/lauren": lauren,
-    "/lauren.html": lauren,
-    "/lauren-en": laurenEn,
-    "/lauren-en.html": laurenEn,
-  },
+  routes: Object.fromEntries(DOC_PATHS.map((path) => [path, index])),
 
   development: process.env.NODE_ENV !== "production" && {
-    // Enable browser hot reloading in development
     hmr: true,
-
-    // Echo console logs from the browser to the server
     console: true,
   },
 });
