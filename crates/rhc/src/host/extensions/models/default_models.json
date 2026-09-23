@@ -14,16 +14,6 @@
           "name": "Grok 4.5"
         }
       ]
-    },
-    "grok": {
-      "default": "grok-4.6",
-      "models": [
-        {
-          "id": "grok-4.6",
-          "family": "xai",
-          "name": "Grok 4.6"
-        }
-      ]
     }
   }
 }
