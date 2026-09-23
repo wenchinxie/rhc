@@ -5,20 +5,22 @@ use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
 use fs4::fs_std::FileExt;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::Value;
 
-use super::constants::{CLIENT_ID, ISSUER, STORE_VERSION};
-use super::error::AuthError;
-use super::session::{OAuthSession, Session};
+use super::constants::{CLIENT_ID, ISSUER};
+use super::session::OAuthSession;
+use crate::host::ports::auth::AuthError;
 
-#[derive(Serialize, Deserialize)]
+const STORE_VERSION: u32 = 1;
+
+#[derive(Serialize)]
 struct StoreFile {
     version: u32,
     credential: CredentialWire,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 struct CredentialWire {
     kind: String,
     access_token: String,
@@ -47,26 +49,22 @@ impl TokenStore {
         home_dir().join(".rhc").join("auth.json")
     }
 
-    pub fn path(&self) -> &Path {
-        &self.path
-    }
-
     pub fn lock_path(&self) -> PathBuf {
         self.path.with_extension("json.lock")
     }
 
-    pub fn load(&self) -> Result<Session, AuthError> {
+    pub fn load(&self) -> Result<Option<OAuthSession>, AuthError> {
         let raw = match fs::read_to_string(&self.path) {
             Ok(s) => s,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Session::LoggedOut),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e.into()),
         };
         if raw.trim().is_empty() {
-            return Ok(Session::LoggedOut);
+            return Ok(None);
         }
         let data: Value = serde_json::from_str(&raw)
             .map_err(|e| AuthError::msg(format!("corrupt auth store: {e}")))?;
-        session_from_wire(&data, &self.path)
+        session_from_wire(&data, &self.path).map(Some)
     }
 
     pub fn save(&self, session: &OAuthSession) -> Result<(), AuthError> {
@@ -169,7 +167,7 @@ fn to_wire(session: &OAuthSession) -> StoreFile {
     }
 }
 
-fn session_from_wire(data: &Value, path: &Path) -> Result<Session, AuthError> {
+fn session_from_wire(data: &Value, path: &Path) -> Result<OAuthSession, AuthError> {
     let obj = data
         .as_object()
         .ok_or_else(|| AuthError::msg(format!("corrupt auth store: {}", path.display())))?;
@@ -202,7 +200,7 @@ fn session_from_wire(data: &Value, path: &Path) -> Result<Session, AuthError> {
         .with_timezone(&Utc);
     let refresh = opt_str(cred.get("refresh_token"));
     let email = opt_str(cred.get("email"));
-    Ok(Session::OAuth(OAuthSession {
+    Ok(OAuthSession {
         access_token: access,
         refresh_token: refresh,
         expires_at,
@@ -210,7 +208,7 @@ fn session_from_wire(data: &Value, path: &Path) -> Result<Session, AuthError> {
         email,
         issuer,
         client_id,
-    }))
+    })
 }
 
 fn require_str(

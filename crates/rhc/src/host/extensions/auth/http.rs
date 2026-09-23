@@ -2,7 +2,7 @@ use serde_json::{Value, json};
 use ureq::Error as UreqError;
 
 use super::constants::{HTTP_TIMEOUT_SECS, client_identity};
-use super::error::AuthError;
+use crate::host::ports::auth::AuthError;
 
 pub(crate) trait FormPoster: Send + Sync {
     fn post_form(&self, url: &str, fields: &[(&str, &str)]) -> Result<(u16, Value), AuthError>;

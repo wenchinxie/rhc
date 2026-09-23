@@ -4,8 +4,8 @@ use chrono::{Duration, TimeZone, Utc};
 use serde_json::Value;
 
 use super::constants::{CLIENT_ID, DEFAULT_EXPIRES_IN_SECS, GROK_SCOPE_KEY, ISSUER};
-use super::error::AuthError;
 use super::session::{OAuthSession, claims_from_jwt};
+use crate::host::ports::auth::AuthError;
 
 pub(crate) fn resolve_grok_auth_path(explicit: Option<&Path>) -> PathBuf {
     if let Some(p) = explicit {
