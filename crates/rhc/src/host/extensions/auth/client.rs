@@ -1,22 +1,20 @@
 use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::Duration;
 
 use chrono::Utc;
 
-use super::error::AuthError;
 use super::grok_import::import_oauth_from_grok;
 use super::http::{FormPoster, UreqPoster};
-use super::oidc::{refresh_grant, run_device_code_flow};
-use super::session::{OAuthSession, Session};
+use super::oidc::{refresh_grant, run_loopback_flow};
+use super::session::OAuthSession;
 use super::store::TokenStore;
+use crate::host::ports::auth::{Auth, AuthError, CredentialSnapshot, Subscription};
 
 pub struct AuthClient {
     store: TokenStore,
     http: Arc<dyn FormPoster>,
     grok_path: Option<PathBuf>,
-    sleep: Arc<dyn Fn(Duration) + Send + Sync>,
 }
 
 impl Default for AuthClient {
@@ -31,7 +29,6 @@ impl AuthClient {
             store: TokenStore::new(path),
             http: Arc::new(UreqPoster),
             grok_path: None,
-            sleep: Arc::new(std::thread::sleep),
         }
     }
 
@@ -42,66 +39,69 @@ impl AuthClient {
     }
 
     #[cfg(test)]
-    pub(crate) fn with_sleep(mut self, sleep: Arc<dyn Fn(Duration) + Send + Sync>) -> Self {
-        self.sleep = sleep;
-        self
-    }
-
-    #[cfg(test)]
     pub(crate) fn with_grok_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.grok_path = Some(path.into());
         self
     }
 
-    pub fn load(&self) -> Result<Session, AuthError> {
-        self.store.load()
-    }
-
-    pub fn login(&self) -> Result<OAuthSession, AuthError> {
-        let mut stderr = io::stderr();
-        self.login_with_stderr(&mut stderr)
-    }
-
-    pub fn login_with_stderr(&self, stderr: &mut dyn Write) -> Result<OAuthSession, AuthError> {
-        let session = run_device_code_flow(self.http.as_ref(), self.sleep.as_ref(), stderr)?;
-        let _lock = self.store.lock()?;
-        self.store.save(&session)?;
-        Ok(session)
-    }
-
-    pub fn login_from_grok(&self) -> Result<OAuthSession, AuthError> {
+    /// SuperGrok only, so it is not part of `Auth`.
+    pub fn login_from_grok(&self) -> Result<CredentialSnapshot, AuthError> {
         let session = import_oauth_from_grok(self.grok_path.as_deref())?;
         let _lock = self.store.lock()?;
         self.store.save(&session)?;
-        Ok(session)
+        Ok(session.into_snapshot())
     }
 
-    pub fn logout(&self) -> Result<(), AuthError> {
+    pub(super) fn login_with_browser(
+        &self,
+        stderr: &mut dyn Write,
+        open_browser: &dyn Fn(&str),
+    ) -> Result<CredentialSnapshot, AuthError> {
+        let session = run_loopback_flow(self.http.as_ref(), stderr, open_browser)?;
+        let _lock = self.store.lock()?;
+        self.store.save(&session)?;
+        Ok(session.into_snapshot())
+    }
+}
+
+impl Auth for AuthClient {
+    fn subscription(&self) -> Subscription {
+        Subscription::SuperGrok
+    }
+
+    fn snapshot(&self) -> Result<Option<CredentialSnapshot>, AuthError> {
+        Ok(self.store.load()?.map(OAuthSession::into_snapshot))
+    }
+
+    fn login(&self) -> Result<CredentialSnapshot, AuthError> {
+        self.login_with_browser(&mut io::stderr(), &|url| {
+            let _ = webbrowser::open(url);
+        })
+    }
+
+    fn logout(&self) -> Result<(), AuthError> {
         let _lock = self.store.lock()?;
         self.store.clear()
     }
 
-    pub fn refresh_if_needed(&self, session: Session) -> Result<Session, AuthError> {
-        let Session::OAuth(current) = session else {
-            return Ok(Session::LoggedOut);
+    fn refresh_if_needed(&self) -> Result<Option<CredentialSnapshot>, AuthError> {
+        let Some(current) = self.store.load()? else {
+            return Ok(None);
         };
         if current.is_fresh(Utc::now()) {
-            return Ok(Session::OAuth(current));
+            return Ok(Some(current.into_snapshot()));
         }
         if current.refresh_token.is_none() {
             return Err(AuthError::NeedLogin);
         }
         let _lock = self.store.lock()?;
-        let latest = self.store.load()?;
-        if let Session::OAuth(ref s) = latest
-            && s.is_fresh(Utc::now())
-        {
-            return Ok(latest);
-        }
-        let Session::OAuth(latest_oauth) = latest else {
+        let Some(latest) = self.store.load()? else {
             return Err(AuthError::NeedLogin);
         };
-        let Some(refresh) = latest_oauth.refresh_token.as_deref() else {
+        if latest.is_fresh(Utc::now()) {
+            return Ok(Some(latest.into_snapshot()));
+        }
+        let Some(refresh) = latest.refresh_token.as_deref() else {
             return Err(AuthError::NeedLogin);
         };
         let grant = match refresh_grant(self.http.as_ref(), refresh) {
@@ -114,23 +114,19 @@ impl AuthClient {
         };
         let new = OAuthSession {
             access_token: grant.access_token,
-            refresh_token: grant.refresh_token.or(latest_oauth.refresh_token),
+            refresh_token: grant.refresh_token.or(latest.refresh_token),
             expires_at: grant.expires_at,
-            email: grant.email.or(latest_oauth.email),
+            email: grant.email.or(latest.email),
             subject: if grant.subject.is_empty() {
-                latest_oauth.subject
+                latest.subject
             } else {
                 grant.subject
             },
-            issuer: latest_oauth.issuer,
-            client_id: latest_oauth.client_id,
+            issuer: latest.issuer,
+            client_id: latest.client_id,
         };
         self.store.save(&new)?;
-        Ok(Session::OAuth(new))
-    }
-
-    pub fn store_path(&self) -> &Path {
-        self.store.path()
+        Ok(Some(new.into_snapshot()))
     }
 }
 

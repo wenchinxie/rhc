@@ -2,7 +2,7 @@ use serde_json::json;
 
 use crate::host::extensions::auth::client::AuthClient;
 use crate::host::extensions::auth::constants::GROK_SCOPE_KEY;
-use crate::host::extensions::auth::session::Session;
+use crate::host::extensions::auth::store::TokenStore;
 
 #[test]
 fn from_grok_copies_key_not_refresh() {
@@ -24,14 +24,15 @@ fn from_grok_copies_key_not_refresh() {
     )
     .unwrap();
     let client = AuthClient::new(dir.path().join("auth.json")).with_grok_path(&grok_path);
-    let session = client.login_from_grok().unwrap();
-    assert_eq!(session.access_token, "grok-access");
-    assert!(session.refresh_token.is_none());
-    assert_eq!(session.email.as_deref(), Some("g@x.ai"));
-    let Session::OAuth(loaded) = client.load().unwrap() else {
-        panic!("expected oauth");
-    };
-    assert!(loaded.refresh_token.is_none());
+    let snapshot = client.login_from_grok().unwrap();
+    assert_eq!(snapshot.token, "grok-access");
+    assert_eq!(snapshot.identity.email.as_deref(), Some("g@x.ai"));
+    let saved = TokenStore::new(dir.path().join("auth.json"))
+        .load()
+        .unwrap()
+        .expect("saved session");
+    assert_eq!(saved.access_token, "grok-access");
+    assert!(saved.refresh_token.is_none());
     let grok_raw = std::fs::read_to_string(&grok_path).unwrap();
     assert!(grok_raw.contains("grok-refresh-must-not-copy"));
 }
