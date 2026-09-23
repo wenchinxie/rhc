@@ -23,11 +23,14 @@ fn ports_and_extensions_never_import_an_extension() {
         .filter(|path| path.is_dir())
         .map(|path| path.file_name().unwrap().to_string_lossy().into_owned())
         .collect();
-    // Grouped `crate::{..}` / `host::{..}` imports are banned so every cross-layer path stays greppable.
-    let mut forbidden: Vec<String> = ["host::extensions", "super::super", "crate::{", "host::{"]
+    let cross_layer_paths = ["host::extensions", "super::super"]
         .map(String::from)
-        .to_vec();
-    forbidden.extend(extensions.iter().map(|name| format!("crate::{name}")));
+        .into_iter()
+        .chain(extensions.iter().map(|name| format!("crate::{name}")));
+    let grouped_imports_that_hide_paths = ["crate::{", "host::{"].map(String::from);
+    let forbidden: Vec<String> = cross_layer_paths
+        .chain(grouped_imports_that_hide_paths)
+        .collect();
 
     let mut files = Vec::new();
     production_sources(&host.join("ports"), &mut files);

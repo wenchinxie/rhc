@@ -1,5 +1,3 @@
-//! Model catalog contract. Implementations register rows. Callers look up by subscription.
-
 use super::auth::Subscription;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

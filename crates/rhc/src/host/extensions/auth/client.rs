@@ -44,7 +44,6 @@ impl AuthClient {
         self
     }
 
-    /// SuperGrok only, so it is not part of `Auth`.
     pub fn login_from_grok(&self) -> Result<CredentialSnapshot, AuthError> {
         let session = import_oauth_from_grok(self.grok_path.as_deref())?;
         let _lock = self.store.lock()?;
