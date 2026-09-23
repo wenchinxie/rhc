@@ -16,9 +16,3 @@ fn supergrok_registers_grok_46() {
         "grok-4.6"
     );
 }
-
-#[test]
-fn grok_subscription_has_a_row() {
-    let catalog = start();
-    assert!(!catalog.models_for(Subscription::Grok).is_empty());
-}

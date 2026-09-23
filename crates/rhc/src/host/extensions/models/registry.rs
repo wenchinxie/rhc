@@ -13,7 +13,6 @@ struct File {
 #[derive(Deserialize)]
 struct Subs {
     supergrok: Group,
-    grok: Group,
 }
 
 #[derive(Deserialize)]
@@ -43,7 +42,6 @@ impl JsonModelCatalog {
     fn group(&self, subscription: Subscription) -> &Group {
         match subscription {
             Subscription::SuperGrok => &self.file.subscriptions.supergrok,
-            Subscription::Grok => &self.file.subscriptions.grok,
         }
     }
 }

@@ -3,7 +3,14 @@ use thiserror::Error;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Subscription {
     SuperGrok,
-    Grok,
+}
+
+impl Subscription {
+    pub fn id(self) -> &'static str {
+        match self {
+            Self::SuperGrok => "supergrok",
+        }
+    }
 }
 
 #[derive(Debug, Error)]
