@@ -1,5 +1,3 @@
-//! SuperGrok browser login behind `ports::auth::Auth`.
-
 mod client;
 mod constants;
 mod grok_import;

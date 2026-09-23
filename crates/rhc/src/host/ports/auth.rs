@@ -1,9 +1,5 @@
-//! Outbound-auth contract for subscriptions whose login rhc owns. Same job as
-//! Grok Build's `xai-grok-auth`. SuperGrok implements it. A later Grok login implements it too.
-
 use thiserror::Error;
 
-/// Which subscription minted the credential. Callers branch on this, not on folder names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Subscription {
     SuperGrok,
@@ -36,14 +32,12 @@ pub struct Identity {
     pub issuer: String,
 }
 
-/// A signed-in credential. Same idea as Grok Build `CredentialSnapshot`.
 #[derive(Debug, Clone)]
 pub struct CredentialSnapshot {
     pub token: String,
     pub identity: Identity,
 }
 
-/// One login provider. HTTP and the CLI talk to this, not to SuperGrok files.
 /// `None` means logged out.
 pub trait Auth: Send + Sync {
     fn subscription(&self) -> Subscription;
