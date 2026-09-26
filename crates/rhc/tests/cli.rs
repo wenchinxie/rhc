@@ -19,11 +19,17 @@ const V1_STORE: &str = r#"{
 const GROK_STORE: &str = r#"{"https://auth.x.ai::b1a00492-073a-47ea-816f-4c329264a828": {"key": "grok-access", "user_id": "user-9", "email": "g@x.ai", "expires_at": "2030-01-01T00:00:00Z", "refresh_token": "must-not-copy"}}"#;
 
 fn run(home: &Path, args: &[&str]) -> (i32, String, String) {
+    run_with_env(
+        &[("HOME", home), ("GROK_AUTH_PATH", &home.join("grok.json"))],
+        args,
+    )
+}
+
+fn run_with_env(env: &[(&str, &Path)], args: &[&str]) -> (i32, String, String) {
     let output = Command::new(env!("CARGO_BIN_EXE_rhc"))
         .args(args)
         .env_clear()
-        .env("HOME", home)
-        .env("GROK_AUTH_PATH", home.join("grok.json"))
+        .envs(env.iter().copied())
         .stdin(Stdio::null())
         .output()
         .expect("run rhc");
@@ -164,4 +170,31 @@ fn logout_without_a_name_clears_the_store() {
     assert_eq!(code, 0);
     assert_eq!(stdout, "supergrok  not signed in\n");
     assert_eq!(stderr, "");
+}
+
+#[test]
+fn from_grok_reads_grok_home_when_no_auth_path_is_set() {
+    let home = tempfile::tempdir().unwrap();
+    let grok_home = home.path().join("grok-home");
+    fs::create_dir_all(&grok_home).unwrap();
+    fs::write(grok_home.join("auth.json"), GROK_STORE).unwrap();
+    let (code, stdout, stderr) = run_with_env(
+        &[("HOME", home.path()), ("GROK_HOME", &grok_home)],
+        &["login", "--from-grok"],
+    );
+    assert_eq!(code, 0);
+    assert_eq!(stdout, "supergrok  signed in as g@x.ai\n");
+    assert_eq!(stderr, "");
+}
+
+#[test]
+fn from_grok_falls_back_to_dot_grok_under_home() {
+    let home = tempfile::tempdir().unwrap();
+    fs::create_dir_all(home.path().join(".grok")).unwrap();
+    fs::write(home.path().join(".grok/auth.json"), GROK_STORE).unwrap();
+    let (code, stdout, stderr) = run_with_env(&[("HOME", home.path())], &["login", "--from-grok"]);
+    assert_eq!(code, 0);
+    assert_eq!(stdout, "supergrok  signed in as g@x.ai\n");
+    assert_eq!(stderr, "");
+    assert!(home.path().join(".rhc/auth.json").exists());
 }

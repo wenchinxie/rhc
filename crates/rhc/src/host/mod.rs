@@ -1,5 +1,6 @@
-pub mod extensions;
+mod extensions;
 pub mod ports;
+pub mod root;
 
 #[cfg(test)]
 #[path = "layers_tests.rs"]

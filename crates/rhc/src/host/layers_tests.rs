@@ -59,3 +59,28 @@ fn ports_and_extensions_never_import_an_extension() {
         "ports and extensions reach another extension only through a port"
     );
 }
+
+#[test]
+fn nothing_under_host_reads_the_environment() {
+    let host = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/host");
+    let mut files = Vec::new();
+    production_sources(&host, &mut files);
+    assert!(files.iter().any(|f| f.ends_with("root.rs")));
+
+    let env_reads = [["std", "env"], ["env", "var"]].map(|parts| parts.join("::"));
+    let readers: Vec<String> = files
+        .iter()
+        .filter(|file| {
+            let text = fs::read_to_string(file).unwrap();
+            env_reads
+                .iter()
+                .any(|needle| text.contains(needle.as_str()))
+        })
+        .map(|file| file.display().to_string())
+        .collect();
+    assert_eq!(
+        readers,
+        Vec::<String>::new(),
+        "the edge reads the environment once and passes it in StartContext"
+    );
+}

@@ -23,7 +23,7 @@ fn from_grok_copies_key_not_refresh() {
         .unwrap(),
     )
     .unwrap();
-    let client = AuthClient::new(dir.path().join("auth.json")).with_grok_path(&grok_path);
+    let client = AuthClient::new(dir.path(), grok_path.clone());
     let snapshot = client.login_from_grok().unwrap();
     assert_eq!(snapshot.token, "grok-access");
     assert_eq!(snapshot.identity.email.as_deref(), Some("g@x.ai"));
