@@ -9,7 +9,7 @@ use chrono::{Duration as ChronoDuration, Utc};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-use super::http::FormPoster;
+use super::http::XaiHttp;
 use super::provider::XAI;
 use super::session::{DEFAULT_EXPIRES_IN_SECS, OAuthSession, claims_from_jwt};
 use crate::host::ports::auth::AuthError;
@@ -30,7 +30,7 @@ pub(crate) struct TokenGrant {
 }
 
 pub(crate) fn run_loopback_flow(
-    http: &dyn FormPoster,
+    http: &dyn XaiHttp,
     stderr: &mut dyn Write,
     open_browser: &dyn Fn(&str),
 ) -> Result<OAuthSession, AuthError> {
@@ -57,7 +57,7 @@ pub(crate) fn run_loopback_flow(
 pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce: &str) -> String {
     format!(
         "{}?response_type=code&client_id={}&redirect_uri={}&scope={}\
-         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}&referrer={}",
+         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}",
         XAI.authorize_url,
         percent_encode(XAI.client_id),
         percent_encode(redirect_uri),
@@ -65,12 +65,11 @@ pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce:
         percent_encode(&pkce.code_challenge),
         percent_encode(state),
         percent_encode(nonce),
-        percent_encode(XAI.referrer),
     )
 }
 
 pub(crate) fn refresh_grant(
-    http: &dyn FormPoster,
+    http: &dyn XaiHttp,
     refresh_token: &str,
 ) -> Result<TokenGrant, AuthError> {
     let (status, data) = http.post_form(
@@ -95,7 +94,7 @@ pub(crate) fn refresh_grant(
 }
 
 pub(crate) fn exchange_code(
-    http: &dyn FormPoster,
+    http: &dyn XaiHttp,
     code: &str,
     redirect_uri: &str,
     code_verifier: &str,

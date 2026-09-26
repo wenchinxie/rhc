@@ -149,7 +149,7 @@ fn models_lists_supergrok_catalog() {
     assert_eq!(code, 0);
     assert_eq!(
         stdout,
-        "supergrok\n  grok-4.6  Grok 4.6  (default)\n  grok-4.5  Grok 4.5\n"
+        "supergrok\n  grok-4.7  Grok 4.7  (default)\n  grok-4.7-build-fast  Grok 4.7 Fast\n  grok-4.6  Grok 4.6\n  grok-4.5  Grok 4.5\n"
     );
     assert_eq!(stderr, "");
 }

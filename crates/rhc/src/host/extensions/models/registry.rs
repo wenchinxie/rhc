@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::host::ports::auth::Subscription;
-use crate::host::ports::models::{ModelCatalog, ModelEntry};
+use crate::host::ports::models::{ModelCatalog, ModelEntry, ModelLister};
 
 const RAW: &str = include_str!("default_models.json");
 
@@ -30,11 +30,13 @@ struct Row {
 
 struct JsonModelCatalog {
     file: File,
+    lister: Box<dyn ModelLister>,
 }
 
-pub fn start() -> impl ModelCatalog {
+pub fn start(lister: Box<dyn ModelLister>) -> impl ModelCatalog {
     JsonModelCatalog {
         file: serde_json::from_str(RAW).expect("default_models.json"),
+        lister,
     }
 }
 
@@ -44,10 +46,8 @@ impl JsonModelCatalog {
             Subscription::SuperGrok => &self.file.subscriptions.supergrok,
         }
     }
-}
 
-impl ModelCatalog for JsonModelCatalog {
-    fn models_for(&self, subscription: Subscription) -> Vec<ModelEntry> {
+    fn bundled(&self, subscription: Subscription) -> Vec<ModelEntry> {
         self.group(subscription)
             .models
             .iter()
@@ -58,10 +58,25 @@ impl ModelCatalog for JsonModelCatalog {
             })
             .collect()
     }
+}
+
+impl ModelCatalog for JsonModelCatalog {
+    fn models_for(&self, subscription: Subscription) -> Vec<ModelEntry> {
+        let mut merged = self.bundled(subscription);
+        // Union, not replace. Hermes found OAuth-callable models missing from /v1/models.
+        if let Ok(Some(remote)) = self.lister.list() {
+            for entry in remote {
+                if !merged.iter().any(|m| m.id == entry.id) {
+                    merged.push(entry);
+                }
+            }
+        }
+        merged
+    }
 
     fn default_for(&self, subscription: Subscription) -> Option<ModelEntry> {
         let group = self.group(subscription);
-        self.models_for(subscription)
+        self.bundled(subscription)
             .into_iter()
             .find(|m| m.id == group.default)
     }

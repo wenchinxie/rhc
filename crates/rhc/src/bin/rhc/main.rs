@@ -76,5 +76,5 @@ fn start_context() -> StartContext {
 
 fn login_from_grok(host: &Host) -> Result<ExitCode, CliError> {
     host.supergrok.login_from_grok()?;
-    commands::print_signed_in(host.supergrok.subscription().id(), &host.supergrok)
+    commands::print_signed_in(host.supergrok.subscription().id(), host.supergrok.as_ref())
 }
