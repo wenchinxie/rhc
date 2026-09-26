@@ -5,14 +5,12 @@ use std::sync::Arc;
 
 use serde_json::json;
 
-use super::{
-    AUTHORIZE_URL, Pkce, REFERRER, SCOPES, authorize_url, code_from_request_line, query_param,
-};
-use crate::host::extensions::auth::client::AuthClient;
-use crate::host::extensions::auth::scripted_http::ScriptedHttp;
-use crate::host::extensions::auth::session::OAuthSession;
-use crate::host::extensions::auth::store::TokenStore;
-use crate::host::extensions::auth::xai_client::{CLIENT_ID, ISSUER};
+use super::{Pkce, authorize_url, code_from_request_line, query_param};
+use crate::host::extensions::xai_auth::client::AuthClient;
+use crate::host::extensions::xai_auth::scripted_http::ScriptedHttp;
+use crate::host::extensions::xai_auth::session::OAuthSession;
+use crate::host::extensions::xai_auth::store::TokenStore;
+use crate::host::extensions::xai_auth::provider::XAI;
 use crate::host::ports::auth::{Auth, AuthError};
 use chrono::{Duration as ChronoDuration, Utc};
 
@@ -23,13 +21,13 @@ fn authorize_url_is_browser_code_flow() {
         code_challenge: "challenge".into(),
     };
     let url = authorize_url("http://127.0.0.1:9/callback", &pkce, "state-1", "nonce-1");
-    assert!(url.starts_with(AUTHORIZE_URL));
+    assert!(url.starts_with(XAI.authorize_url));
     assert!(url.contains("response_type=code"));
     assert!(url.contains("code_challenge_method=S256"));
     assert!(url.contains("code_challenge=challenge"));
-    assert!(query_param(url.split_once('?').unwrap().1, "scope").as_deref() == Some(SCOPES));
-    assert!(query_param(url.split_once('?').unwrap().1, "referrer").as_deref() == Some(REFERRER));
-    assert!(query_param(url.split_once('?').unwrap().1, "client_id").as_deref() == Some(CLIENT_ID));
+    assert!(query_param(url.split_once('?').unwrap().1, "scope").as_deref() == Some(XAI.scopes));
+    assert!(query_param(url.split_once('?').unwrap().1, "referrer").as_deref() == Some(XAI.referrer));
+    assert!(query_param(url.split_once('?').unwrap().1, "client_id").as_deref() == Some(XAI.client_id));
     assert!(!url.contains("device"));
 }
 
@@ -91,7 +89,7 @@ fn loopback_then_token_success() {
     assert!(
         token_form
             .iter()
-            .any(|(k, v)| k == "client_id" && v == CLIENT_ID)
+            .any(|(k, v)| k == "client_id" && v == XAI.client_id)
     );
 }
 
@@ -105,8 +103,8 @@ fn refresh_if_needed_noop_when_fresh() {
         expires_at: Utc::now() + ChronoDuration::hours(2),
         subject: "s".into(),
         email: None,
-        issuer: ISSUER.into(),
-        client_id: CLIENT_ID.into(),
+        issuer: XAI.issuer.into(),
+        client_id: XAI.client_id.into(),
     };
     store.save(&session).unwrap();
     let client = AuthClient::new(dir.path(), dir.path().join("grok.json"));
@@ -129,8 +127,8 @@ fn refresh_invalid_grant_clears_store() {
             expires_at: Utc::now() - ChronoDuration::hours(2),
             subject: "s".into(),
             email: None,
-            issuer: ISSUER.into(),
-            client_id: CLIENT_ID.into(),
+            issuer: XAI.issuer.into(),
+            client_id: XAI.client_id.into(),
         })
         .unwrap();
     let client = AuthClient::new(dir.path(), dir.path().join("grok.json")).with_http(http);

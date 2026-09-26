@@ -10,14 +10,10 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 
 use super::http::FormPoster;
+use super::provider::XAI;
 use super::session::{DEFAULT_EXPIRES_IN_SECS, OAuthSession, claims_from_jwt};
-use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
 
-const SCOPES: &str = "openid profile email offline_access grok-cli:access api:access conversations:read conversations:write workspaces:read workspaces:write";
-const AUTHORIZE_URL: &str = "https://auth.x.ai/oauth2/authorize";
-const TOKEN_URL: &str = "https://auth.x.ai/oauth2/token";
-const REFERRER: &str = "grok-build";
 const CALLBACK_TIMEOUT: Duration = Duration::from_secs(600);
 
 pub(crate) struct Pkce {
@@ -60,15 +56,16 @@ pub(crate) fn run_loopback_flow(
 
 pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce: &str) -> String {
     format!(
-        "{AUTHORIZE_URL}?response_type=code&client_id={}&redirect_uri={}&scope={}\
+        "{}?response_type=code&client_id={}&redirect_uri={}&scope={}\
          &code_challenge={}&code_challenge_method=S256&state={}&nonce={}&referrer={}",
-        percent_encode(CLIENT_ID),
+        XAI.authorize_url,
+        percent_encode(XAI.client_id),
         percent_encode(redirect_uri),
-        percent_encode(SCOPES),
+        percent_encode(XAI.scopes),
         percent_encode(&pkce.code_challenge),
         percent_encode(state),
         percent_encode(nonce),
-        percent_encode(REFERRER),
+        percent_encode(XAI.referrer),
     )
 }
 
@@ -77,11 +74,11 @@ pub(crate) fn refresh_grant(
     refresh_token: &str,
 ) -> Result<TokenGrant, AuthError> {
     let (status, data) = http.post_form(
-        TOKEN_URL,
+        XAI.token_url,
         &[
             ("grant_type", "refresh_token"),
             ("refresh_token", refresh_token),
-            ("client_id", CLIENT_ID),
+            ("client_id", XAI.client_id),
         ],
     )?;
     if data.get("error").and_then(Value::as_str) == Some("invalid_grant") {
@@ -104,12 +101,12 @@ pub(crate) fn exchange_code(
     code_verifier: &str,
 ) -> Result<TokenGrant, AuthError> {
     let (status, data) = http.post_form(
-        TOKEN_URL,
+        XAI.token_url,
         &[
             ("grant_type", "authorization_code"),
             ("code", code),
             ("redirect_uri", redirect_uri),
-            ("client_id", CLIENT_ID),
+            ("client_id", XAI.client_id),
             ("code_verifier", code_verifier),
         ],
     )?;
@@ -221,8 +218,8 @@ fn session_from_grant(grant: TokenGrant) -> OAuthSession {
         expires_at: grant.expires_at,
         email: grant.email,
         subject: grant.subject,
-        issuer: ISSUER.to_string(),
-        client_id: CLIENT_ID.to_string(),
+        issuer: XAI.issuer.to_string(),
+        client_id: XAI.client_id.to_string(),
     }
 }
 
