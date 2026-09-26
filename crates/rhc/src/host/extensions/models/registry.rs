@@ -63,7 +63,6 @@ impl JsonModelCatalog {
 impl ModelCatalog for JsonModelCatalog {
     fn models_for(&self, subscription: Subscription) -> Vec<ModelEntry> {
         let mut merged = self.bundled(subscription);
-        // Union, not replace. Hermes found OAuth-callable models missing from /v1/models.
         if let Ok(Some(remote)) = self.lister.list() {
             for entry in remote {
                 if !merged.iter().any(|m| m.id == entry.id) {
