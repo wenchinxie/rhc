@@ -1,8 +1,10 @@
 use chrono::{DateTime, Utc};
 use serde_json::Value;
 
-use super::constants::FRESHNESS_SKEW_SECS;
 use crate::host::ports::auth::{CredentialSnapshot, Identity};
+
+const FRESHNESS_SKEW_SECS: i64 = 30;
+pub(super) const DEFAULT_EXPIRES_IN_SECS: i64 = 3600;
 
 #[derive(Debug, Clone)]
 pub struct OAuthSession {

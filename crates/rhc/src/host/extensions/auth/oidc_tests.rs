@@ -5,14 +5,14 @@ use std::sync::Arc;
 
 use serde_json::json;
 
-use super::{Pkce, authorize_url, code_from_request_line, query_param};
-use crate::host::extensions::auth::client::AuthClient;
-use crate::host::extensions::auth::constants::{
-    AUTHORIZE_URL, CLIENT_ID, ISSUER, REFERRER, SCOPES,
+use super::{
+    AUTHORIZE_URL, Pkce, REFERRER, SCOPES, authorize_url, code_from_request_line, query_param,
 };
+use crate::host::extensions::auth::client::AuthClient;
 use crate::host::extensions::auth::scripted_http::ScriptedHttp;
 use crate::host::extensions::auth::session::OAuthSession;
 use crate::host::extensions::auth::store::TokenStore;
+use crate::host::extensions::auth::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::{Auth, AuthError};
 use chrono::{Duration as ChronoDuration, Utc};
 
