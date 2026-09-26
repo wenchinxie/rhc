@@ -5,7 +5,7 @@ use std::sync::Arc;
 use chrono::Utc;
 
 use super::grok_import::import_oauth_from_grok;
-use super::http::{FormPoster, UreqPoster};
+use super::http::{UreqHttp, XaiHttp};
 use super::oidc::{refresh_grant, run_loopback_flow};
 use super::session::OAuthSession;
 use super::store::TokenStore;
@@ -13,7 +13,7 @@ use crate::host::ports::auth::{Auth, AuthError, CredentialSnapshot, Subscription
 
 pub struct AuthClient {
     store: TokenStore,
-    http: Arc<dyn FormPoster>,
+    http: Arc<dyn XaiHttp>,
     grok_auth_path: PathBuf,
 }
 
@@ -21,15 +21,19 @@ impl AuthClient {
     pub(super) fn new(rhc_home: &Path, grok_auth_path: PathBuf) -> Self {
         Self {
             store: TokenStore::in_dir(rhc_home),
-            http: Arc::new(UreqPoster),
+            http: Arc::new(UreqHttp),
             grok_auth_path,
         }
     }
 
     #[cfg(test)]
-    pub(crate) fn with_http(mut self, http: Arc<dyn FormPoster>) -> Self {
+    pub(crate) fn with_http(mut self, http: Arc<dyn XaiHttp>) -> Self {
         self.http = http;
         self
+    }
+
+    pub(super) fn http(&self) -> &dyn XaiHttp {
+        self.http.as_ref()
     }
 
     pub fn login_from_grok(&self) -> Result<CredentialSnapshot, AuthError> {

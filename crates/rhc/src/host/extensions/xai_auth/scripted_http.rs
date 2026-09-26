@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use serde_json::Value;
 
-use super::http::FormPoster;
+use super::http::XaiHttp;
 use crate::host::ports::auth::AuthError;
 
 type FormFields = Vec<(String, String)>;
@@ -25,17 +25,12 @@ impl ScriptedHttp {
             requests: Mutex::new(Vec::new()),
         }
     }
-}
 
-impl FormPoster for ScriptedHttp {
-    fn post_form(&self, url: &str, fields: &[(&str, &str)]) -> Result<(u16, Value), AuthError> {
-        self.requests.lock().expect("requests").push((
-            url.to_string(),
-            fields
-                .iter()
-                .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
-                .collect(),
-        ));
+    fn respond(&self, url: &str, recorded: FormFields) -> Result<(u16, Value), AuthError> {
+        self.requests
+            .lock()
+            .expect("requests")
+            .push((url.to_string(), recorded));
         let mut routes = self.routes.lock().expect("routes");
         for (key, queue) in routes.iter_mut() {
             if url.contains(key) {
@@ -46,5 +41,19 @@ impl FormPoster for ScriptedHttp {
             }
         }
         panic!("no route for {url}");
+    }
+}
+
+impl XaiHttp for ScriptedHttp {
+    fn post_form(&self, url: &str, fields: &[(&str, &str)]) -> Result<(u16, Value), AuthError> {
+        let recorded = fields
+            .iter()
+            .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
+            .collect();
+        self.respond(url, recorded)
+    }
+
+    fn get_json(&self, url: &str, bearer: &str) -> Result<(u16, Value), AuthError> {
+        self.respond(url, vec![("authorization".to_string(), bearer.to_string())])
     }
 }

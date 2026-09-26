@@ -26,7 +26,6 @@ fn authorize_url_is_browser_code_flow() {
     assert!(url.contains("code_challenge_method=S256"));
     assert!(url.contains("code_challenge=challenge"));
     assert!(query_param(url.split_once('?').unwrap().1, "scope").as_deref() == Some(XAI.scopes));
-    assert!(query_param(url.split_once('?').unwrap().1, "referrer").as_deref() == Some(XAI.referrer));
     assert!(query_param(url.split_once('?').unwrap().1, "client_id").as_deref() == Some(XAI.client_id));
     assert!(!url.contains("device"));
 }

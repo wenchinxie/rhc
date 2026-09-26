@@ -1,6 +1,7 @@
 mod client;
 mod grok_import;
 mod http;
+mod model_list;
 mod oidc;
 mod provider;
 #[cfg(test)]
