@@ -57,7 +57,7 @@ pub(crate) fn run_loopback_flow(
 pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce: &str) -> String {
     format!(
         "{}?response_type=code&client_id={}&redirect_uri={}&scope={}\
-         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}",
+         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}&referrer={}",
         XAI.authorize_url,
         percent_encode(XAI.client_id),
         percent_encode(redirect_uri),
@@ -65,6 +65,7 @@ pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce:
         percent_encode(&pkce.code_challenge),
         percent_encode(state),
         percent_encode(nonce),
+        percent_encode(XAI.referrer),
     )
 }
 
