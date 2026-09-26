@@ -1,14 +1,31 @@
 mod commands;
+#[cfg(test)]
+mod fake_auth;
+mod terminal;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use rhc::ports::auth::Auth;
+use rhc::ports::auth::{Auth, AuthError};
 use rhc::ports::start_context::StartContext;
 use rhc::root::{self, Host};
 
-use commands::CliError;
+pub type Subscriptions<'a> = &'a [(&'a str, &'a dyn Auth)];
+
+#[derive(Debug, thiserror::Error)]
+pub enum CliError {
+    #[error("unknown subscription: {name} (choose from: {choices})")]
+    UnknownSubscription { name: String, choices: String },
+    #[error("no such choice: {0}")]
+    NoSuchChoice(String),
+    #[error("choose a subscription: rhc login <subscription>\n{0}")]
+    NoSubscriptionChosen(String),
+    #[error(transparent)]
+    Auth(#[from] AuthError),
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+}
 
 #[derive(Parser)]
 #[command(name = "rhc", about = "rhc, a personal coding-agent harness")]
@@ -76,5 +93,5 @@ fn start_context() -> StartContext {
 
 fn login_from_grok(host: &Host) -> Result<ExitCode, CliError> {
     host.supergrok.login_from_grok()?;
-    commands::print_signed_in(host.supergrok.subscription().id(), host.supergrok.as_ref())
+    terminal::print_signed_in(host.supergrok.subscription().id(), host.supergrok.as_ref())
 }
