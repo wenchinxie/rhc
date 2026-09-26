@@ -56,7 +56,7 @@ fn loopback_then_token_success() {
     )])));
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("auth.json");
-    let client = AuthClient::new(&path).with_http(http.clone());
+    let client = AuthClient::new(dir.path(), dir.path().join("grok.json")).with_http(http.clone());
     let mut stderr = Vec::new();
     let snapshot = client
         .login_with_browser(&mut stderr, &|url| {
@@ -109,7 +109,7 @@ fn refresh_if_needed_noop_when_fresh() {
         client_id: CLIENT_ID.into(),
     };
     store.save(&session).unwrap();
-    let client = AuthClient::new(dir.path().join("auth.json"));
+    let client = AuthClient::new(dir.path(), dir.path().join("grok.json"));
     let out = client.refresh_if_needed().unwrap().expect("signed in");
     assert_eq!(out.token, "at");
 }
@@ -133,7 +133,7 @@ fn refresh_invalid_grant_clears_store() {
             client_id: CLIENT_ID.into(),
         })
         .unwrap();
-    let client = AuthClient::new(dir.path().join("auth.json")).with_http(http);
+    let client = AuthClient::new(dir.path(), dir.path().join("grok.json")).with_http(http);
     let err = client.refresh_if_needed().unwrap_err();
     assert!(matches!(err, AuthError::RefreshRevoked));
     assert!(client.snapshot().unwrap().is_none());
@@ -166,7 +166,7 @@ fn refresh_rotates_access_token_and_keeps_refresh_token() {
             client_id: "client-kept".into(),
         })
         .unwrap();
-    let client = AuthClient::new(&path).with_http(http.clone());
+    let client = AuthClient::new(dir.path(), dir.path().join("grok.json")).with_http(http.clone());
     let out = client.refresh_if_needed().unwrap().expect("signed in");
     assert_eq!(out.token, "at-2");
     let saved = store.load().unwrap().expect("saved session");

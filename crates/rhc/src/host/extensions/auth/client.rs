@@ -1,5 +1,5 @@
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use chrono::Utc;
@@ -14,21 +14,15 @@ use crate::host::ports::auth::{Auth, AuthError, CredentialSnapshot, Subscription
 pub struct AuthClient {
     store: TokenStore,
     http: Arc<dyn FormPoster>,
-    grok_path: Option<PathBuf>,
-}
-
-impl Default for AuthClient {
-    fn default() -> Self {
-        Self::new(TokenStore::default_path())
-    }
+    grok_auth_path: PathBuf,
 }
 
 impl AuthClient {
-    pub fn new(path: impl Into<PathBuf>) -> Self {
+    pub(super) fn new(rhc_home: &Path, grok_auth_path: PathBuf) -> Self {
         Self {
-            store: TokenStore::new(path),
+            store: TokenStore::in_dir(rhc_home),
             http: Arc::new(UreqPoster),
-            grok_path: None,
+            grok_auth_path,
         }
     }
 
@@ -38,14 +32,8 @@ impl AuthClient {
         self
     }
 
-    #[cfg(test)]
-    pub(crate) fn with_grok_path(mut self, path: impl Into<PathBuf>) -> Self {
-        self.grok_path = Some(path.into());
-        self
-    }
-
     pub fn login_from_grok(&self) -> Result<CredentialSnapshot, AuthError> {
-        let session = import_oauth_from_grok(self.grok_path.as_deref())?;
+        let session = import_oauth_from_grok(&self.grok_auth_path)?;
         let _lock = self.store.lock()?;
         self.store.save(&session)?;
         Ok(session.into_snapshot())

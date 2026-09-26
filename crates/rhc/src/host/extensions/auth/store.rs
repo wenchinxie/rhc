@@ -45,8 +45,8 @@ impl TokenStore {
         Self { path: path.into() }
     }
 
-    pub fn default_path() -> PathBuf {
-        home_dir().join(".rhc").join("auth.json")
+    pub fn in_dir(rhc_home: &Path) -> Self {
+        Self::new(rhc_home.join("auth.json"))
     }
 
     pub fn lock_path(&self) -> PathBuf {
@@ -230,12 +230,6 @@ fn opt_str(value: Option<&Value>) -> Option<String> {
         .and_then(Value::as_str)
         .filter(|s| !s.is_empty())
         .map(str::to_string)
-}
-
-fn home_dir() -> PathBuf {
-    std::env::var_os("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("."))
 }
 
 #[cfg(test)]

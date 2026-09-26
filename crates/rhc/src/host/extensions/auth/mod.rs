@@ -10,6 +10,8 @@ mod xai_client;
 
 pub use client::AuthClient;
 
-pub fn start() -> AuthClient {
-    AuthClient::default()
+use crate::host::ports::start_context::StartContext;
+
+pub fn start(ctx: &StartContext) -> AuthClient {
+    AuthClient::new(&ctx.rhc_home, ctx.grok_auth_path.clone())
 }

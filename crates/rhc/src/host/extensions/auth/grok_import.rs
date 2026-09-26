@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use chrono::{Duration, TimeZone, Utc};
 use serde_json::Value;
@@ -9,22 +9,8 @@ use crate::host::ports::auth::AuthError;
 
 const GROK_SCOPE_KEY: &str = "https://auth.x.ai::b1a00492-073a-47ea-816f-4c329264a828";
 
-pub(crate) fn resolve_grok_auth_path(explicit: Option<&Path>) -> PathBuf {
-    if let Some(p) = explicit {
-        return p.to_path_buf();
-    }
-    if let Ok(p) = std::env::var("GROK_AUTH_PATH") {
-        return PathBuf::from(p);
-    }
-    if let Ok(home) = std::env::var("GROK_HOME") {
-        return PathBuf::from(home).join("auth.json");
-    }
-    home_dir().join(".grok").join("auth.json")
-}
-
-pub(crate) fn import_oauth_from_grok(path: Option<&Path>) -> Result<OAuthSession, AuthError> {
-    let auth_path = resolve_grok_auth_path(path);
-    let raw = std::fs::read_to_string(&auth_path).map_err(|e| {
+pub(crate) fn import_oauth_from_grok(auth_path: &Path) -> Result<OAuthSession, AuthError> {
+    let raw = std::fs::read_to_string(auth_path).map_err(|e| {
         if e.kind() == std::io::ErrorKind::NotFound {
             AuthError::msg(format!("grok auth file not found: {}", auth_path.display()))
         } else {
@@ -109,12 +95,6 @@ fn expires_from_grok(
             .ok_or_else(|| AuthError::msg("invalid exp claim"));
     }
     Ok(Utc::now() + Duration::seconds(DEFAULT_EXPIRES_IN_SECS))
-}
-
-fn home_dir() -> PathBuf {
-    std::env::var_os("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("."))
 }
 
 #[cfg(test)]
