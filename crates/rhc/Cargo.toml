@@ -1,0 +1,25 @@
+[package]
+name = "rhc"
+version.workspace = true
+edition.workspace = true
+description = "Host crate for rhc, a personal coding-agent harness"
+
+[[bin]]
+name = "rhc"
+path = "src/bin/rhc/main.rs"
+
+[dependencies]
+base64 = "0.22"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+clap = { version = "4", features = ["derive"] }
+fs4 = "0.13"
+getrandom = "0.3"
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+serde_json = "1"
+thiserror = "2"
+ureq = { version = "2", features = ["json"] }
+webbrowser = "1"
+
+[dev-dependencies]
+tempfile = "3"
