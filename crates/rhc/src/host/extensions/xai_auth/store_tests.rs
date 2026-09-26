@@ -3,8 +3,8 @@ use std::os::unix::fs::PermissionsExt;
 use chrono::{TimeZone, Utc};
 
 use super::*;
-use crate::host::extensions::auth::session::OAuthSession;
-use crate::host::extensions::auth::xai_client::{CLIENT_ID, ISSUER};
+use crate::host::extensions::xai_auth::session::OAuthSession;
+use crate::host::extensions::xai_auth::provider::XAI;
 use crate::host::ports::auth::AuthError;
 
 fn sample() -> OAuthSession {
@@ -14,8 +14,8 @@ fn sample() -> OAuthSession {
         expires_at: Utc.with_ymd_and_hms(2030, 1, 1, 0, 0, 0).unwrap(),
         subject: "user-1".into(),
         email: Some("a@b.c".into()),
-        issuer: ISSUER.into(),
-        client_id: CLIENT_ID.into(),
+        issuer: XAI.issuer.into(),
+        client_id: XAI.client_id.into(),
     }
 }
 

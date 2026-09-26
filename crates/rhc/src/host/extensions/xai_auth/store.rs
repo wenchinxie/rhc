@@ -8,8 +8,8 @@ use fs4::fs_std::FileExt;
 use serde::Serialize;
 use serde_json::Value;
 
+use super::provider::XAI;
 use super::session::OAuthSession;
-use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
 
 const STORE_VERSION: u32 = 1;
@@ -192,8 +192,9 @@ fn session_from_wire(data: &Value, path: &Path) -> Result<OAuthSession, AuthErro
     }
     let access = require_str(cred, "access_token", path)?;
     let subject = require_str(cred, "subject", path)?;
-    let issuer = require_str(cred, "issuer", path).unwrap_or_else(|_| ISSUER.to_string());
-    let client_id = require_str(cred, "client_id", path).unwrap_or_else(|_| CLIENT_ID.to_string());
+    let issuer = require_str(cred, "issuer", path).unwrap_or_else(|_| XAI.issuer.to_string());
+    let client_id =
+        require_str(cred, "client_id", path).unwrap_or_else(|_| XAI.client_id.to_string());
     let expires_raw = require_str(cred, "expires_at", path)?;
     let expires_at = DateTime::parse_from_rfc3339(&expires_raw)
         .map_err(|e| AuthError::msg(format!("invalid expires_at: {e}")))?

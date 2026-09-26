@@ -3,8 +3,8 @@ use std::path::Path;
 use chrono::{Duration, TimeZone, Utc};
 use serde_json::Value;
 
+use super::provider::XAI;
 use super::session::{DEFAULT_EXPIRES_IN_SECS, OAuthSession, claims_from_jwt};
-use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
 
 const GROK_SCOPE_KEY: &str = "https://auth.x.ai::b1a00492-073a-47ea-816f-4c329264a828";
@@ -70,8 +70,8 @@ pub(crate) fn import_oauth_from_grok(auth_path: &Path) -> Result<OAuthSession, A
         expires_at,
         subject,
         email,
-        issuer: ISSUER.to_string(),
-        client_id: CLIENT_ID.to_string(),
+        issuer: XAI.issuer.to_string(),
+        client_id: XAI.client_id.to_string(),
     })
 }
 

@@ -1,5 +1,5 @@
-use crate::host::extensions::auth::{self, AuthClient};
 use crate::host::extensions::models;
+use crate::host::extensions::xai_auth::{self, AuthClient};
 use crate::host::ports::auth::Auth;
 use crate::host::ports::models::ModelCatalog;
 use crate::host::ports::start_context::StartContext;
@@ -11,7 +11,7 @@ pub struct Host {
 
 pub fn start(ctx: &StartContext) -> Host {
     Host {
-        supergrok: auth::start(ctx),
+        supergrok: xai_auth::start(ctx),
         catalog: Box::new(models::start()),
     }
 }

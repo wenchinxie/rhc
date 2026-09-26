@@ -1,6 +1,7 @@
-use crate::host::extensions::auth::client::AuthClient;
-use crate::host::extensions::auth::session::OAuthSession;
-use crate::host::extensions::auth::store::TokenStore;
+use crate::host::extensions::xai_auth::client::AuthClient;
+use crate::host::extensions::xai_auth::provider::XAI;
+use crate::host::extensions::xai_auth::session::OAuthSession;
+use crate::host::extensions::xai_auth::store::TokenStore;
 use crate::host::ports::auth::{Auth, AuthError};
 
 #[test]
@@ -29,8 +30,8 @@ fn need_login_when_expired_without_refresh() {
             expires_at: chrono::Utc::now() - chrono::Duration::hours(1),
             subject: "s".into(),
             email: None,
-            issuer: crate::host::extensions::auth::xai_client::ISSUER.into(),
-            client_id: crate::host::extensions::auth::xai_client::CLIENT_ID.into(),
+            issuer: XAI.issuer.into(),
+            client_id: XAI.client_id.into(),
         })
         .unwrap();
     let client = AuthClient::new(dir.path(), dir.path().join("grok.json"));
