@@ -9,13 +9,15 @@ use chrono::{Duration as ChronoDuration, Utc};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-use super::constants::{
-    AUTHORIZE_URL, CLIENT_ID, DEFAULT_EXPIRES_IN_SECS, ISSUER, REFERRER, SCOPES, TOKEN_URL,
-};
 use super::http::FormPoster;
-use super::session::{OAuthSession, claims_from_jwt};
+use super::session::{DEFAULT_EXPIRES_IN_SECS, OAuthSession, claims_from_jwt};
+use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
 
+const SCOPES: &str = "openid profile email offline_access grok-cli:access api:access conversations:read conversations:write workspaces:read workspaces:write";
+const AUTHORIZE_URL: &str = "https://auth.x.ai/oauth2/authorize";
+const TOKEN_URL: &str = "https://auth.x.ai/oauth2/token";
+const REFERRER: &str = "grok-build";
 const CALLBACK_TIMEOUT: Duration = Duration::from_secs(600);
 
 pub(crate) struct Pkce {

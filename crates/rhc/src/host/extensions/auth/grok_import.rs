@@ -3,9 +3,11 @@ use std::path::{Path, PathBuf};
 use chrono::{Duration, TimeZone, Utc};
 use serde_json::Value;
 
-use super::constants::{CLIENT_ID, DEFAULT_EXPIRES_IN_SECS, GROK_SCOPE_KEY, ISSUER};
-use super::session::{OAuthSession, claims_from_jwt};
+use super::session::{DEFAULT_EXPIRES_IN_SECS, OAuthSession, claims_from_jwt};
+use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
+
+const GROK_SCOPE_KEY: &str = "https://auth.x.ai::b1a00492-073a-47ea-816f-4c329264a828";
 
 pub(crate) fn resolve_grok_auth_path(explicit: Option<&Path>) -> PathBuf {
     if let Some(p) = explicit {

@@ -29,8 +29,8 @@ fn need_login_when_expired_without_refresh() {
             expires_at: chrono::Utc::now() - chrono::Duration::hours(1),
             subject: "s".into(),
             email: None,
-            issuer: crate::host::extensions::auth::constants::ISSUER.into(),
-            client_id: crate::host::extensions::auth::constants::CLIENT_ID.into(),
+            issuer: crate::host::extensions::auth::xai_client::ISSUER.into(),
+            client_id: crate::host::extensions::auth::xai_client::CLIENT_ID.into(),
         })
         .unwrap();
     let client = AuthClient::new(dir.path().join("auth.json"));

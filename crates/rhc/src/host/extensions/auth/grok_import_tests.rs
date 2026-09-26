@@ -1,7 +1,7 @@
 use serde_json::json;
 
+use super::GROK_SCOPE_KEY;
 use crate::host::extensions::auth::client::AuthClient;
-use crate::host::extensions::auth::constants::GROK_SCOPE_KEY;
 use crate::host::extensions::auth::store::TokenStore;
 
 #[test]

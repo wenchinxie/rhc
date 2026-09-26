@@ -8,8 +8,8 @@ use fs4::fs_std::FileExt;
 use serde::Serialize;
 use serde_json::Value;
 
-use super::constants::{CLIENT_ID, ISSUER};
 use super::session::OAuthSession;
+use super::xai_client::{CLIENT_ID, ISSUER};
 use crate::host::ports::auth::AuthError;
 
 const STORE_VERSION: u32 = 1;
