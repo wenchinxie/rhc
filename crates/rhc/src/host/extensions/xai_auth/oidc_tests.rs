@@ -7,10 +7,10 @@ use serde_json::json;
 
 use super::{Pkce, authorize_url, code_from_request_line, query_param};
 use crate::host::extensions::xai_auth::client::AuthClient;
+use crate::host::extensions::xai_auth::provider::XAI;
 use crate::host::extensions::xai_auth::scripted_http::ScriptedHttp;
 use crate::host::extensions::xai_auth::session::OAuthSession;
 use crate::host::extensions::xai_auth::store::TokenStore;
-use crate::host::extensions::xai_auth::provider::XAI;
 use crate::host::ports::auth::{Auth, AuthError};
 use chrono::{Duration as ChronoDuration, Utc};
 
@@ -26,8 +26,12 @@ fn authorize_url_is_browser_code_flow() {
     assert!(url.contains("code_challenge_method=S256"));
     assert!(url.contains("code_challenge=challenge"));
     assert!(query_param(url.split_once('?').unwrap().1, "scope").as_deref() == Some(XAI.scopes));
-    assert!(query_param(url.split_once('?').unwrap().1, "referrer").as_deref() == Some(XAI.referrer));
-    assert!(query_param(url.split_once('?').unwrap().1, "client_id").as_deref() == Some(XAI.client_id));
+    assert!(
+        query_param(url.split_once('?').unwrap().1, "referrer").as_deref() == Some(XAI.referrer)
+    );
+    assert!(
+        query_param(url.split_once('?').unwrap().1, "client_id").as_deref() == Some(XAI.client_id)
+    );
     assert!(!url.contains("device"));
 }
 

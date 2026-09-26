@@ -3,8 +3,8 @@ use std::os::unix::fs::PermissionsExt;
 use chrono::{TimeZone, Utc};
 
 use super::*;
-use crate::host::extensions::xai_auth::session::OAuthSession;
 use crate::host::extensions::xai_auth::provider::XAI;
+use crate::host::extensions::xai_auth::session::OAuthSession;
 use crate::host::ports::auth::AuthError;
 
 fn sample() -> OAuthSession {

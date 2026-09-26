@@ -26,10 +26,7 @@ fn ids_of(catalog: &dyn ModelCatalog) -> Vec<String> {
 #[test]
 fn signed_out_lists_bundled_only() {
     let catalog = start(Box::new(FakeLister(Ok(None))));
-    assert_eq!(
-        ids_of(&catalog),
-        BUNDLED_IDS.map(String::from).to_vec()
-    );
+    assert_eq!(ids_of(&catalog), BUNDLED_IDS.map(String::from).to_vec());
     assert_eq!(
         catalog.default_for(Subscription::SuperGrok).unwrap().id,
         "grok-4.7"
@@ -65,8 +62,5 @@ fn remote_models_are_merged_after_bundled() {
 #[test]
 fn lister_error_falls_back_to_bundled() {
     let catalog = start(Box::new(FakeLister(Err(()))));
-    assert_eq!(
-        ids_of(&catalog),
-        BUNDLED_IDS.map(String::from).to_vec()
-    );
+    assert_eq!(ids_of(&catalog), BUNDLED_IDS.map(String::from).to_vec());
 }
