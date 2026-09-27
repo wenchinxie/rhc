@@ -1,0 +1,9 @@
+import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
+
+<>
+  <H2 id="top" n="">rhc</H2>
+  <p><code>models/registry.rs</code> 實作 <code>ModelCatalog</code>。<code>default_models.json</code> 用 <code>include_str!</code> 在編譯期塞進執行檔。<Peek snip="registry-start">模型目錄啟動</Peek></p>
+  <p>內建的 supergrok 清單：<code>grok-4.7</code>「Grok 4.7」（預設）、<code>grok-4.7-build-fast</code>「Grok 4.7 Fast」、<code>grok-4.6</code>、<code>grok-4.5</code>。</p>
+  <p><code>models_for</code> 內建清單在前，接著把 <code>lister.list()</code> 給的遠端 id 中還沒出現過的接上去。未登入（<code>Ok(None)</code>）或出錯時只回內建清單，所以 <code>rhc models</code> 離線也能跑。<code>default_for</code> 只讀內建 json，所以 <code>rhc models</code> 只打一次網路，不是兩次。<Peek snip="models-for">models_for 與 default_for</Peek></p>
+  <p>已登入時 <code>rhc models</code> 才會打網路（<code>GET api.x.ai/v1/models</code>，見「登入 › rhc」的「用票」）。</p>
+</>

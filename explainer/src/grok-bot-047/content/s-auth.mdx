@@ -1,0 +1,27 @@
+import { H2, H3, Dag, Peek } from "../../mdx-components"
+import { AUTH_TREE } from "../authTree"
+
+<>
+  <H2 id="s-auth" n="10">Auth</H2>
+  <p>0.47 人還是登 Cursor，但桌面碼壓進肥 CJS。host 不在 Windows 安裝包的 app.asar，在 VM zip。</p>
+  <H3 id="s-auth-1" n="10.1">關鍵概念</H3>
+  <p>桌面：<code>loginCursor</code> 在 <code>main-app.cjs</code>。preload 走 <code>dune-rpc</code>。這份 app.asar 沒有 <code>dist/host/</code>。VM host：renewer 可多回 <code>grokBotToken</code>。identity mint 是 0.47 才有。</p>
+  <H3 id="s-auth-2" n="10.2">怎麼走</H3>
+  <p>先問看的是安裝包 asar 還是 VM host。asar 裡只有登入，沒有 host 實作。推論票要開 zip。</p>
+  <Dag svg={AUTH_TREE} />
+  <H3 id="s-auth-3" n="10.3">東西在哪</H3>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>loginCursor</td><td><code>dist/electron-main/main-app.cjs</code></td></tr>
+  <tr><td>dune-rpc</td><td>preload</td></tr>
+  <tr><td>host 短票</td><td>VM <code>host-main.cjs</code></td></tr>
+  <tr><td>grokBotToken</td><td>同一 renewer payload，可選</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p><Peek snip="auth-047-login">loginCursor</Peek> <Peek snip="auth-047-host">VM host</Peek></p>
+  <H3 id="s-auth-4" n="10.4">容易踩的</H3>
+  <p>不要在這份 app.asar 找 <code>account/</code> 或 <code>dist/host/</code>。grokBotToken 不是 SuperGrok device-code。identity socket 只在 0.47。</p>
+</>

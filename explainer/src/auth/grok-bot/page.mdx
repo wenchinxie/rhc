@@ -1,0 +1,29 @@
+import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
+import { AUTH_TREE } from "./authTree"
+
+<>
+  <H2 id="top" n="">Grok Bot</H2>
+  <p>兩張票，兩個行程。安裝包 <code>app.asar</code> 只做桌面 Cursor 登入。VM host zip 只換短命推論票。兩邊都不包含對方的路徑。<code>host/ports</code> 沒有 auth。旁邊功能呼叫 <code>start()</code> 交出去的 <code>getAccessToken</code>。</p>
+  <p>桌面票是 <code>cursor-access-token</code> 與 <code>cursor-refresh-token</code>，在 Electron userData 的 <code>sand-secrets.json</code>，值經過 <code>safeStorage</code>。畫面呼叫 <code>loginCursor</code> 拿到的是狀態，不是這兩張原文。</p>
+  <p>host 票在 RAM 的 InferenceCredentialStore。來源是環境變數 <code>SAND_INFERENCE_RENEWAL_CREDENTIAL</code>，或開發用的 <code>SAND_DEV_INFERENCE_TOKEN_FILE</code>。host 不讀 <code>sand-secrets.json</code>。0.47 的 host 另外留 <code>grokBotToken</code>。InferenceService 的 Stream 會把 Authorization 換成它。0.18 只有 <code>getAccessToken</code>。</p>
+  <p>渲染行程呼叫 <code>cursorAccount.login()</code>，對到 edge 的 <code>loginCursor</code>。0.47 安裝包裡同一支在 <code>dist/electron-main/main-app.cjs</code>，preload 走 <code>dune-rpc</code>。這個前綴是 IPC 頻道名，不是 auth 協定。</p>
+  <p><code>createDefaultLoginManager</code> 看後端是不是開發站。開發站用 <code>SandBackendLoginManager</code>。否則用 <code>LoginManager</code>，redirect 是 <code>sand</code>。兩邊都開 <code>/loginDeepControl</code>，帶 PKCE challenge 與 uuid，然後 <code>GET /auth/poll</code>。404 繼續等。連續三次其他失敗就放棄。200 且 JSON 同時有 <code>accessToken</code> 與 <code>refreshToken</code> 才算成功。成功後寫進 <code>sand-secrets.json</code>。0.47 還可能寫 <code>cursor-selected-team-id</code>。0.18 是兩把鑰匙的平面表。</p>
+  <p>host 在另一份 zip。<code>authExtension.start</code> 讀行程環境。有開發 token 檔就讀檔。否則用續期憑證 POST <code>/sand-box/inference-credential</code>。回應的 <code>accessToken</code> 只放記憶體。沒有憑證時 renewer 仍會啟動，<code>getAccessToken</code> 丟等待錯誤。0.47 在還有 box 憑證時才聽 <code>/tmp/sand-identity.sock</code>。客體 <code>POST /v1/tokens/oidc</code> 被轉去 <code>/cloud-agent/identity-token/sand-box</code>。這條不是推論用的短票。安裝包 asar 裡沒有這些名字。</p>
+  <Dag svg={AUTH_TREE} />
+  <p>圖上每一格右下角可點。點開是 0.18 重建稿裡對應的那幾行。0.47 安裝包把同一支壓進 <code>main-app.cjs</code>。host 的對應在 VM zip 的 <code>host-main.cjs</code>。<Peek snip="gb-login">loginCursor</Peek> <Peek snip="gb-which">選哪一種登入</Peek> <Peek snip="gb-poll">poll 成功條件</Peek> <Peek snip="gb-host">host 從哪裡續</Peek> <Peek snip="gb-renew">換短票</Peek> <Peek snip="gb-start">start 交出去的方法</Peek></p>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>0.18 桌面登入</td><td><code>source/electron-main/account/cursor-auth.ts</code></td></tr>
+  <tr><td>0.18 畫面入口</td><td><code>source/electron-main/main-edge.ts</code> 的 <code>loginCursor</code></td></tr>
+  <tr><td>0.18 正式站 URL</td><td><code>source/packages/cursor-config/auth/login.ts</code></td></tr>
+  <tr><td>0.18 host</td><td><code>source/host/extensions/auth/extension.ts</code></td></tr>
+  <tr><td>0.18 換短票</td><td><code>source/host/extensions/auth/credential-renewer.ts</code></td></tr>
+  <tr><td>0.47 安裝包</td><td><code>dist/electron-main/main-app.cjs</code>，沒有 <code>dist/host/</code></td></tr>
+  <tr><td>0.47 VM host</td><td>host zip 的 <code>host-main.cjs</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p>桌面 JWT 換不了 host 短票。安裝包裡沒有 <code>SAND_INFERENCE_RENEWAL_CREDENTIAL</code>、<code>grokBotToken</code>、<code>inference-credential</code>、<code>sand-identity</code>。poll 沒拿到兩張票就沒有 <code>cursor-access-token</code>。0.18 在 refresh 失敗時會清掉登入。0.47 的失敗丟 <code>SandAuthRefreshUnavailableError</code>，那一行不登出。host 沒有續期憑證就換不到推論票。0.47 的 identity socket 只在 VM host、而且要有 box 憑證才聽。</p>
+</>

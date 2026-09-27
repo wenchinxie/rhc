@@ -1,0 +1,28 @@
+import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
+import { AUTH_TREE } from "./authTree"
+
+<>
+  <H2 id="top" n="">Grok Build</H2>
+  <p>打模型之前，<code>resolve_credentials</code> 先看模型自帶鑰匙、provider、session，然後才看 <code>XAI_API_KEY</code>。都沒有，才進 <code>run_auth_flow</code>。一般 xAI 帳號的主幹是瀏覽器。Chrome 打開 <code>auth.x.ai</code>，跳回 <code>127.0.0.1</code>，票寫進 <code>~/.grok/auth.json</code>，模式仍是 <code>AuthMode::Oidc</code>。</p>
+  <p><Term k="auth-port">AuthCredentialProvider</Term> 的 <Term k="snapshot">snapshot</Term> 是現在會送出去的 bearer。HTTP 只問這個，不再跑登入。<code>AuthMode</code> 有 <code>Oidc</code>、<code>ApiKey</code>、<code>External</code>，以及舊的 <code>WebLogin</code>。issuer 就算是 <code>https://auth.x.ai</code>，<code>build_grok_auth</code> 仍寫 <code>AuthMode::Oidc</code>。<code>config.oidc</code> 有值才是另一個 issuer。<code>is_configured</code> 只看這塊。沒有這塊時，預設仍有 xAI oauth2。</p>
+  <p><code>run_auth_flow_steps</code> 的順序是固定的。記憶體裡有未過期、issuer 相容的票，直接用。已過期才 refresh。暫時失敗且磁碟上還有 refresh token，就把過期票交回，不開瀏覽器。設了 <code>auth_provider_command</code> 就先跑那個程式。成功就結束。失敗才繼續瀏覽器。<code>config.oidc</code> 有值就走那個 issuer 的 loopback，不再選 device-code。</p>
+  <p>剩下的是 xAI oauth2。<code>resolve_device_flow</code> 看 CLI、<code>GROK_LOGIN_DEVICE_FLOW</code>、config、遠端旗標，最後 <code>default(false)</code>。預設不打裝置碼。被打開時才 POST <code>/oauth2/device/code</code>。404 是 <code>DeviceCodeError::NotEnabled</code>，下一行仍是 loopback。loopback 綁 <code>127.0.0.1</code>，redirect 是 <code>http://127.0.0.1:&#123;port&#125;/callback</code>。<code>build_authorize_url</code> 用 discovery 的 <code>authorization_endpoint</code>。callback 的 code 用 <code>authorization_code</code> 換票。<code>AuthManager::update</code> 寫入 <code>~/.grok/auth.json</code>。</p>
+  <Dag svg={AUTH_TREE} />
+  <p>圖上每一格右下角可點。API key 在圖的第一個出口，它屬於 <code>resolve_credentials</code>，不在 <code>run_auth_flow_steps</code> 裡面讀環境變數。<Peek snip="gb-resolve">呼叫端先找鑰匙</Peek> <Peek snip="gb-device">裝置碼預設關</Peek> <Peek snip="gb-bind">127.0.0.1 callback</Peek> <Peek snip="gb-authorize">授權網址</Peek> <Peek snip="gb-write">存成 Oidc</Peek> <Peek snip="gb-snapshot">snapshot</Peek></p>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>呼叫端選鑰匙</td><td><code>xai-grok-shell/src/agent/config.rs</code> <code>resolve_credentials</code></td></tr>
+  <tr><td>登入順序</td><td><code>xai-grok-login/src/flow.rs</code> <code>run_auth_flow_steps</code></td></tr>
+  <tr><td>裝置碼開關</td><td>同檔 <code>resolve_device_flow</code></td></tr>
+  <tr><td>瀏覽器與 callback</td><td><code>xai-grok-login/src/oidc/login.rs</code></td></tr>
+  <tr><td>授權網址與換票</td><td><code>xai-grok-login/src/oidc/protocol.rs</code></td></tr>
+  <tr><td>API key 環境變數</td><td><code>xai-grok-login/src/auth_method.rs</code></td></tr>
+  <tr><td>snapshot 合約</td><td><code>xai-grok-auth/src/auth_provider.rs</code></td></tr>
+  <tr><td>auth.json</td><td><code>~/.grok/auth.json</code>，寫入點是 <code>AuthManager::update</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p><code>AuthMode::Oidc</code> 也用來存 xAI 自己的瀏覽器登入。分辨是不是 xAI，要再看 <code>oidc_issuer</code> 是不是 <code>https://auth.x.ai</code>。device-code 的 404 會退回 loopback。其他 device 錯誤直接返回。</p>
+</>

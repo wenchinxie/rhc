@@ -1,0 +1,320 @@
+[
+ {
+  "key": "provider",
+  "title": "XAI 設定",
+  "why": "所有網址、client_id、scope、referrer 集中在這一個常數。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/provider.rs",
+  "anchor": "pub(crate) const XAI: OAuthProvider",
+  "count": 9,
+  "hi": [
+   "client_id:",
+   "scopes:",
+   "referrer: \"rhc\"",
+   "api_base_url:"
+  ]
+ },
+ {
+  "key": "loop",
+  "title": "run_loopback_flow",
+  "why": "綁本機埠，組 PKCE、state、nonce，開瀏覽器，等回呼，換票。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn run_loopback_flow(",
+  "count": 24,
+  "hi": [
+   "TcpListener::bind((\"127.0.0.1\", 0))",
+   "let pkce = generate_pkce()?;",
+   "scope.spawn",
+   "open_browser(&url);",
+   "exchange_code(http"
+  ]
+ },
+ {
+  "key": "url",
+  "title": "authorize_url",
+  "why": "帶 PKCE challenge、state、nonce、referrer=rhc 的授權網址。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn authorize_url(",
+  "count": 14,
+  "hi": [
+   "code_challenge_method=S256",
+   "percent_encode(XAI.referrer)"
+  ]
+ },
+ {
+  "key": "pkce",
+  "title": "generate_pkce",
+  "why": "隨機 verifier 留在本機，只把它的 SHA-256 送出去。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn generate_pkce()",
+  "count": 14,
+  "hi": [
+   "Sha256::digest",
+   "getrandom::fill"
+  ]
+ },
+ {
+  "key": "callback",
+  "title": "code_from_request_line",
+  "why": "回呼先比 state，對上才取 code。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn code_from_request_line(",
+  "count": 23,
+  "hi": [
+   "if state != expected_state",
+   "query_param(query, \"code\")"
+  ]
+ },
+ {
+  "key": "exchange",
+  "title": "exchange_code",
+  "why": "拿 code 和 verifier 去 token 端點換票。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn exchange_code(",
+  "count": 25,
+  "hi": [
+   "(\"grant_type\", \"authorization_code\")",
+   "(\"code_verifier\", code_verifier)"
+  ]
+ },
+ {
+  "key": "claims",
+  "title": "從 token 讀身分",
+  "why": "解開 id_token 拿 sub 和 email。只解碼，不驗簽章，也不比 nonce。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "let id_token = data.get(\"id_token\")",
+  "count": 5,
+  "hi": [
+   "claims_from_jwt"
+  ]
+ },
+ {
+  "key": "jwt",
+  "title": "claims_from_jwt",
+  "why": "把 JWT 中間那段 base64 解成 JSON，沒有驗證。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/session.rs",
+  "anchor": "pub(crate) fn claims_from_jwt",
+  "count": 18,
+  "hi": [
+   "token.split('.').nth(1)"
+  ]
+ },
+ {
+  "key": "refresh-grant",
+  "title": "refresh_grant",
+  "why": "用 refresh token 換新票；invalid_grant 變成 RefreshRevoked。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/oidc.rs",
+  "anchor": "pub(crate) fn refresh_grant(",
+  "count": 24,
+  "hi": [
+   "(\"grant_type\", \"refresh_token\")",
+   "Some(\"invalid_grant\")"
+  ]
+ },
+ {
+  "key": "fresh",
+  "title": "is_fresh",
+  "why": "expires_at 要比現在晚 30 秒以上才算新票；離過期不到 30 秒就當作已過期，先換新。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/session.rs",
+  "anchor": "pub fn is_fresh(",
+  "count": 3,
+  "hi": [
+   "FRESHNESS_SKEW_SECS"
+  ]
+ },
+ {
+  "key": "refresh",
+  "title": "refresh_if_needed",
+  "why": "先不上鎖看一眼；要 refresh 才上鎖，上鎖後再讀一次。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/client.rs",
+  "anchor": "fn refresh_if_needed(&self)",
+  "count": 44,
+  "hi": [
+   "let Some(current) = self.store.load()?",
+   "let _lock = self.store.lock()?;",
+   "if latest.is_fresh(Utc::now())",
+   "Err(AuthError::RefreshRevoked) =>",
+   "grant.refresh_token.or(latest.refresh_token)"
+  ]
+ },
+ {
+  "key": "save",
+  "title": "TokenStore::save",
+  "why": "0700 目錄、0600 檔案；寫暫存檔、fsync、rename。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/store.rs",
+  "anchor": "pub fn save(&self, session: &OAuthSession)",
+  "count": 20,
+  "hi": [
+   "from_mode(0o700)",
+   "sync_all()?",
+   "from_mode(0o600)",
+   "fs::rename"
+  ]
+ },
+ {
+  "key": "lock",
+  "title": "TokenStore::lock",
+  "why": "對 auth.json.lock 拿 flock 排他鎖；鎖跟著 AuthFileLock 的生命走。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/store.rs",
+  "anchor": "pub fn lock(&self)",
+  "count": 15,
+  "hi": [
+   "lock_exclusive()"
+  ]
+ },
+ {
+  "key": "wire",
+  "title": "存檔格式",
+  "why": "外層有 version，裡面是一組 credential。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/store.rs",
+  "anchor": "struct StoreFile {",
+  "count": 16,
+  "hi": [
+   "version: u32"
+  ]
+ },
+ {
+  "key": "http",
+  "title": "UreqHttp::get_json",
+  "why": "帶 Bearer 和 User-Agent: rhc/版本號，沒有冒充 Grok CLI 的標頭。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/http.rs",
+  "anchor": "let request = ureq::get(url)",
+  "count": 5,
+  "hi": [
+   "Bearer {bearer}",
+   "User-Agent"
+  ]
+ },
+ {
+  "key": "identity",
+  "title": "client_identity",
+  "why": "每個請求的 User-Agent 都是 rhc 加上 Cargo 版本號，老實報自己的名字，不冒充 Grok CLI。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/http.rs",
+  "anchor": "fn client_identity()",
+  "count": 3,
+  "hi": [
+   "rhc/{}"
+  ]
+ },
+ {
+  "key": "http-trait",
+  "title": "XaiHttp trait",
+  "why": "對外 HTTP 的接縫。正式用 UreqHttp，測試用 ScriptedHttp。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/http.rs",
+  "anchor": "pub(crate) trait XaiHttp",
+  "count": 4,
+  "hi": [
+   "fn post_form",
+   "fn get_json"
+  ]
+ },
+ {
+  "key": "models",
+  "title": "拿票去列模型",
+  "why": "先確保票是新的，再 GET api.x.ai/v1/models；沒登入就不打。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/model_list.rs",
+  "anchor": "impl ModelLister for AuthClient {",
+  "count": 13,
+  "hi": [
+   "self.refresh_if_needed()?",
+   "return Ok(None);",
+   "{}/models"
+  ]
+ },
+ {
+  "key": "import",
+  "title": "從 Grok Build 抄票",
+  "why": "讀 ~/.grok/auth.json 裡對應 client_id 的那筆，只拿 access token。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/grok_import.rs",
+  "anchor": "const GROK_SCOPE_KEY",
+  "count": 1,
+  "hi": [
+   "b1a00492"
+  ]
+ },
+ {
+  "key": "import-session",
+  "title": "抄來的票沒有 refresh token",
+  "why": "refresh_token 固定是 None，過期後只能重新登入。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/grok_import.rs",
+  "anchor": "    Ok(OAuthSession {",
+  "count": 9,
+  "hi": [
+   "refresh_token: None"
+  ]
+ },
+ {
+  "key": "scripted",
+  "title": "ScriptedHttp",
+  "why": "測試替身：記下每個請求，依網址從佇列吐出預先寫好的回應。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/scripted_http.rs",
+  "anchor": "fn respond(&self",
+  "count": 16,
+  "hi": [
+   "push((url.to_string(), recorded))",
+   "pop_front()"
+  ]
+ },
+ {
+  "key": "gb-scopes",
+  "title": "Grok Build 的 scope",
+  "why": "Grok Build 自己要十個 scope，多了 conversations 和 workspaces。",
+  "root": "grok-build",
+  "path": "crates/codegen/xai-grok-shell/src/auth/config.rs",
+  "anchor": "fn default_oauth2_scopes()",
+  "count": 14,
+  "hi": [
+   "grok-cli:access",
+   "conversations:read"
+  ]
+ },
+ {
+  "key": "gb-referrer",
+  "title": "Grok Build 的 referrer",
+  "why": "授權網址尾巴接 referrer，Grok Build 填 grok-build。",
+  "root": "grok-build",
+  "path": "crates/codegen/xai-grok-shell/src/auth/oidc/protocol.rs",
+  "anchor": "    let referrer = oauth2",
+  "count": 5,
+  "hi": [
+   "&referrer="
+  ]
+ },
+ {
+  "key": "hermes-xai",
+  "title": "Hermes 的 xAI 設定",
+  "why": "同一個 client_id、同一組六個 scope、打 api.x.ai/v1。",
+  "root": "hermes",
+  "path": "hermes_cli/auth.py",
+  "anchor": "XAI_OAUTH_ISSUER = ",
+  "count": 5,
+  "hi": [
+   "XAI_OAUTH_CLIENT_ID",
+   "XAI_OAUTH_SCOPE",
+   "device/code"
+  ]
+ },
+ {
+  "key": "hermes-ua",
+  "title": "Hermes 的 User-Agent",
+  "why": "Hermes 打 xAI 時報自己的名字和版本。",
+  "root": "hermes",
+  "path": "tools/xai_http.py",
+  "anchor": "def hermes_xai_user_agent()",
+  "count": 7,
+  "hi": [
+   "Hermes-Agent/"
+  ]
+ },
+ {
+  "key": "pi-xai",
+  "title": "Pi 的 device-code 請求",
+  "why": "Pi 用 device code 登入，referrer 填自己的名字 pi。",
+  "root": "pi",
+  "path": "packages/ai/src/auth/oauth/xai.ts",
+  "anchor": "scope: XAI_SCOPE,",
+  "count": 2,
+  "hi": [
+   "referrer"
+  ]
+ }
+]

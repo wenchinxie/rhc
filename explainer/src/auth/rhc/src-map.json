@@ -1,0 +1,705 @@
+{
+  "provider": {
+    "type": "code",
+    "kind": "code",
+    "title": "XAI 設定",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/provider.rs:11-19",
+    "why": "所有網址、client_id、scope、referrer 集中在這一個常數。",
+    "start": 11,
+    "hi": [
+      13,
+      16,
+      17,
+      18
+    ],
+    "lines": [
+      "pub(crate) const XAI: OAuthProvider = OAuthProvider {",
+      "    issuer: \"https://auth.x.ai\",",
+      "    client_id: \"b1a00492-073a-47ea-816f-4c329264a828\",",
+      "    authorize_url: \"https://auth.x.ai/oauth2/authorize\",",
+      "    token_url: \"https://auth.x.ai/oauth2/token\",",
+      "    scopes: \"openid profile email offline_access grok-cli:access api:access\",",
+      "    referrer: \"rhc\",",
+      "    api_base_url: \"https://api.x.ai/v1\",",
+      "};"
+    ]
+  },
+  "loop": {
+    "type": "code",
+    "kind": "code",
+    "title": "run_loopback_flow",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:32-55",
+    "why": "綁本機埠，組 PKCE、state、nonce，開瀏覽器，等回呼，換票。",
+    "start": 32,
+    "hi": [
+      37,
+      40,
+      47,
+      48,
+      52
+    ],
+    "lines": [
+      "pub(crate) fn run_loopback_flow(",
+      "    http: &dyn XaiHttp,",
+      "    stderr: &mut dyn Write,",
+      "    open_browser: &dyn Fn(&str),",
+      ") -> Result<OAuthSession, AuthError> {",
+      "    let listener = TcpListener::bind((\"127.0.0.1\", 0))?;",
+      "    let port = listener.local_addr()?.port();",
+      "    let redirect_uri = format!(\"http://127.0.0.1:{port}/callback\");",
+      "    let pkce = generate_pkce()?;",
+      "    let state = random_token()?;",
+      "    let nonce = random_token()?;",
+      "    let url = authorize_url(&redirect_uri, &pkce, &state, &nonce);",
+      "    writeln!(stderr, \"{url}\")?;",
+      "    let grant = thread::scope(|scope| {",
+      "        let waiter =",
+      "            scope.spawn(|| accept_callback(listener, &state, Instant::now() + CALLBACK_TIMEOUT));",
+      "        open_browser(&url);",
+      "        let code = waiter",
+      "            .join()",
+      "            .map_err(|_| AuthError::msg(\"login waiter panicked\"))??;",
+      "        exchange_code(http, &code, &redirect_uri, &pkce.code_verifier)",
+      "    })?;",
+      "    Ok(session_from_grant(grant))",
+      "}"
+    ]
+  },
+  "url": {
+    "type": "code",
+    "kind": "code",
+    "title": "authorize_url",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:57-70",
+    "why": "帶 PKCE challenge、state、nonce、referrer=rhc 的授權網址。",
+    "start": 57,
+    "hi": [
+      60,
+      68
+    ],
+    "lines": [
+      "pub(crate) fn authorize_url(redirect_uri: &str, pkce: &Pkce, state: &str, nonce: &str) -> String {",
+      "    format!(",
+      "        \"{}?response_type=code&client_id={}&redirect_uri={}&scope={}\\",
+      "         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}&referrer={}\",",
+      "        XAI.authorize_url,",
+      "        percent_encode(XAI.client_id),",
+      "        percent_encode(redirect_uri),",
+      "        percent_encode(XAI.scopes),",
+      "        percent_encode(&pkce.code_challenge),",
+      "        percent_encode(state),",
+      "        percent_encode(nonce),",
+      "        percent_encode(XAI.referrer),",
+      "    )",
+      "}"
+    ]
+  },
+  "pkce": {
+    "type": "code",
+    "kind": "code",
+    "title": "generate_pkce",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:123-136",
+    "why": "隨機 verifier 留在本機，只把它的 SHA-256 送出去。",
+    "start": 123,
+    "hi": [
+      125,
+      134
+    ],
+    "lines": [
+      "pub(crate) fn generate_pkce() -> Result<Pkce, AuthError> {",
+      "    let code_verifier = random_token()?;",
+      "    let code_challenge = URL_SAFE_NO_PAD.encode(Sha256::digest(code_verifier.as_bytes()));",
+      "    Ok(Pkce {",
+      "        code_verifier,",
+      "        code_challenge,",
+      "    })",
+      "}",
+      "",
+      "fn random_token() -> Result<String, AuthError> {",
+      "    let mut bytes = [0u8; 32];",
+      "    getrandom::fill(&mut bytes).map_err(|e| AuthError::msg(format!(\"random failed: {e}\")))?;",
+      "    Ok(URL_SAFE_NO_PAD.encode(bytes))",
+      "}"
+    ]
+  },
+  "callback": {
+    "type": "code",
+    "kind": "code",
+    "title": "code_from_request_line",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:180-202",
+    "why": "回呼先比 state，對上才取 code。",
+    "start": 180,
+    "hi": [
+      196,
+      199
+    ],
+    "lines": [
+      "pub(crate) fn code_from_request_line(",
+      "    line: &str,",
+      "    expected_state: &str,",
+      ") -> Result<String, AuthError> {",
+      "    let target = line",
+      "        .split_whitespace()",
+      "        .nth(1)",
+      "        .ok_or_else(|| AuthError::msg(\"callback request missing target\"))?;",
+      "    let query = target.split_once('?').map(|(_, q)| q).unwrap_or(\"\");",
+      "    if let Some(err) = query_param(query, \"error\") {",
+      "        if err == \"access_denied\" {",
+      "            return Err(AuthError::msg(\"authorization denied\"));",
+      "        }",
+      "        return Err(AuthError::msg(format!(\"authorization failed: {err}\")));",
+      "    }",
+      "    let state = query_param(query, \"state\").unwrap_or_default();",
+      "    if state != expected_state {",
+      "        return Err(AuthError::msg(\"login state did not match\"));",
+      "    }",
+      "    query_param(query, \"code\")",
+      "        .filter(|s| !s.is_empty())",
+      "        .ok_or_else(|| AuthError::msg(\"callback missing code\"))",
+      "}"
+    ]
+  },
+  "exchange": {
+    "type": "code",
+    "kind": "code",
+    "title": "exchange_code",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:97-121",
+    "why": "拿 code 和 verifier 去 token 端點換票。",
+    "start": 97,
+    "hi": [
+      106,
+      110
+    ],
+    "lines": [
+      "pub(crate) fn exchange_code(",
+      "    http: &dyn XaiHttp,",
+      "    code: &str,",
+      "    redirect_uri: &str,",
+      "    code_verifier: &str,",
+      ") -> Result<TokenGrant, AuthError> {",
+      "    let (status, data) = http.post_form(",
+      "        XAI.token_url,",
+      "        &[",
+      "            (\"grant_type\", \"authorization_code\"),",
+      "            (\"code\", code),",
+      "            (\"redirect_uri\", redirect_uri),",
+      "            (\"client_id\", XAI.client_id),",
+      "            (\"code_verifier\", code_verifier),",
+      "        ],",
+      "    )?;",
+      "    if status != 200 {",
+      "        return Err(AuthError::msg(error_message(",
+      "            &data,",
+      "            status,",
+      "            \"token exchange failed\",",
+      "        )));",
+      "    }",
+      "    grant_from_token_payload(&data)",
+      "}"
+    ]
+  },
+  "claims": {
+    "type": "code",
+    "kind": "code",
+    "title": "從 token 讀身分",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:243-247",
+    "why": "解開 id_token 拿 sub 和 email。只解碼，不驗簽章，也不比 nonce。",
+    "start": 243,
+    "hi": [
+      244
+    ],
+    "lines": [
+      "    let id_token = data.get(\"id_token\").and_then(Value::as_str);",
+      "    let mut claims = id_token.map(claims_from_jwt).unwrap_or_default();",
+      "    if claims.is_empty() {",
+      "        claims = claims_from_jwt(&access);",
+      "    }"
+    ]
+  },
+  "jwt": {
+    "type": "code",
+    "kind": "code",
+    "title": "claims_from_jwt",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/session.rs:37-54",
+    "why": "把 JWT 中間那段 base64 解成 JSON，沒有驗證。",
+    "start": 37,
+    "hi": [
+      38
+    ],
+    "lines": [
+      "pub(crate) fn claims_from_jwt(token: &str) -> serde_json::Map<String, Value> {",
+      "    let Some(payload) = token.split('.').nth(1) else {",
+      "        return serde_json::Map::new();",
+      "    };",
+      "    let padded = match payload.len() % 4 {",
+      "        0 => payload.to_string(),",
+      "        2 => format!(\"{payload}==\"),",
+      "        3 => format!(\"{payload}=\"),",
+      "        _ => return serde_json::Map::new(),",
+      "    };",
+      "    let Ok(raw) = base64::Engine::decode(&base64::engine::general_purpose::URL_SAFE, padded) else {",
+      "        return serde_json::Map::new();",
+      "    };",
+      "    match serde_json::from_slice::<Value>(&raw) {",
+      "        Ok(Value::Object(map)) => map,",
+      "        _ => serde_json::Map::new(),",
+      "    }",
+      "}"
+    ]
+  },
+  "refresh-grant": {
+    "type": "code",
+    "kind": "code",
+    "title": "refresh_grant",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/oidc.rs:72-95",
+    "why": "用 refresh token 換新票；invalid_grant 變成 RefreshRevoked。",
+    "start": 72,
+    "hi": [
+      79,
+      84
+    ],
+    "lines": [
+      "pub(crate) fn refresh_grant(",
+      "    http: &dyn XaiHttp,",
+      "    refresh_token: &str,",
+      ") -> Result<TokenGrant, AuthError> {",
+      "    let (status, data) = http.post_form(",
+      "        XAI.token_url,",
+      "        &[",
+      "            (\"grant_type\", \"refresh_token\"),",
+      "            (\"refresh_token\", refresh_token),",
+      "            (\"client_id\", XAI.client_id),",
+      "        ],",
+      "    )?;",
+      "    if data.get(\"error\").and_then(Value::as_str) == Some(\"invalid_grant\") {",
+      "        return Err(AuthError::RefreshRevoked);",
+      "    }",
+      "    if status != 200 {",
+      "        return Err(AuthError::msg(error_message(",
+      "            &data,",
+      "            status,",
+      "            \"refresh failed\",",
+      "        )));",
+      "    }",
+      "    grant_from_token_payload(&data)",
+      "}"
+    ]
+  },
+  "fresh": {
+    "type": "code",
+    "kind": "code",
+    "title": "is_fresh",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/session.rs:21-23",
+    "why": "expires_at 要比現在晚 30 秒以上才算新票；離過期不到 30 秒就當作已過期，先換新。",
+    "start": 21,
+    "hi": [
+      22
+    ],
+    "lines": [
+      "    pub fn is_fresh(&self, now: DateTime<Utc>) -> bool {",
+      "        self.expires_at > now + chrono::Duration::seconds(FRESHNESS_SKEW_SECS)",
+      "    }"
+    ]
+  },
+  "refresh": {
+    "type": "code",
+    "kind": "code",
+    "title": "refresh_if_needed",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/client.rs:78-121",
+    "why": "先不上鎖看一眼；要 refresh 才上鎖，上鎖後再讀一次。",
+    "start": 78,
+    "hi": [
+      79,
+      88,
+      92,
+      100,
+      108
+    ],
+    "lines": [
+      "    fn refresh_if_needed(&self) -> Result<Option<CredentialSnapshot>, AuthError> {",
+      "        let Some(current) = self.store.load()? else {",
+      "            return Ok(None);",
+      "        };",
+      "        if current.is_fresh(Utc::now()) {",
+      "            return Ok(Some(current.into_snapshot()));",
+      "        }",
+      "        if current.refresh_token.is_none() {",
+      "            return Err(AuthError::NeedLogin);",
+      "        }",
+      "        let _lock = self.store.lock()?;",
+      "        let Some(latest) = self.store.load()? else {",
+      "            return Err(AuthError::NeedLogin);",
+      "        };",
+      "        if latest.is_fresh(Utc::now()) {",
+      "            return Ok(Some(latest.into_snapshot()));",
+      "        }",
+      "        let Some(refresh) = latest.refresh_token.as_deref() else {",
+      "            return Err(AuthError::NeedLogin);",
+      "        };",
+      "        let grant = match refresh_grant(self.http.as_ref(), refresh) {",
+      "            Ok(g) => g,",
+      "            Err(AuthError::RefreshRevoked) => {",
+      "                self.store.clear()?;",
+      "                return Err(AuthError::RefreshRevoked);",
+      "            }",
+      "            Err(e) => return Err(e),",
+      "        };",
+      "        let new = OAuthSession {",
+      "            access_token: grant.access_token,",
+      "            refresh_token: grant.refresh_token.or(latest.refresh_token),",
+      "            expires_at: grant.expires_at,",
+      "            email: grant.email.or(latest.email),",
+      "            subject: if grant.subject.is_empty() {",
+      "                latest.subject",
+      "            } else {",
+      "                grant.subject",
+      "            },",
+      "            issuer: latest.issuer,",
+      "            client_id: latest.client_id,",
+      "        };",
+      "        self.store.save(&new)?;",
+      "        Ok(Some(new.into_snapshot()))",
+      "    }"
+    ]
+  },
+  "save": {
+    "type": "code",
+    "kind": "code",
+    "title": "TokenStore::save",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/store.rs:70-89",
+    "why": "0700 目錄、0600 檔案；寫暫存檔、fsync、rename。",
+    "start": 70,
+    "hi": [
+      76,
+      81,
+      82,
+      83
+    ],
+    "lines": [
+      "    pub fn save(&self, session: &OAuthSession) -> Result<(), AuthError> {",
+      "        let parent = self",
+      "            .path",
+      "            .parent()",
+      "            .ok_or_else(|| AuthError::msg(\"auth path has no parent\"))?;",
+      "        fs::create_dir_all(parent)?;",
+      "        fs::set_permissions(parent, fs::Permissions::from_mode(0o700))?;",
+      "        let payload = serde_json::to_vec_pretty(&to_wire(session))",
+      "            .map_err(|e| AuthError::msg(format!(\"serialize auth store: {e}\")))?;",
+      "        let mut tmp = tempfile_in(parent)?;",
+      "        tmp.file.write_all(&payload)?;",
+      "        tmp.file.sync_all()?;",
+      "        fs::set_permissions(&tmp.path, fs::Permissions::from_mode(0o600))?;",
+      "        fs::rename(&tmp.path, &self.path)?;",
+      "        tmp.keep = true;",
+      "        if let Ok(dir) = File::open(parent) {",
+      "            let _ = dir.sync_all();",
+      "        }",
+      "        Ok(())",
+      "    }"
+    ]
+  },
+  "lock": {
+    "type": "code",
+    "kind": "code",
+    "title": "TokenStore::lock",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/store.rs:99-113",
+    "why": "對 auth.json.lock 拿 flock 排他鎖；鎖跟著 AuthFileLock 的生命走。",
+    "start": 99,
+    "hi": [
+      110
+    ],
+    "lines": [
+      "    pub fn lock(&self) -> Result<AuthFileLock, AuthError> {",
+      "        if let Some(parent) = self.path.parent() {",
+      "            fs::create_dir_all(parent)?;",
+      "            fs::set_permissions(parent, fs::Permissions::from_mode(0o700))?;",
+      "        }",
+      "        let file = OpenOptions::new()",
+      "            .create(true)",
+      "            .read(true)",
+      "            .write(true)",
+      "            .truncate(false)",
+      "            .open(self.lock_path())?;",
+      "        file.lock_exclusive()?;",
+      "        Ok(AuthFileLock { _file: file })",
+      "    }",
+      "}"
+    ]
+  },
+  "wire": {
+    "type": "code",
+    "kind": "code",
+    "title": "存檔格式",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/store.rs:18-33",
+    "why": "外層有 version，裡面是一組 credential。",
+    "start": 18,
+    "hi": [
+      19
+    ],
+    "lines": [
+      "struct StoreFile {",
+      "    version: u32,",
+      "    credential: CredentialWire,",
+      "}",
+      "",
+      "#[derive(Serialize)]",
+      "struct CredentialWire {",
+      "    kind: String,",
+      "    access_token: String,",
+      "    refresh_token: Option<String>,",
+      "    expires_at: String,",
+      "    email: Option<String>,",
+      "    subject: String,",
+      "    issuer: String,",
+      "    client_id: String,",
+      "}"
+    ]
+  },
+  "http": {
+    "type": "code",
+    "kind": "code",
+    "title": "UreqHttp::get_json",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/http.rs:39-43",
+    "why": "帶 Bearer 和 User-Agent: rhc/版本號，沒有冒充 Grok CLI 的標頭。",
+    "start": 39,
+    "hi": [
+      40,
+      42
+    ],
+    "lines": [
+      "        let request = ureq::get(url)",
+      "            .set(\"Authorization\", &format!(\"Bearer {bearer}\"))",
+      "            .set(\"Accept\", \"application/json\")",
+      "            .set(\"User-Agent\", &identity)",
+      "            .timeout(std::time::Duration::from_secs(HTTP_TIMEOUT_SECS));"
+    ]
+  },
+  "identity": {
+    "type": "code",
+    "kind": "code",
+    "title": "client_identity",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/http.rs:63-65",
+    "why": "每個請求的 User-Agent 都是 rhc 加上 Cargo 版本號，老實報自己的名字，不冒充 Grok CLI。",
+    "start": 63,
+    "hi": [
+      64
+    ],
+    "lines": [
+      "fn client_identity() -> String {",
+      "    format!(\"rhc/{}\", env!(\"CARGO_PKG_VERSION\"))",
+      "}"
+    ]
+  },
+  "http-trait": {
+    "type": "code",
+    "kind": "code",
+    "title": "XaiHttp trait",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/http.rs:8-11",
+    "why": "對外 HTTP 的接縫。正式用 UreqHttp，測試用 ScriptedHttp。",
+    "start": 8,
+    "hi": [
+      9,
+      10
+    ],
+    "lines": [
+      "pub(crate) trait XaiHttp: Send + Sync {",
+      "    fn post_form(&self, url: &str, fields: &[(&str, &str)]) -> Result<(u16, Value), AuthError>;",
+      "    fn get_json(&self, url: &str, bearer: &str) -> Result<(u16, Value), AuthError>;",
+      "}"
+    ]
+  },
+  "models": {
+    "type": "code",
+    "kind": "code",
+    "title": "拿票去列模型",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/model_list.rs:8-20",
+    "why": "先確保票是新的，再 GET api.x.ai/v1/models；沒登入就不打。",
+    "start": 8,
+    "hi": [
+      10,
+      11,
+      13
+    ],
+    "lines": [
+      "impl ModelLister for AuthClient {",
+      "    fn list(&self) -> Result<Option<Vec<ModelEntry>>, AuthError> {",
+      "        let Some(snapshot) = self.refresh_if_needed()? else {",
+      "            return Ok(None);",
+      "        };",
+      "        let url = format!(\"{}/models\", XAI.api_base_url);",
+      "        let (status, body) = self.http().get_json(&url, &snapshot.token)?;",
+      "        if status != 200 {",
+      "            return Err(AuthError::msg(format!(\"model list failed (HTTP {status})\")));",
+      "        }",
+      "        Ok(Some(parse_models(&body)))",
+      "    }",
+      "}"
+    ]
+  },
+  "import": {
+    "type": "code",
+    "kind": "code",
+    "title": "從 Grok Build 抄票",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/grok_import.rs:10-10",
+    "why": "讀 ~/.grok/auth.json 裡對應 client_id 的那筆，只拿 access token。",
+    "start": 10,
+    "hi": [
+      10
+    ],
+    "lines": [
+      "const GROK_SCOPE_KEY: &str = \"https://auth.x.ai::b1a00492-073a-47ea-816f-4c329264a828\";"
+    ]
+  },
+  "import-session": {
+    "type": "code",
+    "kind": "code",
+    "title": "抄來的票沒有 refresh token",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/grok_import.rs:67-75",
+    "why": "refresh_token 固定是 None，過期後只能重新登入。",
+    "start": 67,
+    "hi": [
+      69
+    ],
+    "lines": [
+      "    Ok(OAuthSession {",
+      "        access_token: access,",
+      "        refresh_token: None,",
+      "        expires_at,",
+      "        subject,",
+      "        email,",
+      "        issuer: XAI.issuer.to_string(),",
+      "        client_id: XAI.client_id.to_string(),",
+      "    })"
+    ]
+  },
+  "scripted": {
+    "type": "code",
+    "kind": "code",
+    "title": "ScriptedHttp",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/scripted_http.rs:29-44",
+    "why": "測試替身：記下每個請求，依網址從佇列吐出預先寫好的回應。",
+    "start": 29,
+    "hi": [
+      33,
+      38
+    ],
+    "lines": [
+      "    fn respond(&self, url: &str, recorded: FormFields) -> Result<(u16, Value), AuthError> {",
+      "        self.requests",
+      "            .lock()",
+      "            .expect(\"requests\")",
+      "            .push((url.to_string(), recorded));",
+      "        let mut routes = self.routes.lock().expect(\"routes\");",
+      "        for (key, queue) in routes.iter_mut() {",
+      "            if url.contains(key) {",
+      "                let (status, body) = queue",
+      "                    .pop_front()",
+      "                    .unwrap_or_else(|| panic!(\"no more responses for {key}\"));",
+      "                return Ok((status, body));",
+      "            }",
+      "        }",
+      "        panic!(\"no route for {url}\");",
+      "    }"
+    ]
+  },
+  "gb-scopes": {
+    "type": "code",
+    "kind": "code",
+    "title": "Grok Build 的 scope",
+    "meta": "grok-build: crates/codegen/xai-grok-shell/src/auth/config.rs:15-28",
+    "why": "Grok Build 自己要十個 scope，多了 conversations 和 workspaces。",
+    "start": 15,
+    "hi": [
+      21,
+      23
+    ],
+    "lines": [
+      "fn default_oauth2_scopes() -> Vec<String> {",
+      "    vec![",
+      "        \"openid\".into(),",
+      "        \"profile\".into(),",
+      "        \"email\".into(),",
+      "        \"offline_access\".into(),",
+      "        \"grok-cli:access\".into(),",
+      "        \"api:access\".into(),",
+      "        \"conversations:read\".into(),",
+      "        \"conversations:write\".into(),",
+      "        \"workspaces:read\".into(),",
+      "        \"workspaces:write\".into(),",
+      "    ]",
+      "}"
+    ]
+  },
+  "gb-referrer": {
+    "type": "code",
+    "kind": "code",
+    "title": "Grok Build 的 referrer",
+    "meta": "grok-build: crates/codegen/xai-grok-shell/src/auth/oidc/protocol.rs:387-391",
+    "why": "授權網址尾巴接 referrer，Grok Build 填 grok-build。",
+    "start": 387,
+    "hi": [
+      391
+    ],
+    "lines": [
+      "    let referrer = oauth2",
+      "        .and_then(|o| o.referrer.as_deref())",
+      "        .filter(|r| !r.is_empty())",
+      "        .unwrap_or(\"grok-build\");",
+      "    url.push_str(&format!(\"&referrer={}\", urlencoding::encode(referrer)));"
+    ]
+  },
+  "hermes-xai": {
+    "type": "code",
+    "kind": "code",
+    "title": "Hermes 的 xAI 設定",
+    "meta": "hermes: hermes_cli/auth.py:110-114",
+    "why": "同一個 client_id、同一組六個 scope、打 api.x.ai/v1。",
+    "start": 110,
+    "hi": [
+      112,
+      113,
+      114
+    ],
+    "lines": [
+      "XAI_OAUTH_ISSUER = \"https://auth.x.ai\"",
+      "XAI_OAUTH_DISCOVERY_URL = f\"{XAI_OAUTH_ISSUER}/.well-known/openid-configuration\"",
+      "XAI_OAUTH_CLIENT_ID = \"b1a00492-073a-47ea-816f-4c329264a828\"",
+      "XAI_OAUTH_SCOPE = \"openid profile email offline_access grok-cli:access api:access\"",
+      "XAI_OAUTH_DEVICE_CODE_URL = f\"{XAI_OAUTH_ISSUER}/oauth2/device/code\""
+    ]
+  },
+  "hermes-ua": {
+    "type": "code",
+    "kind": "code",
+    "title": "Hermes 的 User-Agent",
+    "meta": "hermes: tools/xai_http.py:91-97",
+    "why": "Hermes 打 xAI 時報自己的名字和版本。",
+    "start": 91,
+    "hi": [
+      97
+    ],
+    "lines": [
+      "def hermes_xai_user_agent() -> str:",
+      "    \"\"\"Return a stable Hermes-specific User-Agent for xAI HTTP calls.\"\"\"",
+      "    try:",
+      "        from hermes_cli import __version__",
+      "    except Exception:",
+      "        __version__ = \"unknown\"",
+      "    return f\"Hermes-Agent/{__version__}\""
+    ]
+  },
+  "pi-xai": {
+    "type": "code",
+    "kind": "code",
+    "title": "Pi 的 device-code 請求",
+    "meta": "pi: packages/ai/src/auth/oauth/xai.ts:150-151",
+    "why": "Pi 用 device code 登入，referrer 填自己的名字 pi。",
+    "start": 150,
+    "hi": [
+      151
+    ],
+    "lines": [
+      "\t\t\tscope: XAI_SCOPE,",
+      "\t\t\treferrer: \"pi\","
+    ]
+  }
+}

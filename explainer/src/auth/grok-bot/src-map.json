@@ -1,0 +1,170 @@
+{
+  "gb-host": {
+    "type": "code",
+    "kind": "code",
+    "title": "host 從哪裡續",
+    "meta": "source/host/extensions/auth/auth-service.ts:56-79",
+    "why": "開發 token 檔優先。否則用 SAND_INFERENCE_RENEWAL_CREDENTIAL。都沒有就等。",
+    "start": 56,
+    "hi": [
+      56,
+      58
+    ],
+    "lines": [
+      "  const devTokenFile = env[SAND_DEV_INFERENCE_TOKEN_FILE_ENV]?.trim() ?? \"\";",
+      "  const isDevTokenFile = devTokenFile.length > 0;",
+      "  const hasRenewalCredential = isDevTokenFile || (env[SAND_INFERENCE_RENEWAL_CREDENTIAL_ENV]?.trim() ?? \"\").length > 0;",
+      "  const renewer = new SandInferenceCredentialRenewer({",
+      "    getCredential: isDevTokenFile ? () => devTokenFile : () => env[SAND_INFERENCE_RENEWAL_CREDENTIAL_ENV]?.trim() ?? null,",
+      "    renew: isDevTokenFile",
+      "      ? () => (options.readDevCredential ?? ((path) => readDevInferenceCredentialFile({ path })))(devTokenFile)",
+      "      : (credential) => (options.renewCredential ?? ((backendUrl, value) => renewSandBoxInferenceCredential({ backendUrl, credential: value })))(options.backendUrl ?? getConfiguredBackendUrl(env), credential),",
+      "    setCredential: (credential) => { wroteFirstCredential = store.getValidAccessToken() == null; store.setCredential(credential); },",
+      "    onResult: (result) => {",
+      "      const isFirstCredential = result.outcome === \"renewed\" && wroteFirstCredential;",
+      "      wroteFirstCredential = false;",
+      "      if (result.outcome === \"failed\") options.log(`inference-credential renewal failed (streak ${result.consecutiveFailures}): ${result.errorSummary ?? \"unknown error\"}`);",
+      "      emit({ ...result, isFirstCredential });",
+      "    },",
+      "    retry: options.retry,",
+      "    clock: options.clock",
+      "  });",
+      "  renewer.start();",
+      "  options.log(isDevTokenFile",
+      "    ? `DEV inference-credential renewer started, reading short-lived tokens from ${devTokenFile} (dev:box-docker local loop)`",
+      "    : hasRenewalCredential",
+      "      ? \"inference-credential renewer started (backend self-renewal is the sole inference-credential source)\"",
+      "      : \"inference-credential renewer started, but no renewal credential was delivered into the box; inference is unavailable until the box is re-provisioned with one\");"
+    ]
+  },
+  "gb-login": {
+    "type": "code",
+    "kind": "code",
+    "title": "loginCursor",
+    "meta": "source/electron-main/main-edge.ts:142",
+    "why": "畫面入口呼叫 cursorAccount.login。回傳狀態，不回傳 token。",
+    "start": 142,
+    "hi": [
+      142
+    ],
+    "lines": [
+      "    getCursorAuthStatus: () => invoke(deps.cursorAccount, \"getAuthStatus\"), loginCursor: () => invoke(deps.cursorAccount, \"login\"), cancelCursorLogin: () => invoke(deps.cursorAccount, \"cancelLogin\"), logoutCursor: () => invoke(deps.cursorAccount, \"logout\"), updateCursorAccountName: (raw) => invoke(deps.cursorAccount, \"updateAccountName\", req(raw).name), getCursorAvatar: () => invoke(deps.cursorAccount, \"getAvatar\"), getCursorWeeklyUsage: () => invoke(deps.cursorAccount, \"getWeeklyUsage\"), getCursorUsageSummary: () => invoke(deps.cursorAccount, \"getUsageSummary\"), getCursorPrReviewPreferences: () => invoke(deps.cursorAccount, \"getPrReviewPreferences\"), getCursorPrivacyModeEnabled: () => invoke(deps.cursorAccount, \"getPrivacyModeEnabled\"), getSandAccess: () => invoke(deps.cursorAccount, \"getSandAccess\"), getSandAccessFresh: () => invoke(deps.cursorAccount, \"getSandAccessFresh\"), invokeCursorDashboardAction: (raw) => invoke(deps.cursorAccount, \"invokeDashboardAction\", raw), cancelCursorSandTrial: () => invoke(deps.cursorAccount, \"cancelTrial\"),"
+    ]
+  },
+  "gb-poll": {
+    "type": "code",
+    "kind": "code",
+    "title": "poll 成功條件",
+    "meta": "source/electron-main/account/cursor-auth.ts:138-141",
+    "why": "200 且同時有 accessToken 與 refreshToken 才返回。否則當沒完成。",
+    "start": 138,
+    "hi": [
+      138
+    ],
+    "lines": [
+      "        else {",
+      "          const result: unknown = await response.json();",
+      "          if (typeof result === \"object\" && result !== null && \"accessToken\" in result && typeof result.accessToken === \"string\" && \"refreshToken\" in result && typeof result.refreshToken === \"string\") return { accessToken: result.accessToken, refreshToken: result.refreshToken };",
+      "          return null;"
+    ]
+  },
+  "gb-renew": {
+    "type": "code",
+    "kind": "code",
+    "title": "換短票",
+    "meta": "source/host/extensions/auth/credential-renewer.ts:40-51",
+    "why": "POST /sand-box/inference-credential，body 是 credential。",
+    "start": 40,
+    "hi": [
+      40
+    ],
+    "lines": [
+      "export async function renewSandBoxInferenceCredential(args: {",
+      "  readonly backendUrl: string;",
+      "  readonly credential: string;",
+      "  readonly fetchImpl?: typeof fetch;",
+      "}): Promise<InferenceCredential> {",
+      "  const response = await (args.fetchImpl ?? fetch)(new URL(RENEWAL_PATH, args.backendUrl).toString(), {",
+      "    method: \"POST\",",
+      "    headers: { \"content-type\": \"application/json\", ...getSandBackendClientHeaders() },",
+      "    body: JSON.stringify({ credential: args.credential })",
+      "  });",
+      "  if (!response.ok) throw new SandCredentialRenewalError(`Sand inference-credential renewal failed (HTTP ${response.status}).`);",
+      "  return credentialFromPayload(await response.json(), \"Sand inference-credential renewal returned no token.\");"
+    ]
+  },
+  "gb-start": {
+    "type": "code",
+    "kind": "code",
+    "title": "start 交方法",
+    "meta": "source/host/extensions/auth/extension.ts:9-30",
+    "why": "旁邊拿到 getAccessToken、peekAccessToken、getMachineId。不拿到桌面檔。",
+    "start": 9,
+    "hi": [
+      23,
+      24
+    ],
+    "lines": [
+      "export const authExtension = defineHostExtension({",
+      "  id: HostExtensions.Auth, dependencies: [],",
+      "  start: (context) => {",
+      "    const host = context.host as AuthHost;",
+      "    const service = createHostAuthService({ retry: createRealRetryPolicy({ name: \"sand-inference-credential-renewal\", maxAttempts: Number.MAX_SAFE_INTEGER, initialDelayMs: CREDENTIAL_RETRY_BASE_DELAY_MS, maxDelayMs: CREDENTIAL_RETRY_MAX_DELAY_MS }), clock: realClock, log: (message) => host.log(message) });",
+      "    context.onStop(() => service.dispose());",
+      "    const userFullName = createSandUserFullNameResolver({",
+      "      getAccessToken: (options) => service.getAccessToken(options),",
+      "      peekAccessToken: () => service.peekAccessToken(),",
+      "      getMachineId: () => service.getMachineId(),",
+      "      log: (message) => host.log(message)",
+      "    });",
+      "    context.onStop(service.subscribeToRenewal((event) => { if (event.outcome === \"renewed\") void userFullName.refresh(); }));",
+      "    if (service.peekAccessToken() !== null) void userFullName.refresh();",
+      "    return {",
+      "      getAccessToken: (options: { readonly backendUrl?: string }) => service.getAccessToken(options),",
+      "      peekAccessToken: () => service.peekAccessToken(),",
+      "      getLastRenewalEvent: () => service.getLastRenewalEvent(),",
+      "      getMachineId: () => service.getMachineId(),",
+      "      subscribeToRenewal: (listener: Parameters<typeof service.subscribeToRenewal>[0]) => service.subscribeToRenewal(listener),",
+      "      getUserFullName: () => userFullName.getUserFullName()",
+      "    };"
+    ]
+  },
+  "gb-url": {
+    "type": "code",
+    "kind": "code",
+    "title": "loginDeepControl",
+    "meta": "source/packages/cursor-config/auth/login.ts:17-21",
+    "why": "正式站網址帶 challenge、uuid、redirectTarget。桌面把預設 cli 改成 sand。",
+    "start": 17,
+    "hi": [
+      17,
+      21
+    ],
+    "lines": [
+      "export function generateAuthParams(redirectTarget = \"cli\", websiteUrl = resolveWebsiteUrl()): { uuid: string; challenge: string; verifier: string; loginUrl: string } {",
+      "  const verifier = base64UrlEncode(randomBytes(32));",
+      "  const challenge = base64UrlEncode(sha256(verifier));",
+      "  const uuid = randomUUID();",
+      "  return { uuid, challenge, verifier, loginUrl: `${websiteUrl}/loginDeepControl?challenge=${challenge}&uuid=${uuid}&mode=login&redirectTarget=${redirectTarget}` };"
+    ]
+  },
+  "gb-which": {
+    "type": "code",
+    "kind": "code",
+    "title": "選登入器",
+    "meta": "source/electron-main/account/cursor-auth.ts:154-158",
+    "why": "開發後端用 SandBackendLoginManager。否則 LoginManager，redirect 是 sand。",
+    "start": 154,
+    "hi": [
+      156,
+      157
+    ],
+    "lines": [
+      "export function createDefaultLoginManager(): CursorLoginManager {",
+      "  const backendUrl = getConfiguredBackendUrl();",
+      "  if (isDevAuthBackend(backendUrl)) return new SandBackendLoginManager(backendUrl, getAuthWebsiteUrl(backendUrl));",
+      "  return new LoginManager({ redirectTarget: resolveAuthRedirectTarget() });",
+      "}"
+    ]
+  }
+}

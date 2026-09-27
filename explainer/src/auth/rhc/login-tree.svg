@@ -1,0 +1,109 @@
+<svg class="dag" viewBox="0 0 920 900" role="img" aria-label="rhc login 怎麼拿到票">
+  <defs>
+    <marker id="ologar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="ologbr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="ologlp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#ologar)"/>
+  <path d="M380.0,171.0 L470,171" marker-end="url(#ologar)"/>
+  <path d="M260,210 L260,254" marker-end="url(#ologar)"/>
+  <path d="M260,318 L260,362" marker-end="url(#ologar)"/>
+  <path d="M260,426 L260,470" marker-end="url(#ologar)"/>
+  <path d="M260,534 L260,578" marker-end="url(#ologar)"/>
+  <path d="M380.0,617.0 L470,617" marker-end="url(#ologar)"/>
+  <path d="M260,656 L260,700" marker-end="url(#ologar)"/>
+  <path d="M260,764 L260,808" marker-end="url(#ologar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">觸發</text>
+  <a class="xref" href="#s-login">
+  <g class="app lay-trigger src" data-snip="loop" tabindex="0" role="button" aria-label="rhc login，開啟原文">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">rhc login</text>
+    <text class="sub" x="94" y="71">commands.rs</text>
+    <path class="srcfold" d="M431,88 L440,88 L440,79 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="175">判決</text>
+  <a class="xref" href="#s-import">
+  <g class="dec lay-judge src" data-snip="import" tabindex="0" role="button" aria-label="有 --from-grok？，開啟原文">
+    <polygon points="260,132 380.0,171.0 260,210 140.0,171.0"/>
+    <text text-anchor="middle" x="260" y="176.0">有 --from-grok？</text>
+    <circle class="srcdot" cx="260" cy="193" r="4"/>
+  </g>
+  </a>
+  <a class="xref" href="#s-import">
+  <g class="app lay-judge src" data-snip="import-session" tabindex="0" role="button" aria-label="抄 access token，開啟原文">
+    <rect x="470" y="142" width="430" height="58" rx="8"/>
+    <text x="484" y="166">抄 access token</text>
+    <text class="sub" x="484" y="186">grok_import.rs</text>
+    <path class="srcfold" d="M891,200 L900,200 L900,191 z"/>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="163.0">有</text>
+  <text class="elab" x="272" y="236.0">沒有</text>
+  <text class="lay" text-anchor="end" x="76" y="290">執行</text>
+  <a class="xref" href="#s-login">
+  <g class="app lay-exec src" data-snip="loop" tabindex="0" role="button" aria-label="綁 127.0.0.1 空埠，開啟原文">
+    <rect x="80" y="254" width="360" height="64" rx="8"/>
+    <text x="94" y="281">綁 127.0.0.1 空埠</text>
+    <text class="sub" x="94" y="301">oidc.rs</text>
+    <path class="srcfold" d="M431,318 L440,318 L440,309 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="398">執行</text>
+  <a class="xref" href="#s-login-pkce">
+  <g class="app lay-exec src" data-snip="pkce" tabindex="0" role="button" aria-label="產生 PKCE、state、nonce，開啟原文">
+    <rect x="80" y="362" width="360" height="64" rx="8"/>
+    <text x="94" y="389">產生 PKCE、state、nonce</text>
+    <text class="sub" x="94" y="409">oidc.rs</text>
+    <path class="srcfold" d="M431,426 L440,426 L440,417 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="506">執行</text>
+  <a class="xref" href="#s-login-url">
+  <g class="app lay-exec src" data-snip="url" tabindex="0" role="button" aria-label="開 auth.x.ai 授權頁，開啟原文">
+    <rect x="80" y="470" width="360" height="64" rx="8"/>
+    <text x="94" y="497">開 auth.x.ai 授權頁</text>
+    <text class="sub" x="94" y="517">referrer=rhc</text>
+    <path class="srcfold" d="M431,534 L440,534 L440,525 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="621">判決</text>
+  <a class="xref" href="#s-login-pkce">
+  <g class="dec lay-judge src" data-snip="callback" tabindex="0" role="button" aria-label="回呼的 state 對嗎？，開啟原文">
+    <polygon points="260,578 380.0,617.0 260,656 140.0,617.0"/>
+    <text text-anchor="middle" x="260" y="622.0">回呼的 state 對嗎？</text>
+    <circle class="srcdot" cx="260" cy="639" r="4"/>
+  </g>
+  </a>
+  <a class="xref" href="#s-login-pkce">
+  <g class="app lay-judge src" data-snip="callback" tabindex="0" role="button" aria-label="登入失敗，開啟原文">
+    <rect x="470" y="588" width="430" height="58" rx="8" stroke-dasharray="5 4"/>
+    <text x="484" y="612">登入失敗</text>
+    <text class="sub" x="484" y="632">state 不符</text>
+    <path class="srcfold" d="M891,646 L900,646 L900,637 z"/>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="609.0">不對</text>
+  <text class="elab" x="272" y="682.0">對</text>
+  <text class="lay" text-anchor="end" x="76" y="736">執行</text>
+  <a class="xref" href="#s-login-exchange">
+  <g class="app lay-exec src" data-snip="exchange" tabindex="0" role="button" aria-label="code + verifier 換票，開啟原文">
+    <rect x="80" y="700" width="360" height="64" rx="8"/>
+    <text x="94" y="727">code + verifier 換票</text>
+    <text class="sub" x="94" y="747">oauth2/token</text>
+    <path class="srcfold" d="M431,764 L440,764 L440,755 z"/>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="844">圍籬</text>
+  <a class="xref" href="#s-store">
+  <g class="app lay-fence src" data-snip="save" tabindex="0" role="button" aria-label="上鎖寫入 auth.json，開啟原文">
+    <rect x="80" y="808" width="360" height="64" rx="8"/>
+    <text x="94" y="835">上鎖寫入 auth.json</text>
+    <text class="sub" x="94" y="855">store.rs</text>
+    <path class="srcfold" d="M431,872 L440,872 L440,863 z"/>
+  </g>
+  </a>
+</svg>
