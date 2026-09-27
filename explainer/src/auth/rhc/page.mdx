@@ -1,13 +1,10 @@
-import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
-import { LOGIN_TREE } from "./loginTree"
-import { REFRESH_TREE } from "./refreshTree"
-import { LOGIN_FLOW } from "./loginFlow"
-import { SeqFlow } from "../../components/SeqFlow"
+import { H2, H3, Peek, Term } from "../../mdx-components"
+import { FlowDag } from "../../components/FlowDag"
+import { LOGIN_FLOW, REFRESH_FLOW } from "./flows"
 
 <>
   <H2 id="top" n="">rhc</H2>
   <p>rhc 用作者的 SuperGrok 訂閱，透過瀏覽器登入 xAI（OAuth 2.0 authorization code + <Term k="pkce">PKCE</Term>，<Term k="loopback">loopback</Term> redirect）。票存進 <code>~/.rhc/auth.json</code>，要用之前先在檔案鎖底下換新，打 <code>api.x.ai/v1</code> 這個公開 API 時老實報自己的名字（<code>User-Agent: rhc/&lt;version&gt;</code>、<code>referrer=rhc</code>）。</p>
-  <SeqFlow flow={LOGIN_FLOW} />
   <H3 id="s-provider" n="1">設定集中一處</H3>
   <p><code>provider.rs</code> 一個常數 <code>XAI</code> 放齊所有設定：issuer <code>https://auth.x.ai</code>、client_id <code>b1a00492-073a-47ea-816f-4c329264a828</code>、authorize <code>https://auth.x.ai/oauth2/authorize</code>、token <code>https://auth.x.ai/oauth2/token</code>、<Term k="scope">scope</Term> <code>"openid profile email offline_access grok-cli:access api:access"</code>、<Term k="referrer">referrer</Term> <code>"rhc"</code>、api_base_url <code>https://api.x.ai/v1</code>。<Peek snip="provider">XAI 設定</Peek></p>
   <p>這個 client_id 是 Grok Build 的。Grok Build、Hermes、Pi、OpenClaw 都用同一個 client_id。<Peek snip="hermes-xai">Hermes 的 xAI 設定</Peek>這 6 個 <Term k="scope">scope</Term> 是 Pi 和 Hermes 的組合，Grok Build 要 10 個，多了 <code>conversations:read/write</code> 和 <code>workspaces:read/write</code>。<Peek snip="gb-scopes">Grok Build 的 scope</Peek></p>
@@ -15,8 +12,7 @@ import { SeqFlow } from "../../components/SeqFlow"
   <p><code>rhc login</code> 呼叫 <code>AuthClient::login</code>，走到 <code>oidc::run_loopback_flow</code>。<Peek snip="loop">run_loopback_flow</Peek></p>
   <p>步驟：在 <code>127.0.0.1</code> 綁 port 0（作業系統挑一個空的），redirect_uri 是 <code>http://127.0.0.1:&#123;port&#125;/callback</code>；做出 <Term k="pkce">PKCE</Term>、<Term k="state">state</Term>、<Term k="nonce">nonce</Term>；把授權網址印到 stderr；開一條有範圍界線的執行緒（scoped thread）等回呼（10 分鐘逾時），同時打開瀏覽器；等到回呼再去換票。</p>
   <p>為什麼是 <Term k="loopback">loopback</Term> 不是 <Term k="device-code">device code</Term>：Hermes、Pi、OpenClaw 用 <Term k="device-code">device code</Term>（RFC 8628，畫面印一組代碼，使用者在網頁上輸入，程式輪詢結果）。rhc 用 <Term k="loopback">loopback</Term> 這種瀏覽器 authorization-code 流程，跟 Grok Build 一樣。<Peek snip="pi-xai">Pi 的 device-code 請求</Peek> <Peek snip="hermes-xai">Hermes 用 device code</Peek></p>
-  <Dag svg={LOGIN_TREE} />
-  <p className="dagcap" id="login-dag-cap">rhc login 從觸發到寫入 auth.json 的判斷樹。</p>
+  <FlowDag flow={LOGIN_FLOW} />
   <h4 id="s-login-pkce"><span className="no">2.1</span>PKCE、state、nonce</h4>
   <p><Term k="pkce">PKCE</Term>：本機先產生 32 個隨機位元組，base64url 編碼成 code_verifier，留在本機不送出去。code_challenge 是 code_verifier 的 SHA-256 再 base64url，隨網址送出去，帶 <code>code_challenge_method=S256</code>。換票時 rhc 才把 verifier 送過去，伺服器比對雜湊。就算有人半路偷到 code，沒有 verifier 也換不到票。<Peek snip="pkce">generate_pkce</Peek></p>
   <p><Term k="state">state</Term>：隨機值。回呼帶回來的 <Term k="state">state</Term> 要對得上，對不上就登入失敗（<code>"login state did not match"</code>），擋掉偽造的回呼。回呼處理還認得兩種情況：<code>error=access_denied</code> 變成「authorization denied」；缺 code 也算錯誤。<Peek snip="callback">code_from_request_line</Peek></p>
@@ -51,8 +47,7 @@ import { SeqFlow } from "../../components/SeqFlow"
     <li>伺服器回 <code>invalid_grant</code> → <code>RefreshRevoked</code>，rhc 刪掉 <code>auth.json</code>，使用者要重新登入。</li>
     <li>成功就是新的 session；伺服器沒回的欄位（refresh_token、email，subject 是空的話）保留舊值；存檔。</li>
   </ul>
-  <Dag svg={REFRESH_TREE} />
-  <p className="dagcap" id="refresh-dag-cap">refresh_if_needed 從要用票到寫回新票的判斷樹。</p>
+  <FlowDag flow={REFRESH_FLOW} />
   <p><code>\_lock</code> 這個具名但底線開頭的變數，讓鎖活到函式結束才放；如果寫成裸的 <code>\_</code>，鎖立刻就被丟掉。<Peek snip="refresh">refresh_if_needed</Peek></p>
   <p>為什麼要重讀這一步很重要（推論，未對 xAI 驗證過）：如果 <Term k="refresh-token">refresh token</Term> 只能用一次，用同一個 token 換第二次會拿到 <code>invalid_grant</code>，把一個原本還能用的登入洗掉。</p>
   <H3 id="s-use" n="5">用票</H3>

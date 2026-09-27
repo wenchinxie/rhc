@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
 import { Peek } from "./components/Peek";
 import { Term } from "./components/Term";
-import { Xfer } from "./components/Xfer";
 
-export { Peek, Term, Xfer };
-
-export function Apex(props: { children: ReactNode }) {
-  return <section className="apex wide">{props.children}</section>;
-}
+export { Peek, Term };
 
 export function H2(props: { id: string; n: string; children: ReactNode }) {
   return (
@@ -27,15 +22,4 @@ export function H3(props: { id: string; n: string; children: ReactNode }) {
   );
 }
 
-export function Dag(props: { svg: string }) {
-  return (
-    <figure id="map">
-      <div
-        className="overflow dagbox wide"
-        dangerouslySetInnerHTML={{ __html: props.svg }}
-      />
-    </figure>
-  );
-}
-
-export const mdxComponents = { Apex, H2, H3, Term, Peek, Dag, Xfer };
+export const mdxComponents = { H2, H3, Term, Peek };

@@ -1,5 +1,6 @@
-import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
-import { AUTH_TREE } from "./authTree"
+import { H2, H3, Peek, Term } from "../../mdx-components"
+import { FlowDag } from "../../components/FlowDag"
+import { AUTH_FLOW } from "./flow"
 
 <>
   <H2 id="top" n="">Codex</H2>
@@ -8,8 +9,8 @@ import { AUTH_TREE } from "./authTree"
   <p>入口在 <code>cli/src/main.rs</code>。<code>--with-api-key</code> 和 <code>--with-access-token</code> 同時出現就結束。接著才是 <code>--device-auth</code>，然後舊的 <code>--api-key</code>（只印停用），然後 <code>--with-api-key</code> 從 stdin 讀金鑰，然後 <code>--with-access-token</code>。一個都沒有，呼叫 <code>run_login_with_chatgpt</code>，進 <code>run_login_server</code>。</p>
   <p>瀏覽器那條先 <code>generate_pkce</code>，綁定 <code>127.0.0.1:1455</code>（被佔用就改 1457），redirect 是 <code>http://localhost:&#123;port&#125;/auth/callback</code>。授權網址打到 issuer 的 <code>/oauth/authorize</code>，帶 <code>code_challenge_method=S256</code>。使用者回來之後，<code>exchange_code</code> 用 <code>grant_type=authorization_code</code> 換票。接著還會用 id token 再換一次 <code>openai-api-key</code>。這次失敗仍會把 ChatGPT tokens 存下來。</p>
   <p>device-code 不聽 localhost。它 POST <code>/api/accounts/deviceauth/usercode</code>，螢幕印 <code>/codex/device</code> 與 user code，再 poll <code>/deviceauth/token</code>。404 是這台伺服器沒開裝置碼，CLI 印完就停，不改走瀏覽器。</p>
-  <Dag svg={AUTH_TREE} />
-  <p>圖上每一格右下角可點。點開是該步的原文。<Peek snip="cx-dispatch">旗標分流</Peek> <Peek snip="cx-pkce">本機 PKCE</Peek> <Peek snip="cx-open">localhost callback</Peek> <Peek snip="cx-file">寫 auth.json</Peek> <Peek snip="cx-env">環境金鑰不落盤</Peek></p>
+  <FlowDag flow={AUTH_FLOW} />
+  <p>點圖上的方塊，打開的是該步原文。<Peek snip="cx-dispatch">旗標分流</Peek> <Peek snip="cx-pkce">本機 PKCE</Peek> <Peek snip="cx-open">localhost callback</Peek> <Peek snip="cx-file">寫 auth.json</Peek> <Peek snip="cx-env">環境金鑰不落盤</Peek></p>
   <div className="overflow wide">
   <table>
   <thead><tr><th>東西</th><th>位置</th></tr></thead>

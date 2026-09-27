@@ -61,8 +61,9 @@
     click(caret); await wait(100);
     expect(!openSet().includes("model"), "caret: a second click did not close #model");
 
-    const x = document.querySelector('.doc a[href^="#"]');
+    const x = document.querySelector(".doc").appendChild(Object.assign(document.createElement("a"), { href: "#model-codex" }));
     click(x); await wait(250);
+    x.remove();
     noHash("link in the text");
     expect(cur() === expectedCurrent(), "link in the text: spy is stale after the jump");
 

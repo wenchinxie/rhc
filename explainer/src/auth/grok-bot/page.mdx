@@ -1,5 +1,6 @@
-import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
-import { AUTH_TREE } from "./authTree"
+import { H2, H3, Peek, Term } from "../../mdx-components"
+import { FlowDag } from "../../components/FlowDag"
+import { AUTH_FLOW } from "./flow"
 
 <>
   <H2 id="top" n="">Grok Bot</H2>
@@ -9,8 +10,8 @@ import { AUTH_TREE } from "./authTree"
   <p>渲染行程呼叫 <code>cursorAccount.login()</code>，對到 edge 的 <code>loginCursor</code>。0.47 安裝包裡同一支在 <code>dist/electron-main/main-app.cjs</code>，preload 走 <code>dune-rpc</code>。這個前綴是 IPC 頻道名，不是 auth 協定。</p>
   <p><code>createDefaultLoginManager</code> 看後端是不是開發站。開發站用 <code>SandBackendLoginManager</code>。否則用 <code>LoginManager</code>，redirect 是 <code>sand</code>。兩邊都開 <code>/loginDeepControl</code>，帶 PKCE challenge 與 uuid，然後 <code>GET /auth/poll</code>。404 繼續等。連續三次其他失敗就放棄。200 且 JSON 同時有 <code>accessToken</code> 與 <code>refreshToken</code> 才算成功。成功後寫進 <code>sand-secrets.json</code>。0.47 還可能寫 <code>cursor-selected-team-id</code>。0.18 是兩把鑰匙的平面表。</p>
   <p>host 在另一份 zip。<code>authExtension.start</code> 讀行程環境。有開發 token 檔就讀檔。否則用續期憑證 POST <code>/sand-box/inference-credential</code>。回應的 <code>accessToken</code> 只放記憶體。沒有憑證時 renewer 仍會啟動，<code>getAccessToken</code> 丟等待錯誤。0.47 在還有 box 憑證時才聽 <code>/tmp/sand-identity.sock</code>。客體 <code>POST /v1/tokens/oidc</code> 被轉去 <code>/cloud-agent/identity-token/sand-box</code>。這條不是推論用的短票。安裝包 asar 裡沒有這些名字。</p>
-  <Dag svg={AUTH_TREE} />
-  <p>圖上每一格右下角可點。點開是 0.18 重建稿裡對應的那幾行。0.47 安裝包把同一支壓進 <code>main-app.cjs</code>。host 的對應在 VM zip 的 <code>host-main.cjs</code>。<Peek snip="gb-login">loginCursor</Peek> <Peek snip="gb-which">選哪一種登入</Peek> <Peek snip="gb-poll">poll 成功條件</Peek> <Peek snip="gb-host">host 從哪裡續</Peek> <Peek snip="gb-renew">換短票</Peek> <Peek snip="gb-start">start 交出去的方法</Peek></p>
+  <FlowDag flow={AUTH_FLOW} />
+  <p>點圖上的方塊，打開的是 0.18 重建稿裡對應的那幾行。0.47 安裝包把同一支壓進 <code>main-app.cjs</code>。host 的對應在 VM zip 的 <code>host-main.cjs</code>。<Peek snip="gb-login">loginCursor</Peek> <Peek snip="gb-which">選哪一種登入</Peek> <Peek snip="gb-poll">poll 成功條件</Peek> <Peek snip="gb-host">host 從哪裡續</Peek> <Peek snip="gb-renew">換短票</Peek> <Peek snip="gb-start">start 交出去的方法</Peek></p>
   <div className="overflow wide">
   <table>
   <thead><tr><th>東西</th><th>位置</th></tr></thead>

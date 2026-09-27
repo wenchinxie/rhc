@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { MDXProvider } from "@mdx-js/react";
 import { ExplainerShell } from "./ExplainerShell";
 import { mdxComponents } from "./mdx-components";
+import { FolderSlug } from "./folder";
 import AuthRhcDoc from "./auth/rhc/page.mdx";
 import { GLOSS as auth_rhc_gloss } from "./auth/rhc/gloss";
 import auth_rhc_src from "./auth/rhc/src-map.json";
@@ -127,7 +128,7 @@ function FolderDoc(props: { slug: string; children: ReactNode }) {
   }, [props.slug]);
   return (
     <section ref={ref} className="site-folder" id={props.slug} data-folder={props.slug}>
-      {props.children}
+      <FolderSlug.Provider value={props.slug}>{props.children}</FolderSlug.Provider>
     </section>
   );
 }
