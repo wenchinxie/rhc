@@ -1,0 +1,79 @@
+import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
+import { LOGIN_TREE } from "./loginTree"
+import { REFRESH_TREE } from "./refreshTree"
+
+<>
+  <h1>rhc OAuth 登入</h1>
+  <p>rhc 用作者的 SuperGrok 訂閱，透過瀏覽器登入 xAI（OAuth 2.0 authorization code + <Term k="pkce">PKCE</Term>，<Term k="loopback">loopback</Term> redirect）。票存進 <code>~/.rhc/auth.json</code>，要用之前先在檔案鎖底下換新，打 <code>api.x.ai/v1</code> 這個公開 API 時老實報自己的名字（<code>User-Agent: rhc/&lt;version&gt;</code>、<code>referrer=rhc</code>）。</p>
+  <H2 id="s-provider" n="1">設定集中一處</H2>
+  <p><code>provider.rs</code> 一個常數 <code>XAI</code> 放齊所有設定：issuer <code>https://auth.x.ai</code>、client_id <code>b1a00492-073a-47ea-816f-4c329264a828</code>、authorize <code>https://auth.x.ai/oauth2/authorize</code>、token <code>https://auth.x.ai/oauth2/token</code>、<Term k="scope">scope</Term> <code>"openid profile email offline_access grok-cli:access api:access"</code>、<Term k="referrer">referrer</Term> <code>"rhc"</code>、api_base_url <code>https://api.x.ai/v1</code>。<Peek snip="provider">XAI 設定</Peek></p>
+  <p>這個 client_id 是 Grok Build 的。Grok Build、Hermes、Pi、OpenClaw 都用同一個 client_id。<Peek snip="hermes-xai">Hermes 的 xAI 設定</Peek>這 6 個 <Term k="scope">scope</Term> 是 Pi 和 Hermes 的組合，Grok Build 要 10 個，多了 <code>conversations:read/write</code> 和 <code>workspaces:read/write</code>。<Peek snip="gb-scopes">Grok Build 的 scope</Peek></p>
+  <H2 id="s-login" n="2">登入</H2>
+  <p><code>rhc login</code> 呼叫 <code>AuthClient::login</code>，走到 <code>oidc::run_loopback_flow</code>。<Peek snip="loop">run_loopback_flow</Peek></p>
+  <p>步驟：在 <code>127.0.0.1</code> 綁 port 0（作業系統挑一個空的），redirect_uri 是 <code>http://127.0.0.1:&#123;port&#125;/callback</code>；做出 <Term k="pkce">PKCE</Term>、<Term k="state">state</Term>、<Term k="nonce">nonce</Term>；把授權網址印到 stderr；開一條有範圍界線的執行緒（scoped thread）等回呼（10 分鐘逾時），同時打開瀏覽器；等到回呼再去換票。</p>
+  <p>為什麼是 <Term k="loopback">loopback</Term> 不是 <Term k="device-code">device code</Term>：Hermes、Pi、OpenClaw 用 <Term k="device-code">device code</Term>（RFC 8628，畫面印一組代碼，使用者在網頁上輸入，程式輪詢結果）。rhc 用 <Term k="loopback">loopback</Term> 這種瀏覽器 authorization-code 流程，跟 Grok Build 一樣。<Peek snip="pi-xai">Pi 的 device-code 請求</Peek> <Peek snip="hermes-xai">Hermes 用 device code</Peek></p>
+  <Dag svg={LOGIN_TREE} />
+  <p className="dagcap" id="login-dag-cap">rhc login 從觸發到寫入 auth.json 的判斷樹。</p>
+  <H3 id="s-login-pkce" n="2.1">PKCE、state、nonce</H3>
+  <p><Term k="pkce">PKCE</Term>：本機先產生 32 個隨機位元組，base64url 編碼成 code_verifier，留在本機不送出去。code_challenge 是 code_verifier 的 SHA-256 再 base64url，隨網址送出去，帶 <code>code_challenge_method=S256</code>。換票時 rhc 才把 verifier 送過去，伺服器比對雜湊。就算有人半路偷到 code，沒有 verifier 也換不到票。<Peek snip="pkce">generate_pkce</Peek></p>
+  <p><Term k="state">state</Term>：隨機值。回呼帶回來的 <Term k="state">state</Term> 要對得上，對不上就登入失敗（<code>"login state did not match"</code>），擋掉偽造的回呼。回呼處理還認得兩種情況：<code>error=access_denied</code> 變成「authorization denied」；缺 code 也算錯誤。<Peek snip="callback">code_from_request_line</Peek></p>
+  <p><Term k="nonce">nonce</Term>：隨機值，隨網址送出去。已知缺口：rhc 從來不檢查回來的 <Term k="id-token">id token</Term> 裡的 <Term k="nonce">nonce</Term>。<Peek snip="claims">從 token 讀身分</Peek></p>
+  <H3 id="s-login-url" n="2.2">授權網址與 referrer</H3>
+  <p>網址 = authorize_url 加上 <code>response_type=code</code>、<code>client_id</code>、<code>redirect_uri</code>、<code>scope</code>、<code>code_challenge</code>、<code>code_challenge_method=S256</code>、<code>state</code>、<code>nonce</code>、<code>referrer=rhc</code>，每個值都 percent-encode。<Peek snip="url">authorize_url</Peek></p>
+  <p><Term k="referrer">referrer</Term> 說的是誰在敲門。Grok Build 送 <code>referrer=grok-build</code> <Peek snip="gb-referrer">Grok Build 的 referrer</Peek>；Pi 送 <code>pi</code> <Peek snip="pi-xai">Pi 送 referrer=pi</Peek>；rhc 送 <code>rhc</code>。作者選了 rhc 自己的名字，接受這個風險（2026-09-25 的決定）。</p>
+  <p>未驗證：<code>auth.x.ai</code> 在 <Term k="loopback">loopback</Term> 的 authorize 網址上會不會接受 <code>referrer=rhc</code>，目前還沒有跑過一次真的登入。</p>
+  <H3 id="s-login-exchange" n="2.3">換票與身分</H3>
+  <p><code>exchange_code</code> 用表單 POST 到 token 網址：<code>grant_type=authorization_code</code>、<code>code</code>、<code>redirect_uri</code>、<code>client_id</code>、<code>code_verifier</code>。非 200 回應就用伺服器給的 <code>error_description</code> 報錯。<Peek snip="exchange">exchange_code</Peek></p>
+  <p>回應裡：<Term k="access-token">access token</Term>（必要）、<Term k="refresh-token">refresh token</Term>（非必要）、expires_in（沒帶就當 3600 秒）。</p>
+  <p>身分：sub 和 email 是從 <Term k="id-token">id token</Term>（沒有 <Term k="id-token">id token</Term> 才退回 <Term k="access-token">access token</Term>）讀出來的，經 <code>claims_from_jwt</code> 把 JWT 中間那段 base64 解開。它不驗簽章，也不比對 <Term k="nonce">nonce</Term>。<Peek snip="claims">從 token 讀身分</Peek> <Peek snip="jwt">claims_from_jwt</Peek></p>
+  <H2 id="s-store" n="3">存票</H2>
+  <p>rhc 每個指令都是一個跑完就結束的行程，沒有檔案存著票，下一個指令又要重新開瀏覽器登入一次。</p>
+  <p>檔案在 <code>~/.rhc/auth.json</code>，形狀是 <code>&#123; "version": 1, "credential": &#123; kind, access_token, refresh_token, expires_at, email, subject, issuer, client_id &#125; &#125;</code>。<Peek snip="wire">存檔格式</Peek></p>
+  <p><code>store.rs</code> 給四個保證：</p>
+  <ol>
+    <li>只有自己讀得到：目錄 0700，檔案 0600。<Peek snip="save">TokenStore::save</Peek></li>
+    <li>寫到一半當機不會壞掉舊檔：先寫暫存檔、fsync，再靠改名蓋過去（<Term k="atomic-rename">atomic rename</Term>）；Tmp guard 在失敗時刪掉暫存檔。</li>
+    <li>兩個行程不會同時寫：<code>lock()</code> 對 <code>auth.json.lock</code> 拿一把排他的 <Term k="flock">flock</Term>；<code>AuthFileLock</code> 被丟掉時鎖才釋放。<Peek snip="lock">TokenStore::lock</Peek></li>
+    <li>檔案帶著版本號。</li>
+  </ol>
+  <p>Grok Build（<code>auth/storage.rs</code>，653 行）做一樣的核心（<code>auth.json</code>、0600、temp+rename、<code>auth.json.lock</code> <Term k="flock">flock</Term>），另外多了：一個檔案存多個帳號（<code>AuthStore = BTreeMap&lt;String, GrokAuth&gt;</code>）；壞掉的檔案先改名成 <code>auth.json.corrupt.&lt;millis&gt;</code> 再重寫（rhc 遇到壞檔是回傳「corrupt auth store」）；磁碟空間不夠 temp+rename 時退回原地寫入；鎖有心跳（PID:timestamp）讓卡住的鎖可以被打斷，送 <Term k="refresh-token">refresh token</Term> 前先查 <code>still_live</code>；<code>single_flight.rs</code> 同一時間只准一次互動式登入。兩邊都沒有用作業系統的 keychain。</p>
+  <H2 id="s-refresh" n="4">換新票</H2>
+  <p><code>refresh_if_needed</code> 的走法：</p>
+  <ul>
+    <li>不上鎖先讀一次。沒有檔案 → <code>Ok(None)</code>（未登入）。是新的就直接用。</li>
+    <li>新不新看 <code>expires_at</code> 是不是還在 30 秒之後。<Peek snip="fresh">is_fresh</Peek></li>
+    <li>過期又沒有 <Term k="refresh-token">refresh token</Term> → <code>NeedLogin</code>。</li>
+    <li>上鎖，再讀一次。如果別的行程已經換過票，重讀是新的就直接用，不會再換第二次（double-checked locking）。</li>
+    <li>否則呼叫 <code>refresh_grant</code>：POST <code>grant_type=refresh_token</code>、<code>refresh_token</code>、<code>client_id</code>。<Peek snip="refresh-grant">refresh_grant</Peek></li>
+    <li>伺服器回 <code>invalid_grant</code> → <code>RefreshRevoked</code>，rhc 刪掉 <code>auth.json</code>，使用者要重新登入。</li>
+    <li>成功就是新的 session；伺服器沒回的欄位（refresh_token、email，subject 是空的話）保留舊值；存檔。</li>
+  </ul>
+  <Dag svg={REFRESH_TREE} />
+  <p className="dagcap" id="refresh-dag-cap">refresh_if_needed 從要用票到寫回新票的判斷樹。</p>
+  <p><code>\_lock</code> 這個具名但底線開頭的變數，讓鎖活到函式結束才放；如果寫成裸的 <code>\_</code>，鎖立刻就被丟掉。<Peek snip="refresh">refresh_if_needed</Peek></p>
+  <p>為什麼要重讀這一步很重要（推論，未對 xAI 驗證過）：如果 <Term k="refresh-token">refresh token</Term> 只能用一次，用同一個 token 換第二次會拿到 <code>invalid_grant</code>，把一個原本還能用的登入洗掉。</p>
+  <H2 id="s-use" n="5">用票</H2>
+  <p>今天唯一會打的 API：<code>ModelLister for AuthClient</code> 先 <code>refresh_if_needed</code>，再 <code>GET &#123;api_base_url&#125;/models</code>，帶 <code>Authorization: Bearer &lt;token&gt;</code>。未登入回 <code>Ok(None)</code>，不會發 HTTP 請求。非 200 就報錯。回應解析 <code>data[].id</code>。<Peek snip="models">拿票去列模型</Peek></p>
+  <p>每個請求都帶 <code>User-Agent: rhc/&lt;CARGO_PKG_VERSION&gt;</code>，沒有冒充 Grok CLI 的標頭。Hermes 也是這樣報自己的名字。<Peek snip="http">UreqHttp::get_json</Peek> <Peek snip="identity">client_identity</Peek></p>
+  <p>Grok Build 和 OpenClaw 打 <code>cli-chat-proxy.grok.com/v1</code>，要帶 <code>X-XAI-Token-Auth: xai-grok-cli</code> 這個標頭。Hermes 和 Pi 打 <code>api.x.ai/v1</code>，rhc 跟著他們走。</p>
+  <p>未驗證、有風險：Hermes 的 issue #26847 回報有些一般 SuperGrok 訂閱者用 OAuth token 打 <code>api.x.ai</code> 會收到 403，rhc 還沒實測過。另外未驗證：打 <code>api.x.ai</code> 的用量算不算在訂閱裡，還有 <code>/v1/models</code> 會不會列出 <code>grok-4.7</code>。</p>
+  <H2 id="s-import" n="6">從 Grok 抄票</H2>
+  <p><code>rhc login --from-grok</code> 讀 <code>~/.grok/auth.json</code>（或 <code>GROK_AUTH_PATH</code>，或 <code>GROK_HOME/auth.json</code>），找鍵值是 <code>"https://auth.x.ai::b1a00492-…"</code> 的那筆，抄 <Term k="access-token">access token</Term>、email、user_id。<Peek snip="import">從 Grok Build 抄票</Peek></p>
+  <p>抄來的票，<Term k="refresh-token">refresh token</Term> 永遠是 <code>None</code>，所以它過期之後 <code>refresh_if_needed</code> 只會回 <code>NeedLogin</code>。<Peek snip="import-session">抄來的票沒有 refresh token</Peek></p>
+  <p>expires_at 先看那筆記錄自己帶的值，沒有就看 JWT 的 exp claim，兩個都沒有就當現在加 3600 秒。</p>
+  <H2 id="s-others" n="7">別家怎麼做</H2>
+  <ul>
+    <li>Grok Build：<Term k="loopback">loopback</Term>（也有 <Term k="device-code">device code</Term>），client_id <code>b1a00492…</code>，10 個 <Term k="scope">scope</Term>，<Term k="referrer">referrer</Term>=<code>grok-build</code>，走 <code>cli-chat-proxy</code> 帶 <code>X-XAI-Token-Auth</code>。<Peek snip="gb-scopes">Grok Build 的 scope</Peek><Peek snip="gb-referrer">Grok Build 的 referrer</Peek></li>
+    <li>Hermes：<Term k="device-code">device code</Term>，同一個 client_id，6 個 <Term k="scope">scope</Term>，打 <code>api.x.ai/v1</code>，每個 xAI 請求帶 <code>User-Agent: Hermes-Agent/&lt;version&gt;</code>。<Peek snip="hermes-xai">Hermes 的 xAI 設定</Peek><Peek snip="hermes-ua">Hermes 的 User-Agent</Peek></li>
+    <li>Pi：<Term k="device-code">device code</Term>，6 個 <Term k="scope">scope</Term>，<Term k="referrer">referrer</Term>=<code>pi</code>，<code>api.x.ai/v1</code>。<Peek snip="pi-xai">Pi 的 device-code 請求</Peek></li>
+    <li>OpenClaw：<Term k="device-code">device code</Term>，<code>cli-chat-proxy</code>，<code>X-XAI-Token-Auth</code> 標頭。</li>
+    <li>rhc：<Term k="loopback">loopback</Term>，同一個 client_id，Pi 的 6 個 <Term k="scope">scope</Term>，<Term k="referrer">referrer</Term>=<code>rhc</code>，<code>api.x.ai/v1</code>，UA <code>rhc/&lt;version&gt;</code>。</li>
+  </ul>
+  <H2 id="s-risk" n="8">政策與風險</H2>
+  <p>xAI 官方核准了 OpenCode；Hermes、OpenClaw、Pi 有回報說是核准的。沒有給任意第三方 harness 的一般性許可。還有不少沒被官方點名的（grok-oauth-proxy、progrok、pi-grok、pi-xai-oauth、grokcli-2api），搜尋（2026-09-25）沒找到公開的封禁案例。</p>
+  <p>作者決定用 rhc 自己的名字，接受這個風險。目前 rhc 還沒有真的送出過任何請求給 x.ai，一次真的登入還沒跑過。</p>
+  <H2 id="s-test" n="9">測試替身</H2>
+  <p><code>XaiHttp</code> trait（<code>post_form</code>、<code>get_json</code>）是接縫。<Peek snip="http-trait">XaiHttp trait</Peek>正式環境是 <code>UreqHttp</code>，它自己還沒有測試。</p>
+  <p><code>ScriptedHttp</code>（<code>#[cfg(test)]</code>）記下每個請求，依網址包含的路由鍵從佇列吐出預先寫好的一組 <code>status</code> 和 <code>body</code>，佇列空了就 panic。<Peek snip="scripted">ScriptedHttp</Peek></p>
+  <p><code>AuthClient::with_http</code>（只在測試用）把它換上去；<code>login_with_browser</code> 把 stderr 和 open_browser 當參數傳進去，測試就不會真的打開瀏覽器。</p>
+</>

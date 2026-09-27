@@ -1,0 +1,173 @@
+[
+ {
+  "key": "main",
+  "title": "main：組起來再分派",
+  "why": "先 root::start 組 host，再依子指令呼叫 commands，錯誤只在這裡印。",
+  "path": "crates/rhc/src/bin/rhc/main.rs",
+  "anchor": "fn main() -> ExitCode {",
+  "count": 23,
+  "hi": [
+   "root::start",
+   "host.subscriptions()",
+   "eprintln!"
+  ]
+ },
+ {
+  "key": "cli-error",
+  "title": "CliError 與 Subscriptions",
+  "why": "兩個模組共用的型別放在 binary 的根，commands 和 terminal 不互相 import。",
+  "path": "crates/rhc/src/bin/rhc/main.rs",
+  "anchor": "pub type Subscriptions",
+  "count": 15,
+  "hi": [
+   "pub type Subscriptions",
+   "#[from] AuthError"
+  ]
+ },
+ {
+  "key": "root",
+  "title": "root：唯一的組裝點",
+  "why": "AuthClient 用 Arc 共用，一份給 Host，一份包成 ModelLister 注入模型目錄。",
+  "path": "crates/rhc/src/host/root.rs",
+  "anchor": "pub fn start(ctx: &StartContext) -> Host {",
+  "count": 8,
+  "hi": [
+   "Arc::new(xai_auth::start(ctx))",
+   "SupergrokModels(Arc::clone"
+  ]
+ },
+ {
+  "key": "lister-adapter",
+  "title": "SupergrokModels 轉接",
+  "why": "一行轉接，讓模型目錄只看到 ModelLister。",
+  "path": "crates/rhc/src/host/root.rs",
+  "anchor": "struct SupergrokModels",
+  "count": 7,
+  "hi": [
+   "self.0.list()"
+  ]
+ },
+ {
+  "key": "auth-trait",
+  "title": "Auth trait",
+  "why": "登入這件事的約定。commands 只認得這五個方法。",
+  "path": "crates/rhc/src/host/ports/auth.rs",
+  "anchor": "pub trait Auth: Send + Sync {",
+  "count": 7,
+  "hi": [
+   "fn login",
+   "fn refresh_if_needed"
+  ]
+ },
+ {
+  "key": "models-port",
+  "title": "ModelCatalog 與 ModelLister",
+  "why": "模型目錄對外的約定，和它向外要遠端清單的約定。",
+  "path": "crates/rhc/src/host/ports/models.rs",
+  "anchor": "pub trait ModelCatalog",
+  "count": 9,
+  "hi": [
+   "fn models_for",
+   "fn list"
+  ]
+ },
+ {
+  "key": "login",
+  "title": "commands::login",
+  "why": "決定登入哪個訂閱：有名字就找，終端機就問，pipe 就報錯。",
+  "path": "crates/rhc/src/bin/rhc/commands.rs",
+  "anchor": "pub fn login(",
+  "count": 15,
+  "hi": [
+   "Some(name) =>",
+   "None if std::io::stdin().is_terminal()",
+   "return Err(CliError::NoSubscriptionChosen",
+   "auth.login()?;"
+  ]
+ },
+ {
+  "key": "find",
+  "title": "commands::find",
+  "why": "用名字在訂閱清單裡查；查不到就回 UnknownSubscription，並列出所有可選的名字。",
+  "path": "crates/rhc/src/bin/rhc/commands.rs",
+  "anchor": "fn find<'a>",
+  "count": 14,
+  "hi": [
+   ".find(|(n, _)| *n == name)"
+  ]
+ },
+ {
+  "key": "prompt",
+  "title": "terminal::prompt_choice",
+  "why": "選單印到 stderr，flush 之後才讀 stdin。",
+  "path": "crates/rhc/src/bin/rhc/terminal.rs",
+  "anchor": "pub fn prompt_choice<'a>(",
+  "count": 13,
+  "hi": [
+   "eprintln!",
+   "flush()?",
+   "read_line"
+  ]
+ },
+ {
+  "key": "row",
+  "title": "terminal::row",
+  "why": "一行狀態文字，外加一個 ok 旗標給 whoami 決定 exit code。",
+  "path": "crates/rhc/src/bin/rhc/terminal.rs",
+  "anchor": "fn row(name: &str",
+  "count": 18,
+  "hi": [
+   "Ok(Some(snapshot))",
+   "Ok(None)",
+   "Err(e)",
+   "{name:<width$}"
+  ]
+ },
+ {
+  "key": "registry-start",
+  "title": "模型目錄啟動",
+  "why": "json 在編譯時塞進執行檔，lister 從外面注入。",
+  "path": "crates/rhc/src/host/extensions/models/registry.rs",
+  "anchor": "const RAW: &str",
+  "count": 1,
+  "hi": [
+   "include_str!"
+  ]
+ },
+ {
+  "key": "models-for",
+  "title": "models_for 與 default_for",
+  "why": "內建清單在前，遠端多出的 id 接在後面；預設只看內建。",
+  "path": "crates/rhc/src/host/extensions/models/registry.rs",
+  "anchor": "fn models_for(&self",
+  "count": 18,
+  "hi": [
+   "if let Ok(Some(remote))",
+   "if !merged.iter().any",
+   "self.bundled(subscription)"
+  ]
+ },
+ {
+  "key": "client-struct",
+  "title": "AuthClient 的三個零件",
+  "why": "檔案、HTTP、Grok 的票放哪。http 是 dyn，測試換掉。",
+  "path": "crates/rhc/src/host/extensions/xai_auth/client.rs",
+  "anchor": "pub struct AuthClient {",
+  "count": 14,
+  "hi": [
+   "http: Arc<dyn XaiHttp>",
+   "Arc::new(UreqHttp)"
+  ]
+ },
+ {
+  "key": "fake-auth",
+  "title": "測試用的 FakeAuth",
+  "why": "實作同一個 Auth trait，commands 和 terminal 的測試不用碰網路。",
+  "path": "crates/rhc/src/bin/rhc/fake_auth.rs",
+  "anchor": "impl Auth for FakeAuth {",
+  "count": 4,
+  "hi": [
+   "impl Auth for FakeAuth"
+  ]
+ }
+]

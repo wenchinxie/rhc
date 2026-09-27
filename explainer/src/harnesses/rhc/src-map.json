@@ -1,0 +1,367 @@
+{
+  "main": {
+    "type": "code",
+    "kind": "code",
+    "title": "main：組起來再分派",
+    "meta": "crates/rhc/src/bin/rhc/main.rs:55-77",
+    "why": "先 root::start 組 host，再依子指令呼叫 commands，錯誤只在這裡印。",
+    "start": 55,
+    "hi": [
+      57,
+      58,
+      73
+    ],
+    "lines": [
+      "fn main() -> ExitCode {",
+      "    let cli = Cli::parse();",
+      "    let host = root::start(&start_context());",
+      "    let subscriptions = host.subscriptions();",
+      "    let result = match cli.cmd {",
+      "        Cmd::Login {",
+      "            from_grok: true, ..",
+      "        } => login_from_grok(&host),",
+      "        Cmd::Login { subscription, .. } => commands::login(&subscriptions, subscription.as_deref()),",
+      "        Cmd::Logout { subscription } => commands::logout(&subscriptions, subscription.as_deref()),",
+      "        Cmd::Whoami { subscription } => commands::whoami(&subscriptions, subscription.as_deref()),",
+      "        Cmd::Models { subscription } => {",
+      "            commands::models(&subscriptions, host.catalog(), subscription.as_deref())",
+      "        }",
+      "    };",
+      "    match result {",
+      "        Ok(code) => code,",
+      "        Err(e) => {",
+      "            eprintln!(\"{e}\");",
+      "            ExitCode::FAILURE",
+      "        }",
+      "    }",
+      "}"
+    ]
+  },
+  "cli-error": {
+    "type": "code",
+    "kind": "code",
+    "title": "CliError 與 Subscriptions",
+    "meta": "crates/rhc/src/bin/rhc/main.rs:14-28",
+    "why": "兩個模組共用的型別放在 binary 的根，commands 和 terminal 不互相 import。",
+    "start": 14,
+    "hi": [
+      14,
+      25
+    ],
+    "lines": [
+      "pub type Subscriptions<'a> = &'a [(&'a str, &'a dyn Auth)];",
+      "",
+      "#[derive(Debug, thiserror::Error)]",
+      "pub enum CliError {",
+      "    #[error(\"unknown subscription: {name} (choose from: {choices})\")]",
+      "    UnknownSubscription { name: String, choices: String },",
+      "    #[error(\"no such choice: {0}\")]",
+      "    NoSuchChoice(String),",
+      "    #[error(\"choose a subscription: rhc login <subscription>\\n{0}\")]",
+      "    NoSubscriptionChosen(String),",
+      "    #[error(transparent)]",
+      "    Auth(#[from] AuthError),",
+      "    #[error(transparent)]",
+      "    Io(#[from] std::io::Error),",
+      "}"
+    ]
+  },
+  "root": {
+    "type": "code",
+    "kind": "code",
+    "title": "root：唯一的組裝點",
+    "meta": "crates/rhc/src/host/root.rs:14-21",
+    "why": "AuthClient 用 Arc 共用，一份給 Host，一份包成 ModelLister 注入模型目錄。",
+    "start": 14,
+    "hi": [
+      15,
+      16
+    ],
+    "lines": [
+      "pub fn start(ctx: &StartContext) -> Host {",
+      "    let supergrok = Arc::new(xai_auth::start(ctx));",
+      "    let lister: Box<dyn ModelLister> = Box::new(SupergrokModels(Arc::clone(&supergrok)));",
+      "    Host {",
+      "        supergrok,",
+      "        catalog: Box::new(models::start(lister)),",
+      "    }",
+      "}"
+    ]
+  },
+  "lister-adapter": {
+    "type": "code",
+    "kind": "code",
+    "title": "SupergrokModels 轉接",
+    "meta": "crates/rhc/src/host/root.rs:33-39",
+    "why": "一行轉接，讓模型目錄只看到 ModelLister。",
+    "start": 33,
+    "hi": [
+      37
+    ],
+    "lines": [
+      "struct SupergrokModels(Arc<AuthClient>);",
+      "",
+      "impl ModelLister for SupergrokModels {",
+      "    fn list(&self) -> Result<Option<Vec<ModelEntry>>, AuthError> {",
+      "        self.0.list()",
+      "    }",
+      "}"
+    ]
+  },
+  "auth-trait": {
+    "type": "code",
+    "kind": "code",
+    "title": "Auth trait",
+    "meta": "crates/rhc/src/host/ports/auth.rs:49-55",
+    "why": "登入這件事的約定。commands 只認得這五個方法。",
+    "start": 49,
+    "hi": [
+      52,
+      54
+    ],
+    "lines": [
+      "pub trait Auth: Send + Sync {",
+      "    fn subscription(&self) -> Subscription;",
+      "    fn snapshot(&self) -> Result<Option<CredentialSnapshot>, AuthError>;",
+      "    fn login(&self) -> Result<CredentialSnapshot, AuthError>;",
+      "    fn logout(&self) -> Result<(), AuthError>;",
+      "    fn refresh_if_needed(&self) -> Result<Option<CredentialSnapshot>, AuthError>;",
+      "}"
+    ]
+  },
+  "models-port": {
+    "type": "code",
+    "kind": "code",
+    "title": "ModelCatalog 與 ModelLister",
+    "meta": "crates/rhc/src/host/ports/models.rs:10-18",
+    "why": "模型目錄對外的約定，和它向外要遠端清單的約定。",
+    "start": 10,
+    "hi": [
+      11,
+      17
+    ],
+    "lines": [
+      "pub trait ModelCatalog: Send + Sync {",
+      "    fn models_for(&self, subscription: Subscription) -> Vec<ModelEntry>;",
+      "    fn default_for(&self, subscription: Subscription) -> Option<ModelEntry>;",
+      "}",
+      "",
+      "pub trait ModelLister: Send + Sync {",
+      "    /// `Ok(None)` means signed out, so nothing was fetched.",
+      "    fn list(&self) -> Result<Option<Vec<ModelEntry>>, AuthError>;",
+      "}"
+    ]
+  },
+  "login": {
+    "type": "code",
+    "kind": "code",
+    "title": "commands::login",
+    "meta": "crates/rhc/src/bin/rhc/commands.rs:10-24",
+    "why": "決定登入哪個訂閱：有名字就找，終端機就問，pipe 就報錯。",
+    "start": 10,
+    "hi": [
+      12,
+      13,
+      15,
+      22
+    ],
+    "lines": [
+      "pub fn login(subscriptions: Subscriptions, name: Option<&str>) -> Result<ExitCode, CliError> {",
+      "    let (name, auth) = match name {",
+      "        Some(name) => (name, find(subscriptions, name)?),",
+      "        None if std::io::stdin().is_terminal() => terminal::prompt_choice(subscriptions)?,",
+      "        None => {",
+      "            return Err(CliError::NoSubscriptionChosen(",
+      "                terminal::rows(subscriptions)",
+      "                    .trim_end_matches('\\n')",
+      "                    .to_string(),",
+      "            ));",
+      "        }",
+      "    };",
+      "    auth.login()?;",
+      "    terminal::print_signed_in(name, auth)",
+      "}"
+    ]
+  },
+  "find": {
+    "type": "code",
+    "kind": "code",
+    "title": "commands::find",
+    "meta": "crates/rhc/src/bin/rhc/commands.rs:66-79",
+    "why": "用名字在訂閱清單裡查；查不到就回 UnknownSubscription，並列出所有可選的名字。",
+    "start": 66,
+    "hi": [
+      69
+    ],
+    "lines": [
+      "fn find<'a>(subscriptions: Subscriptions<'a>, name: &str) -> Result<&'a dyn Auth, CliError> {",
+      "    subscriptions",
+      "        .iter()",
+      "        .find(|(n, _)| *n == name)",
+      "        .map(|(_, auth)| *auth)",
+      "        .ok_or_else(|| CliError::UnknownSubscription {",
+      "            name: name.to_string(),",
+      "            choices: subscriptions",
+      "                .iter()",
+      "                .map(|(n, _)| *n)",
+      "                .collect::<Vec<_>>()",
+      "                .join(\", \"),",
+      "        })",
+      "}"
+    ]
+  },
+  "prompt": {
+    "type": "code",
+    "kind": "code",
+    "title": "terminal::prompt_choice",
+    "meta": "crates/rhc/src/bin/rhc/terminal.rs:9-21",
+    "why": "選單印到 stderr，flush 之後才讀 stdin。",
+    "start": 9,
+    "hi": [
+      14,
+      17,
+      19
+    ],
+    "lines": [
+      "pub fn prompt_choice<'a>(",
+      "    subscriptions: Subscriptions<'a>,",
+      ") -> Result<(&'a str, &'a dyn Auth), CliError> {",
+      "    let width = width_of(subscriptions);",
+      "    for (i, (name, auth)) in subscriptions.iter().enumerate() {",
+      "        eprintln!(\"{}) {}\", i + 1, row(name, width, *auth).0);",
+      "    }",
+      "    eprint!(\"choose a subscription [1-{}]: \", subscriptions.len());",
+      "    std::io::stderr().flush()?;",
+      "    let mut line = String::new();",
+      "    std::io::stdin().read_line(&mut line)?;",
+      "    choose(subscriptions, line.trim())",
+      "}"
+    ]
+  },
+  "row": {
+    "type": "code",
+    "kind": "code",
+    "title": "terminal::row",
+    "meta": "crates/rhc/src/bin/rhc/terminal.rs:90-107",
+    "why": "一行狀態文字，外加一個 ok 旗標給 whoami 決定 exit code。",
+    "start": 90,
+    "hi": [
+      92,
+      103,
+      104,
+      106
+    ],
+    "lines": [
+      "fn row(name: &str, width: usize, auth: &dyn Auth) -> (String, bool) {",
+      "    let (state, ok) = match auth.snapshot() {",
+      "        Ok(Some(snapshot)) => (",
+      "            format!(",
+      "                \"signed in as {}\",",
+      "                snapshot",
+      "                    .identity",
+      "                    .email",
+      "                    .as_deref()",
+      "                    .unwrap_or(&snapshot.identity.subject)",
+      "            ),",
+      "            true,",
+      "        ),",
+      "        Ok(None) => (\"not signed in\".to_string(), true),",
+      "        Err(e) => (format!(\"error: {e}\"), false),",
+      "    };",
+      "    (format!(\"{name:<width$}  {state}\"), ok)",
+      "}"
+    ]
+  },
+  "registry-start": {
+    "type": "code",
+    "kind": "code",
+    "title": "模型目錄啟動",
+    "meta": "crates/rhc/src/host/extensions/models/registry.rs:6-6",
+    "why": "json 在編譯時塞進執行檔，lister 從外面注入。",
+    "start": 6,
+    "hi": [
+      6
+    ],
+    "lines": [
+      "const RAW: &str = include_str!(\"default_models.json\");"
+    ]
+  },
+  "models-for": {
+    "type": "code",
+    "kind": "code",
+    "title": "models_for 與 default_for",
+    "meta": "crates/rhc/src/host/extensions/models/registry.rs:64-81",
+    "why": "內建清單在前，遠端多出的 id 接在後面；預設只看內建。",
+    "start": 64,
+    "hi": [
+      66,
+      68,
+      65
+    ],
+    "lines": [
+      "    fn models_for(&self, subscription: Subscription) -> Vec<ModelEntry> {",
+      "        let mut merged = self.bundled(subscription);",
+      "        if let Ok(Some(remote)) = self.lister.list() {",
+      "            for entry in remote {",
+      "                if !merged.iter().any(|m| m.id == entry.id) {",
+      "                    merged.push(entry);",
+      "                }",
+      "            }",
+      "        }",
+      "        merged",
+      "    }",
+      "",
+      "    fn default_for(&self, subscription: Subscription) -> Option<ModelEntry> {",
+      "        let group = self.group(subscription);",
+      "        self.bundled(subscription)",
+      "            .into_iter()",
+      "            .find(|m| m.id == group.default)",
+      "    }"
+    ]
+  },
+  "client-struct": {
+    "type": "code",
+    "kind": "code",
+    "title": "AuthClient 的三個零件",
+    "meta": "crates/rhc/src/host/extensions/xai_auth/client.rs:14-27",
+    "why": "檔案、HTTP、Grok 的票放哪。http 是 dyn，測試換掉。",
+    "start": 14,
+    "hi": [
+      16,
+      24
+    ],
+    "lines": [
+      "pub struct AuthClient {",
+      "    store: TokenStore,",
+      "    http: Arc<dyn XaiHttp>,",
+      "    grok_auth_path: PathBuf,",
+      "}",
+      "",
+      "impl AuthClient {",
+      "    pub(super) fn new(rhc_home: &Path, grok_auth_path: PathBuf) -> Self {",
+      "        Self {",
+      "            store: TokenStore::in_dir(rhc_home),",
+      "            http: Arc::new(UreqHttp),",
+      "            grok_auth_path,",
+      "        }",
+      "    }"
+    ]
+  },
+  "fake-auth": {
+    "type": "code",
+    "kind": "code",
+    "title": "測試用的 FakeAuth",
+    "meta": "crates/rhc/src/bin/rhc/fake_auth.rs:27-30",
+    "why": "實作同一個 Auth trait，commands 和 terminal 的測試不用碰網路。",
+    "start": 27,
+    "hi": [
+      27
+    ],
+    "lines": [
+      "impl Auth for FakeAuth {",
+      "    fn subscription(&self) -> Subscription {",
+      "        Subscription::SuperGrok",
+      "    }"
+    ]
+  }
+}

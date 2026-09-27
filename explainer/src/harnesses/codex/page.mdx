@@ -1,0 +1,43 @@
+import { H2, H3, Dag, Peek, Term } from "../../mdx-components"
+import { AUTH_TREE } from "./authTree"
+
+<>
+  <h1>Codex</h1>
+  <H2 id="s-parts" n="1">元件</H2>
+  <p>點這個工具只看這一輪要啟動的七個槽。登入的走法與決策樹在第四節。</p>
+  <H3 id="s-parts-session" n="1">對話</H3>
+  <p>一段對話在 <code>codex-rs/core/src/session/</code>。<code>session.rs</code> 握著這段，<code>handlers.rs</code> 接進來的事件。</p>
+  <H3 id="s-parts-prompt" n="2">提示</H3>
+  <p>Skill 是獨立 crate <code>codex-rs/skills</code>。塞進這一輪的上下文在 <code>core/src/context/</code> 與 <code>session/turn_context.rs</code>。</p>
+  <H3 id="s-parts-model" n="3">模型</H3>
+  <p>呼叫模型的客戶端在 <code>core/src/client.rs</code>。模型與努力程度的設定在 <code>session/reasoning_effort.rs</code> 與 <code>codex-rs/config</code>。</p>
+  <H3 id="s-parts-auth" n="4">登入</H3>
+  <p><code>codex login</code> 用旗標選路。沒有旗標就開瀏覽器，本機聽 <code>localhost</code>，把 ChatGPT 票寫進 <code>auth.json</code>。<code>CODEX_API_KEY</code> 不參與這次選擇，它只在之後讀憑證時蓋過檔案。</p>
+  <p>寫進檔的有兩種票。<code>AuthMode::ApiKey</code> 只有 stdin 進來的金鑰。<code>AuthMode::Chatgpt</code> 是瀏覽器或 device-code 換到的 tokens。<Term k="pkce">PKCE</Term> 兩邊都用，但產生的地方不同。瀏覽器那條自己做 verifier。device-code 的 verifier 是輪詢回應給的。真正落盤的是 <code>save_auth</code>。預設 store mode 是 File，檔在 <code>$CODEX_HOME/auth.json</code>。</p>
+  <p>入口在 <code>cli/src/main.rs</code>。<code>--with-api-key</code> 和 <code>--with-access-token</code> 同時出現就結束。接著才是 <code>--device-auth</code>，然後舊的 <code>--api-key</code>（只印停用），然後 <code>--with-api-key</code> 從 stdin 讀金鑰，然後 <code>--with-access-token</code>。一個都沒有，呼叫 <code>run_login_with_chatgpt</code>，進 <code>run_login_server</code>。</p>
+  <p>瀏覽器那條先 <code>generate_pkce</code>，綁定 <code>127.0.0.1:1455</code>（被佔用就改 1457），redirect 是 <code>http://localhost:&#123;port&#125;/auth/callback</code>。授權網址打到 issuer 的 <code>/oauth/authorize</code>，帶 <code>code_challenge_method=S256</code>。使用者回來之後，<code>exchange_code</code> 用 <code>grant_type=authorization_code</code> 換票。接著還會用 id token 再換一次 <code>openai-api-key</code>。這次失敗仍會把 ChatGPT tokens 存下來。</p>
+  <p>device-code 不聽 localhost。它 POST <code>/api/accounts/deviceauth/usercode</code>，螢幕印 <code>/codex/device</code> 與 user code，再 poll <code>/deviceauth/token</code>。404 是這台伺服器沒開裝置碼，CLI 印完就停，不改走瀏覽器。</p>
+  <Dag svg={AUTH_TREE} />
+  <p>圖上每一格右下角可點。點開是該步的原文。<Peek snip="cx-dispatch">旗標分流</Peek> <Peek snip="cx-pkce">本機 PKCE</Peek> <Peek snip="cx-open">localhost callback</Peek> <Peek snip="cx-file">寫 auth.json</Peek> <Peek snip="cx-env">環境金鑰不落盤</Peek></p>
+  <div className="overflow wide">
+  <table>
+  <thead><tr><th>東西</th><th>位置</th></tr></thead>
+  <tbody>
+  <tr><td>旗標順序</td><td><code>codex-rs/cli/src/main.rs</code></td></tr>
+  <tr><td>stdin 金鑰與 device-code 入口</td><td><code>codex-rs/cli/src/login.rs</code></td></tr>
+  <tr><td>localhost PKCE</td><td><code>codex-rs/login/src/server.rs</code></td></tr>
+  <tr><td>自己產生的 PKCE</td><td><code>codex-rs/login/src/oauth/pkce.rs</code></td></tr>
+  <tr><td>device-code</td><td><code>codex-rs/login/src/device_code_auth.rs</code></td></tr>
+  <tr><td>換票</td><td><code>codex-rs/login/src/oauth/client.rs</code></td></tr>
+  <tr><td>寫檔</td><td><code>codex-rs/login/src/auth/storage.rs</code> 的 <code>FileAuthStorage::save</code></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p><code>CODEX_API_KEY</code> 在 <code>AuthManager</code> 讀憑證時優先，做成記憶體裡的 <code>CodexAuth::ApiKey</code>，不寫 <code>auth.json</code>。<code>codex login status</code> 把這個開關關掉，所以 status 看不到只活在環境變數裡的 key。Keyring 模式成功之後會刪掉 <code>auth.json</code>。一般預設是 File。device-code 存下來的 <code>openai_api_key</code> 是空的。localhost 那條才多打一次 token-exchange。</p>
+  <H3 id="s-parts-tools" n="5">工具</H3>
+  <p>本機指令在 <code>core/src/exec.rs</code>。MCP 掛在 <code>session/mcp.rs</code>。能不能跑、在哪種沙箱，在 <code>core/src/exec_policy.rs</code>。</p>
+  <H3 id="s-parts-turn" n="6">一輪</H3>
+  <p>一次使用者輸入走完工具再回到模型，在 <code>core/src/session/turn.rs</code>。執行緒外殼是 <code>core/src/codex_thread.rs</code>。</p>
+  <H3 id="s-parts-rest" n="7">旁邊的槽</H3>
+  <p>對話太長會縮，入口在 <code>core/src/compact.rs</code>。Hook 在 <code>core/src/hook_runtime.rs</code>。</p>
+</>

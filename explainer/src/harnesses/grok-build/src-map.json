@@ -1,0 +1,318 @@
+{
+  "gb-resolve": {
+    "type": "code",
+    "kind": "code",
+    "start": 4636,
+    "hi": [
+      4636,
+      4661
+    ],
+    "lines": [
+      "    let info = model.info();",
+      "    let (api_key, base_url, auth_type) = if let Some(key) = model.own_credential() {",
+      "        (",
+      "            Some(key),",
+      "            info.base_url.clone(),",
+      "            xai_chat_state::AuthType::ApiKey,",
+      "        )",
+      "    } else if let Some(provider) = model.auth_provider.as_ref() {",
+      "        debug_assert!(model.effective_auth_provider().is_some());",
+      "        (",
+      "            provider.cached_token(),",
+      "            info.base_url.clone(),",
+      "            xai_chat_state::AuthType::ApiKey,",
+      "        )",
+      "    } else if let Some(key) = session_key",
+      "        && xai_grok_login::backend::AuthBackend::may_receive_session(",
+      "            &xai_grok_login::backend::ActiveAuthBackend::default(),",
+      "            &info.base_url,",
+      "        )",
+      "    {",
+      "        (",
+      "            Some(key.to_owned()),",
+      "            info.base_url.clone(),",
+      "            xai_chat_state::AuthType::SessionToken,",
+      "        )",
+      "    } else if let Ok(key) = crate::agent::auth_method::read_xai_api_key_env() {",
+      "        let url = model",
+      "            .api_base_url",
+      "            .clone()",
+      "            .unwrap_or_else(|| info.base_url.clone());",
+      "        (Some(key), url, xai_chat_state::AuthType::ApiKey)",
+      "    } else {"
+    ],
+    "title": "呼叫端先找鑰匙",
+    "meta": "xai-grok-shell/src/agent/config.rs:4636-4667",
+    "why": "模型自帶鑰匙、provider、session，然後才讀 XAI_API_KEY。都沒有才用登入存的票。"
+  },
+  "gb-apikey": {
+    "type": "code",
+    "kind": "code",
+    "start": 11,
+    "hi": [
+      11
+    ],
+    "lines": [
+      "pub const XAI_API_KEY_ENV_VAR: &str = \"XAI_API_KEY\";",
+      "",
+      "/// Legacy env var name.",
+      "/// Checked as a fallback when `XAI_API_KEY` is not set, so existing deployments that use the old name keep working.",
+      "pub const LEGACY_XAI_API_KEY_ENV_VAR: &str = \"GROK_CODE_XAI_API_KEY\";",
+      "",
+      "/// Read the API key from the environment.",
+      "///",
+      "/// Checks `XAI_API_KEY` first, then falls back to the legacy `GROK_CODE_XAI_API_KEY` for backward compatibility.",
+      "pub fn read_xai_api_key_env() -> Result<String, std::env::VarError> {",
+      "    std::env::var(XAI_API_KEY_ENV_VAR).or_else(|_| std::env::var(LEGACY_XAI_API_KEY_ENV_VAR))"
+    ],
+    "title": "兩個環境變數",
+    "meta": "xai-grok-login/src/auth_method.rs:11-21",
+    "why": "先 XAI_API_KEY，沒有才 GROK_CODE_XAI_API_KEY。這條不是瀏覽器。"
+  },
+  "gb-cached": {
+    "type": "code",
+    "kind": "code",
+    "start": 468,
+    "hi": [
+      468
+    ],
+    "lines": [
+      "    if !force_interactive && let Some(auth) = auth_manager.current() {",
+      "        if is_cached_credential_compatible(&auth, grok_com_config) {",
+      "            tracing::info!(auth_mode = ?auth.auth_mode, \"auth: using cached credentials\");",
+      "            xai_grok_telemetry::unified_log::info(",
+      "                \"auth: using cached credentials\",",
+      "                None,",
+      "                Some(serde_json::json!({ \"auth_mode\": format!(\"{:?}\", auth.auth_mode) })),",
+      "            );",
+      "            return Ok((auth, false));"
+    ],
+    "title": "快取仍有效",
+    "meta": "xai-grok-login/src/flow.rs:468-476",
+    "why": "未過期且 issuer 相容就結束，不開瀏覽器。"
+  },
+  "gb-external": {
+    "type": "code",
+    "kind": "code",
+    "start": 553,
+    "hi": [
+      553
+    ],
+    "lines": [
+      "    if let Some(ref cmd) = grok_com_config.auth_provider_command {",
+      "        let over_stale_credential = reauth || auth_manager.is_expired();",
+      "        match run_external_auth_provider(cmd, auth_manager, over_stale_credential, on_stderr).await",
+      "        {",
+      "            Ok(result) => return Ok(result),",
+      "            Err(e) => {",
+      "                tracing::warn!(",
+      "                    error = %e,",
+      "                    \"auth: external auth provider failed, falling through to interactive login\"",
+      "                );",
+      "                eprintln!(\"Signing in with browser instead...\");",
+      "            }"
+    ],
+    "title": "外部登入指令",
+    "meta": "xai-grok-login/src/flow.rs:553-564",
+    "why": "auth_provider_command 成功就結束。失敗才印 Signing in with browser instead。"
+  },
+  "gb-idp": {
+    "type": "code",
+    "kind": "code",
+    "start": 569,
+    "hi": [
+      569
+    ],
+    "lines": [
+      "    if crate::oidc::is_configured(grok_com_config) {",
+      "        return crate::oidc::run_login_flow(grok_com_config, auth_manager, channels).await;",
+      "    }"
+    ],
+    "title": "config.oidc",
+    "meta": "xai-grok-login/src/flow.rs:569-571",
+    "why": "只有 config.oidc 有值才走這支。預設 xAI 帳號沒有這塊。"
+  },
+  "gb-device": {
+    "type": "code",
+    "kind": "code",
+    "start": 75,
+    "hi": [
+      86
+    ],
+    "lines": [
+      "/// Device-flow precedence, highest first: CLI, env, config, remote feature flag, then the loopback default.",
+      "/// Returns the deciding tier so the caller can log which one chose the transport.",
+      "fn resolve_device_flow(",
+      "    login_override: LoginTransportOverride,",
+      "    config: Option<bool>,",
+      "    remote: Option<bool>,",
+      ") -> xai_grok_config_types::Resolved<bool> {",
+      "    xai_grok_config_types::BoolFlag::env(\"GROK_LOGIN_DEVICE_FLOW\")",
+      "        .cli(login_override.as_cli_bool())",
+      "        .config(config)",
+      "        .feature_flag(remote)",
+      "        .default(false)",
+      "        .resolve()"
+    ],
+    "title": "裝置碼預設關",
+    "meta": "xai-grok-login/src/flow.rs:75-87",
+    "why": "CLI、GROK_LOGIN_DEVICE_FLOW、config、遠端旗標都沒設時 default(false)。"
+  },
+  "gb-bind": {
+    "type": "code",
+    "kind": "code",
+    "start": 383,
+    "hi": [
+      387
+    ],
+    "lines": [
+      "    let listener = TcpListener::bind((\"127.0.0.1\", callback_port))",
+      "        .await",
+      "        .map_err(|e| anyhow::Error::new(OidcError::BindLoopback(e.to_string())))?;",
+      "    let port = listener.local_addr()?.port();",
+      "    let redirect_uri = format!(\"http://127.0.0.1:{}/callback\", port);",
+      "    let oauth2 = auth_manager.grok_com_config().oauth2.as_ref();",
+      "    let auth_url = build_authorize_url(",
+      "        oidc,",
+      "        oauth2,",
+      "        &discovery,",
+      "        &redirect_uri,",
+      "        &pkce,",
+      "        &state,",
+      "        &nonce,",
+      "    );"
+    ],
+    "title": "本機回呼",
+    "meta": "xai-grok-login/src/oidc/login.rs:383-397",
+    "why": "redirect_uri 是 http://127.0.0.1:{port}/callback。"
+  },
+  "gb-authorize": {
+    "type": "code",
+    "kind": "code",
+    "start": 331,
+    "hi": [
+      331
+    ],
+    "lines": [
+      "    let mut url = format!(",
+      "        \"{}?response_type=code&client_id={}&redirect_uri={}&scope={}\\",
+      "         &code_challenge={}&code_challenge_method=S256&state={}&nonce={}\",",
+      "        discovery.authorization_endpoint,",
+      "        urlencoding::encode(&config.client_id),",
+      "        urlencoding::encode(redirect_uri),",
+      "        urlencoding::encode(&scopes),",
+      "        urlencoding::encode(&pkce.code_challenge),",
+      "        urlencoding::encode(state),",
+      "        urlencoding::encode(nonce),",
+      "    );"
+    ],
+    "title": "授權網址",
+    "meta": "xai-grok-login/src/oidc/protocol.rs:331-341",
+    "why": "host 來自 discovery 的 authorization_endpoint，加上 PKCE。"
+  },
+  "gb-exchange": {
+    "type": "code",
+    "kind": "code",
+    "start": 384,
+    "hi": [
+      384
+    ],
+    "lines": [
+      "    let resp = with_alpha_test_key(",
+      "        xai_grok_http::shared_client()",
+      "            .post(token_endpoint)",
+      "            .header(\"x-grok-client-version\", xai_grok_version::VERSION)",
+      "            .form(&[",
+      "                (\"grant_type\", \"authorization_code\"),",
+      "                (\"code\", code),",
+      "                (\"redirect_uri\", redirect_uri),",
+      "                (\"client_id\", client_id),",
+      "                (\"code_verifier\", code_verifier),",
+      "            ])",
+      "            .timeout(std::time::Duration::from_secs(15)),"
+    ],
+    "title": "換票",
+    "meta": "xai-grok-login/src/oidc/protocol.rs:384-395",
+    "why": "grant_type=authorization_code，帶 code_verifier。"
+  },
+  "gb-write": {
+    "type": "code",
+    "kind": "code",
+    "start": 199,
+    "hi": [
+      199
+    ],
+    "lines": [
+      "pub(super) fn build_grok_auth(",
+      "    tokens: TokenResponse,",
+      "    user_info: OidcUserInfo,",
+      "    issuer: &str,",
+      "    client_id: &str,",
+      ") -> GrokAuth {",
+      "    let now = Utc::now();",
+      "    GrokAuth {",
+      "        key: tokens.access_token,",
+      "        auth_mode: AuthMode::Oidc,",
+      "        create_time: now,",
+      "        user_id: user_info.user_id,",
+      "        email: user_info.email,"
+    ],
+    "title": "存成 Oidc",
+    "meta": "xai-grok-login/src/oidc/protocol.rs:199-211",
+    "why": "issuer 是 https://auth.x.ai 時 auth_mode 仍是 Oidc。"
+  },
+  "gb-snapshot": {
+    "type": "code",
+    "kind": "code",
+    "start": 33,
+    "hi": [
+      33
+    ],
+    "lines": [
+      "pub trait AuthCredentialProvider: HttpAuth + Send + Sync + 'static {",
+      "    /// Implementations should issue a cheap disk re-read (`AuthManager::refresh`) before snapshotting.",
+      "    /// This lets callers see updates from sibling processes (`grok-desktop`, `grok login`).",
+      "    /// The `token` field MUST mirror the bearer that `HttpAuth::apply` would send on the wire so 401-attribution prefixes match the actual request.",
+      "    fn snapshot(&self) -> CredentialSnapshot;"
+    ],
+    "title": "snapshot",
+    "meta": "xai-grok-auth/src/auth_provider.rs:33-37",
+    "why": "呼叫端問現在會送出的 bearer。這一步不再登入。"
+  },
+  "gb-port": {
+    "type": "code",
+    "kind": "code",
+    "start": 33,
+    "hi": [
+      33
+    ],
+    "lines": [
+      "pub trait AuthCredentialProvider: HttpAuth + Send + Sync + 'static {",
+      "    /// Implementations should issue a cheap disk re-read (`AuthManager::refresh`) before snapshotting.",
+      "    /// This lets callers see updates from sibling processes (`grok-desktop`, `grok login`).",
+      "    /// The `token` field MUST mirror the bearer that `HttpAuth::apply` would send on the wire so 401-attribution prefixes match the actual request.",
+      "    fn snapshot(&self) -> CredentialSnapshot;"
+    ],
+    "title": "AuthCredentialProvider",
+    "meta": "xai-grok-auth/src/auth_provider.rs:33-37",
+    "why": "HTTP 只認 snapshot。"
+  },
+  "rhc-port": {
+    "type": "code",
+    "kind": "code",
+    "start": 44,
+    "hi": [
+      44
+    ],
+    "lines": [
+      "    fn snapshot(&self) -> CredentialSnapshot;",
+      "    fn login(&self) -> Result<CredentialSnapshot, AuthError>;",
+      "    fn logout(&self) -> Result<(), AuthError>;",
+      "    fn refresh_if_needed(&self) -> Result<CredentialSnapshot, AuthError>;",
+      "}"
+    ],
+    "title": "rhc Auth",
+    "meta": "crates/xai-oauth/src/host/ports/auth.rs:44-49",
+    "why": "rhc 的合約對齊這層。"
+  }
+}

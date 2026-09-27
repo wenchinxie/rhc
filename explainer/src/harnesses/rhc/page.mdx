@@ -1,0 +1,40 @@
+import { H2, Peek, Term } from "../../mdx-components"
+
+<>
+  <h1>rhc 程式導讀</h1>
+  <p>rhc 是作者自己的 Rust coding-agent 外殼。現在只有四個指令：<code>rhc login</code>、<code>rhc logout</code>、<code>rhc whoami</code>、<code>rhc models</code>，全部對著一個訂閱，SuperGrok（xAI）。還沒有對話輪、沒有 session、沒有提示詞、沒有工具。</p>
+  <H2 id="s-layers" n="1">分層</H2>
+  <p>程式碼在 <code>crates/rhc/src/</code>。執行檔是 <code>bin/rhc/</code>（<code>main.rs</code>、<code>commands.rs</code>、<code>terminal.rs</code>）。函式庫在 <code>host/</code>。</p>
+  <p><code>bin/rhc/main.rs</code> 是最外層。它把 <code>HOME</code>、<code>GROK_AUTH_PATH</code>、<code>GROK_HOME</code> 讀進 <code>StartContext</code>，呼叫 <code>root::start</code>，再依子指令分派。指令回傳的錯誤只在這裡印出，並轉成 exit code FAILURE。<Peek snip="main">main 怎麼分派</Peek></p>
+  <p><code>host/root.rs</code> 是唯一的<Term k="composition-root">組裝點</Term>。它只建一次 <code>AuthClient</code>，用 Arc 包起來，一份留在 <code>Host.supergrok</code>，另一份包成 <code>SupergrokModels</code> 交給模型目錄當 <code>ModelLister</code>。<Peek snip="root">root::start</Peek> <Peek snip="lister-adapter">SupergrokModels 轉接</Peek></p>
+  <p><code>host/ports/</code> 放的是<Term k="port">合約</Term>：<code>Auth</code>（5 個方法：<code>subscription</code>、<code>snapshot</code>、<code>login</code>、<code>logout</code>、<code>refresh_if_needed</code>）<Peek snip="auth-trait">Auth trait</Peek>，以及 <code>ModelCatalog</code>（<code>models_for</code>、<code>default_for</code>）和 <code>ModelLister</code>（<code>list</code>）。<Peek snip="models-port">ModelCatalog 與 ModelLister</Peek></p>
+  <p><code>host/extensions/</code> 放兩個功能：<code>xai_auth/</code>（xAI 的 <code>Auth</code> 實作，第二頁講）和 <code>models/</code>（模型目錄）。模型目錄不 import <code>xai_auth</code>，它只看得到 <code>ModelLister</code>。<code>commands.rs</code> 不 import <code>xai_auth</code>，它只看得到 <code>&dyn Auth</code>。所以測試可以換上假的實作。</p>
+  <H2 id="s-cmd" n="2">指令</H2>
+  <p>commit 5158f05（2026-09-26）把指令模組拆開：<code>commands.rs</code> 留決策（login、logout、whoami、models、find），<code>terminal.rs</code> 管所有終端機讀寫（<code>prompt_choice</code>、<code>choose</code>、<code>print_signed_in</code>、<code>print_status</code>、<code>print_identity</code>、<code>print_model_block</code>、<code>rows</code>、<code>row</code>、<code>width_of</code>）。</p>
+  <p><code>CliError</code> 和 <code>Subscriptions</code> 放在 <code>main.rs</code>，讓 commands 和 terminal 不互相 import。<Peek snip="cli-error">CliError 與 Subscriptions</Peek> <code>Subscriptions</code> 是一串 <code>(&str, &dyn Auth)</code> 配對，即 <code>&[(&str, &dyn Auth)]</code>。今天只有一組：<code>("supergrok", AuthClient)</code>。</p>
+  <p><code>commands::login</code> 的走法：<code>name</code> 的型別是 <Term k="option">Option</Term>，裡面包著 <code>&str</code>。<code>Some(name)</code> 表示使用者打了名字，去 <code>find</code> 它<Peek snip="find">commands::find</Peek>；<code>None</code> 而且 stdin 是終端機，<code>terminal::prompt_choice</code> 把編號選單印到 stderr、flush、讀一行 stdin，<code>choose</code> 接受數字或名字<Peek snip="prompt">terminal::prompt_choice</Peek>；<code>None</code> 且不是終端機（被 pipe 或腳本呼叫），直接回傳 <code>Err(NoSubscriptionChosen(rows))</code>，因為沒有人能回答選單。三個分支由上而下比對，有條件的 <code>None</code> 一定要排在裸的 <code>None</code> 前面。</p>
+  <p><code>?</code> 是<Term k="question-mark">問號運算子</Term>：遇到 <code>Err</code> 立刻回傳（經 <code>#[from]</code> 轉型），遇到 <code>Ok</code> 就解開繼續往下。<code>auth.login()?</code> 經由 <Term k="vtable">vtable</Term> 呼叫到 <code>AuthClient::login</code>（瀏覽器登入流程，第二頁講）。函式最後一行沒有分號，就是回傳值。<Peek snip="login">commands::login</Peek></p>
+  <p>錯誤文字怎麼出現：<code>login</code> 回傳 <code>Err</code>，main 的 <code>eprintln!("{"{e}"}")</code> 呼叫 thiserror 依 <code>#[error("choose a subscription: rhc login &lt;subscription&gt;\n{"{0}"}")]</code> 產生的 <code>Display</code>。畫面會印出 <code>choose a subscription: rhc login &lt;subscription&gt;</code>，再一行 <code>supergrok  not signed in</code>。exit code 是 1。<Peek snip="cli-error">CliError 的錯誤文字</Peek></p>
+  <p>選單長這樣：<code>1) supergrok  not signed in</code>，接著 <code>choose a subscription [1-1]: </code>。選單和提示都印到 stderr，結果印到 stdout，所以 <code>rhc login &gt; file</code> 一樣看得到選單。<Peek snip="prompt">選單印到 stderr</Peek></p>
+  <p><code>row</code> 回傳 <code>(text, ok)</code>。<code>ok</code> 只有 snapshot 出錯時是 false，<code>whoami</code> 不帶名字時用它決定 exit code FAILURE。<code>{"{name:<width$}"}</code> 把名字補齊寬度對齊。<Peek snip="row">terminal::row</Peek></p>
+  <p>已知的粗邊（推論，未在 rhc 上實測）：<code>println!</code> 遇到斷掉的管線（例如 <code>rhc models | head -1</code>）會 panic，因為 Rust 忽略 SIGPIPE。修法會是改寫進注入的 <code>&mut dyn Write</code>，還沒做。</p>
+  <H2 id="s-rust" n="3">讀這段 Rust 要的觀念</H2>
+  <p><Term k="trait">trait</Term> 是一組具名的方法簽章，一個型別答應要實作（約略對應 Python 的 <code>typing.Protocol</code> 或 <code>abc.ABC</code>）。要明講才算數：<code>impl Auth for AuthClient</code>。<Peek snip="auth-trait">Auth trait</Peek></p>
+  <p><Term k="dyn">dyn Trait</Term> 是 trait object：「某個實作了這個 <Term k="trait">trait</Term> 的型別，執行期才決定是誰」。一定藏在指標後面：<code>&dyn</code> 是借用，用 <code>Box</code> 包住是一份自己擁有，用 <code>Arc</code> 包住是共享。<Peek snip="client-struct">AuthClient 的三個零件</Peek></p>
+  <p><Term k="vtable">vtable</Term> 是每個型別和 trait 配對各一份的函式指標表，編譯期就造好。<code>&dyn Auth</code> 是兩個字：資料指標加 vtable 指標。<Term k="vtable">vtable</Term> 只放這個 <Term k="trait">trait</Term> 的方法，所以拿著 <code>&dyn Auth</code> 的程式碼叫不到 <code>AuthClient::login_from_grok</code>；這就是為什麼 <code>main.rs</code> 要在具體的 <code>host.supergrok</code> 上呼叫它。</p>
+  <p>什麼時候用 dyn、什麼時候用 generics：不同型別要共用一個清單、決定要在執行期做、或是在注入的接縫（不讓型別參數往外擴散）時用 dyn；熱路徑或 <Term k="trait">trait</Term> 不是 object-safe 時用 generics。rhc 的呼叫都在做網路或磁碟 I/O，<Term k="vtable">vtable</Term> 查表的成本不算什麼。</p>
+  <p><Term k="option">Option</Term> 是 <code>Some(T)</code> 或 <code>None</code>，<code>match</code> 一定要兩邊都寫到，漏掉 <code>None</code> 編不過。<code>Result</code> 是 <code>Ok</code> 或 <code>Err</code>。<code>snapshot()</code> 回傳的型別外層是 <code>Result</code>，內層再包一層 <code>Option</code> 裝著 <code>CredentialSnapshot</code>：<code>Ok(Some)</code> 是已登入，<code>Ok(None)</code> 是未登入，<code>Err</code> 是讀檔失敗。<Peek snip="row">snapshot 的三種結果</Peek></p>
+  <p><code>&str</code> 本身已經是借用，而且是 Copy，傳 <code>name</code> 就好，不用傳 <code>&name</code>。</p>
+  <H2 id="s-models" n="4">模型目錄</H2>
+  <p><code>models/registry.rs</code> 實作 <code>ModelCatalog</code>。<code>default_models.json</code> 用 <code>include_str!</code> 在編譯期塞進執行檔。<Peek snip="registry-start">模型目錄啟動</Peek></p>
+  <p>內建的 supergrok 清單：<code>grok-4.7</code>「Grok 4.7」（預設）、<code>grok-4.7-build-fast</code>「Grok 4.7 Fast」、<code>grok-4.6</code>、<code>grok-4.5</code>。</p>
+  <p><code>models_for</code> 內建清單在前，接著把 <code>lister.list()</code> 給的遠端 id 中還沒出現過的接上去。未登入（<code>Ok(None)</code>）或出錯時只回內建清單，所以 <code>rhc models</code> 離線也能跑。<code>default_for</code> 只讀內建 json，所以 <code>rhc models</code> 只打一次網路，不是兩次。<Peek snip="models-for">models_for 與 default_for</Peek></p>
+  <p>已登入時 <code>rhc models</code> 才會打網路（<code>GET api.x.ai/v1/models</code>，見第二頁「用票」）。</p>
+  <H2 id="s-client" n="5">AuthClient 一眼</H2>
+  <p>三個欄位：<code>store</code>（<code>TokenStore</code>，對應 <code>~/.rhc/auth.json</code>）、<code>http</code>（型別是用 <code>Arc</code> 包住的 <code>dyn XaiHttp</code>，正式環境是 <code>UreqHttp</code>）、<code>grok_auth_path</code>（<code>~/.grok/auth.json</code>）。細節在 OAuth 那頁。<Peek snip="client-struct">AuthClient 的三個零件</Peek></p>
+  <H2 id="s-test" n="6">測試替身</H2>
+  <p><code>bin/rhc/fake_auth.rs</code>（<code>#[cfg(test)]</code>）實作同一個 <code>Auth</code> <Term k="trait">trait</Term>，用記憶體裡的身分，供 <code>commands_tests.rs</code>（2 個測試）與 <code>terminal_tests.rs</code>（6 個測試）使用。<Peek snip="fake-auth">測試用的 FakeAuth</Peek></p>
+  <p>整個 crate：42 個測試通過，clippy -D warnings 乾淨（2026-09-26）。</p>
+  <H2 id="s-missing" n="7">還沒有的槽</H2>
+  <p>還沒有 session、transcript，還沒有提示詞、skill，還沒有工具，還沒有對話輪，還沒有 memory、compaction、hook、telemetry。Grok Build 把提示詞放在 <code>crates/codegen/xai-grok-agent/src/prompt/</code>，工具放在 <code>crates/codegen/xai-grok-tools</code>。</p>
+</>

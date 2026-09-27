@@ -1,0 +1,72 @@
+<svg class="dag" viewBox="0 0 920 576" role="img" aria-label="0.47 怎麼拿到票">
+  <defs>
+    <marker id="a047ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)" stroke="none"/></marker>
+    <marker id="a047br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--pen)" stroke="none"/></marker>
+    <marker id="a047lp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--loop)" stroke="none"/></marker>
+  </defs>
+  <path d="M260,88 L260,132" marker-end="url(#a047ar)"/>
+  <path d="M380.0,171.0 L470,171" marker-end="url(#a047ar)"/>
+  <path d="M260,210 L260,254" marker-end="url(#a047ar)"/>
+  <path d="M260,318 L260,362" marker-end="url(#a047ar)"/>
+  <path d="M380.0,401.0 L470,401" marker-end="url(#a047ar)"/>
+  <path d="M260,440 L260,484" marker-end="url(#a047ar)"/>
+  <text class="lay" text-anchor="end" x="76" y="60">觸發</text>
+  <a class="xref" href="#s-auth-1">
+  <g class="app lay-trigger">
+    <rect x="80" y="24" width="360" height="64" rx="8"/>
+    <text x="94" y="51">要登入或要推論票</text>
+    <text class="sub" x="94" y="71">先分安裝包 asar 還是 VM host</text>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="175">判決</text>
+  <a class="xref" href="#s-auth-2">
+  <g class="dec lay-judge">
+    <polygon points="260,132 380.0,171.0 260,210 140.0,171.0"/>
+    <text text-anchor="middle" x="260" y="176.0">這份是安裝包 asar？</text>
+  </g>
+  </a>
+  <a class="xref" href="#s-auth-1">
+  <g class="app lay-judge">
+    <rect x="470" y="142" width="430" height="58" rx="8"/>
+    <text x="484" y="166">是：沒有 dist/host</text>
+    <text class="sub" x="484" y="186">loginCursor 在 main-app.cjs</text>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="163.0">是</text>
+  <text class="elab" x="272" y="236.0">否：VM host</text>
+  <text class="lay" text-anchor="end" x="76" y="290">沙箱</text>
+  <a class="xref" href="#s-auth-3">
+  <g class="app lay-box">
+    <rect x="80" y="254" width="360" height="64" rx="8"/>
+    <text x="94" y="281">host-main.cjs 續短票</text>
+    <text class="sub" x="94" y="301">cb0ed63，檔界是 // src/host/</text>
+  </g>
+  </a>
+  <text class="lay" text-anchor="end" x="76" y="405">沙箱</text>
+  <a class="xref" href="#s-auth-3">
+  <g class="dec lay-box">
+    <polygon points="260,362 380.0,401.0 260,440 140.0,401.0"/>
+    <text text-anchor="middle" x="260" y="406.0">payload 有 grokBotToken？</text>
+  </g>
+  </a>
+  <a class="xref" href="#s-auth-4">
+  <g class="app lay-box">
+    <rect x="470" y="372" width="430" height="58" rx="8"/>
+    <text x="484" y="396">可選第二欄</text>
+    <text class="sub" x="484" y="416">仍不是 SuperGrok device-code</text>
+  </g>
+  </a>
+  <text class="elab" x="396.0" y="393.0">否</text>
+  <text class="elab" x="272" y="466.0">只有 accessToken</text>
+  <text class="lay" text-anchor="end" x="76" y="520">圍籬</text>
+  <a class="xref" href="#s-auth-3">
+  <g class="app lay-fence">
+    <rect x="80" y="484" width="360" height="64" rx="8"/>
+    <text x="94" y="511">identity mint 或 RAM store</text>
+    <text class="sub" x="94" y="531">/tmp/sand-identity.sock 是 0.47 才有</text>
+  </g>
+  </a>
+</svg>
