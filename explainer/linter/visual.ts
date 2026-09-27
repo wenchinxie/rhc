@@ -16,14 +16,15 @@ type Case = { name: string; w: number; h: number; dark?: boolean; full?: boolean
 const CASES: Case[] = [
   { name: "1440-light", w: 1440, h: 900, full: true },
   { name: "1920-light", w: 1920, h: 1000, full: true },
-  { name: "900-sheet", w: 900, h: 800, full: true },
+  { name: "700-sheet", w: 700, h: 800, full: true },
   { name: "1440-dark", w: 1440, h: 900, dark: true, full: true },
-  { name: "rail-closed", w: 1440, h: 900, setup: `document.getElementById("railtg").click()` },
-  { name: "sheet-open", w: 900, h: 800, setup: `document.getElementById("tocbtn").click()` },
+  { name: "rail-closed", w: 1440, h: 900, setup: `document.querySelector("[data-catalog-close]").click()` },
+  { name: "sheet-open", w: 700, h: 800, setup: `document.querySelector("[data-catalog-open]").click()` },
   { name: "src-pane", w: 1440, h: 900, setup: `document.querySelector("[data-snip]").click()` },
   { name: "src-pane-dark", w: 1440, h: 900, dark: true, setup: `document.querySelector("[data-snip]").click()` },
   { name: "gloss", w: 1440, h: 900, setup: `(() => { const t = document.querySelector("[data-gloss]"); t.scrollIntoView({ block: "center" }); t.click(); })()` },
-  { name: "rail-deep", w: 1440, h: 900, setup: `document.getElementById("model-codex").scrollIntoView()` },
+  { name: "rail-pkce", w: 1440, h: 900, setup: `[...document.querySelectorAll("[data-catalog] a")].find((a) => a.textContent.includes("PKCE")).click()` },
+  { name: "rail-deep", w: 1440, h: 900, setup: `document.getElementById("auth-codex").scrollIntoView()` },
 ];
 
 const FREEZE = `*,*::before,*::after{transition:none!important;animation:none!important;caret-color:transparent!important}`;
@@ -83,6 +84,7 @@ try {
     await send("Emulation.setDeviceMetricsOverride", { width: c.w, height: c.h, deviceScaleFactor: 1, mobile: false });
     await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: c.dark ? "dark" : "light" }] });
     await evaluate("try { localStorage.clear() } catch {}");
+    await send("Network.clearBrowserCookies");
     await send("Page.navigate", { url: base });
     await Bun.sleep(2500);
     await evaluate(`document.head.insertAdjacentHTML("beforeend", "<style>${FREEZE}</style>"); document.fonts.ready.then(() => 1)`);
@@ -131,6 +133,11 @@ try {
         }
         const a = PNG.sync.read(Buffer.from(await Bun.file(join(bdir, f)).arrayBuffer()));
         const b = PNG.sync.read(Buffer.from(await Bun.file(join(cdir, f)).arrayBuffer()));
+        if (a.width !== b.width || a.height !== b.height) {
+          console.log(`FAIL ${c.name}/${f}: size ${a.width}x${a.height} → ${b.width}x${b.height}`);
+          changed++;
+          continue;
+        }
         const diff = new PNG({ width: a.width, height: a.height });
         const n = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0, includeAA: true });
         if (n) {

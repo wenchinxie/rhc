@@ -12,7 +12,7 @@ import { AUTH_FLOW } from "./flow"
   <p>host 在另一份 zip。<code>authExtension.start</code> 讀行程環境。有開發 token 檔就讀檔。否則用續期憑證 POST <code>/sand-box/inference-credential</code>。回應的 <code>accessToken</code> 只放記憶體。沒有憑證時 renewer 仍會啟動，<code>getAccessToken</code> 丟等待錯誤。0.47 在還有 box 憑證時才聽 <code>/tmp/sand-identity.sock</code>。客體 <code>POST /v1/tokens/oidc</code> 被轉去 <code>/cloud-agent/identity-token/sand-box</code>。這條不是推論用的短票。安裝包 asar 裡沒有這些名字。</p>
   <FlowDag flow={AUTH_FLOW} />
   <p>點圖上的方塊，打開的是 0.18 重建稿裡對應的那幾行。0.47 安裝包把同一支壓進 <code>main-app.cjs</code>。host 的對應在 VM zip 的 <code>host-main.cjs</code>。<Peek snip="gb-login">loginCursor</Peek> <Peek snip="gb-which">選哪一種登入</Peek> <Peek snip="gb-poll">poll 成功條件</Peek> <Peek snip="gb-host">host 從哪裡續</Peek> <Peek snip="gb-renew">換短票</Peek> <Peek snip="gb-start">start 交出去的方法</Peek></p>
-  <div className="overflow wide">
+  <div className="my-[1.1rem] overflow-x-auto">
   <table>
   <thead><tr><th>東西</th><th>位置</th></tr></thead>
   <tbody>

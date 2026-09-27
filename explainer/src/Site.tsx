@@ -3,6 +3,9 @@ import { MDXProvider } from "@mdx-js/react";
 import { ExplainerShell } from "./ExplainerShell";
 import { mdxComponents } from "./mdx-components";
 import { FolderSlug } from "./folder";
+import type { TocLink } from "./CatalogRail";
+import type { GlossEntry } from "./components/Term";
+import type { SrcEntry } from "./components/SourceSheet";
 import AuthRhcDoc from "./auth/rhc/page.mdx";
 import { GLOSS as auth_rhc_gloss } from "./auth/rhc/gloss";
 import auth_rhc_src from "./auth/rhc/src-map.json";
@@ -19,48 +22,13 @@ import auth_claude_code_src from "./auth/claude-code/src-map.json";
 import AuthGrokBuildDoc from "./auth/grok-build/page.mdx";
 import { GLOSS as auth_grok_build_gloss } from "./auth/grok-build/gloss";
 import auth_grok_build_src from "./auth/grok-build/src-map.json";
-import SessionGrokBotDoc from "./session/grok-bot/page.mdx";
-import SessionCodexDoc from "./session/codex/page.mdx";
-import SessionClaudeCodeDoc from "./session/claude-code/page.mdx";
-import SessionGrokBuildDoc from "./session/grok-build/page.mdx";
-import PromptGrokBotDoc from "./prompt/grok-bot/page.mdx";
-import PromptCodexDoc from "./prompt/codex/page.mdx";
-import PromptClaudeCodeDoc from "./prompt/claude-code/page.mdx";
-import PromptGrokBuildDoc from "./prompt/grok-build/page.mdx";
-import ModelRhcDoc from "./model/rhc/page.mdx";
-import model_rhc_src from "./model/rhc/src-map.json";
-import ModelGrokBotDoc from "./model/grok-bot/page.mdx";
-import ModelCodexDoc from "./model/codex/page.mdx";
-import ModelClaudeCodeDoc from "./model/claude-code/page.mdx";
-import ModelGrokBuildDoc from "./model/grok-build/page.mdx";
-import ToolsGrokBotDoc from "./tools/grok-bot/page.mdx";
-import ToolsCodexDoc from "./tools/codex/page.mdx";
-import ToolsClaudeCodeDoc from "./tools/claude-code/page.mdx";
-import ToolsGrokBuildDoc from "./tools/grok-build/page.mdx";
-import TurnGrokBotDoc from "./turn/grok-bot/page.mdx";
-import TurnCodexDoc from "./turn/codex/page.mdx";
-import TurnClaudeCodeDoc from "./turn/claude-code/page.mdx";
-import TurnGrokBuildDoc from "./turn/grok-build/page.mdx";
-import RestGrokBotDoc from "./rest/grok-bot/page.mdx";
-import RestCodexDoc from "./rest/codex/page.mdx";
-import RestClaudeCodeDoc from "./rest/claude-code/page.mdx";
-import RestGrokBuildDoc from "./rest/grok-build/page.mdx";
-
-type GlossEntry = { t: string; d: string; avoid?: string[] };
-
-type TocLink = {
-  href: string;
-  n?: string;
-  label: string;
-  children?: TocLink[];
-};
 
 type Folder = {
   slug: string;
   label: string;
   toc: TocLink[];
   gloss: Record<string, GlossEntry>;
-  srcMap: Record<string, unknown>;
+  srcMap: Record<string, SrcEntry>;
   Doc: () => ReactNode;
 };
 
@@ -113,18 +81,6 @@ function FolderDoc(props: { slug: string; children: ReactNode }) {
         a.setAttribute("href", `#${prefix}${hash}`);
       }
     });
-    root.querySelectorAll("[data-gloss]").forEach((el) => {
-      const key = el.getAttribute("data-gloss") || "";
-      if (key && !key.startsWith(prefix)) {
-        el.setAttribute("data-gloss", prefix + key);
-      }
-    });
-    root.querySelectorAll("[data-snip]").forEach((el) => {
-      const key = el.getAttribute("data-snip") || "";
-      if (key && !key.startsWith(prefix)) {
-        el.setAttribute("data-snip", prefix + key);
-      }
-    });
   }, [props.slug]);
   return (
     <section ref={ref} className="site-folder" id={props.slug} data-folder={props.slug}>
@@ -139,87 +95,24 @@ const TOOLS: Tool[] = [
     slug: "auth",
     label: "登入",
     parts: [
-      { slug: "auth-rhc", label: "rhc", toc: auth_rhc_toc, gloss: auth_rhc_gloss, srcMap: auth_rhc_src as Record<string, unknown>, Doc: () => <AuthRhcDoc /> },
-      { slug: "auth-grok-bot", label: "Grok Bot", toc: [], gloss: auth_grok_bot_gloss, srcMap: auth_grok_bot_src as Record<string, unknown>, Doc: () => <AuthGrokBotDoc /> },
-      { slug: "auth-codex", label: "Codex", toc: [], gloss: auth_codex_gloss, srcMap: auth_codex_src as Record<string, unknown>, Doc: () => <AuthCodexDoc /> },
-      { slug: "auth-claude-code", label: "Claude Code", toc: [], gloss: auth_claude_code_gloss, srcMap: auth_claude_code_src as Record<string, unknown>, Doc: () => <AuthClaudeCodeDoc /> },
-      { slug: "auth-grok-build", label: "Grok Build", toc: [], gloss: auth_grok_build_gloss, srcMap: auth_grok_build_src as Record<string, unknown>, Doc: () => <AuthGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "session",
-    label: "對話",
-    parts: [
-      { slug: "session-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <SessionGrokBotDoc /> },
-      { slug: "session-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <SessionCodexDoc /> },
-      { slug: "session-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <SessionClaudeCodeDoc /> },
-      { slug: "session-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <SessionGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "prompt",
-    label: "提示",
-    parts: [
-      { slug: "prompt-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <PromptGrokBotDoc /> },
-      { slug: "prompt-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <PromptCodexDoc /> },
-      { slug: "prompt-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <PromptClaudeCodeDoc /> },
-      { slug: "prompt-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <PromptGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "model",
-    label: "模型",
-    parts: [
-      { slug: "model-rhc", label: "rhc", toc: [], gloss: {}, srcMap: model_rhc_src as Record<string, unknown>, Doc: () => <ModelRhcDoc /> },
-      { slug: "model-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <ModelGrokBotDoc /> },
-      { slug: "model-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <ModelCodexDoc /> },
-      { slug: "model-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <ModelClaudeCodeDoc /> },
-      { slug: "model-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <ModelGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "tools",
-    label: "工具",
-    parts: [
-      { slug: "tools-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <ToolsGrokBotDoc /> },
-      { slug: "tools-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <ToolsCodexDoc /> },
-      { slug: "tools-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <ToolsClaudeCodeDoc /> },
-      { slug: "tools-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <ToolsGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "turn",
-    label: "一輪",
-    parts: [
-      { slug: "turn-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <TurnGrokBotDoc /> },
-      { slug: "turn-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <TurnCodexDoc /> },
-      { slug: "turn-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <TurnClaudeCodeDoc /> },
-      { slug: "turn-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <TurnGrokBuildDoc /> },
-    ],
-  },
-  {
-    slug: "rest",
-    label: "旁邊的槽",
-    parts: [
-      { slug: "rest-grok-bot", label: "Grok Bot", toc: [], gloss: {}, srcMap: {}, Doc: () => <RestGrokBotDoc /> },
-      { slug: "rest-codex", label: "Codex", toc: [], gloss: {}, srcMap: {}, Doc: () => <RestCodexDoc /> },
-      { slug: "rest-claude-code", label: "Claude Code", toc: [], gloss: {}, srcMap: {}, Doc: () => <RestClaudeCodeDoc /> },
-      { slug: "rest-grok-build", label: "Grok Build", toc: [], gloss: {}, srcMap: {}, Doc: () => <RestGrokBuildDoc /> },
+      { slug: "auth-rhc", label: "rhc", toc: auth_rhc_toc, gloss: auth_rhc_gloss, srcMap: auth_rhc_src as Record<string, SrcEntry>, Doc: () => <AuthRhcDoc /> },
+      { slug: "auth-grok-bot", label: "Grok Bot", toc: [], gloss: auth_grok_bot_gloss, srcMap: auth_grok_bot_src as Record<string, SrcEntry>, Doc: () => <AuthGrokBotDoc /> },
+      { slug: "auth-codex", label: "Codex", toc: [], gloss: auth_codex_gloss, srcMap: auth_codex_src as Record<string, SrcEntry>, Doc: () => <AuthCodexDoc /> },
+      { slug: "auth-claude-code", label: "Claude Code", toc: [], gloss: auth_claude_code_gloss, srcMap: auth_claude_code_src as Record<string, SrcEntry>, Doc: () => <AuthClaudeCodeDoc /> },
+      { slug: "auth-grok-build", label: "Grok Build", toc: [], gloss: auth_grok_build_gloss, srcMap: auth_grok_build_src as Record<string, SrcEntry>, Doc: () => <AuthGrokBuildDoc /> },
     ],
   },
 ];
 
 const ALL_PARTS = TOOLS.flatMap((tool) => tool.parts);
 
-const GLOSS = Object.assign(
+export const GLOSS: Record<string, GlossEntry> = Object.assign(
   {},
   ...ALL_PARTS.map((folder) => prefixRecord(folder.slug, folder.gloss)),
 );
-const SRC_MAP_JSON = JSON.stringify(
-  Object.assign(
-    {},
-    ...ALL_PARTS.map((folder) => prefixRecord(folder.slug, folder.srcMap)),
-  ),
+export const SRC_MAP: Record<string, SrcEntry> = Object.assign(
+  {},
+  ...ALL_PARTS.map((folder) => prefixRecord(folder.slug, folder.srcMap)),
 );
 
 function toolToc(tool: Tool): TocLink {
@@ -249,17 +142,17 @@ export function Site() {
   return (
     <ExplainerShell
       title="Explainers"
-      subtitle="按元件分：登入、對話、提示、模型、工具、一輪、旁邊的槽。每個元件底下是 rhc 與各家 harness。"
+      subtitle="登入：rhc 與各家 harness 怎麼拿到票。"
       kicker="catalog"
       mastNote="同一頁捲動。點章不換 path。"
       toc={TOOLS.map(toolToc)}
       gloss={GLOSS}
-      srcMapJson={SRC_MAP_JSON}
+      srcMap={SRC_MAP}
     >
       <MDXProvider components={mdxComponents}>
         {TOOLS.map((tool) => (
           <section key={tool.slug} id={tool.slug}>
-            <h1>{tool.label}</h1>
+            <h1 className="not-prose mb-6 text-[length:var(--fs-h1)] leading-[1.1] font-[850] tracking-[-0.018em]">{tool.label}</h1>
             {tool.parts.map((folder) => (
               <FolderDoc key={folder.slug} slug={folder.slug}>
                 <folder.Doc />

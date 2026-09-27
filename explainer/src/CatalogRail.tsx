@@ -1,4 +1,20 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
 export type TocLink = { href: string; n?: string; label: string; children?: TocLink[] };
 
@@ -26,34 +42,8 @@ function ancestors(index: TocIndex, id: string | null): Set<string> {
   return out;
 }
 
-function tokenPx(name: string, fallback: number): number {
-  const probe = document.createElement("div");
-  probe.style.cssText = `position:absolute;left:-9999px;top:0;height:0;padding:0;border:0;margin:0;width:var(${name})`;
-  document.documentElement.appendChild(probe);
-  const w = probe.getBoundingClientRect().width;
-  probe.remove();
-  return w || fallback;
-}
-
-function readRailClosed(): boolean {
-  try {
-    return localStorage.getItem("rail-closed") === "1";
-  } catch {
-    return false;
-  }
-}
-
-function useBodyClass(name: string, on: boolean) {
-  useLayoutEffect(() => {
-    document.body.classList.toggle(name, on);
-  }, [name, on]);
-}
-
-/** Keeps `el` inside the rail's own scroller, never scrolling the page. */
-function scrollIntoRail(nav: HTMLElement | null, el: Element | null) {
-  if (!nav || !el || !document.body.classList.contains("rail-on")) return;
-  const box = nav.querySelector(".toc-scroll");
-  if (!box) return;
+function scrollIntoCatalog(box: HTMLElement | null, el: Element | null) {
+  if (!box || !el) return;
   const cr = el.getBoundingClientRect();
   const br = box.getBoundingClientRect();
   if (cr.height === 0 || br.height === 0) return;
@@ -68,46 +58,13 @@ function scrollToId(id: string): boolean {
   return true;
 }
 
-/**
- * The rail is shown only when the prose and the rail both fit, and only when
- * the collapsed catalog fits the rail's scroller; otherwise the same nav is the
- * sheet behind #tocbtn. Measuring the expanded height instead would drop the
- * rail whenever a long chapter opened.
- */
-function useRailFit(nav: RefObject<HTMLElement | null>): boolean {
-  const [railOn, setRailOn] = useState(false);
-  useLayoutEffect(() => {
-    let timer = 0;
-    const fit = () => {
-      const el = nav.current;
-      if (!el) return;
-      const body = document.body;
-      const need = tokenPx("--prose", 720) + tokenPx("--rail-w", 240) + tokenPx("--rail-gap", 48) + 24;
-      let on = document.documentElement.clientWidth >= need;
-      if (on) {
-        body.classList.add("rail-on");
-        const box = el.querySelector(".toc-scroll") ?? el;
-        el.classList.add("measuring");
-        on = box.scrollHeight <= box.clientHeight;
-        el.classList.remove("measuring");
-      }
-      body.classList.toggle("rail-on", on);
-      setRailOn(on);
-    };
-    const schedule = () => {
-      clearTimeout(timer);
-      timer = window.setTimeout(fit, 40);
-    };
-    fit();
-    window.addEventListener("resize", schedule);
-    window.visualViewport?.addEventListener("resize", schedule);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("resize", schedule);
-      window.visualViewport?.removeEventListener("resize", schedule);
-    };
-  }, [nav]);
-  return railOn;
+function scrollAfterUnlock(id: string) {
+  const start = performance.now();
+  const tick = () => {
+    if (document.body.hasAttribute("data-scroll-locked") && performance.now() - start < 1000) requestAnimationFrame(tick);
+    else scrollToId(id);
+  };
+  requestAnimationFrame(tick);
 }
 
 /** The current section is the last target, in document order, whose top has passed 28% of the viewport. */
@@ -165,63 +122,98 @@ function useHashFreeLinks() {
 
 type ItemProps = {
   link: TocLink;
+  depth: number;
   active: string | null;
   isOpen: (id: string) => boolean;
   onToggle: (id: string) => void;
 };
 
-function TocItem({ link, active, isOpen, onToggle }: ItemProps) {
-  const id = link.href.slice(1);
-  const anchor = (
-    <a href={link.href} aria-current={active === id ? "true" : undefined}>
-      <i>{link.n ?? ""}</i>
-      {link.label}
-    </a>
-  );
-  if (!link.children?.length) return anchor;
-  const open = isOpen(id);
+function Label({ link }: { link: TocLink }) {
   return (
-    <span className={open ? "toc-group open" : "toc-group"}>
-      {anchor}
-      <button
-        type="button"
-        className="toc-tg"
-        aria-expanded={open}
-        aria-controls={`sub-${id}`}
-        aria-label="展開/收合"
-        onClick={() => onToggle(id)}
-      >
-        ›
-      </button>
-      <span className="toc-sub" id={`sub-${id}`}>
-        {link.children.map((c) => (
-          <TocItem key={`${c.href}-${c.label}`} link={c} active={active} isOpen={isOpen} onToggle={onToggle} />
-        ))}
-      </span>
-    </span>
+    <>
+      {link.n ? <span className="w-4 shrink-0 font-code text-xs text-ink-3">{link.n}</span> : null}
+      <span>{link.label}</span>
+    </>
   );
 }
 
-export function CatalogRail(props: {
-  toc: TocLink[];
-  label: string;
-  kicker?: string;
-  lead?: ReactNode;
-  railNote?: ReactNode;
-}) {
-  const nav = useRef<HTMLElement>(null);
-  const btn = useRef<HTMLButtonElement>(null);
+function CatalogItem({ link, depth, active, isOpen, onToggle }: ItemProps) {
+  const id = link.href.slice(1);
+  const current = active === id;
+  const anchor = (
+    <a href={link.href} aria-current={current ? "true" : undefined}>
+      <Label link={link} />
+    </a>
+  );
+  const button =
+    depth === 0 ? (
+      <SidebarMenuButton asChild isActive={current} className="h-auto py-1.5 font-semibold text-ink-2 data-[active=true]:text-pen-ink">
+        {anchor}
+      </SidebarMenuButton>
+    ) : (
+      <SidebarMenuSubButton
+        asChild
+        isActive={current}
+        className={`h-auto py-1 text-ink-2 data-[active=true]:text-pen-ink [&>span:last-child]:whitespace-normal ${link.children?.length ? "pr-7" : ""}`}
+      >
+        {anchor}
+      </SidebarMenuSubButton>
+    );
+  const Item = depth === 0 ? SidebarMenuItem : SidebarMenuSubItem;
+  if (!link.children?.length) return <Item>{button}</Item>;
+  const open = isOpen(id);
+  return (
+    <Collapsible asChild open={open} onOpenChange={() => onToggle(id)}>
+      <Item data-group={id} className="relative">
+        {button}
+        <CollapsibleTrigger asChild>
+          <SidebarMenuAction aria-label="展開/收合" className="data-[state=open]:rotate-90">
+            <ChevronRight />
+          </SidebarMenuAction>
+        </CollapsibleTrigger>
+        <CollapsibleContent forceMount className="data-[state=closed]:hidden">
+          <SidebarMenuSub className={depth === 0 ? "mr-0 pr-0" : "mr-0 ml-1.5 pr-0 pl-2"}>
+            {link.children.map((c) => (
+              <CatalogItem
+                key={`${c.href}-${c.label}`}
+                link={c}
+                depth={depth + 1}
+                active={active}
+                isOpen={isOpen}
+                onToggle={onToggle}
+              />
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </Item>
+    </Collapsible>
+  );
+}
+
+export function CatalogButton({ label }: { label: string }) {
+  const { isMobile, state, openMobile, toggleSidebar } = useSidebar();
+  return (
+    <button
+      type="button"
+      data-catalog-open
+      aria-expanded={isMobile ? openMobile : false}
+      onClick={toggleSidebar}
+      className={`${state === "expanded" ? "md:hidden " : ""}fixed bottom-4 left-4 z-40 cursor-pointer rounded-full border border-line-strong bg-paper px-4 py-2 text-[length:var(--fs-xs)] font-semibold text-ink-2 shadow-md hover:text-pen-ink`}
+    >
+      {label}
+    </button>
+  );
+}
+
+export function CatalogRail(props: { toc: TocLink[]; label: string; kicker?: string }) {
+  const scroller = useRef<HTMLDivElement>(null);
   const index = useMemo(() => indexToc(props.toc), [props.toc]);
-  const railOn = useRailFit(nav);
   const active = useActiveSection(index.ids);
-  const [railClosed, setRailClosed] = useState(readRailClosed);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const { isMobile, setOpenMobile } = useSidebar();
   /** A caret click overrides ownership: true stays open, false stays closed until the section changes. */
   const [manual, setManual] = useState<Map<string, boolean>>(() => new Map());
   const [lastOpened, setLastOpened] = useState<string | null>(null);
   useHashFreeLinks();
-  useBodyClass("rail-closed", railClosed);
-  useBodyClass("toc-open", sheetOpen);
 
   const owners = useMemo(() => ancestors(index, active), [index, active]);
   const isOpen = (id: string) => manual.get(id) ?? owners.has(id);
@@ -234,35 +226,14 @@ export function CatalogRail(props: {
   }, [active]);
 
   useLayoutEffect(() => {
-    scrollIntoRail(nav.current, nav.current?.querySelector("a[aria-current]") ?? null);
-  }, [active, owners, railOn]);
+    scrollIntoCatalog(scroller.current, scroller.current?.querySelector("a[aria-current]") ?? null);
+  }, [active, owners]);
 
   useLayoutEffect(() => {
     if (!lastOpened) return;
-    const sub = document.getElementById(`sub-${lastOpened}`);
-    scrollIntoRail(nav.current, sub?.lastElementChild ?? null);
+    const group = scroller.current?.querySelector(`[data-group="${lastOpened}"] [data-sidebar="menu-sub"]`);
+    scrollIntoCatalog(scroller.current, group?.lastElementChild ?? null);
   }, [lastOpened]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("rail-closed", railClosed ? "1" : "");
-    } catch {}
-  }, [railClosed]);
-
-  const sheetMounted = useRef(false);
-  useEffect(() => {
-    if (!sheetMounted.current) {
-      sheetMounted.current = true;
-      return;
-    }
-    (sheetOpen ? nav.current : btn.current)?.focus();
-    if (!sheetOpen) return;
-    const onKey = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape") setSheetOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [sheetOpen]);
 
   const toggle = (id: string) => {
     const open = !isOpen(id);
@@ -271,50 +242,41 @@ export function CatalogRail(props: {
   };
 
   return (
-    <>
-      <button
-        ref={btn}
-        type="button"
-        id="tocbtn"
-        aria-controls="toc"
-        aria-expanded={sheetOpen}
-        onClick={() => setSheetOpen((o) => !o)}
-      >
-        {props.label}
-      </button>
-      <div id="tocscrim" hidden onClick={() => setSheetOpen(false)} />
-      <nav
-        ref={nav}
-        className="toc"
-        id="toc"
+    <Sidebar
+      label={props.label}
+      className="border-none"
+      onOpenAutoFocus={(ev) => {
+        const here = scroller.current?.querySelector<HTMLElement>("a[aria-current]");
+        if (!here) return;
+        ev.preventDefault();
+        here.focus({ preventScroll: true });
+        scrollIntoCatalog(scroller.current, here);
+      }}
+    >
+      <SidebarHeader className="flex-row items-center justify-between border-t-[3px] border-ink px-3 pt-3">
+        {props.kicker ? <span className="font-code text-xs tracking-widest text-ink-3">{props.kicker}</span> : <span />}
+        {isMobile ? null : <SidebarTrigger data-catalog-close aria-label="收合目錄" className="text-ink-3" />}
+      </SidebarHeader>
+      <SidebarContent
+        ref={scroller}
+        role="navigation"
         aria-label={props.label}
-        tabIndex={-1}
+        data-catalog
+        className="px-2 pb-6 [scrollbar-width:none]"
         onClick={(ev) => {
-          if ((ev.target as Element).closest("a")) setSheetOpen(false);
+          const a = (ev.target as Element).closest('a[href^="#"]');
+          if (!a || !isMobile) return;
+          ev.preventDefault();
+          setOpenMobile(false);
+          scrollAfterUnlock(decodeURIComponent(a.getAttribute("href")!.slice(1)));
         }}
       >
-        <button type="button" id="tocclose" aria-label={props.label} onClick={() => setSheetOpen(false)}>
-          ×
-        </button>
-        <button
-          type="button"
-          id="railtg"
-          aria-controls="toc"
-          aria-expanded={!railClosed}
-          aria-label={railClosed ? "展開目錄" : "收合目錄"}
-          onClick={() => setRailClosed((c) => !c)}
-        >
-          {railClosed ? "»" : "«"}
-        </button>
-        <div className="toc-scroll">
-          {props.lead}
-          {props.kicker ? <div className="t">{props.kicker}</div> : null}
+        <SidebarMenu>
           {props.toc.map((l) => (
-            <TocItem key={`${l.href}-${l.label}`} link={l} active={active} isOpen={isOpen} onToggle={toggle} />
+            <CatalogItem key={`${l.href}-${l.label}`} link={l} depth={0} active={active} isOpen={isOpen} onToggle={toggle} />
           ))}
-          {props.railNote ? <div className="rail-note">{props.railNote}</div> : null}
-        </div>
-      </nav>
-    </>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
   );
 }

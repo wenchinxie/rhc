@@ -20,6 +20,7 @@ import { NodeStatusIndicator } from "@/components/node-status-indicator";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useFolderKey } from "../folder";
+import { useOpenSource } from "./SourceSheet";
 
 /** `ask` is a branch point, `exit` ends the flow off the main path, `fail` ends it with an error. */
 export type FlowKind = "step" | "ask" | "exit" | "fail";
@@ -64,6 +65,7 @@ const KIND_CLASS: Record<FlowKind, string> = {
 
 function StepNode({ data }: NodeProps<Node<StepData>>) {
   const { step, dir, snip } = data;
+  const openSource = useOpenSource();
   return (
     <NodeStatusIndicator status={data.status} variant="border">
       <BaseNode
@@ -75,6 +77,16 @@ function StepNode({ data }: NodeProps<Node<StepData>>) {
         data-snip={snip}
         tabIndex={snip ? 0 : undefined}
         role={snip ? "button" : undefined}
+        onClick={snip ? (ev) => openSource(snip, ev.currentTarget) : undefined}
+        onKeyDown={
+          snip
+            ? (ev) => {
+                if (ev.key !== "Enter" && ev.key !== " ") return;
+                ev.preventDefault();
+                openSource(snip, ev.currentTarget);
+              }
+            : undefined
+        }
       >
         <Handle className="!opacity-0" type="target" position={dir === "DOWN" ? Position.Top : Position.Left} />
         <div className="flex items-baseline justify-between gap-2 px-2.5 pt-1.5 pb-0.5">
@@ -241,6 +253,7 @@ function PhaseCanvas(props: { flow: Flow; steps: string[]; at: number; onJump: (
   return (
     <div ref={ref} className="h-[clamp(20rem,calc(100svh-9rem),46rem)] rounded-md border border-line-strong bg-paper">
       <ReactFlow
+        nodesFocusable={false}
         nodes={nodes}
         onNodesChange={onNodesChange}
         edges={fit ? drawn : []}
@@ -268,7 +281,7 @@ export function FlowDag({ flow }: { flow: Flow }) {
     setOpen(phaseOf.get(flow.path[i]!)!);
   };
   return (
-    <figure className="wide my-6" aria-label={flow.label}>
+    <figure className="my-6" aria-label={flow.label}>
       <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
         {flow.phases.length > 1
           ? flow.phases.map((p, i) => (

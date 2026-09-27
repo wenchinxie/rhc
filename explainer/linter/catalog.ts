@@ -1,4 +1,3 @@
-// Starts its own explainer server and checks the left catalog's rules in headless Chrome.
 // Exits 1 with one line per broken rule. Usage: bun linter/catalog.ts
 import { join } from "node:path";
 
@@ -12,11 +11,14 @@ const server = Bun.spawn(["bun", "--preload", "./mdx-plugin.ts", "src/index.ts"]
   stderr: "ignore",
 });
 
-const CASES = [
+const CASES: { size: string; path: string; cookie?: string; script?: string }[] = [
   { size: "1440x900", path: "/" },
   { size: "1280x800", path: "/" },
-  { size: "900x800", path: "/" },
+  { size: "700x400", path: "/" },
   { size: "1440x900", path: "/?expect=auth-rhc-s-risk#auth-rhc-s-risk" },
+  { size: "1440x900", path: "/?reloaded-closed", cookie: "sidebar_state=false" },
+  { size: "1440x900", path: "/", script: "linter/panels.js" },
+  { size: "700x800", path: "/", script: "linter/panels.js" },
 ];
 
 let failed = 0;
@@ -26,8 +28,8 @@ try {
     await Bun.sleep(100);
   }
   for (const c of CASES) {
-    const run = Bun.spawnSync(["bun", "linter/probe.ts", base + c.path, c.size, "linter/catalog.js"], { cwd: root });
-    const label = `${c.size} ${c.path}`;
+    const run = Bun.spawnSync(["bun", "linter/probe.ts", base + c.path, c.size, c.script ?? "linter/catalog.js", ...(c.cookie ? [c.cookie] : [])], { cwd: root });
+    const label = `${c.size} ${c.path}${c.script ? ` ${c.script}` : ""}`;
     let out: { console_errors: string[]; value: string[] | { exception: string } };
     try {
       out = JSON.parse(run.stdout.toString());

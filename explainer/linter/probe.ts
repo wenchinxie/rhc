@@ -1,7 +1,6 @@
-// Usage: bun linter/probe.ts <url> <width>x<height> <js-expression-file>
 // Loads the url in headless Chrome, evaluates the expression, prints its JSON value.
-const [url, size = "1440x900", exprFile] = process.argv.slice(2);
-if (!url || !exprFile) throw new Error("usage: probe.ts <url> <WxH> <expr.js>");
+const [url, size = "1440x900", exprFile, cookie] = process.argv.slice(2);
+if (!url || !exprFile) throw new Error("usage: probe.ts <url> <WxH> <expr.js> [cookie]");
 const [w, h] = size.split("x").map(Number);
 const expr = await Bun.file(exprFile).text();
 const port = 9300 + Math.floor(Math.random() * 500);
@@ -31,6 +30,10 @@ try {
   await send("Runtime.enable");
   await send("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: 1, mobile: false });
   await send("Page.enable");
+  if (cookie) {
+    const [name, value] = cookie.split("=");
+    await send("Network.setCookie", { name, value, url });
+  }
   await send("Page.navigate", { url });
   await Bun.sleep(3000);
   const res = await send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });

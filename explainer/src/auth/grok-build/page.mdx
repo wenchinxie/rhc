@@ -10,7 +10,7 @@ import { AUTH_FLOW } from "./flow"
   <p>剩下的是 xAI oauth2。<code>resolve_device_flow</code> 看 CLI、<code>GROK_LOGIN_DEVICE_FLOW</code>、config、遠端旗標，最後 <code>default(false)</code>。預設不打裝置碼。被打開時才 POST <code>/oauth2/device/code</code>。404 是 <code>DeviceCodeError::NotEnabled</code>，下一行仍是 loopback。loopback 綁 <code>127.0.0.1</code>，redirect 是 <code>http://127.0.0.1:&#123;port&#125;/callback</code>。<code>build_authorize_url</code> 用 discovery 的 <code>authorization_endpoint</code>。callback 的 code 用 <code>authorization_code</code> 換票。<code>AuthManager::update</code> 寫入 <code>~/.grok/auth.json</code>。</p>
   <FlowDag flow={AUTH_FLOW} />
   <p>點圖上的方塊，打開的是該步原文。API key 在圖的第一個出口，它屬於 <code>resolve_credentials</code>，不在 <code>run_auth_flow_steps</code> 裡面讀環境變數。<Peek snip="gb-resolve">呼叫端先找鑰匙</Peek> <Peek snip="gb-device">裝置碼預設關</Peek> <Peek snip="gb-bind">127.0.0.1 callback</Peek> <Peek snip="gb-authorize">授權網址</Peek> <Peek snip="gb-write">存成 Oidc</Peek> <Peek snip="gb-snapshot">snapshot</Peek></p>
-  <div className="overflow wide">
+  <div className="my-[1.1rem] overflow-x-auto">
   <table>
   <thead><tr><th>東西</th><th>位置</th></tr></thead>
   <tbody>

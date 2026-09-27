@@ -11,7 +11,7 @@ import { AUTH_FLOW } from "./flow"
   <p>device-code 不聽 localhost。它 POST <code>/api/accounts/deviceauth/usercode</code>，螢幕印 <code>/codex/device</code> 與 user code，再 poll <code>/deviceauth/token</code>。404 是這台伺服器沒開裝置碼，CLI 印完就停，不改走瀏覽器。</p>
   <FlowDag flow={AUTH_FLOW} />
   <p>點圖上的方塊，打開的是該步原文。<Peek snip="cx-dispatch">旗標分流</Peek> <Peek snip="cx-pkce">本機 PKCE</Peek> <Peek snip="cx-open">localhost callback</Peek> <Peek snip="cx-file">寫 auth.json</Peek> <Peek snip="cx-env">環境金鑰不落盤</Peek></p>
-  <div className="overflow wide">
+  <div className="my-[1.1rem] overflow-x-auto">
   <table>
   <thead><tr><th>東西</th><th>位置</th></tr></thead>
   <tbody>
