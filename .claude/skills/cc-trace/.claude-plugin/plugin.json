@@ -1,0 +1,1 @@
+{ "name": "cc-trace", "version": "0.1.0", "description": "Observe-only trace of this session's harness: system prompt, injected context, turns, tool calls, subagents, skills, appended rows" }

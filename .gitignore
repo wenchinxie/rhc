@@ -10,3 +10,7 @@ explainer/scip-send/index.scip
 .DS_Store
 .env
 .env.*
+
+.claude/skills/*/.claude-plugin/types/
+.claude/skills/*/tsconfig.json
+*.jsonl
